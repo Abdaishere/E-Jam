@@ -1,0 +1,3 @@
+/home/mohamed/CLionProjects/sendingRawEF/cmake-build-debug/CMakeFiles/sendingRawEF.dir
+/home/mohamed/CLionProjects/sendingRawEF/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mohamed/CLionProjects/sendingRawEF/cmake-build-debug/CMakeFiles/rebuild_cache.dir
