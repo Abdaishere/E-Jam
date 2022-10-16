@@ -1,0 +1,3 @@
+/home/mostafa-abdullah/CLionProjects/GP/PipesTest/cmake-build-debug/CMakeFiles/PipesTest.dir
+/home/mostafa-abdullah/CLionProjects/GP/PipesTest/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mostafa-abdullah/CLionProjects/GP/PipesTest/cmake-build-debug/CMakeFiles/rebuild_cache.dir

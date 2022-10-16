@@ -1,0 +1,3 @@
+/home/mostafa-abdullah/CLionProjects/GP/SocketsTest/cmake-build-debug/CMakeFiles/SocketsTest.dir
+/home/mostafa-abdullah/CLionProjects/GP/SocketsTest/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mostafa-abdullah/CLionProjects/GP/SocketsTest/cmake-build-debug/CMakeFiles/rebuild_cache.dir
