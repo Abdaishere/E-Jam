@@ -1,0 +1,3 @@
+/home/mohamedelhagry/CLionProjects/receiveEthernet/cmake-build-debug/CMakeFiles/receiveEthernet.dir
+/home/mohamedelhagry/CLionProjects/receiveEthernet/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mohamedelhagry/CLionProjects/receiveEthernet/cmake-build-debug/CMakeFiles/rebuild_cache.dir
