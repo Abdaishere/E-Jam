@@ -13,20 +13,19 @@ using namespace std;
 
 int main()
 {
-    auto begin = chrono::high_resolution_clock::now();
-    int n = 1e5;
-    vector<string> requests;
-    for (int i = 0; i < n; i++)
-        requests.emplace_back(string(10, 'a'));
+    auto startTest = std::chrono::system_clock::now();
+    auto endTest = startTest + 5min;
+
+    long long counter = 0;
 
     char buffer[bufferSize];
+    string request = string(10, 'a');
 
     // open the file with read and write modes
     int fd1 = open(FIFO_FILE1, O_RDWR);
     int fd2 = open(FIFO_FILE2, O_RDWR);
 
-    for (auto& request : requests)
-    {
+    do {
         // send request to the server
         memset(&buffer, 0, sizeof buffer); // clear the buffer
         strcpy(buffer, request.c_str());
@@ -36,12 +35,20 @@ int main()
         memset(&buffer, 0, sizeof buffer); // clear the buffer
         read(fd2, buffer, sizeof(buffer));
 //        cout << "Server responded: " << buffer << endl;
-    }
+
+        counter++;
+
+    } while (std::chrono::system_clock::now() < endTest);
+
+    strcpy(buffer, "exit");
+    write(fd1, buffer, strlen(buffer));
+
     // close the file descriptor
     close(fd1);
     close(fd2);
 
-    auto end = chrono::high_resolution_clock::now();
-    cout << "Total time = " << chrono::duration_cast<chrono::duration<double>>(end - begin).count() * 1000 << endl;
+    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(std::chrono::system_clock::now() - startTest).count() * 1000;
+    cout << "Total time = " << elapsedTime << endl;
+    cout << "Sent requests = " << counter << endl;
     return 0;
 }

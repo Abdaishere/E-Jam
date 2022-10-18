@@ -12,11 +12,10 @@ using namespace std;
 
 int main()
 {
-    auto begin = chrono::high_resolution_clock::now();
-    vector<string> requests;
-    int n = 1e7;
-    for (int i = 0; i < n; i++)
-        requests.emplace_back(string(10, 'b'));
+    auto startTest = std::chrono::system_clock::now();
+    auto endTest = startTest + 5min;
+
+    long long counter = 0;
 
     // create the socket file descriptor
     int sock = socket(AF_INET /* IP v4 */, SOCK_STREAM /* TCP */, 0);
@@ -49,8 +48,9 @@ int main()
     int bufferSize = 1024;
     char buffer[bufferSize];
 
-    for (auto& request : requests)
-    {
+    string request = string(10, 'a');
+
+    do {
         // send request to the server
         memset(buffer, 0, sizeof(buffer)); // clear the buffer
         strcpy(buffer, request.c_str());
@@ -60,12 +60,19 @@ int main()
         memset(&buffer, 0, sizeof(buffer)); // clear the buffer
         recv(sock, (char*)&buffer, bufferSize, 0);
 //        cout << "Server responded: " << buffer << endl;
-    }
+
+        counter++;
+
+    } while (std::chrono::system_clock::now() < endTest);
+
+    strcpy(buffer, "exit");
+    send(sock, (char*)&buffer, strlen(buffer), 0);
 
     // closing the connected socket
     close(client_fd);
 
-    auto end = chrono::high_resolution_clock::now();
-    cout << "Total time = " << chrono::duration_cast<chrono::duration<double>>(end - begin).count() * 1000 << endl;
+    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(std::chrono::system_clock::now() - startTest).count() * 1000;
+    cout << "Total time = " << elapsedTime << endl;
+    cout << "Sent requests = " << counter << endl;
     return 0;
 }

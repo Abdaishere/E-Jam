@@ -1,19 +1,18 @@
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.*;
 
 public class Client {
     public static final String IP = "127.0.0.1";
     public static final int PORT = 5000;
-    public static final int N = (int)1e5;
 
     public Client(String ip, int port) throws IOException {
-        ArrayList<String> requests = new ArrayList<>();
-        for (int i = 1; i <= N; i++) {
-            requests.add("a".repeat(10));
-        }
 
-        long start = System.currentTimeMillis();
+        // set timer for 5 min
+        long timer = 5 * 60 * 1000, counter = 0;
+
+        long startTest = System.currentTimeMillis();
+        long endTest = System.currentTimeMillis();
 
         // create a socket to communicate to the specified host and port
         Socket socket = new Socket(ip, port);
@@ -24,23 +23,27 @@ public class Client {
         // create a stream for writing to this socket
         PrintStream printStream = new PrintStream(socket.getOutputStream());
 
-        String responce;
-        for (String request : requests) {
+        String request = "a".repeat(10);
+
+        while (endTest - startTest < timer) {
             // send request to the server
             printStream.println(request);
 
             // receive response from the server
-            responce = fromServer.readLine();
-//            System.out.println("Server responded: " + responce);
+            String response = fromServer.readLine();
+//            System.out.println("Server responded: " + response);
+
+            counter++;
+            endTest = System.currentTimeMillis();
         }
 
         fromServer.close();
         printStream.close();
         socket.close();
 
-        long end = System.currentTimeMillis();
-        long elapsedTime = end - start;
+        long elapsedTime = endTest - startTest;
         System.out.println("Total time = " + elapsedTime);
+        System.out.println("Sent requests = " + counter);
     }
 
     public static void main(String[] args) throws IOException {

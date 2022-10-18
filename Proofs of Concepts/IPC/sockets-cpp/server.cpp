@@ -13,12 +13,8 @@ using namespace std;
 
 int main()
 {
-    double total = 0;
-    auto begin = chrono::high_resolution_clock::now();
-    vector<string> responses;
-    int n = 1e7;
-    for (int i = 0; i < n; i++)
-        responses.emplace_back(string(10, 'b'));
+    auto startTest = chrono::high_resolution_clock::now();
+    long long counter = 0;
 
     // create the socket file descriptor
     int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -56,9 +52,6 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    auto end = chrono::high_resolution_clock::now();
-    total += chrono::duration_cast<chrono::duration<double>>(end - begin).count();
-
     // accepting the client connection
     int server_fd;
     int addrlen = sizeof(address);
@@ -68,22 +61,27 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    begin = chrono::high_resolution_clock::now();
-
     int bufferSize = 1024;
     char buffer[bufferSize];
 
-    for (auto& response : responses)
+    string response = string(10, 'b');
+
+    while (true)
     {
         // receive request from the client
         memset(&buffer, 0, sizeof(buffer)); // clear the buffer
         recv(server_fd, (char*)&buffer, bufferSize, 0);
 //        cout << "Client requested: " << buffer << endl;
 
+        if (strcmp(buffer, "exit") == 0)
+            break;
+
         // send response to the client
         memset(&buffer, 0, sizeof(buffer)); //clear the buffer
         strcpy(buffer, response.c_str());
         send(server_fd, (char*)&buffer, strlen(buffer), 0);
+
+        counter++;
     }
 
     // closing the connected socket
@@ -92,8 +90,9 @@ int main()
     // closing the listening socket
     shutdown(sock, SHUT_RDWR);
 
-    end = chrono::high_resolution_clock::now();
-    total += chrono::duration_cast<chrono::duration<double>>(end - begin).count();
-    cout << "Total time = " << total * 1000 << endl;
+    auto endTest = chrono::high_resolution_clock::now();
+    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(endTest - startTest).count() * 1000;
+    cout << "Total time = " << elapsedTime << endl;
+    cout << "Sent responses = " << counter << endl;
     return 0;
 }

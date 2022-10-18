@@ -1,33 +1,53 @@
 import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
-import java.util.ArrayList;
 
 public class Main {
-    public static final int N = (int)1e5;
 
     public static void main(String[] args) throws IOException {
-        long start = System.currentTimeMillis();
+        long timer = 5 * 60 * 1000, counter = 0;
+
+        long startTest = System.currentTimeMillis();
+        long endTest = System.currentTimeMillis();
+
+        PipedWriter writeToServer = new PipedWriter();
+        PipedReader readFromClient = new PipedReader();
+
+        PipedWriter writeToClient = new PipedWriter();
+        PipedReader readFromServer = new PipedReader();
+
+        writeToServer.connect(readFromClient);
+        writeToClient.connect(readFromServer);
+
+        while (endTest - startTest < timer) {
+            writeToServer.write("a".repeat(10).toCharArray());
+            writeToServer.write('\n');
+
+            int i;
+            while ((char)(i = readFromClient.read()) != '\n') {
+//                System.out.print((char)i);
+            }
+
+            writeToClient.write("b".repeat(10).toCharArray());
+            writeToClient.write('\n');
 
 
-        PipedReader reader = new PipedReader();
-        PipedWriter writer = new PipedWriter(reader);
+            while ((char)(i = readFromServer.read()) != '\n') {
+//                System.out.print((char)i);
+            }
 
-        for (int i = 0; i < N; i++) {
-            writer.write("a".repeat(10));
+            counter++;
+            endTest = System.currentTimeMillis();
         }
-        writer.write('\n');
 
-        int i;
-        while ((char)(i = reader.read()) != '\n') {
-//            System.out.print((char)i);
-        }
+        writeToClient.close();
+        readFromClient.close();
 
-        writer.close();
-        reader.close();
-
-        long end = System.currentTimeMillis();
-        long elapsedTime = end - start;
+        long elapsedTime = endTest - startTest;
         System.out.println("Total time = " + elapsedTime);
+        System.out.println("Total sent = " + counter);
     }
 }
+
+// 331606
+// 6747891
