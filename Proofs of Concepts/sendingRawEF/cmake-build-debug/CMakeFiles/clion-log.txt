@@ -1,4 +1,4 @@
-/snap/clion/209/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/209/bin/ninja/linux/ninja -G Ninja -S /home/mohamed/CLionProjects/sendingRawEF -B /home/mohamed/CLionProjects/sendingRawEF/cmake-build-debug
+/home/mohamedelhagry/Downloads/CLion-2022.2.4/clion-2022.2.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" -S "/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/sendingRawEF" -B "/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/sendingRawEF/cmake-build-debug"
 -- The C compiler identification is GNU 11.2.0
 -- The CXX compiler identification is GNU 11.2.0
 -- Detecting C compiler ABI info
@@ -13,4 +13,4 @@
 -- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/mohamed/CLionProjects/sendingRawEF/cmake-build-debug
+-- Build files have been written to: /home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/sendingRawEF/cmake-build-debug

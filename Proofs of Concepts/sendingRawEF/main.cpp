@@ -7,7 +7,8 @@
 #include <cstring>
 #include <netinet/in.h>
 
-#define DEFAULT_IF_NAME "enp34s0"
+//#define DEFAULT_IF_NAME "enp34s0"
+const char* DEFAULT_IF_NAME = "enp34s0";
 #define BUFF_LEN 81
 #define frameLength 118
 #define protocol 0x88b5
@@ -22,6 +23,9 @@ struct EthernetFrame{
 int main(int argn, char** argv) {
     //experimental use etherTypes 0x88B5 and 0x88B6
     int etherType = 0x88B5;
+
+    if(argn > 1)
+        DEFAULT_IF_NAME = argv[1];
 
 
     //open socket
