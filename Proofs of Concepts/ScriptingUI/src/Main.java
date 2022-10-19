@@ -30,7 +30,7 @@ public class Main {
                     System.out.println(e);
                 }
 
-                System.out.println("\"" + data + "\" Has be parsed");
+                System.out.println("\"" + data + "\" has been parsed");
             }
             myReader.close();
         } catch (FileNotFoundException e) {
