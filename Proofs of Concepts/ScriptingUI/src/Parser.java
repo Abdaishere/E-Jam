@@ -71,6 +71,7 @@ public class Parser {
             default -> throw new Error("undefined input at Function of instruction :" + d);
         }
     }
+
     /**
      *  find the absolute time for a specific date starting from the last time entered
      * @param now the last time entered
