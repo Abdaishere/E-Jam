@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/SocketsTest.dir/server.cpp.o CMakeFiles/SocketsTest.dir/client.cpp.o -o SocketsTest 

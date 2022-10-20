@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="PipesTest"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="PipesTest">
+				<Option output="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug/PipesTest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 PipesTest"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="PipesTest/fast">
+				<Option output="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug/PipesTest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/11"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/11"/>
+					<Add directory="/usr/include/c++/11/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/11/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 PipesTest/fast"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -j8 -f &quot;/home/mohamedelhagry/CLionProjects/E-Jam/Proofs\ of\ Concepts/IPC/pipes-cpp/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/client.cpp">
+			<Option target="PipesTest"/>
+		</Unit>
+		<Unit filename="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/main.cpp">
+			<Option target="PipesTest"/>
+		</Unit>
+		<Unit filename="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/server.cpp">
+			<Option target="PipesTest"/>
+		</Unit>
+		<Unit filename="/home/mohamedelhagry/CLionProjects/E-Jam/Proofs of Concepts/IPC/pipes-cpp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
