@@ -1,42 +1,61 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <cstdio>
-#include <cstring>
-#include <chrono>
+#include <unistd.h>
 using namespace std;
+
+struct memory {
+    char buff[300000];
+    int status, pid1, pid2;
+    bool read, write;
+};
+
+struct memory* shmptr;
 
 int main()
 {
-    auto begin = chrono::high_resolution_clock::now();
+    auto startTest = chrono::high_resolution_clock::now();
+    long long counter = 0;
 
-    // ftok to generate unique key
-    key_t key = ftok("shmfile",65);
+    // process id of server
+    int pid = getpid();
 
-    // shmget returns an identifier in shmid
-    int shmid = shmget(key,1024, IPC_CREAT | 0666);
+    // key value of shared memory
+    int key = 12345;
 
-    // shmat to attach to shared memory
-    char *str = (char*) shmat(shmid, nullptr, 0);
-    string prev;
+    // shared memory create
+    int shmid = shmget(key, sizeof(struct memory), IPC_CREAT | 0666);
 
-    while (strcmp(str, "exit") != 0)
+    // attaching the shared memory
+    shmptr = (struct memory*)shmat(shmid, NULL, 0);
+
+    // store the process id of server in shared memory
+    shmptr->pid1 = pid;
+    shmptr->read = false;
+    shmptr->write = true;
+
+    string temp;
+
+    while (strcmp(shmptr->buff, "exit") != 0)
     {
-        if (strcmp(str, prev.c_str()) != 0)
-        {
-//            printf("Data read from memory: %s\n", str);
-            prev = str;
-        }
+        while (!shmptr->read)
+            continue;
+
+        // read from the shared memory
+        shmptr->read = false;
+        temp = shmptr->buff;
+//        cout << "Client sent: " << temp << endl;
+        shmptr->write = true;
+
+        counter++;
     }
 
-    //detach from shared memory
-    shmdt(str);
-
-    // destroy the shared memory
+    shmdt((void*)shmptr);
     shmctl(shmid, IPC_RMID, nullptr);
 
-    auto end = chrono::high_resolution_clock::now();
-    cout << "Server time = " << chrono::duration_cast<chrono::duration<double>>(end - begin).count() * 1000 << endl;
+    auto endTest = chrono::high_resolution_clock::now();
+    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(endTest - startTest).count() * 1000;
+    cout << "Total time = " << elapsedTime << endl;
+    cout << "Received requests = " << counter << endl;
     return 0;
 }

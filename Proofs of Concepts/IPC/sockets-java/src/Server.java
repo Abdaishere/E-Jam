@@ -4,6 +4,7 @@ import java.net.Socket;
 
 public class Server {
     public static final int PORT = 5000;
+    public static final int N = 16384;
 
     public Server(int port) throws IOException {
 
@@ -25,7 +26,7 @@ public class Server {
         // create a stream for writing to this socket
         PrintStream printStream = new PrintStream(socket.getOutputStream());
 
-        String response = "b".repeat(10), request;
+        String response = "b".repeat(N), request;
 
         // receive request from the client
         while ((request = fromClient.readLine()) != null) {

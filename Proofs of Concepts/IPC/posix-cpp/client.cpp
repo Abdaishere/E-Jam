@@ -1,40 +1,65 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <cstdio>
-#include <cstring>
-#include <chrono>
+#include <unistd.h>
 using namespace std;
 
-int main()
+struct memory {
+    char buff[300000];
+    int status, pid1, pid2;
+    bool read, write;
+};
+
+struct memory* shmptr;
+
+int main(int argc, char* argv[])
 {
-    auto begin = chrono::high_resolution_clock::now();
-    int n = 1e7;
-    vector<string> requests;
-    for (int i = 0; i < n; i++)
-        requests.emplace_back(string(10, 'a'));
-    requests.emplace_back("exit");
+    int n = stoi(argv[1]);
+    cout << "n = " << n << endl;
 
-    // ftok to generate unique key
-    key_t key = ftok("shmfile",65);
+    auto startTest = chrono::high_resolution_clock::now();
+    auto endTest = startTest + 5min;
 
-    // shmget returns an identifier in shmid
-    int shmid = shmget(key, 1024, IPC_CREAT | 0666);
+    long long counter = 0;
 
-    // shmat to attach to shared memory
-    char *str = (char*) shmat(shmid, nullptr, 0);
+    // process id of client
+    int pid = getpid();
 
-    for (auto& request : requests)
-    {
-        strcpy(str, request.c_str());
-//        printf("Data written in memory: %s\n", str);
-    }
+    // key value of shared memory
+    int key = 12345;
 
-    //detach from shared memory
-    shmdt(str);
+    // shared memory create
+    int shmid = shmget(key, sizeof(struct memory), IPC_CREAT | 0666);
 
-    auto end = chrono::high_resolution_clock::now();
-    cout << "Client time = " << chrono::duration_cast<chrono::duration<double>>(end - begin).count() * 1000 << endl;
+    // attaching the shared memory
+    shmptr = (struct memory*)shmat(shmid, nullptr, 0);
+
+    // store the process id of client in shared memory
+    shmptr->pid2 = pid;
+    shmptr->read = false;
+    shmptr->write = true;
+
+    string request = string(n, 'a');
+
+    do {
+        while (!shmptr->write)
+            continue;
+
+        // write to the shared memory
+        shmptr->write = false;
+        strcpy(shmptr->buff, request.c_str());
+        shmptr->read = true;
+
+        counter++;
+
+    } while (std::chrono::system_clock::now() < endTest);
+
+    strcpy(shmptr->buff, "exit");
+
+    shmdt((void*)shmptr);
+
+    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(endTest - startTest).count() * 1000;
+    cout << "Total time = " << elapsedTime << endl;
+    cout << "Sent requests = " << counter << endl;
     return 0;
 }

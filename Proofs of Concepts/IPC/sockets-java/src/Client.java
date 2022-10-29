@@ -5,6 +5,7 @@ import java.util.*;
 public class Client {
     public static final String IP = "127.0.0.1";
     public static final int PORT = 5000;
+    public static final int N = 16384;
 
     public Client(String ip, int port) throws IOException {
 
@@ -23,7 +24,7 @@ public class Client {
         // create a stream for writing to this socket
         PrintStream printStream = new PrintStream(socket.getOutputStream());
 
-        String request = "a".repeat(10);
+        String request = "a".repeat(N);
 
         while (endTest - startTest < timer) {
             // send request to the server

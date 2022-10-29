@@ -3,6 +3,7 @@ import java.io.PipedReader;
 import java.io.PipedWriter;
 
 public class Main {
+    public static final int N = 1023;
 
     public static void main(String[] args) throws IOException {
         long timer = 5 * 60 * 1000, counter = 0;
@@ -20,7 +21,7 @@ public class Main {
         writeToClient.connect(readFromServer);
 
         while (endTest - startTest < timer) {
-            writeToServer.write("a".repeat(10).toCharArray());
+            writeToServer.write("a".repeat(N).toCharArray());
             writeToServer.write('\n');
 
             int i;
@@ -28,7 +29,7 @@ public class Main {
 //                System.out.print((char)i);
             }
 
-            writeToClient.write("b".repeat(10).toCharArray());
+            writeToClient.write("b".repeat(N).toCharArray());
             writeToClient.write('\n');
 
 
@@ -49,5 +50,3 @@ public class Main {
     }
 }
 
-// 331606
-// 6747891

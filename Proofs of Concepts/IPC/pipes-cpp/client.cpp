@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
@@ -7,19 +6,22 @@
 
 using namespace std;
 
-#define bufferSize 1024
 #define FIFO_FILE1 "/tmp/fifo_pipe1"
 #define FIFO_FILE2 "/tmp/fifo_pipe2"
 
-int main()
+int main(int argc, char* argv[])
 {
+    int n = stoi(argv[1]);
+    cout << "n = " << n << endl;
+
     auto startTest = std::chrono::system_clock::now();
     auto endTest = startTest + 5min;
 
     long long counter = 0;
 
+    int bufferSize = n + 5;
     char buffer[bufferSize];
-    string request = string(10, 'a');
+    string request = string(n, 'a');
 
     // open the file with read and write modes
     int fd1 = open(FIFO_FILE1, O_RDWR);
@@ -47,7 +49,7 @@ int main()
     close(fd1);
     close(fd2);
 
-    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(std::chrono::system_clock::now() - startTest).count() * 1000;
+    long long elapsedTime = (long long)(chrono::duration_cast<chrono::milliseconds>(endTest - startTest).count());
     cout << "Total time = " << elapsedTime << endl;
     cout << "Sent requests = " << counter << endl;
     return 0;

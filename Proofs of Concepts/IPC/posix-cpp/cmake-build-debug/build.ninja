@@ -67,6 +67,18 @@ build CMakeFiles/posixTest.dir/server.cpp.o: CXX_COMPILER__posixTest_Debug /home
   OBJECT_DIR = CMakeFiles/posixTest.dir
   OBJECT_FILE_DIR = CMakeFiles/posixTest.dir
 
+build CMakeFiles/posixTest.dir/user1.cpp.o: CXX_COMPILER__posixTest_Debug /home/mostafa-abdullah/CLionProjects/GP/posixTest/user1.cpp || cmake_object_order_depends_target_posixTest
+  DEP_FILE = CMakeFiles/posixTest.dir/user1.cpp.o.d
+  FLAGS = -g -std=gnu++2a
+  OBJECT_DIR = CMakeFiles/posixTest.dir
+  OBJECT_FILE_DIR = CMakeFiles/posixTest.dir
+
+build CMakeFiles/posixTest.dir/user2.cpp.o: CXX_COMPILER__posixTest_Debug /home/mostafa-abdullah/CLionProjects/GP/posixTest/user2.cpp || cmake_object_order_depends_target_posixTest
+  DEP_FILE = CMakeFiles/posixTest.dir/user2.cpp.o.d
+  FLAGS = -g -std=gnu++2a
+  OBJECT_DIR = CMakeFiles/posixTest.dir
+  OBJECT_FILE_DIR = CMakeFiles/posixTest.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target posixTest
@@ -75,7 +87,7 @@ build CMakeFiles/posixTest.dir/server.cpp.o: CXX_COMPILER__posixTest_Debug /home
 #############################################
 # Link the executable posixTest
 
-build posixTest: CXX_EXECUTABLE_LINKER__posixTest_Debug CMakeFiles/posixTest.dir/main.cpp.o CMakeFiles/posixTest.dir/client.cpp.o CMakeFiles/posixTest.dir/server.cpp.o
+build posixTest: CXX_EXECUTABLE_LINKER__posixTest_Debug CMakeFiles/posixTest.dir/main.cpp.o CMakeFiles/posixTest.dir/client.cpp.o CMakeFiles/posixTest.dir/server.cpp.o CMakeFiles/posixTest.dir/user1.cpp.o CMakeFiles/posixTest.dir/user2.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/posixTest.dir
   POST_BUILD = :

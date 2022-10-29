@@ -1,5 +1,4 @@
-#include <vector>
-#include <iostream>
+#include <bits/stdc++.h>
 #include <arpa/inet.h>
 #include <cstdio>
 #include <cstring>
@@ -10,8 +9,11 @@ using namespace std;
 
 #define PORT 5000
 
-int main()
+int main(int argc, char* argv[])
 {
+    int n = stoi(argv[1]);
+    cout << "n = " << n << endl;
+
     auto startTest = std::chrono::system_clock::now();
     auto endTest = startTest + 5min;
 
@@ -45,21 +47,38 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    int bufferSize = 1024;
+    int bufferSize = n + 5;
     char buffer[bufferSize];
 
-    string request = string(10, 'a');
+    string request = string(n, 'a');
 
     do {
         // send request to the server
-        memset(buffer, 0, sizeof(buffer)); // clear the buffer
-        strcpy(buffer, request.c_str());
-        send(sock, (char*)&buffer, strlen(buffer), 0);
+        string message = request;
+        size_t sentSize = 0;
+        while (sentSize < n)
+        {
+            memset(buffer, 0, sizeof(buffer)); // clear the buffer
+            strcpy(buffer, message.c_str());
+            int cur = send(sock, (char*)&buffer, message.length(), 0);
+            sentSize += cur;
+            if (sentSize == message.length())
+                message = "";
+            else
+                message = message.substr(sentSize);
+        }
 
         // receive buffer from the server
-        memset(&buffer, 0, sizeof(buffer)); // clear the buffer
-        recv(sock, (char*)&buffer, bufferSize, 0);
-//        cout << "Server responded: " << buffer << endl;
+        int receivedSize = 0;
+        string response;
+        while (receivedSize < n)
+        {
+            memset(&buffer, 0, sizeof(buffer)); // clear the buffer
+            receivedSize += recv(sock, (char*)&buffer, bufferSize, 0);
+            response += buffer;
+        }
+//        cout << "Server responded: " << response << endl;
+//        cout << response.length() << endl;
 
         counter++;
 
@@ -71,7 +90,8 @@ int main()
     // closing the connected socket
     close(client_fd);
 
-    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(std::chrono::system_clock::now() - startTest).count() * 1000;
+//    long long elapsedTime = chrono::duration_cast<chrono::duration<chrono::milliseconds>>(std::chrono::system_clock::now() - startTest);
+    long long elapsedTime = (long long)(chrono::duration_cast<chrono::milliseconds>(endTest - startTest).count());
     cout << "Total time = " << elapsedTime << endl;
     cout << "Sent requests = " << counter << endl;
     return 0;

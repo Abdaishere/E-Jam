@@ -1,5 +1,4 @@
-#include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 #include <netinet/in.h>
 #include <cstdio>
 #include <cstdlib>
@@ -11,9 +10,12 @@ using namespace std;
 
 #define PORT 5000
 
-int main()
+int main(int argc, char* argv[])
 {
-    auto startTest = chrono::high_resolution_clock::now();
+    int n = stoi(argv[1]);
+    cout << "n = " << n << endl;
+
+    auto startTest = std::chrono::system_clock::now();
     long long counter = 0;
 
     // create the socket file descriptor
@@ -61,25 +63,44 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    int bufferSize = 1024;
+    int bufferSize = n + 5;
     char buffer[bufferSize];
 
-    string response = string(10, 'b');
+    string response = string(n, 'b');
 
     while (true)
     {
         // receive request from the client
-        memset(&buffer, 0, sizeof(buffer)); // clear the buffer
-        recv(server_fd, (char*)&buffer, bufferSize, 0);
-//        cout << "Client requested: " << buffer << endl;
+        int receivedSize = 0;
+        string request;
+        while (receivedSize < n)
+        {
+            memset(&buffer, 0, sizeof(buffer)); // clear the buffer
+            receivedSize += recv(server_fd, (char*)&buffer, bufferSize, 0);
+            request += buffer;
+            if (request == "exit")
+                break;
+        }
+//        cout << "Client requested: " << request << endl;
+//        cout << request.length() << endl;
 
-        if (strcmp(buffer, "exit") == 0)
+        if (request == "exit")
             break;
 
         // send response to the client
-        memset(&buffer, 0, sizeof(buffer)); //clear the buffer
-        strcpy(buffer, response.c_str());
-        send(server_fd, (char*)&buffer, strlen(buffer), 0);
+        string message = response;
+        size_t sentSize = 0;
+        while (sentSize < n)
+        {
+            memset(buffer, 0, sizeof(buffer)); // clear the buffer
+            strcpy(buffer, message.c_str());
+            int cur = send(server_fd, (char*)&buffer, strlen(buffer), 0);
+            sentSize += cur;
+            if (sentSize == message.length())
+                message = "";
+            else
+                message = message.substr(sentSize);
+        }
 
         counter++;
     }
@@ -90,8 +111,8 @@ int main()
     // closing the listening socket
     shutdown(sock, SHUT_RDWR);
 
-    auto endTest = chrono::high_resolution_clock::now();
-    double elapsedTime = chrono::duration_cast<chrono::duration<double>>(endTest - startTest).count() * 1000;
+    auto endTest = std::chrono::system_clock::now();
+    long long elapsedTime = (long long)(chrono::duration_cast<chrono::milliseconds>(endTest - startTest).count());
     cout << "Total time = " << elapsedTime << endl;
     cout << "Sent responses = " << counter << endl;
     return 0;
