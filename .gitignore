@@ -1,6 +1,13 @@
 # Prerequisites
 *.d
 
+
+# clion extra files
+*.json
+*.cbp
+*.cmake
+*.marks
+
 # Compiled Object files
 *.slo
 *.lo

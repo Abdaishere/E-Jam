@@ -3,8 +3,13 @@ import Instructions.Disconnect;
 import Instructions.Generate;
 import Instructions.Instruction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class Parser {
@@ -20,7 +25,7 @@ public class Parser {
         LocalDateTime tempTime;
         String[] input = d.split(" ", 4);
 
-        // first part, time of occurrence {'!' after, '@'} in (yyyy:MM:dd:HH:mm:ss.SSSSSS format)
+        // first part, time of occurrence {'!' after in (HH:mm:ss.SSSSSS format) , '@' in (yyyy:MM:dd:HH:mm:ss.SSSSSS format)}
         if (input[0].equals("!")) {
             tempTime = TimeAdder(now, input[1]);
         } else if (input[0].equals("@")) {
@@ -71,6 +76,7 @@ public class Parser {
             default -> throw new Error("undefined input at Function of instruction :" + d);
         }
     }
+
     /**
      *  find the absolute time for a specific date starting from the last time entered
      * @param now the last time entered
@@ -78,16 +84,16 @@ public class Parser {
      * @return absolute time
      */
     public static LocalDateTime TimeAdder(LocalDateTime now, String i) {
-        LocalDateTime result = LocalDateTime.parse(i, DateTimeFormatter.ofPattern("yyyy:MM:dd:HH:mm:ss.SSSSSS"));
+        final DateTimeFormatter timeColonFormatter = new DateTimeFormatterBuilder().appendPattern("HH:mm:ss.SSSSSS").parseDefaulting(ChronoField.YEAR_OF_ERA, 1)
+                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
+                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
+                .toFormatter(); ;
 
-        // Accuracy
-        now = now.plusYears(result.getYear());
-        now = now.plusMonths(result.getMonth().getValue());
-        now = now.plusDays(result.getDayOfMonth());
-        now = now.plusHours(result.getHour());
-        now = now.plusMinutes(result.getMinute());
-        now = now.plusSeconds(result.getSecond());
-        now = now.plusNanos(result.getNano());
+        LocalDateTime parsed = LocalDateTime.parse(i, timeColonFormatter);
+        now = now.plusNanos(parsed.getNano());
+        now = now.plusSeconds(parsed.getSecond());
+        now = now.plusMinutes(parsed.getMinute());
+        now = now.plusHours(parsed.getHour());
 
         return now;
     }
