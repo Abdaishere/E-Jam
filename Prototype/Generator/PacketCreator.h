@@ -5,6 +5,7 @@
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H
 
+#include <queue>
 #include "PayloadGenerator.h"
 #include "SegmentConstructor.h"
 #include "DatagramConstructor.h"
@@ -25,13 +26,19 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
+    static PacketCreator* instance;
+
     PayloadGenerator* payloadGenerator;
     SegmentConstructor* segmentConstructor;
     DatagramConstructor* datagramConstructor;
     FrameConstructor* frameConstructor;
-public:
 
+    std::queue<char*> productQueue;
+
+    PacketCreator();
+public:
     void createPacket();
+    static PacketCreator* getInstance();
 };
 
 
