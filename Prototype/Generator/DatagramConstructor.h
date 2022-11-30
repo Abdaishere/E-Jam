@@ -10,12 +10,10 @@
 class DatagramConstructor
 {
 private:
-    int protocol;
     char* datagram;
 public:
-    DatagramConstructor(int protocol, const char* resultingString, int innerProtocol){};
+    DatagramConstructor(const char* payload, int innerProtocol){};
     void constructDatagram();
 };
-
 
 #endif //GENERATOR_DATAGRAMCONSTRUCTOR_H

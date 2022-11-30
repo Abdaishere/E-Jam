@@ -20,9 +20,6 @@ struct segmentConstructorInfo{
     //
 };
 
-
-
-
 class PacketCreator
 {
 private:
