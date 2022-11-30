@@ -10,6 +10,7 @@
 #include "SegmentConstructor.h"
 #include "DatagramConstructor.h"
 #include "FrameConstructor.h"
+#include "EthernetConstructor.h"
 
 struct segmentConstructorInfo{
     //some relevant values regarding the headers of the protocol
@@ -24,18 +25,13 @@ class PacketCreator
 {
 private:
     static PacketCreator* instance;
-
-    PayloadGenerator* payloadGenerator;
-    SegmentConstructor* segmentConstructor;
-    DatagramConstructor* datagramConstructor;
-    FrameConstructor* frameConstructor;
-
-    std::queue<char*> productQueue;
+    std::queue<unsigned char*> productQueue;
 
     PacketCreator();
 public:
     void createPacket();
     static PacketCreator* getInstance();
+    void sendHead();
 };
 
 

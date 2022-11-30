@@ -3,3 +3,8 @@
 //
 
 #include "FrameConstructor.h"
+
+unsigned char *FrameConstructor::getFrame()
+{
+    return frame;
+}

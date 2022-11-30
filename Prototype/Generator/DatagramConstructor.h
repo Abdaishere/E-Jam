@@ -10,9 +10,11 @@
 class DatagramConstructor
 {
 private:
+    int protocol;
     char* datagram;
+    char* payload;
 public:
-    DatagramConstructor(const char* payload, int innerProtocol){};
+    DatagramConstructor(const char* payload, int protocol){};
     void constructDatagram();
 };
 

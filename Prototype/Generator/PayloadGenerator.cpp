@@ -6,19 +6,30 @@
 
 PayloadGenerator::PayloadGenerator(int type)
 {
+    switch (type)
+    {
+        default:
+            generateAlphabet();
+    }
+}
+
+void PayloadGenerator::generateRandomCharacters()
+{
     //TODO
 }
 
-char *PayloadGenerator::generateRandomCharacters()
+void PayloadGenerator::generateAlphabet()
 {
-    //TODO
-
-    return nullptr;
+    payload = (unsigned char *) "abcdefghijklmnopqrstuvwxyz";
+    payloadSize = 26;
 }
 
-char *PayloadGenerator::generateAlphabet()
+unsigned char*PayloadGenerator::getPayload()
 {
-    //TODO
+    return payload;
+}
 
-    return nullptr;
+int PayloadGenerator::getPayloadSize()
+{
+    return payloadSize;
 }

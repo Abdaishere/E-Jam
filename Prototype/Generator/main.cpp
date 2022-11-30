@@ -1,7 +1,20 @@
-#include <iostream>
+#include "PacketCreator.h"
+#include<unistd.h>
 
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    PacketCreator* pc = PacketCreator::getInstance();
+
+    int pid = fork();
+
+    if (pid==0)
+    {
+        pc->createPacket();
+    }
+    else
+    {
+        pc->sendHead();
+    }
+
+    //TODO (Obviously, there is a segmentation fault)
 }

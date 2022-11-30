@@ -9,10 +9,9 @@
 class FrameConstructor
 {
 protected:
-    //remove payload because you only need to know the protocol number of the layer below you
     unsigned char* frame;
-    unsigned char destination_address[6];
-    unsigned char source_address[6];
+    unsigned char destination_address[6]; //Destination MAC address
+    unsigned char source_address[6];      //Source MAC address
 public:
     FrameConstructor(unsigned char* source_address, unsigned char* destination_address){
         for(int i=0; i<6; i++)
@@ -21,6 +20,7 @@ public:
             this->destination_address[i] = destination_address[i];
     };
     virtual void constructFrame() = 0;
+    unsigned char* getFrame();
 };
 
 

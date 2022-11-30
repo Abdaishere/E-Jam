@@ -9,10 +9,7 @@
 
 class rawGenerator
 {
-    void generate(int len, unsigned char* data)
-    {
-        ;
-    }
+    void generate(int len, unsigned char* data);
 };
 
 #endif //GENERATOR_RAWGENERATOR_H

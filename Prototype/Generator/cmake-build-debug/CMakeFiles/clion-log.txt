@@ -1,4 +1,16 @@
-/home/mohamedelhagry/Downloads/CLion-2022.2.4/clion-2022.2.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" -S /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator -B /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/opt/clion/bin/ninja/linux/ninja -G Ninja "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator"
+-- The C compiler identification is GNU 12.2.0
+-- The CXX compiler identification is GNU 12.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug
+-- Build files have been written to: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug
