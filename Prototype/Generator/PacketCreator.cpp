@@ -14,3 +14,8 @@ void PacketCreator::createPacket()
     //gateway.send(frame generator.string)
 
 }
+
+PacketCreator *PacketCreator::getInstance()
+{
+    return nullptr;
+}
