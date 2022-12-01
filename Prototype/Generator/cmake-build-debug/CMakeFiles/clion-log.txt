@@ -1,4 +1,4 @@
-/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/opt/clion/bin/ninja/linux/ninja -G Ninja "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator"
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator"
 -- The C compiler identification is GNU 12.2.0
 -- The CXX compiler identification is GNU 12.2.0
 -- Detecting C compiler ABI info

@@ -6,17 +6,17 @@
 #define GENERATOR_PAYLOADGENERATOR_H
 
 
+#include <string>
+
 class PayloadGenerator
 {
 private:
-    unsigned char* payload;
-    int payloadSize;
+    std::string payload;
     void generateRandomCharacters();
     void generateAlphabet();
 public:
     explicit PayloadGenerator(int type);
-    unsigned char *getPayload();
-    int getPayloadSize();
+    std::string getPayload();
 
 };
 

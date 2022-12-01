@@ -4,7 +4,7 @@
 
 #include "FrameConstructor.h"
 
-unsigned char *FrameConstructor::getFrame()
+std::string FrameConstructor::getFrame()
 {
     return frame;
 }

@@ -20,16 +20,11 @@ void PayloadGenerator::generateRandomCharacters()
 
 void PayloadGenerator::generateAlphabet()
 {
-    payload = (unsigned char *) "abcdefghijklmnopqrstuvwxyz";
-    payloadSize = 26;
+    payload = "abcdefghijklmnopqrstuvwxyz";
 }
 
-unsigned char*PayloadGenerator::getPayload()
+std::string PayloadGenerator::getPayload()
 {
     return payload;
 }
 
-int PayloadGenerator::getPayloadSize()
-{
-    return payloadSize;
-}

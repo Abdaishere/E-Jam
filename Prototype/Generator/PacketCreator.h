@@ -4,8 +4,9 @@
 
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H
-
+#include <mutex>
 #include <queue>
+#include <string>
 #include "PayloadGenerator.h"
 #include "SegmentConstructor.h"
 #include "DatagramConstructor.h"
@@ -24,13 +25,10 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
-    static PacketCreator* instance;
-    std::queue<unsigned char*> productQueue;
-
-    PacketCreator();
 public:
+    static std::mutex mtx;
+    static std::queue<std::string> productQueue;
     void createPacket();
-    static PacketCreator* getInstance();
     void sendHead();
 };
 

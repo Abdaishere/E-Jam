@@ -5,16 +5,18 @@
 #ifndef GENERATOR_DATAGRAMCONSTRUCTOR_H
 #define GENERATOR_DATAGRAMCONSTRUCTOR_H
 
+#include <string>
+
 #define valid_protocols {IPv6, IPv4, };
 
 class DatagramConstructor
 {
 private:
     int protocol;
-    char* datagram;
-    char* payload;
+    std::string datagram;
+    std::string payload;
 public:
-    DatagramConstructor(const char* payload, int protocol){};
+    DatagramConstructor(std::string payload, int protocol){};
     void constructDatagram();
 };
 
