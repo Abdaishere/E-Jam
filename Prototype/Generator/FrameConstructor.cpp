@@ -4,7 +4,7 @@
 
 #include "FrameConstructor.h"
 
-std::string FrameConstructor::getFrame()
+ByteArray FrameConstructor::getFrame()
 {
     return frame;
 }

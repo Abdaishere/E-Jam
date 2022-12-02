@@ -7,16 +7,17 @@
 
 
 #include <string>
+#include "Byte.h"
 
 class PayloadGenerator
 {
 private:
-    std::string payload;
+    ByteArray payload;
     void generateRandomCharacters();
     void generateAlphabet();
 public:
     explicit PayloadGenerator(int type);
-    std::string getPayload();
+    ByteArray getPayload();
 
 };
 

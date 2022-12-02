@@ -5,15 +5,15 @@
 #include "PacketCreator.h"
 #include <iostream>
 
-std::queue<std::string> PacketCreator::productQueue;
+std::queue<ByteArray> PacketCreator::productQueue;
 std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket()
 {
     PayloadGenerator* payloadGenerator = new PayloadGenerator(0);
-    FrameConstructor* frameConstructor = new EthernetConstructor("BBBBBB", "CCCCCC",
+    FrameConstructor* frameConstructor = new EthernetConstructor(ByteArray("BBBBBB",6), ByteArray("CCCCCC",6),
                                                                  payloadGenerator->getPayload(),
-                                                                 "00");
+                                                                 ByteArray("00",2));
     frameConstructor->constructFrame();
 
     mtx.lock();
@@ -33,11 +33,11 @@ void PacketCreator::sendHead()
         return;
     }
     mtx.lock();
-    std::string packet = productQueue.front();
+    ByteArray packet = productQueue.front();
     productQueue.pop();
     mtx.unlock();
 
-    printf("%s\n",packet.c_str());
+    packet.print();
 //    std::cout<<packet<<std::endl;
     //gateway.send(packet) //TODO
 }

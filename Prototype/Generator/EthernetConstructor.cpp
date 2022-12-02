@@ -4,27 +4,28 @@
 
 #include "EthernetConstructor.h"
 
-EthernetConstructor::EthernetConstructor(std::string sourceAddress, std::string destinationAddress,
-                                         const std::string payload,
-                                         std::string innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
+#define CRC_LEN 4
+EthernetConstructor::EthernetConstructor(ByteArray sourceAddress, ByteArray destinationAddress,
+                                         const ByteArray payload,
+                                         ByteArray innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
     this->payload = payload;
     type=innerProtocol;
 }
 
 void EthernetConstructor::constructFrame() {
 
-    frame = "";
-    frame = source_address;
-    frame+= destination_address;
-    frame+=type;
-    frame+=payload;
+    frame.reset(source_address.length + destination_address.length + type.length + payload.length + CRC_LEN);
+    frame.write(source_address);
+    frame.write(destination_address);
+    frame.write(type);
+    frame.write(payload);
 
-    calculateCRC(payload.size(), payload);
-    frame+=CRC;
+    calculateCRC(payload);
+    frame.write(CRC);
 }
 
-int EthernetConstructor::calculateCRC(int payloadSize, std::string payload) {
+ByteArray EthernetConstructor::calculateCRC(ByteArray payload) {
     int crc = 0;
-    CRC = "Working";
+    CRC = ByteArray("Work", 4);
     return crc;
 }

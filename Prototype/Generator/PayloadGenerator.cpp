@@ -20,10 +20,10 @@ void PayloadGenerator::generateRandomCharacters()
 
 void PayloadGenerator::generateAlphabet()
 {
-    payload = "abcdefghijklmnopqrstuvwxyz";
+    payload = ByteArray("abcdefghijklmnopqrstuvwxyz",26);
 }
 
-std::string PayloadGenerator::getPayload()
+ByteArray PayloadGenerator::getPayload()
 {
     return payload;
 }

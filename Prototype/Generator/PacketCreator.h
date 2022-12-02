@@ -27,7 +27,7 @@ class PacketCreator
 private:
 public:
     static std::mutex mtx;
-    static std::queue<std::string> productQueue;
+    static std::queue<ByteArray> productQueue;
     void createPacket();
     void sendHead();
 };
