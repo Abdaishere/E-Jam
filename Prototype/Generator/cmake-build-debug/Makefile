@@ -249,6 +249,30 @@ PacketCreator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/PacketCreator.cpp.s
 .PHONY : PacketCreator.cpp.s
 
+PacketSender.o: PacketSender.cpp.o
+.PHONY : PacketSender.o
+
+# target to build an object file
+PacketSender.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/PacketSender.cpp.o
+.PHONY : PacketSender.cpp.o
+
+PacketSender.i: PacketSender.cpp.i
+.PHONY : PacketSender.i
+
+# target to preprocess a source file
+PacketSender.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/PacketSender.cpp.i
+.PHONY : PacketSender.cpp.i
+
+PacketSender.s: PacketSender.cpp.s
+.PHONY : PacketSender.s
+
+# target to generate assembly for a file
+PacketSender.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/PacketSender.cpp.s
+.PHONY : PacketSender.cpp.s
+
 PayloadGenerator.o: PayloadGenerator.cpp.o
 .PHONY : PayloadGenerator.o
 
@@ -393,6 +417,9 @@ help:
 	@echo "... PacketCreator.o"
 	@echo "... PacketCreator.i"
 	@echo "... PacketCreator.s"
+	@echo "... PacketSender.o"
+	@echo "... PacketSender.i"
+	@echo "... PacketSender.s"
 	@echo "... PayloadGenerator.o"
 	@echo "... PayloadGenerator.i"
 	@echo "... PayloadGenerator.s"
