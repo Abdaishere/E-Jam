@@ -7,20 +7,21 @@
 
 
 #include <string>
+#include "Byte.h"
 
 class FrameConstructor
 {
 protected:
-    std::string frame;
-    std::string destination_address; //Destination MAC address
-    std::string source_address;      //Source MAC address
+    ByteArray frame;
+    ByteArray destination_address; //Destination MAC address
+    ByteArray source_address;      //Source MAC address
 public:
-    FrameConstructor(std::string source_address, std::string destination_address){
+    FrameConstructor(ByteArray source_address, ByteArray destination_address){
         this->source_address = source_address;
         this->destination_address = destination_address;
     };
     virtual void constructFrame() = 0;
-    std::string getFrame();
+     ByteArray getFrame();
 };
 
 
