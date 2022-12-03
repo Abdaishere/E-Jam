@@ -3,15 +3,19 @@
 //
 
 #include "PacketCreator.h"
+#include "ConfigurationManager.h"
 #include <iostream>
 
 std::queue<ByteArray> PacketCreator::productQueue;
 std::mutex PacketCreator::mtx;
 
-void PacketCreator::createPacket()
+void PacketCreator::createPacket(int rcvInd)
 {
-    PayloadGenerator* payloadGenerator = new PayloadGenerator(0);
-    FrameConstructor* frameConstructor = new EthernetConstructor(ByteArray("BBBBBB",6), ByteArray("CCCCCC",6),
+    ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
+    ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
+
+    PayloadGenerator* payloadGenerator = new PayloadGenerator(ConfigurationManager::getConfiguration()->getPayloadType());
+    FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
                                                                  payloadGenerator->getPayload(),
                                                                  ByteArray("00",2));
     frameConstructor->constructFrame();

@@ -4,27 +4,44 @@
 
 #include "PayloadGenerator.h"
 
-PayloadGenerator::PayloadGenerator(int type)
+PayloadGenerator::PayloadGenerator(PayloadType payloadType)
 {
-    switch (type)
+    switch (payloadType)
     {
+        case FIRST:
+            generateFirstAlphabet();
+            break;
+        case SECOND:
+            generateSecondAlphabet();
+            break;
         default:
-            generateAlphabet();
+            generateAlphabet((rand()%22)+5);
     }
 }
 
-void PayloadGenerator::generateRandomCharacters()
+void PayloadGenerator::generateAlphabet(int n)
 {
-    //TODO
-}
-
-void PayloadGenerator::generateAlphabet()
-{
-    payload = ByteArray("abcdefghijklmnopqrstuvwxyz",26);
+   payload = ByteArray(n,0);
+   for (int i=0; i<n; i++)
+   {
+       int offset = rand()%26;
+       payload[i] = offset+'a';
+   }
 }
 
 ByteArray PayloadGenerator::getPayload()
 {
     return payload;
 }
+
+void PayloadGenerator::generateFirstAlphabet()
+{
+    payload = ByteArray("abcdefghijklm",13);
+}
+
+void PayloadGenerator::generateSecondAlphabet()
+{
+    payload = ByteArray("nopqrstuvwxyz",13);
+}
+
 

@@ -153,29 +153,29 @@ Byte.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Byte.cpp.s
 .PHONY : Byte.cpp.s
 
-Configuration.o: Configuration.cpp.o
-.PHONY : Configuration.o
+ConfigurationManager.o: ConfigurationManager.cpp.o
+.PHONY : ConfigurationManager.o
 
 # target to build an object file
-Configuration.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Configuration.cpp.o
-.PHONY : Configuration.cpp.o
+ConfigurationManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/ConfigurationManager.cpp.o
+.PHONY : ConfigurationManager.cpp.o
 
-Configuration.i: Configuration.cpp.i
-.PHONY : Configuration.i
+ConfigurationManager.i: ConfigurationManager.cpp.i
+.PHONY : ConfigurationManager.i
 
 # target to preprocess a source file
-Configuration.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Configuration.cpp.i
-.PHONY : Configuration.cpp.i
+ConfigurationManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/ConfigurationManager.cpp.i
+.PHONY : ConfigurationManager.cpp.i
 
-Configuration.s: Configuration.cpp.s
-.PHONY : Configuration.s
+ConfigurationManager.s: ConfigurationManager.cpp.s
+.PHONY : ConfigurationManager.s
 
 # target to generate assembly for a file
-Configuration.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Configuration.cpp.s
-.PHONY : Configuration.cpp.s
+ConfigurationManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/ConfigurationManager.cpp.s
+.PHONY : ConfigurationManager.cpp.s
 
 DatagramConstructor.o: DatagramConstructor.cpp.o
 .PHONY : DatagramConstructor.o
@@ -429,9 +429,9 @@ help:
 	@echo "... Byte.o"
 	@echo "... Byte.i"
 	@echo "... Byte.s"
-	@echo "... Configuration.o"
-	@echo "... Configuration.i"
-	@echo "... Configuration.s"
+	@echo "... ConfigurationManager.o"
+	@echo "... ConfigurationManager.i"
+	@echo "... ConfigurationManager.s"
 	@echo "... DatagramConstructor.o"
 	@echo "... DatagramConstructor.i"
 	@echo "... DatagramConstructor.s"

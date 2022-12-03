@@ -111,24 +111,10 @@ CMakeFiles/Generator.dir/StreamDetails.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/StreamDetails.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/StreamDetails.cpp" -o CMakeFiles/Generator.dir/StreamDetails.cpp.s
 
-CMakeFiles/Generator.dir/Configuration.cpp.o: CMakeFiles/Generator.dir/flags.make
-CMakeFiles/Generator.dir/Configuration.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/Configuration.cpp
-CMakeFiles/Generator.dir/Configuration.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Generator.dir/Configuration.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/Configuration.cpp.o -MF CMakeFiles/Generator.dir/Configuration.cpp.o.d -o CMakeFiles/Generator.dir/Configuration.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/Configuration.cpp"
-
-CMakeFiles/Generator.dir/Configuration.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Generator.dir/Configuration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/Configuration.cpp" > CMakeFiles/Generator.dir/Configuration.cpp.i
-
-CMakeFiles/Generator.dir/Configuration.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/Configuration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/Configuration.cpp" -o CMakeFiles/Generator.dir/Configuration.cpp.s
-
 CMakeFiles/Generator.dir/PayloadGenerator.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/PayloadGenerator.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/PayloadGenerator.cpp
 CMakeFiles/Generator.dir/PayloadGenerator.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Generator.dir/PayloadGenerator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Generator.dir/PayloadGenerator.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/PayloadGenerator.cpp.o -MF CMakeFiles/Generator.dir/PayloadGenerator.cpp.o.d -o CMakeFiles/Generator.dir/PayloadGenerator.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/PayloadGenerator.cpp"
 
 CMakeFiles/Generator.dir/PayloadGenerator.cpp.i: cmake_force
@@ -142,7 +128,7 @@ CMakeFiles/Generator.dir/PayloadGenerator.cpp.s: cmake_force
 CMakeFiles/Generator.dir/SegmentConstructor.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/SegmentConstructor.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/SegmentConstructor.cpp
 CMakeFiles/Generator.dir/SegmentConstructor.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Generator.dir/SegmentConstructor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Generator.dir/SegmentConstructor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/SegmentConstructor.cpp.o -MF CMakeFiles/Generator.dir/SegmentConstructor.cpp.o.d -o CMakeFiles/Generator.dir/SegmentConstructor.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/SegmentConstructor.cpp"
 
 CMakeFiles/Generator.dir/SegmentConstructor.cpp.i: cmake_force
@@ -156,7 +142,7 @@ CMakeFiles/Generator.dir/SegmentConstructor.cpp.s: cmake_force
 CMakeFiles/Generator.dir/DatagramConstructor.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/DatagramConstructor.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/DatagramConstructor.cpp
 CMakeFiles/Generator.dir/DatagramConstructor.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Generator.dir/DatagramConstructor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Generator.dir/DatagramConstructor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/DatagramConstructor.cpp.o -MF CMakeFiles/Generator.dir/DatagramConstructor.cpp.o.d -o CMakeFiles/Generator.dir/DatagramConstructor.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/DatagramConstructor.cpp"
 
 CMakeFiles/Generator.dir/DatagramConstructor.cpp.i: cmake_force
@@ -170,7 +156,7 @@ CMakeFiles/Generator.dir/DatagramConstructor.cpp.s: cmake_force
 CMakeFiles/Generator.dir/FrameConstructor.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/FrameConstructor.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/FrameConstructor.cpp
 CMakeFiles/Generator.dir/FrameConstructor.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Generator.dir/FrameConstructor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Generator.dir/FrameConstructor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/FrameConstructor.cpp.o -MF CMakeFiles/Generator.dir/FrameConstructor.cpp.o.d -o CMakeFiles/Generator.dir/FrameConstructor.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/FrameConstructor.cpp"
 
 CMakeFiles/Generator.dir/FrameConstructor.cpp.i: cmake_force
@@ -184,7 +170,7 @@ CMakeFiles/Generator.dir/FrameConstructor.cpp.s: cmake_force
 CMakeFiles/Generator.dir/EthernetConstructor.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/EthernetConstructor.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/EthernetConstructor.cpp
 CMakeFiles/Generator.dir/EthernetConstructor.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/Generator.dir/EthernetConstructor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Generator.dir/EthernetConstructor.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/EthernetConstructor.cpp.o -MF CMakeFiles/Generator.dir/EthernetConstructor.cpp.o.d -o CMakeFiles/Generator.dir/EthernetConstructor.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/EthernetConstructor.cpp"
 
 CMakeFiles/Generator.dir/EthernetConstructor.cpp.i: cmake_force
@@ -198,7 +184,7 @@ CMakeFiles/Generator.dir/EthernetConstructor.cpp.s: cmake_force
 CMakeFiles/Generator.dir/rawGenerator.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/rawGenerator.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/rawGenerator.cpp
 CMakeFiles/Generator.dir/rawGenerator.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/Generator.dir/rawGenerator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/Generator.dir/rawGenerator.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/rawGenerator.cpp.o -MF CMakeFiles/Generator.dir/rawGenerator.cpp.o.d -o CMakeFiles/Generator.dir/rawGenerator.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/rawGenerator.cpp"
 
 CMakeFiles/Generator.dir/rawGenerator.cpp.i: cmake_force
@@ -212,7 +198,7 @@ CMakeFiles/Generator.dir/rawGenerator.cpp.s: cmake_force
 CMakeFiles/Generator.dir/PacketSender.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/PacketSender.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/PacketSender.cpp
 CMakeFiles/Generator.dir/PacketSender.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/Generator.dir/PacketSender.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/Generator.dir/PacketSender.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/PacketSender.cpp.o -MF CMakeFiles/Generator.dir/PacketSender.cpp.o.d -o CMakeFiles/Generator.dir/PacketSender.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/PacketSender.cpp"
 
 CMakeFiles/Generator.dir/PacketSender.cpp.i: cmake_force
@@ -226,7 +212,7 @@ CMakeFiles/Generator.dir/PacketSender.cpp.s: cmake_force
 CMakeFiles/Generator.dir/Byte.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/Byte.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/Byte.cpp
 CMakeFiles/Generator.dir/Byte.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/Generator.dir/Byte.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/Generator.dir/Byte.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/Byte.cpp.o -MF CMakeFiles/Generator.dir/Byte.cpp.o.d -o CMakeFiles/Generator.dir/Byte.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/Byte.cpp"
 
 CMakeFiles/Generator.dir/Byte.cpp.i: cmake_force
@@ -237,12 +223,25 @@ CMakeFiles/Generator.dir/Byte.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/Byte.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/Byte.cpp" -o CMakeFiles/Generator.dir/Byte.cpp.s
 
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.o: CMakeFiles/Generator.dir/flags.make
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.o: /run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation\ Project/E-Jam/Prototype/Generator/ConfigurationManager.cpp
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/Generator.dir/ConfigurationManager.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/ConfigurationManager.cpp.o -MF CMakeFiles/Generator.dir/ConfigurationManager.cpp.o.d -o CMakeFiles/Generator.dir/ConfigurationManager.cpp.o -c "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/ConfigurationManager.cpp"
+
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Generator.dir/ConfigurationManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/ConfigurationManager.cpp" > CMakeFiles/Generator.dir/ConfigurationManager.cpp.i
+
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/ConfigurationManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/ConfigurationManager.cpp" -o CMakeFiles/Generator.dir/ConfigurationManager.cpp.s
+
 # Object files for target Generator
 Generator_OBJECTS = \
 "CMakeFiles/Generator.dir/main.cpp.o" \
 "CMakeFiles/Generator.dir/PacketCreator.cpp.o" \
 "CMakeFiles/Generator.dir/StreamDetails.cpp.o" \
-"CMakeFiles/Generator.dir/Configuration.cpp.o" \
 "CMakeFiles/Generator.dir/PayloadGenerator.cpp.o" \
 "CMakeFiles/Generator.dir/SegmentConstructor.cpp.o" \
 "CMakeFiles/Generator.dir/DatagramConstructor.cpp.o" \
@@ -250,7 +249,8 @@ Generator_OBJECTS = \
 "CMakeFiles/Generator.dir/EthernetConstructor.cpp.o" \
 "CMakeFiles/Generator.dir/rawGenerator.cpp.o" \
 "CMakeFiles/Generator.dir/PacketSender.cpp.o" \
-"CMakeFiles/Generator.dir/Byte.cpp.o"
+"CMakeFiles/Generator.dir/Byte.cpp.o" \
+"CMakeFiles/Generator.dir/ConfigurationManager.cpp.o"
 
 # External object files for target Generator
 Generator_EXTERNAL_OBJECTS =
@@ -258,7 +258,6 @@ Generator_EXTERNAL_OBJECTS =
 Generator: CMakeFiles/Generator.dir/main.cpp.o
 Generator: CMakeFiles/Generator.dir/PacketCreator.cpp.o
 Generator: CMakeFiles/Generator.dir/StreamDetails.cpp.o
-Generator: CMakeFiles/Generator.dir/Configuration.cpp.o
 Generator: CMakeFiles/Generator.dir/PayloadGenerator.cpp.o
 Generator: CMakeFiles/Generator.dir/SegmentConstructor.cpp.o
 Generator: CMakeFiles/Generator.dir/DatagramConstructor.cpp.o
@@ -267,6 +266,7 @@ Generator: CMakeFiles/Generator.dir/EthernetConstructor.cpp.o
 Generator: CMakeFiles/Generator.dir/rawGenerator.cpp.o
 Generator: CMakeFiles/Generator.dir/PacketSender.cpp.o
 Generator: CMakeFiles/Generator.dir/Byte.cpp.o
+Generator: CMakeFiles/Generator.dir/ConfigurationManager.cpp.o
 Generator: CMakeFiles/Generator.dir/build.make
 Generator: CMakeFiles/Generator.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable Generator"

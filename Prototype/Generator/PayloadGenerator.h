@@ -4,6 +4,7 @@
 
 #ifndef GENERATOR_PAYLOADGENERATOR_H
 #define GENERATOR_PAYLOADGENERATOR_H
+#include "Configuration.h"
 
 
 #include <string>
@@ -13,10 +14,11 @@ class PayloadGenerator
 {
 private:
     ByteArray payload;
-    void generateRandomCharacters();
-    void generateAlphabet();
+    void generateFirstAlphabet();
+    void generateSecondAlphabet();
+    void generateAlphabet(int);
 public:
-    explicit PayloadGenerator(int type);
+    explicit PayloadGenerator(PayloadType);
     ByteArray getPayload();
 
 };

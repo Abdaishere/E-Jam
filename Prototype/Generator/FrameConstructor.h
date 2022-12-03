@@ -16,10 +16,7 @@ protected:
     ByteArray destination_address; //Destination MAC address
     ByteArray source_address;      //Source MAC address
 public:
-    FrameConstructor(ByteArray source_address, ByteArray destination_address){
-        this->source_address = source_address;
-        this->destination_address = destination_address;
-    };
+    FrameConstructor(ByteArray, ByteArray);
     virtual void constructFrame() = 0;
      ByteArray getFrame();
 };

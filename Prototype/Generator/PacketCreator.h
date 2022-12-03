@@ -28,7 +28,7 @@ private:
 public:
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
-    void createPacket();
+    void createPacket(int);
     void sendHead();
 };
 
