@@ -13,7 +13,7 @@ class EthernetConstructor : public FrameConstructor
 private:
     const static int headerSize = 8 + 6 + 6 + 2 + 4;
     constexpr static unsigned char preamble[] = {0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAB};
-    //type of network layer protocol or length of data
+    //type of network layer protocol or capacity of data
     ByteArray type;
     ByteArray payload;
     ByteArray CRC;

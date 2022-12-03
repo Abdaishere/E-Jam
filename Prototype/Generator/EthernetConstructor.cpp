@@ -14,7 +14,7 @@ EthernetConstructor::EthernetConstructor(ByteArray sourceAddress, ByteArray dest
 
 void EthernetConstructor::constructFrame() {
 
-    frame.reset(source_address.length + destination_address.length + type.length + payload.length + CRC_LEN);
+    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + payload.capacity + CRC_LEN);
     frame.write(source_address);
     frame.write(destination_address);
     frame.write(type);
