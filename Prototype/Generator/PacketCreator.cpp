@@ -5,6 +5,14 @@
 #include "PacketCreator.h"
 #include "ConfigurationManager.h"
 #include <iostream>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include<stdio.h>
+#include<unistd.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include <fcntl.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
 std::mutex PacketCreator::mtx;
@@ -41,7 +49,28 @@ void PacketCreator::sendHead()
     productQueue.pop();
     mtx.unlock();
 
-    packet.print();
-//    std::cout<<packet<<std::endl;
+    sendToGateway(packet);
     //gateway.send(packet) //TODO
+}
+
+void PacketCreator::sendToGateway(const ByteArray& packet)
+{
+    //making the FIFO with 777 permissions
+    if(mkfifo("./gen",0777)==-1)
+    {
+        if(errno != EEXIST) //if the error was more than the file already existing
+        {
+            printf("Error in creating the FIFO file\n");
+            return;
+        }
+        else
+        {
+            printf("File already exists, skipping creation...\n");
+        }
+    }
+    //open the fifo as write only and get the file descriptor (blocking by default)
+    int fd = open("myfifo1", O_WRONLY);
+
+    write(fd,packet.bytes,packet.length);
+    //close(fd); //No need to close because the stream is always on (NOT TESTED) //TODO
 }

@@ -25,6 +25,7 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
+    void sendToGateway(const ByteArray&);
 public:
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
