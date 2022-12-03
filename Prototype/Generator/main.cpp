@@ -16,15 +16,24 @@ void creatingFunction(PacketCreator* pc)
 
 int main()
 {
-    PacketCreator* pc = new PacketCreator();
+    ByteArray a =  ByteArray("abc", 3);
+    ByteArray b =  ByteArray("deff", 4);
 
+    a+=b;
 
-    std::thread creator(creatingFunction,pc);
-    std::thread sender(sendingFunction,pc);
+    a.print();
+    b.print();
+    printf("%d,%d ||  %d,%d\n", a.capacity, a.length, b.capacity, b.length);
 
-
-    creator.join();
-    sender.join();
+//    PacketCreator* pc = new PacketCreator();
+//
+//
+//    std::thread creator(creatingFunction,pc);
+//    std::thread sender(sendingFunction,pc);
+//
+//
+//    creator.join();
+//    sender.join();
 
     //TODO (Obviously, there is a segmentation fault)
 }

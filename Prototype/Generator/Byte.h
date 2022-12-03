@@ -10,81 +10,145 @@
 struct ByteArray
 {
     unsigned char * bytes;
-    int length, writePointer;
+    int capacity, length, extraBuffer;
 
-    ByteArray ()
+
+    ByteArray(int len=0, int extraBuffer = 10)
     {
-        bytes = nullptr;
-        length = writePointer = 0;
-    }
-
-    ByteArray(int len) {
-        bytes = new unsigned char[len];
-        writePointer = 0;
-        length = len;
+        if(len==0)
+        {
+            bytes = nullptr;
+            capacity = length = 0;
+        }
+        else
+        {
+            bytes = new unsigned char[len];
+            length = 0;
+            capacity = len;
+        }
+        this->extraBuffer = extraBuffer;
     }
 
     void reset(int len)
     {
-        writePointer = 0;
-        length = len;
-        bytes = new unsigned char[length];
+        length = 0;
+        capacity = len;
+        delete[] bytes; //delete before initializing
+        bytes = new unsigned char[capacity];
     }
 
     ByteArray(ByteArray const &other)
     {
+        this->capacity = other.capacity;
         this->length = other.length;
-        this->writePointer = other.writePointer;
-        this->bytes = new unsigned char[this->length];
-        for(int i=0; i<writePointer; i++)
+        this->bytes = new unsigned char[this->capacity];
+        this->extraBuffer = other.extraBuffer;
+        for(int i=0; i < length; i++) {
             this->bytes[i] = other.bytes[i];
+        }
     }
 
-    ByteArray(const char* bytes, int length)
+    ByteArray(const char* bytes, int length, int extraBuffer = 10)
     {
         this->bytes = new unsigned char[length];
-        this->length = length;
+        this->capacity = length;
         for(int i=0; i<length; i++)
             this->bytes[i] = bytes[i];
-        writePointer = length;
+        length = length;
+        this->extraBuffer = extraBuffer;
     }
 
     //appends entire bytesToWrite to the current byteArray
     bool write(ByteArray& bytesToWrite)
     {
-        if(writePointer + bytesToWrite.length >= length)
+        if(length + bytesToWrite.capacity >= capacity)
             return false;
-        for(int i=0; i<bytesToWrite.length; i++)
-            bytes[writePointer++] = bytesToWrite.bytes[i];
+        for(int i=0; i<bytesToWrite.capacity; i++)
+            bytes[length++] = bytesToWrite.bytes[i];
         return true;
     }
 
     //appends a sub-range [start, end] of bytesToWrite to the current byteArray
     bool write(ByteArray& bytesToWrite, int start, int end)
     {
-        if(writePointer + (end - start + 1) >= length)
+        if(length + (end - start + 1) >= capacity)
             return false;
         for(int i=start; i<=end; i++)
-            bytes[writePointer++] = bytesToWrite.bytes[i];
+            bytes[length++] = bytesToWrite.bytes[i];
         return true;
     }
 
-    void operator= (ByteArray other)
+    void operator= (const ByteArray& other)
     {
+        this->capacity = other.capacity;
         this->length = other.length;
-        this->writePointer = other.writePointer;
-        this->bytes = new unsigned char[this->length];
-        for(int i=0; i<writePointer; i++)
+        delete[] bytes;
+        this->bytes = new unsigned char[this->capacity];
+        this->extraBuffer = other.extraBuffer;
+        for(int i=0; i < length; i++)
             this->bytes[i] = other.bytes[i];
+    }
+
+    unsigned char& operator[] (int idx)
+    {
+        return bytes[idx];
+    }
+
+    void operator+= (const ByteArray& other)
+    {
+        if(this->capacity >= this->length + other.length)
+        {
+            int j=0;
+            for (int i=length; i < this->length + other.length; i++)
+            {
+                bytes[i]= other.bytes[j++];
+            }
+        }
+        else
+        {
+            int newLen = this->length + other.length + extraBuffer;
+            unsigned char* newPtr = new unsigned char[newLen];
+
+            for (int i=0; i<this->length; i++)
+            {
+                   newPtr[i]=this->bytes[i];
+            }
+            this->capacity = newLen;
+
+            int j=0;
+            for (int i=length; j < other.length; i++,j++)
+            {
+                newPtr[i] = other.bytes[j];
+            }
+            this->length += other.length;
+            delete[] bytes;
+            this->bytes = newPtr;
+        }
+    }
+
+    void at(int idx, char info)
+    {
+        if(idx>=0 && idx < capacity)
+        {
+            bytes[idx] = info;
+        }
     }
 
     void print()
     {
-        for(int i=0;i<writePointer; i++)
+        for(int i=0; i < length; i++)
             printf("%c", this->bytes[i]);
         printf("\n");
 
     }
+
+
+    ~ByteArray()
+    {
+        delete[] bytes;
+    }
+
+
 };
 
 #endif //GENERATOR_BYTE_H
