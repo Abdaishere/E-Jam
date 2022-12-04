@@ -1,0 +1,57 @@
+# depslib dependency file v1.0
+1670178356 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\main.cpp
+	<iostream>
+
+1670181407 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\packetunpacker.cpp
+	"PacketUnpacker.h"
+	<iostream>
+
+1670181360 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\packetunpacker.h
+	"Byte.h"
+	<queue>
+
+1670182909 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\datagramverifier.cpp
+	"DatagramVerifier.h"
+
+1670182844 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\datagramverifier.h
+	"Byte.h"
+
+1670178461 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\errorhandler.cpp
+	"ErrorHandler.h"
+
+1670178461 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\errorhandler.h
+
+1670182763 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\framverifier.cpp
+	"FramVerifier.h"
+
+1670182698 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\framverifier.h
+	"ConfigurationManager.h"
+
+1670183033 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\payloadverifier.cpp
+	"PayloadVerifier.h"
+
+1670183138 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\payloadverifier.h
+	"Byte.h"
+	"ConfigurationManager.h"
+
+1670182909 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\segmentverifier.cpp
+	"SegmentVerifier.h"
+
+1670182843 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\segmentverifier.h
+	"Byte.h"
+
+1670178765 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\byte.h
+	<cstdio>
+
+1670179742 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\configurationmanager.cpp
+	"ConfigurationManager.h"
+
+1670179699 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\configurationmanager.h
+	"Configuration.h"
+	"Byte.h"
+
+1670179089 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\configuration.h
+	<vector>
+	<cstdlib>
+	"Byte.h"
+
