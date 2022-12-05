@@ -121,12 +121,10 @@ struct ByteArray
         }
     }
 
-    void at(int idx, char info)
+    //a.at(5) = 'b';
+    unsigned char& at(int idx)
     {
-        if(idx>=0 && idx < capacity)
-        {
-            bytes[idx] = info;
-        }
+        return bytes[idx];
     }
 
     void print()

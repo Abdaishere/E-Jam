@@ -1,17 +1,15 @@
 #include <iostream>
 #include <queue>
 #include "src/Byte.h"
+#include "src/FramVerifier.h"
 
 using namespace std;
 int main()
 {
-    ByteArray a("abc", 3, 0);
-    std::queue<ByteArray*> que;
-    que.push(&a);
-    que.front()->at(0, 'b');
-    que.front()->print();
-    a.print();
 
+    auto ret = ConfigurationManager::getConfiguration()->getSenders();
+    ret.push_back(ByteArray("abv", 3, 0));
+    cout<<ret[0][2];
 
     return 0;
 }

@@ -20,5 +20,46 @@ FrameVerifier* FrameVerifier::getInstance()
 
 bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
-    //todo
+
+    //check first 6 entries with a sender
+    bool correctSender = false;
+    for(int i=0;i<acceptedSenders.size();i++)
+    {
+        //ith index is current sender compare it with first 6 entries in packet
+        bool fullMatch = true;
+        for(int j=0;j<6;j++)
+        {
+            if(acceptedSenders[i][j] != packet->at(j)){ fullMatch = false; break; }
+        }
+        if(fullMatch)
+        {
+            correctSender = true;
+            break;
+        }
+    }
+
+    if(!correctSender)
+    {
+        return false;
+    }
+
+    //check for receiver
+    bool correctReceiver = true;
+    for(int i=7;i<12;i++)
+    {
+        if(acceptedRecv[i] != packet->at(i))
+        {
+            correctReceiver = false;
+            break;
+        }
+    }
+
+    if(!correctReceiver)
+    {
+        return false;
+    }
+
+    //everything is correct
+    return true;
+
 }

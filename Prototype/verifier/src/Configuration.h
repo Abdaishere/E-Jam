@@ -42,7 +42,7 @@ public:
             this->myMacAddress[i] = hexSwitcher(rand()%16);
         }
     }
-    const std::vector<ByteArray> &getSenders() const
+    std::vector<ByteArray> &getSenders()
     {
         return senders;
     }
