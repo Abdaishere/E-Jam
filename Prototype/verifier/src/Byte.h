@@ -48,9 +48,8 @@ struct ByteArray
     {
         this->bytes = new unsigned char[length];
         this->capacity = length;
-        for(int i=0; i<length; i++)
-            this->bytes[i] = bytes[i];
-        length = length;
+        this->length = length;
+        for(int i=0; i<length; i++){ this->bytes[i] = bytes[i]; }
         this->extraBuffer = extraBuffer;
     }
 
@@ -133,7 +132,10 @@ struct ByteArray
     void print()
     {
         for(int i=0; i < length; i++)
+        {
             printf("%c", this->bytes[i]);
+
+        }
         printf("\n");
 
     }

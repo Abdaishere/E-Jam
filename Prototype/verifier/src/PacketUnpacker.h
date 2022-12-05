@@ -2,6 +2,8 @@
 #define PACKETUNPACKER_H
 
 #include "Byte.h"
+#include "FramVerifier.h"
+#include "PayloadVerifier.h"
 #include <queue>
 
 class PacketUnpacker
@@ -9,10 +11,11 @@ class PacketUnpacker
     public:
         PacketUnpacker();
         virtual ~PacketUnpacker();
-        static std::queue<ByteArray> packetQueue;
-    private:
+        static std::queue<ByteArray*> packetQueue;
         void readPacket();
-        ByteArray consumePacket();
+        void verifiyPacket();
+    private:
+        ByteArray* consumePacket();
 };
 
 #endif // PACKETUNPACKER_H

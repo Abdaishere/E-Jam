@@ -1,11 +1,11 @@
 #include "DatagramVerifier.h"
 
-DatagramVerifier::DatagramVerifier(ByteArray datagram)
+DatagramVerifier::DatagramVerifier()
 {
     //ctor
 }
 
-bool DatagramVerifier::verifiy()
+bool DatagramVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
     //todo
 }

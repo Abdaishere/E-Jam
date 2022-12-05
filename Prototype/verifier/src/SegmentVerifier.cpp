@@ -1,11 +1,10 @@
 #include "SegmentVerifier.h"
-
-SegmentVerifier::SegmentVerifier(ByteArray segment)
+SegmentVerifier::SegmentVerifier()
 {
     //ctor
 }
 
-bool SegmentVerifier::verifiy()
+bool SegmentVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
     //todo
 }
