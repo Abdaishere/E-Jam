@@ -321,6 +321,30 @@ PayloadGenerator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/PayloadGenerator.cpp.s
 .PHONY : PayloadGenerator.cpp.s
 
+RNG.o: RNG.cpp.o
+.PHONY : RNG.o
+
+# target to build an object file
+RNG.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/RNG.cpp.o
+.PHONY : RNG.cpp.o
+
+RNG.i: RNG.cpp.i
+.PHONY : RNG.i
+
+# target to preprocess a source file
+RNG.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/RNG.cpp.i
+.PHONY : RNG.cpp.i
+
+RNG.s: RNG.cpp.s
+.PHONY : RNG.s
+
+# target to generate assembly for a file
+RNG.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/RNG.cpp.s
+.PHONY : RNG.cpp.s
+
 SegmentConstructor.o: SegmentConstructor.cpp.o
 .PHONY : SegmentConstructor.o
 
@@ -450,6 +474,9 @@ help:
 	@echo "... PayloadGenerator.o"
 	@echo "... PayloadGenerator.i"
 	@echo "... PayloadGenerator.s"
+	@echo "... RNG.o"
+	@echo "... RNG.i"
+	@echo "... RNG.s"
 	@echo "... SegmentConstructor.o"
 	@echo "... SegmentConstructor.i"
 	@echo "... SegmentConstructor.s"

@@ -69,6 +69,12 @@ struct ByteArray
         return true;
     }
 
+    bool write(unsigned char& c)
+    {
+        bytes[writePointer++] = c;
+        return true;
+    }
+
     void operator= (ByteArray other)
     {
         this->length = other.length;

@@ -4,6 +4,7 @@
 
 #include "PayloadGenerator.h"
 
+
 PayloadGenerator::PayloadGenerator(int type)
 {
     switch (type)
@@ -13,8 +14,14 @@ PayloadGenerator::PayloadGenerator(int type)
     }
 }
 
-void PayloadGenerator::generateRandomCharacters()
+void PayloadGenerator::generateRandomCharacters(int seed = 0)
 {
+
+    for(int i=0; i<payload.length; i++)
+    {
+        unsigned char c = rng.gen();
+        payload.write(c);
+    }
     //TODO
 }
 

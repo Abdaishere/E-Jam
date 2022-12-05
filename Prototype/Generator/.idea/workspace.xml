@@ -21,24 +21,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e08ccbfc-78e1-4bad-8ced-2f7ca2553820" name="Changes" comment="added basic ethernet protocol implementation">
-      <change afterPath="$PROJECT_DIR$/Byte.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Byte.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNG.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNG.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Byte.h" beforeDir="false" afterPath="$PROJECT_DIR$/Byte.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EthernetConstructor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/EthernetConstructor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EthernetConstructor.h" beforeDir="false" afterPath="$PROJECT_DIR$/EthernetConstructor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrameConstructor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/FrameConstructor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrameConstructor.h" beforeDir="false" afterPath="$PROJECT_DIR$/FrameConstructor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacketCreator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/PacketCreator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacketCreator.h" beforeDir="false" afterPath="$PROJECT_DIR$/PacketCreator.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PayloadGenerator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/PayloadGenerator.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PayloadGenerator.h" beforeDir="false" afterPath="$PROJECT_DIR$/PayloadGenerator.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeOutput.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/TargetDirectories.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/TargetDirectories.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/build.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/build.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.internal" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.internal" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/link.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/progress.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/progress.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Generator" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Generator" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,18 +67,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
@@ -104,7 +103,9 @@
       <workItem from="1669875345329" duration="11000" />
       <workItem from="1670007222190" duration="283000" />
       <workItem from="1670007535238" duration="1121000" />
-      <workItem from="1670008668323" duration="5806000" />
+      <workItem from="1670008668323" duration="6049000" />
+      <workItem from="1670243540247" duration="16000" />
+      <workItem from="1670243679331" duration="4389000" />
     </task>
     <task id="LOCAL-00001" summary="added basic ethernet protocol implementation">
       <created>1669827527075</created>

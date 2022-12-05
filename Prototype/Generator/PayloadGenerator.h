@@ -8,12 +8,14 @@
 
 #include <string>
 #include "Byte.h"
+#include "RNG.h"
 
 class PayloadGenerator
 {
 private:
     ByteArray payload;
-    void generateRandomCharacters();
+    void generateRandomCharacters(int seed);
+    RNG rng;
     void generateAlphabet();
 public:
     explicit PayloadGenerator(int type);

@@ -16,6 +16,8 @@ void creatingFunction(PacketCreator* pc)
 
 int main()
 {
+    //TODO (Obviously, there is a segmentation fault)
+
     PacketCreator* pc = new PacketCreator();
 
 
@@ -26,5 +28,5 @@ int main()
     creator.join();
     sender.join();
 
-    //TODO (Obviously, there is a segmentation fault)
 }
+
