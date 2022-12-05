@@ -17,27 +17,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4eb42aef-98c7-4794-8a94-6ef194c44320" name="Changes" comment="[Fix] refactor">
-      <change afterPath="$PROJECT_DIR$/ConfigurationManager.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ConfigurationManager.h" afterDir="false" />
+    <list default="true" id="4eb42aef-98c7-4794-8a94-6ef194c44320" name="Changes" comment="[Feature] Send to gateway">
+      <change afterPath="$PROJECT_DIR$/RNG.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RNG.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Configuration.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Configuration.h" beforeDir="false" afterPath="$PROJECT_DIR$/Configuration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrameConstructor.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/FrameConstructor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrameConstructor.h" beforeDir="false" afterPath="$PROJECT_DIR$/FrameConstructor.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacketCreator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/PacketCreator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacketCreator.h" beforeDir="false" afterPath="$PROJECT_DIR$/PacketCreator.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PayloadGenerator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/PayloadGenerator.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PayloadGenerator.h" beforeDir="false" afterPath="$PROJECT_DIR$/PayloadGenerator.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/build.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/build.make" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.internal" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/compiler_depend.make" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/link.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/link.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/progress.make" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Generator.dir/progress.make" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/Makefile2" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +59,10 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
     <property name="cmake.loaded.for.project" value="true" />
   </component>
   <component name="RunManager">
@@ -86,7 +80,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="e08ccbfc-78e1-4bad-8ced-2f7ca2553820" name="Changes" comment="" />
+      <changelist id="4eb42aef-98c7-4794-8a94-6ef194c44320" name="Changes" comment="[Feature] Send to gateway" />
       <created>1669810468240</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -96,6 +90,8 @@
       <workItem from="1670007222190" duration="283000" />
       <workItem from="1670007535238" duration="1121000" />
       <workItem from="1670008668323" duration="5806000" />
+      <workItem from="1670180169734" duration="1751000" />
+      <workItem from="1670270955737" duration="148000" />
     </task>
     <task id="LOCAL-00001" summary="added basic ethernet protocol implementation">
       <created>1669827527075</created>
@@ -125,7 +121,21 @@
       <option name="project" value="LOCAL" />
       <updated>1670091151996</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="[Feature] Configuration is now usable">
+      <created>1670094719267</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1670094719267</updated>
+    </task>
+    <task id="LOCAL-00006" summary="[Feature] Send to gateway">
+      <created>1670095241382</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1670095241382</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -147,7 +157,9 @@
     <MESSAGE value="[Feature] added operators, refactored ```ByteArray```" />
     <MESSAGE value="[Fix] ignore clion files" />
     <MESSAGE value="[Fix] refactor" />
-    <option name="LAST_COMMIT_MESSAGE" value="[Fix] refactor" />
+    <MESSAGE value="[Feature] Configuration is now usable" />
+    <MESSAGE value="[Feature] Send to gateway" />
+    <option name="LAST_COMMIT_MESSAGE" value="[Feature] Send to gateway" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
