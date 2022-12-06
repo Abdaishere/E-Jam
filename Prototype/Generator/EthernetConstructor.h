@@ -20,9 +20,9 @@ private:
     //may need to insert 12-byte inter-packet gap, not sure
 
 public:
-    EthernetConstructor(ByteArray sourceAddress, ByteArray destinationAddress,
-                        ByteArray payload,
-                        ByteArray innerProtocol) ;
+    EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
+                        ByteArray& payload,
+                        ByteArray& innerProtocol) ;
 
     void constructFrame();
 

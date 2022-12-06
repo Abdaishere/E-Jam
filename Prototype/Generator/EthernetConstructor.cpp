@@ -5,16 +5,16 @@
 #include "EthernetConstructor.h"
 
 #define CRC_LEN 4
-EthernetConstructor::EthernetConstructor(ByteArray sourceAddress, ByteArray destinationAddress,
-                                         const ByteArray payload,
-                                         ByteArray innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
+EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
+                                         ByteArray& payload,
+                                         ByteArray& innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
     this->payload = payload;
     type=innerProtocol;
 }
 
 void EthernetConstructor::constructFrame() {
 
-    frame.reset(source_address.length + destination_address.length + type.length + payload.length + CRC_LEN);
+    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + payload.capacity + CRC_LEN);
     frame.write(source_address);
     frame.write(destination_address);
     frame.write(type);
@@ -27,5 +27,5 @@ void EthernetConstructor::constructFrame() {
 ByteArray EthernetConstructor::calculateCRC(ByteArray payload) {
     int crc = 0;
     CRC = ByteArray("Work", 4);
-    return crc;
+    return CRC;
 }

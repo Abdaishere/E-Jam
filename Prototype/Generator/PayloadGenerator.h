@@ -14,11 +14,12 @@ class PayloadGenerator
 {
 private:
     ByteArray payload;
-    void generateRandomCharacters(int seed);
+    void generateRandomCharacters(int seed = 0);
     RNG rng;
     void generateAlphabet();
 public:
-    explicit PayloadGenerator(int type);
+    //must specify the length of the payload and its type
+    explicit PayloadGenerator(int cap, int type);
     ByteArray getPayload();
 
 };

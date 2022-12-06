@@ -10,10 +10,16 @@ std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket()
 {
-    PayloadGenerator* payloadGenerator = new PayloadGenerator(0);
-    FrameConstructor* frameConstructor = new EthernetConstructor(ByteArray("BBBBBB",6), ByteArray("CCCCCC",6),
-                                                                 payloadGenerator->getPayload(),
-                                                                 ByteArray("00",2));
+
+    int len = 20;
+    PayloadGenerator* payloadGenerator = new PayloadGenerator(len, 1);
+    ByteArray src = ByteArray("BBBBBB",6);
+    ByteArray dest = ByteArray("CCCCCC",6);
+    ByteArray payload = payloadGenerator->getPayload();
+    ByteArray innerProt =  ByteArray("00",2);
+    FrameConstructor* frameConstructor = new EthernetConstructor(src,dest ,
+                                                                 payload,
+                                                                 innerProt);
     frameConstructor->constructFrame();
 
     mtx.lock();

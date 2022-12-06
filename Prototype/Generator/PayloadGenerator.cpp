@@ -5,22 +5,29 @@
 #include "PayloadGenerator.h"
 
 
-PayloadGenerator::PayloadGenerator(int type)
+PayloadGenerator::PayloadGenerator(int cap, int type)
 {
+    payload = ByteArray(cap, type);
     switch (type)
     {
+        case 1:
+            generateRandomCharacters();
+            break;
         default:
             generateAlphabet();
     }
 }
 
-void PayloadGenerator::generateRandomCharacters(int seed = 0)
+void PayloadGenerator::generateRandomCharacters(int seed)
 {
-
-    for(int i=0; i<payload.length; i++)
+    rng.setSeed(rand());
+    for(int i=0; i<payload.capacity; i++)
     {
         unsigned char c = rng.gen();
-        payload.write(c);
+        payload.at(i) = c;
+        // so copy constructor works correctly
+        payload.length++;
+
     }
     //TODO
 }
