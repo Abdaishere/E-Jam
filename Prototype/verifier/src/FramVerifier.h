@@ -2,7 +2,7 @@
 #define FRAMVERIFIER_H
 
 #include "ConfigurationManager.h"
-
+#include "ErrorHandler.h"
 //singleton
 class FrameVerifier
 {
@@ -10,7 +10,7 @@ class FrameVerifier
         //parameters pointer to byteArray, start index, end index of payload
         bool verifiy(ByteArray*, int, int);
         static FrameVerifier* getInstance();
-    //private:
+    private:
         static FrameVerifier* instance;
         //singleton class
         FrameVerifier();

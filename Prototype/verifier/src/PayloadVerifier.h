@@ -4,6 +4,7 @@
 
 #include "Byte.h"
 #include "ConfigurationManager.h"
+#include "ErrorHandler.h"
 
 //singleton
 class PayloadVerifier

@@ -19,6 +19,7 @@ PayloadVerifier* PayloadVerifier::getInstance()
 
 bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
+    bool status = true;
     switch(ConfigurationManager::getConfiguration()->getPayloadType())
     {
         case FIRST:
@@ -28,7 +29,7 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
                 {
                     if(packet->at(i) != 'a'+offset)
                     {
-                        return false;
+                        status = false;
                     }
                     offset++;
                 }
@@ -41,15 +42,24 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
                 {
                     if(packet->at(i) != 'n'+offset)
                     {
-                        return false;
+                        status = false;
                     }
                     offset++;
                 }
                 break;
             }
-        default:
-            return true; //todo handle random state
     }
+    if(status == false)
+    {
+        ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+        if(errorInfo == nullptr)
+        {
+            errorInfo = new ErrorInfo(packet);
+        }
+        errorInfo->addError(PAYLOAD);
+        ErrorHandler::getInstance()->logError();
+    }
+    return status;
 }
 
 

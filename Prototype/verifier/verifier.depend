@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1670273688 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\main.cpp
+1670275041 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\main.cpp
 	<iostream>
 	<queue>
 	"src/Byte.h"
@@ -19,18 +19,18 @@
 1670182844 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\datagramverifier.h
 	"Byte.h"
 
-1670178461 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\errorhandler.cpp
+1670357593 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\errorhandler.cpp
 	"ErrorHandler.h"
 
 1670178461 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\errorhandler.h
 
-1670274493 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\framverifier.cpp
+1670357593 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\framverifier.cpp
 	"FramVerifier.h"
 
 1670182698 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\framverifier.h
 	"ConfigurationManager.h"
 
-1670269691 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\payloadverifier.cpp
+1670357793 source:d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\payloadverifier.cpp
 	"PayloadVerifier.h"
 
 1670183138 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\include\payloadverifier.h
@@ -101,10 +101,15 @@
 1670267826 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\datagramverifier.h
 	"Byte.h"
 
-1670178461 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\errorhandler.h
+1670357602 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\errorhandler.h
+	<queue>
+	<vector>
+	"Byte.h"
+	"time.h"
 
-1670274174 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\framverifier.h
+1670355731 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\framverifier.h
 	"ConfigurationManager.h"
+	"ErrorHandler.h"
 
 1670269848 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\packetunpacker.h
 	"Byte.h"
@@ -112,9 +117,10 @@
 	"PayloadVerifier.h"
 	<queue>
 
-1670270500 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\payloadverifier.h
+1670357761 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\payloadverifier.h
 	"Byte.h"
 	"ConfigurationManager.h"
+	"ErrorHandler.h"
 
 1670267787 d:\projects\vdns-monitoring-and-debugging\prototype\verifier\src\segmentverifier.h
 	"Byte.h"

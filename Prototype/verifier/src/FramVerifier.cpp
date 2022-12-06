@@ -20,6 +20,9 @@ FrameVerifier* FrameVerifier::getInstance()
 
 bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
+    ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+
+    bool status = true;
 
     //check first 6 entries with a sender
     bool correctSender = false;
@@ -40,7 +43,9 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
     if(!correctSender)
     {
-        return false;
+        errorInfo = new ErrorInfo(packet);
+        errorInfo->addError(SOURCE_MAC);
+        status = false;
     }
 
     //check for receiver
@@ -56,10 +61,13 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
     if(!correctReceiver)
     {
-        return false;
+        if(errorInfo == nullptr)
+        {
+           errorInfo = new ErrorInfo(packet);
+        }
+        errorInfo->addError(DESTINATION_MAC);
+        status = false;
     }
 
-    //everything is correct
-    return true;
-
+    return status;
 }
