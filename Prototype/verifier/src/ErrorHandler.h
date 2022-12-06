@@ -10,8 +10,12 @@
 //supported errors
 enum ErrorType
 {
-    DATAGRAM, SEGMENT, PAYLOAD,
-    SOURCE_MAC, DESTINATION_MAC, CRC
+    DATAGRAM,
+    SEGMENT,
+    PAYLOAD,
+    SOURCE_MAC,
+    DESTINATION_MAC,
+    CRC
 };
 
 struct ErrorInfo
@@ -32,6 +36,7 @@ struct ErrorInfo
 
     void addError(ErrorType error)
     {
+        //printf("%d", error);
         errorTypes.push_back(error);
     }
 

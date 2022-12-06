@@ -6,9 +6,9 @@ void PacketUnpacker::readPacket()
 {
     //hard code to receive a packet until finishing the gateway //todo
     int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
-    ByteArray packet("AABBCCFFFFFFabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
+    ByteArray* packet = new ByteArray("AABBCCFFFFFFabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     mtx.lock();
-    packetQueue.push(&packet);
+    packetQueue.push(packet);
     mtx.unlock();
 }
 
@@ -37,7 +37,7 @@ void PacketUnpacker::verifiyPacket()
 
     //check for payload error
     int payloadLength = 13;  //todo get payload length from configuration
-    startIndex = 12, endIndex = startIndex+payloadLength;
+    startIndex = 12, endIndex = startIndex+payloadLength-1;
 
     PayloadVerifier* pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);

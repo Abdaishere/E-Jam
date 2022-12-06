@@ -29,6 +29,7 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
                 {
                     if(packet->at(i) != 'a'+offset)
                     {
+                        printf("%c %c", packet->at(i) , 'a'+offset);
                         status = false;
                     }
                     offset++;

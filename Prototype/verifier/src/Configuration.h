@@ -35,16 +35,20 @@ public:
     Configuration()
     {
         //handle macaddres
-        int macLen = 6;
+        myMacAddress = ByteArray("FFFFFF",6,0);
+        /*int macLen = 6;
         this->myMacAddress = ByteArray(macLen,0);
         for (int i=0; i<macLen; i++)
         {
             this->myMacAddress[i] = hexSwitcher(rand()%16);
             this->myMacAddress.length++;
-        }
+        }*/
 
         //payload
         payloadType = FIRST;
+
+        //sender
+        senders.push_back(ByteArray("AABBCC",6,0));
 
     }
 
