@@ -17,8 +17,8 @@ private:
     std::vector<ByteArray> receivers;
     ByteArray myMacAddress;
     PayloadType payloadType;
-    ull numberOfPackets;
-    ull lifeTime;
+    ull numberOfPackets = 100;
+    ull lifeTime = 100;
     int flowType;
     ull SendingRate;
 
@@ -34,14 +34,20 @@ private:
 public:
     Configuration()
     {
+        //handle macaddres
         int macLen = 6;
-
         this->myMacAddress = ByteArray(macLen,0);
         for (int i=0; i<macLen; i++)
         {
             this->myMacAddress[i] = hexSwitcher(rand()%16);
+            this->myMacAddress.length++;
         }
+
+        //payload
+        payloadType = FIRST;
+
     }
+
     std::vector<ByteArray> &getSenders()
     {
         return senders;
@@ -111,6 +117,7 @@ public:
     {
         SendingRate = sendingRate;
     }
+
     ByteArray getMyMacAddress()
     {
         return myMacAddress;

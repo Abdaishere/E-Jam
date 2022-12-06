@@ -51,6 +51,7 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     }
     if(status == false)
     {
+        printf("error\n");
         ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
         if(errorInfo == nullptr)
         {
@@ -58,6 +59,9 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         }
         errorInfo->addError(PAYLOAD);
         ErrorHandler::getInstance()->logError();
+    }else
+    {
+        printf("ok\n");
     }
     return status;
 }

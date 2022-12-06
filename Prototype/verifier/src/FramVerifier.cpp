@@ -52,7 +52,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     bool correctReceiver = true;
     for(int i=7;i<12;i++)
     {
-        if(acceptedRecv[i] != packet->at(i))
+        if(acceptedRecv[i-7] != packet->at(i))
         {
             correctReceiver = false;
             break;

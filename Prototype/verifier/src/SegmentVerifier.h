@@ -6,7 +6,6 @@
 class SegmentVerifier
 {
     public:
-        SegmentVerifier();
         //parameters pointer to byteArray, start index, end index of payload
         bool verifiy(ByteArray*, int, int);
 };

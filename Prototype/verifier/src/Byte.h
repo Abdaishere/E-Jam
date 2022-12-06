@@ -5,7 +5,7 @@
 
 struct ByteArray
 {
-    unsigned char * bytes;
+    unsigned char* bytes;
     int capacity, length, extraBuffer;
 
 
