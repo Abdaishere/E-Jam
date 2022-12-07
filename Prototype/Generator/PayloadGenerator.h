@@ -9,6 +9,7 @@
 
 #include <string>
 #include "Byte.h"
+#include "RNG.h"
 
 class PayloadGenerator
 {
@@ -16,9 +17,12 @@ private:
     ByteArray payload;
     void generateFirstAlphabet();
     void generateSecondAlphabet();
-    void generateAlphabet(int);
+    void generateRandomCharacters(int seed = 0);
+    RNG rng;
+    void generateAlphabet();
 public:
-    explicit PayloadGenerator(PayloadType);
+    //must specify the length of the payload and its type
+    explicit PayloadGenerator(int cap, PayloadType type);
     ByteArray getPayload();
 
 };

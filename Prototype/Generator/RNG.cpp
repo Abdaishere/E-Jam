@@ -14,5 +14,8 @@
         printf("%d ", rng.gen());
         printf("%llu\n", rng.getR());
     }
+
+
 }
+
 */

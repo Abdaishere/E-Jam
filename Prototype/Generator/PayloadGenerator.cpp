@@ -15,18 +15,27 @@ PayloadGenerator::PayloadGenerator(PayloadType payloadType)
             generateSecondAlphabet();
             break;
         default:
-            generateAlphabet((rand()%22)+5);
+            generateRandomCharacters();
     }
 }
 
-void PayloadGenerator::generateAlphabet(int n)
+void PayloadGenerator::generateRandomCharacters(int seed)
 {
-   payload = ByteArray(n,0);
-   for (int i=0; i<n; i++)
-   {
-       int offset = rand()%26;
-       payload[i] = offset+'a';
-   }
+    rng.setSeed(rand());
+    for(int i=0; i<payload.capacity; i++)
+    {
+        unsigned char c = rng.gen();
+        payload.at(i) = c;
+        // so copy constructor works correctly
+        payload.length++;
+
+    }
+    //TODO
+}
+
+void PayloadGenerator::generateAlphabet()
+{
+    payload = ByteArray("abcdefghijklmnopqrstuvwxyz",26);
 }
 
 ByteArray PayloadGenerator::getPayload()

@@ -32,6 +32,11 @@ public:
         return currRandomNumber;
     }
 
+    void setSeed (int s)
+    {
+        rng.seed(s);
+    }
+
     unsigned char gen()
     {
         if(index == 8)

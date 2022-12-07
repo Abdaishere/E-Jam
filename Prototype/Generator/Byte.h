@@ -1,9 +1,5 @@
-//
-// Created by mohamedelhagry on 12/2/22.
-//
-
-#ifndef GENERATOR_BYTE_H
-#define GENERATOR_BYTE_H
+#ifndef BYTEARRAY_H
+#define BYTEARRAY_H
 
 #include <cstdio>
 
@@ -52,16 +48,15 @@ struct ByteArray
     {
         this->bytes = new unsigned char[length];
         this->capacity = length;
-        for(int i=0; i<length; i++)
-            this->bytes[i] = bytes[i];
-        length = length;
+        this->length = length;
+        for(int i=0; i<length; i++){ this->bytes[i] = bytes[i]; }
         this->extraBuffer = extraBuffer;
     }
 
     //appends entire bytesToWrite to the current byteArray
     bool write(ByteArray& bytesToWrite)
     {
-        if(length + bytesToWrite.capacity >= capacity)
+        if(length + bytesToWrite.capacity > capacity)
             return false;
         for(int i=0; i<bytesToWrite.capacity; i++)
             bytes[length++] = bytesToWrite.bytes[i];
@@ -111,7 +106,7 @@ struct ByteArray
 
             for (int i=0; i<this->length; i++)
             {
-                   newPtr[i]=this->bytes[i];
+                newPtr[i]=this->bytes[i];
             }
             this->capacity = newLen;
 
@@ -126,18 +121,21 @@ struct ByteArray
         }
     }
 
-    void at(int idx, char info)
+    //a.at(5) = 'b';
+    unsigned char& at(int idx)
     {
-        if(idx>=0 && idx < capacity)
-        {
-            bytes[idx] = info;
-        }
+        return bytes[idx];
     }
 
     void print()
     {
         for(int i=0; i < length; i++)
-            printf("%c", this->bytes[i]);
+        {
+            //to avoid seeing whitespaces
+            printf("%d ", this->bytes[i]);
+//            printf("%c", this->bytes[i]);
+
+        }
         printf("\n");
 
     }
@@ -151,4 +149,5 @@ struct ByteArray
 
 };
 
-#endif //GENERATOR_BYTE_H
+#endif
+// BYTEARRAY_H
