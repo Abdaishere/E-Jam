@@ -8,8 +8,7 @@ using namespace std;
 
 void read(PacketUnpacker* pu)
 {
-    int times = 400;
-    while(times)
+    while(true)
     {
         pu->readPacket();
     }
@@ -17,8 +16,7 @@ void read(PacketUnpacker* pu)
 
 void verify(PacketUnpacker* pu)
 {
-    int times = 200;
-    while(times)
+    while(true)
     {
         pu->verifiyPacket();
     }

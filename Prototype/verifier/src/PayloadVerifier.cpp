@@ -23,34 +23,38 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     switch(ConfigurationManager::getConfiguration()->getPayloadType())
     {
         case FIRST:
+        {
+            int offset = 0;
+            for(int i=startIndex;i<=endIndex;i++)
             {
-                int offset = 0;
-                for(int i=startIndex;i<=endIndex;i++)
+                if(packet->at(i) != 'a'+offset)
                 {
-                    if(packet->at(i) != 'a'+offset)
-                    {
-                        printf("%c %c", packet->at(i) , 'a'+offset);
-                        status = false;
-                    }
-                    offset++;
+                    printf("%c %c", packet->at(i) , 'a'+offset);
+                    status = false;
                 }
-                break;
+                offset++;
             }
+            break;
+        }
         case SECOND:
+        {
+            int offset = 0;
+            for(int i=startIndex;i<=endIndex;i++)
             {
-                int offset = 0;
-                for(int i=startIndex;i<=endIndex;i++)
+                if(packet->at(i) != 'n'+offset)
                 {
-                    if(packet->at(i) != 'n'+offset)
-                    {
-                        status = false;
-                    }
-                    offset++;
+                    status = false;
                 }
-                break;
+                offset++;
             }
+            break;
+        }
+        case RANDOM:
+            //TODO
+            status = true;
+            break;
     }
-    if(status == false)
+    if(!status)
     {
         printf("error\n");
         ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;

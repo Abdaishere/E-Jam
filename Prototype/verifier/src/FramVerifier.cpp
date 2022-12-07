@@ -69,5 +69,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         status = false;
     }
 
+
+    //TODO check for CRC
     return status;
 }
