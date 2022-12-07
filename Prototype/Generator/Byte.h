@@ -27,6 +27,8 @@ struct ByteArray
 
     void reset(int len)
     {
+        if(len==length)
+            return;
         length = 0;
         capacity = len;
         delete[] bytes; //delete before initializing
@@ -127,7 +129,7 @@ struct ByteArray
         return bytes[idx];
     }
 
-    void print()
+    void print() const
     {
         for(int i=0; i < length; i++)
         {
@@ -138,6 +140,15 @@ struct ByteArray
         }
         printf("\n");
 
+    }
+
+    void printChars() const
+    {
+        for(int i=0; i < length; i++)
+        {
+            printf("%c", this->bytes[i]);
+        }
+        printf("\n");
     }
 
 

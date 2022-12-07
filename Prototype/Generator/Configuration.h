@@ -1,6 +1,9 @@
 //
 // Created by khaled on 11/27/22.
 //
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
+
 #include <vector>
 #include <cstdlib>
 #include "Byte.h"
@@ -19,8 +22,10 @@ private:
     PayloadType payloadType;
     ull numberOfPackets;
     ull lifeTime;
+    int payloadLength;
     int flowType;
     ull SendingRate;
+    int seed;
 
     unsigned char hexSwitcher(int x)
     {
@@ -31,16 +36,39 @@ private:
         else
             return 'F';
     }
-public:
-    Configuration()
+    ByteArray discoverMyMac()
     {
+        ByteArray mac;
+        mac = ByteArray("FFFFFF",6,0);
+        /*
         int macLen = 6;
-
-        this->myMacAddress = ByteArray(macLen,0);
+        mac = ByteArray(macLen,0);
         for (int i=0; i<macLen; i++)
         {
             this->myMacAddress[i] = hexSwitcher(rand()%16);
-        }
+            this->myMacAddress.length++;
+        }*/
+        return mac;
+    }
+public:
+    Configuration()
+    {
+        //TODO load from file
+
+        //handle macaddres
+        myMacAddress = discoverMyMac();
+
+        //payload
+        payloadType = RANDOM;
+
+        //Receiver
+        receivers.push_back(ByteArray("AABBCC",6,0));
+
+        numberOfPackets = 100;
+
+        seed = 0;
+
+        payloadLength = 13;
     }
     const std::vector<ByteArray> &getSenders() const
     {
@@ -115,5 +143,15 @@ public:
     {
         return myMacAddress;
     }
+    int getSeed()
+    {
+        return seed;
+    }
+
+    int getPayloadLength()
+    {
+        return payloadLength;
+    }
 };
 
+#endif

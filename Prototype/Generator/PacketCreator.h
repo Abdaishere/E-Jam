@@ -4,6 +4,7 @@
 
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H
+
 #include <mutex>
 #include <queue>
 #include <string>

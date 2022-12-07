@@ -4,8 +4,33 @@
 
 #include "PayloadGenerator.h"
 
-PayloadGenerator::PayloadGenerator(PayloadType payloadType)
+PayloadGenerator* PayloadGenerator::instance = nullptr;
+
+PayloadGenerator::PayloadGenerator()
 {
+    int seed = ConfigurationManager::getConfiguration()->getSeed();
+    this->rng.setSeed(seed);
+
+    int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
+    payload = ByteArray(payloadLength,0);
+}
+
+void PayloadGenerator::generateRandomCharacters()
+{
+    payload.length=0;
+    for(int i=0; i<payload.capacity; i++)
+    {
+        unsigned char c = rng.gen();
+        payload.at(i) = c;
+        // so copy constructor works correctly
+        payload.length++;
+    }
+}
+
+void PayloadGenerator::regeneratePayload()
+{
+    PayloadType payloadType = ConfigurationManager::getConfiguration()->getPayloadType();
+
     switch (payloadType)
     {
         case FIRST:
@@ -17,20 +42,6 @@ PayloadGenerator::PayloadGenerator(PayloadType payloadType)
         default:
             generateRandomCharacters();
     }
-}
-
-void PayloadGenerator::generateRandomCharacters(int seed)
-{
-    rng.setSeed(rand());
-    for(int i=0; i<payload.capacity; i++)
-    {
-        unsigned char c = rng.gen();
-        payload.at(i) = c;
-        // so copy constructor works correctly
-        payload.length++;
-
-    }
-    //TODO
 }
 
 void PayloadGenerator::generateAlphabet()
@@ -51,6 +62,16 @@ void PayloadGenerator::generateFirstAlphabet()
 void PayloadGenerator::generateSecondAlphabet()
 {
     payload = ByteArray("nopqrstuvwxyz",13);
+}
+
+
+PayloadGenerator *PayloadGenerator::getInstance()
+{
+    if(instance == nullptr)
+    {
+        instance = new PayloadGenerator();
+    }
+    return instance;
 }
 
 

@@ -11,6 +11,7 @@ void sendingFunction(PacketCreator* pc)
 void creatingFunction(PacketCreator* pc)
 {
     unsigned long long numberOfPackets = ConfigurationManager::getConfiguration()->getNumberOfPackets();
+
     while(numberOfPackets--)
     {
         int lenRcv = ConfigurationManager::getConfiguration()->getReceivers().size();

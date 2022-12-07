@@ -3,6 +3,7 @@
 //
 
 #include "ConfigurationManager.h"
+Configuration* ConfigurationManager::configuration = nullptr;
 
 Configuration* ConfigurationManager::getConfiguration()
 {

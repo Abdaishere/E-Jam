@@ -8,10 +8,10 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
-#include<stdio.h>
-#include<unistd.h>
-#include<sys/stat.h>
-#include<sys/types.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <fcntl.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
@@ -22,24 +22,24 @@ void PacketCreator::createPacket(int rcvInd)
     ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
     ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
 
-    PayloadGenerator* payloadGenerator = new PayloadGenerator(ConfigurationManager::getConfiguration()->getPayloadType());
+    PayloadGenerator* payloadGenerator = PayloadGenerator::getInstance();
+    payloadGenerator->regeneratePayload();
+    ByteArray payload = payloadGenerator->getPayload();
+    ByteArray innerProtocol = ByteArray("00",2);
     FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
-                                                                 payloadGenerator->getPayload(),
-                                                                 ByteArray("00",2));
+                                                                 payload,
+                                                                 innerProtocol);
     frameConstructor->constructFrame();
 
     mtx.lock();
     productQueue.push(frameConstructor->getFrame());
     mtx.unlock();
-
-
 }
 
 
 
 void PacketCreator::sendHead()
 {
-
     if(productQueue.size()<1)
     {
         return;
@@ -50,7 +50,6 @@ void PacketCreator::sendHead()
     mtx.unlock();
 
     sendToGateway(packet);
-    //gateway.send(packet) //TODO
 }
 
 void PacketCreator::sendToGateway(const ByteArray& packet)
