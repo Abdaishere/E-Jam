@@ -1,19 +1,13 @@
 #include "PacketSender.h"
-#include <iostream>
-#include <cstring>
-#include <vector>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <chrono>
-using namespace std;
+
+PacketSender::PacketSender() {}
 
 void PacketSender::openPipes()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        mkfifo(FIFO_FILE + to_string(i), S_IFIFO | 0640);
-        fd[i] = open((FIFO_FILE + to_string(i)).c_str(), O_RDWR);
+        mkfifo((FIFO_FILE + std::to_string(i)).c_str(), S_IFIFO | 0640);
+        fd[i] = open((FIFO_FILE + std::to_string(i)).c_str(), O_RDWR);
     }
 }
 
@@ -23,16 +17,20 @@ void PacketSender::closePipes()
         close(fd[i]);
 }
 
-void PacketSender::receivePayload(Payload payload, int process)
+void PacketSender::checkPipes()
 {
-    memset(&buffer, 0, sizeof buffer); // clear the buffer
-    read(fd[process], buffer, sizeof(buffer));
-    payloads[process].push(buffer);
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        while (read(fd[i], buffer, sizeof(buffer)) != 0)
+        {
+            payloads[i].push(buffer);
+            memset(&buffer, 0, sizeof buffer); // clear the buffer
+        }
+    }
 }
 
-vector<Payload> PacketSender::roundRubin()
+void PacketSender::roundRubin()
 {
-    vector<Payload> order;
     auto endTest = std::chrono::system_clock::now(); + 5min;
     do {
         for (int i = 0; i < MAX_PROCESSES && std::chrono::system_clock::now() < endTest; i++)
@@ -40,118 +38,63 @@ vector<Payload> PacketSender::roundRubin()
             while (payloads[i].empty() && std::chrono::system_clock::now() < endTest);
             if (!payloads[i].empty())
             {
-                order.push_back(payloads[i].front());
+                sendToSwitch(payloads[i].front());
                 payloads[i].pop();
             }
         }
     } while (std::chrono::system_clock::now() < endTest);
-    return order;
 }
 
-void PacketSender::sendToSwitch()
+bool PacketSender::sendToSwitch(Payload& payload)
 {
-    int n = stoi(argv[1]);
-    cout << "n = " << n << endl;
-
-    auto startTest = std::chrono::system_clock::now();
-    long long counter = 0;
-
-    // create the socket file descriptor
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    // open socket
+    int sock = socket(AF_PACKET, SOCK_RAW, protocol);
     if (sock == -1)
     {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
+        std::cout << "unable to open socket\n";
+        return false;
     }
 
-    // forcefully attaching socket to the port
-    int opt = 1;
-    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
+    // get interface index
+    // using netDevice - low-level access to Linux network devices
+    struct ifreq ifr;
+    size_t if_name_len = strlen(DEFAULT_IF_NAME);
+    if (if_name_len < sizeof(ifr.ifr_name))
     {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
+        memcpy(ifr.ifr_name, DEFAULT_IF_NAME, if_name_len);
+        ifr.ifr_name[if_name_len] = 0;
     }
-
-    // construct the client address
-    struct sockaddr_in address {};
-    address.sin_family = AF_INET;
-    address.sin_port = htons(PORT);
-    address.sin_addr.s_addr = INADDR_ANY;   // bind to all interfaces
-
-    // binds the socket to the address and port number
-    if (bind(sock, (struct sockaddr*)&address, sizeof(address)) < 0)
+    else
     {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
+        std::cout << "interface name too long\n";
+        return false;
     }
-
-    // waits for the client to approach the server to make a connection
-    if (listen(sock, 3) < 0)
+    if (ioctl(sock,SIOCGIFINDEX,&ifr) == -1)
     {
-        perror("listen failed");
-        exit(EXIT_FAILURE);
+        std::cout << "could not get open ethernet interface\n";
+        return false;
     }
+    int ifIndex = ifr.ifr_ifindex;
 
-    // accepting the client connection
-    int server_fd;
-    int addrlen = sizeof(address);
-    if ((server_fd = accept(sock, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0)
+
+    //construct destination address
+    const unsigned char ether_broadcast_addr[]=
+            {0xff,0xff,0xff,0xff,0xff,0xff};
+
+    struct sockaddr_ll addr = {0};
+    addr.sll_family = AF_PACKET;
+    addr.sll_ifindex = ifIndex;
+    addr.sll_halen = ETHER_ADDR_LEN;
+    addr.sll_protocol = htons(htons(protocol));
+    memcpy(addr.sll_addr,ether_broadcast_addr,ETHER_ADDR_LEN);
+
+    // send the request
+    // ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+    //                const struct sockaddr *dest_addr, socklen_t addrlen);
+    if (sendto(sock, &payload, sizeof(payload), 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     {
-        perror("accept");
-        exit(EXIT_FAILURE);
+        std::cout << "couldn't send frame\n";
+        return false;
     }
-
-    int bufferSize = n + 5;
-    char buffer[bufferSize];
-
-    string response = string(n, 'b');
-
-    while (true)
-    {
-        // receive request from the client
-        int receivedSize = 0;
-        string request;
-        while (receivedSize < n)
-        {
-            memset(&buffer, 0, sizeof(buffer)); // clear the buffer
-            receivedSize += recv(server_fd, (char*)&buffer, bufferSize, 0);
-            request += buffer;
-            if (request == "exit")
-                break;
-        }
-//        cout << "Client requested: " << request << endl;
-//        cout << request.length() << endl;
-
-        if (request == "exit")
-            break;
-
-        // send response to the client
-        string message = response;
-        size_t sentSize = 0;
-        while (sentSize < n)
-        {
-            memset(buffer, 0, sizeof(buffer)); // clear the buffer
-            strcpy(buffer, message.c_str());
-            int cur = send(server_fd, (char*)&buffer, strlen(buffer), 0);
-            sentSize += cur;
-            if (sentSize == message.length())
-                message = "";
-            else
-                message = message.substr(sentSize);
-        }
-
-        counter++;
-    }
-
-    // closing the connected socket
-    close(server_fd);
-
-    // closing the listening socket
-    shutdown(sock, SHUT_RDWR);
-
-    auto endTest = std::chrono::system_clock::now();
-    long long elapsedTime = (long long)(chrono::duration_cast<chrono::milliseconds>(endTest - startTest).count());
-    cout << "Total time = " << elapsedTime << endl;
-    cout << "Sent responses = " << counter << endl;
-    return 0;
+    return true;
 }
