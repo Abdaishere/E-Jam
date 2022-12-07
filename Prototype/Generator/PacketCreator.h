@@ -13,6 +13,7 @@
 #include "DatagramConstructor.h"
 #include "FrameConstructor.h"
 #include "EthernetConstructor.h"
+#include "PacketSender.h"
 
 struct segmentConstructorInfo{
     //some relevant values regarding the headers of the protocol
@@ -26,8 +27,9 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
-    void sendToGateway(const ByteArray&);
+    PacketSender* sender;
 public:
+    PacketCreator();
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
     void createPacket(int);

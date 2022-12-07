@@ -111,19 +111,19 @@ CMakeFiles/Generator.dir/StreamDetails.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/StreamDetails.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/StreamDetails.cpp -o CMakeFiles/Generator.dir/StreamDetails.cpp.s
 
-CMakeFiles/Generator.dir/Configuration.cpp.o: CMakeFiles/Generator.dir/flags.make
-CMakeFiles/Generator.dir/Configuration.cpp.o: ../Configuration.cpp
-CMakeFiles/Generator.dir/Configuration.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Generator.dir/Configuration.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/Configuration.cpp.o -MF CMakeFiles/Generator.dir/Configuration.cpp.o.d -o CMakeFiles/Generator.dir/Configuration.cpp.o -c /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/Configuration.cpp
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.o: CMakeFiles/Generator.dir/flags.make
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.o: ../ConfigurationManager.cpp
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.o: CMakeFiles/Generator.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Generator.dir/ConfigurationManager.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Generator.dir/ConfigurationManager.cpp.o -MF CMakeFiles/Generator.dir/ConfigurationManager.cpp.o.d -o CMakeFiles/Generator.dir/ConfigurationManager.cpp.o -c /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/ConfigurationManager.cpp
 
-CMakeFiles/Generator.dir/Configuration.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Generator.dir/Configuration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/Configuration.cpp > CMakeFiles/Generator.dir/Configuration.cpp.i
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Generator.dir/ConfigurationManager.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/ConfigurationManager.cpp > CMakeFiles/Generator.dir/ConfigurationManager.cpp.i
 
-CMakeFiles/Generator.dir/Configuration.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/Configuration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/Configuration.cpp -o CMakeFiles/Generator.dir/Configuration.cpp.s
+CMakeFiles/Generator.dir/ConfigurationManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Generator.dir/ConfigurationManager.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/ConfigurationManager.cpp -o CMakeFiles/Generator.dir/ConfigurationManager.cpp.s
 
 CMakeFiles/Generator.dir/PayloadGenerator.cpp.o: CMakeFiles/Generator.dir/flags.make
 CMakeFiles/Generator.dir/PayloadGenerator.cpp.o: ../PayloadGenerator.cpp
@@ -256,7 +256,7 @@ Generator_OBJECTS = \
 "CMakeFiles/Generator.dir/main.cpp.o" \
 "CMakeFiles/Generator.dir/PacketCreator.cpp.o" \
 "CMakeFiles/Generator.dir/StreamDetails.cpp.o" \
-"CMakeFiles/Generator.dir/Configuration.cpp.o" \
+"CMakeFiles/Generator.dir/ConfigurationManager.cpp.o" \
 "CMakeFiles/Generator.dir/PayloadGenerator.cpp.o" \
 "CMakeFiles/Generator.dir/SegmentConstructor.cpp.o" \
 "CMakeFiles/Generator.dir/DatagramConstructor.cpp.o" \
@@ -273,7 +273,7 @@ Generator_EXTERNAL_OBJECTS =
 Generator: CMakeFiles/Generator.dir/main.cpp.o
 Generator: CMakeFiles/Generator.dir/PacketCreator.cpp.o
 Generator: CMakeFiles/Generator.dir/StreamDetails.cpp.o
-Generator: CMakeFiles/Generator.dir/Configuration.cpp.o
+Generator: CMakeFiles/Generator.dir/ConfigurationManager.cpp.o
 Generator: CMakeFiles/Generator.dir/PayloadGenerator.cpp.o
 Generator: CMakeFiles/Generator.dir/SegmentConstructor.cpp.o
 Generator: CMakeFiles/Generator.dir/DatagramConstructor.cpp.o

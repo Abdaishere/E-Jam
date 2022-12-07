@@ -3,6 +3,9 @@
 #include <iostream>
 #include <thread>
 
+//#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
+#define FIFO_FILE "./fifo_pipe_gen"
+
 void sendingFunction(PacketCreator* pc)
 {
     while(true)
@@ -22,19 +25,19 @@ void creatingFunction(PacketCreator* pc)
     }
 }
 
-int main()
+
+int main(int argc, char** argv)
 {
-    //TODO (Obviously, there is a segmentation fault)
+    int genID = 0;
+    if(argc > 1)
+        genID = std::stoi(argv[0]);
+    PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
     PacketCreator* pc = new PacketCreator();
-
-
     std::thread creator(creatingFunction,pc);
     std::thread sender(sendingFunction,pc);
 
-
     creator.join();
     sender.join();
-
 }
 

@@ -36,7 +36,9 @@ void PacketCreator::createPacket(int rcvInd)
     mtx.unlock();
 }
 
-
+PacketCreator::PacketCreator() {
+    sender = PacketSender::getInstance();
+}
 
 void PacketCreator::sendHead()
 {
@@ -49,27 +51,5 @@ void PacketCreator::sendHead()
     productQueue.pop();
     mtx.unlock();
 
-    sendToGateway(packet);
-}
-
-void PacketCreator::sendToGateway(const ByteArray& packet)
-{
-    //making the FIFO with 777 permissions
-    if(mkfifo("./gen",0777)==-1)
-    {
-        if(errno != EEXIST) //if the error was more than the file already existing
-        {
-            printf("Error in creating the FIFO file\n");
-            return;
-        }
-        else
-        {
-            printf("File already exists, skipping creation...\n");
-        }
-    }
-    //open the fifo as write only and get the file descriptor (blocking by default)
-    int fd = open("myfifo1", O_WRONLY);
-
-    write(fd,packet.bytes,packet.length);
-    //close(fd); //No need to close because the stream is always on (NOT TESTED) //TODO
+    sender->transmitPackets(packet);
 }
