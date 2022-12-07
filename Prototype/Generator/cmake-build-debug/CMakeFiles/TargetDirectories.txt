@@ -1,3 +1,3 @@
-/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles/Generator.dir
-/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles/Generator.dir
+/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles/edit_cache.dir
+/run/media/khaled/6AD25B3FD25B0EA7/Uni/Graduation Project/E-Jam/Prototype/Generator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
