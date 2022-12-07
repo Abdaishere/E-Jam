@@ -129,29 +129,53 @@ Generator/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/build
 .PHONY : Generator/fast
 
-Configuration.o: Configuration.cpp.o
-.PHONY : Configuration.o
+Byte.o: Byte.cpp.o
+.PHONY : Byte.o
 
 # target to build an object file
-Configuration.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Configuration.cpp.o
-.PHONY : Configuration.cpp.o
+Byte.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Byte.cpp.o
+.PHONY : Byte.cpp.o
 
-Configuration.i: Configuration.cpp.i
-.PHONY : Configuration.i
+Byte.i: Byte.cpp.i
+.PHONY : Byte.i
 
 # target to preprocess a source file
-Configuration.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Configuration.cpp.i
-.PHONY : Configuration.cpp.i
+Byte.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Byte.cpp.i
+.PHONY : Byte.cpp.i
 
-Configuration.s: Configuration.cpp.s
-.PHONY : Configuration.s
+Byte.s: Byte.cpp.s
+.PHONY : Byte.s
 
 # target to generate assembly for a file
-Configuration.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Configuration.cpp.s
-.PHONY : Configuration.cpp.s
+Byte.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/Byte.cpp.s
+.PHONY : Byte.cpp.s
+
+ConfigurationManager.o: ConfigurationManager.cpp.o
+.PHONY : ConfigurationManager.o
+
+# target to build an object file
+ConfigurationManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/ConfigurationManager.cpp.o
+.PHONY : ConfigurationManager.cpp.o
+
+ConfigurationManager.i: ConfigurationManager.cpp.i
+.PHONY : ConfigurationManager.i
+
+# target to preprocess a source file
+ConfigurationManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/ConfigurationManager.cpp.i
+.PHONY : ConfigurationManager.cpp.i
+
+ConfigurationManager.s: ConfigurationManager.cpp.s
+.PHONY : ConfigurationManager.s
+
+# target to generate assembly for a file
+ConfigurationManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/ConfigurationManager.cpp.s
+.PHONY : ConfigurationManager.cpp.s
 
 DatagramConstructor.o: DatagramConstructor.cpp.o
 .PHONY : DatagramConstructor.o
@@ -297,6 +321,30 @@ PayloadGenerator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/PayloadGenerator.cpp.s
 .PHONY : PayloadGenerator.cpp.s
 
+RNG.o: RNG.cpp.o
+.PHONY : RNG.o
+
+# target to build an object file
+RNG.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/RNG.cpp.o
+.PHONY : RNG.cpp.o
+
+RNG.i: RNG.cpp.i
+.PHONY : RNG.i
+
+# target to preprocess a source file
+RNG.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/RNG.cpp.i
+.PHONY : RNG.cpp.i
+
+RNG.s: RNG.cpp.s
+.PHONY : RNG.s
+
+# target to generate assembly for a file
+RNG.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Generator.dir/build.make CMakeFiles/Generator.dir/RNG.cpp.s
+.PHONY : RNG.cpp.s
+
 SegmentConstructor.o: SegmentConstructor.cpp.o
 .PHONY : SegmentConstructor.o
 
@@ -402,9 +450,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... Generator"
-	@echo "... Configuration.o"
-	@echo "... Configuration.i"
-	@echo "... Configuration.s"
+	@echo "... Byte.o"
+	@echo "... Byte.i"
+	@echo "... Byte.s"
+	@echo "... ConfigurationManager.o"
+	@echo "... ConfigurationManager.i"
+	@echo "... ConfigurationManager.s"
 	@echo "... DatagramConstructor.o"
 	@echo "... DatagramConstructor.i"
 	@echo "... DatagramConstructor.s"
@@ -423,6 +474,9 @@ help:
 	@echo "... PayloadGenerator.o"
 	@echo "... PayloadGenerator.i"
 	@echo "... PayloadGenerator.s"
+	@echo "... RNG.o"
+	@echo "... RNG.i"
+	@echo "... RNG.s"
 	@echo "... SegmentConstructor.o"
 	@echo "... SegmentConstructor.i"
 	@echo "... SegmentConstructor.s"

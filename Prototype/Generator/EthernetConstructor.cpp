@@ -4,37 +4,28 @@
 
 #include "EthernetConstructor.h"
 
-EthernetConstructor::EthernetConstructor(unsigned char *sourceAddress, unsigned char *destinationAddress,
-                                         const int payloadSize, const unsigned char *payload,
-                                         unsigned char *innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
-    this->payloadSize = payloadSize;
-    this->payload = new unsigned char [payloadSize];
-    for(int i=0; i<payloadSize; i++)
-        this->payload[i] = payload[i];
-
-    type[0] = innerProtocol[0];
-    type[1] = innerProtocol[1];
+#define CRC_LEN 4
+EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
+                                         ByteArray& payload,
+                                         ByteArray& innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
+    this->payload = payload;
+    type=innerProtocol;
 }
 
 void EthernetConstructor::constructFrame() {
 
-    frame = new unsigned char[headerSize + payloadSize];
-    int framePointer = 0;
-    for(int i=0; i<6; i++)
-        frame[framePointer++] = source_address[i];
-    for(int i=0; i<6; i++)
-        frame[framePointer++] = destination_address[i];
-    for(int i=0; i<2; i++)
-        frame[framePointer++] = type[i];
-    for(int i=0; i<payloadSize; i++)
-        frame[framePointer++] = payload[i];
+    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + payload.capacity + CRC_LEN);
+    frame.write(source_address);
+    frame.write(destination_address);
+    frame.write(type);
+    frame.write(payload);
 
-    calculateCRC(payloadSize, payload);
-    for(int i=0; i<4; i++)
-        frame[framePointer++] = CRC[i];
+    calculateCRC(payload);
+    frame.write(CRC);
 }
 
-int EthernetConstructor::calculateCRC(int payloadSize, unsigned char *payload) {
+ByteArray EthernetConstructor::calculateCRC(ByteArray payload) {
     int crc = 0;
-    return crc;
+    CRC = ByteArray("Work", 4);
+    return CRC;
 }

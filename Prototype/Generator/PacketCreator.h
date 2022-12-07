@@ -5,11 +5,15 @@
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H
 
+#include <mutex>
 #include <queue>
+#include <string>
 #include "PayloadGenerator.h"
 #include "SegmentConstructor.h"
 #include "DatagramConstructor.h"
 #include "FrameConstructor.h"
+#include "EthernetConstructor.h"
+#include "PacketSender.h"
 
 struct segmentConstructorInfo{
     //some relevant values regarding the headers of the protocol
@@ -23,19 +27,13 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
-    static PacketCreator* instance;
-
-    PayloadGenerator* payloadGenerator;
-    SegmentConstructor* segmentConstructor;
-    DatagramConstructor* datagramConstructor;
-    FrameConstructor* frameConstructor;
-
-    std::queue<char*> productQueue;
-
-    PacketCreator();
+    PacketSender* sender;
 public:
-    void createPacket();
-    static PacketCreator* getInstance();
+    PacketCreator();
+    static std::mutex mtx;
+    static std::queue<ByteArray> productQueue;
+    void createPacket(int);
+    void sendHead();
 };
 
 

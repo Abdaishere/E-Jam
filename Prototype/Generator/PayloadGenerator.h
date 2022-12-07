@@ -4,17 +4,31 @@
 
 #ifndef GENERATOR_PAYLOADGENERATOR_H
 #define GENERATOR_PAYLOADGENERATOR_H
+#include "Configuration.h"
 
+
+#include <string>
+#include "Byte.h"
+#include "RNG.h"
+#include "ConfigurationManager.h"
 
 class PayloadGenerator
 {
 private:
-
+    static PayloadGenerator* instance;
+    ByteArray payload;
+    void generateFirstAlphabet();
+    void generateSecondAlphabet();
+    void generateRandomCharacters();
+    RNG rng;
+    void generateAlphabet();
+    explicit PayloadGenerator();
 public:
-    explicit PayloadGenerator(int type);
+    //must specify the length of the payload and its type
+    ByteArray getPayload();
+    static PayloadGenerator* getInstance();
 
-    char* generateRandomCharacters();
-    char* generateAlphabet();
+    void regeneratePayload();
 };
 
 

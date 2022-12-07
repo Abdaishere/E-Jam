@@ -5,6 +5,9 @@
 #ifndef GENERATOR_PACKETSENDER_H
 #define GENERATOR_PACKETSENDER_H
 
+#include <string>
+#include "Byte.h"
+
 /**
  * This class is responsible for communicating with the gateway
  */
@@ -12,15 +15,17 @@ class PacketSender
 {
 private:
     static PacketSender* instance;
-    char* pipeDir;
-    char* permissions;
-
+    std::string pipeDir;
+    int permissions;
+    //file descriptor for pipe
+    int fd;
+    int genID;
     PacketSender();
-    char* getNewPacket();
+//    std::string getNewPacket();
     int openFifo();
 public:
-    static PacketSender* getInstance();
-    void transmitPackets();
+    static PacketSender* getInstance(int genID = 0, std::string pipeDir = "", int pipePerm = 0777);
+    void transmitPackets(const ByteArray &packet) const;
 };
 
 

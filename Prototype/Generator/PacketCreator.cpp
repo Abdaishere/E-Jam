@@ -3,19 +3,53 @@
 //
 
 #include "PacketCreator.h"
+#include "ConfigurationManager.h"
+#include <iostream>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
-void PacketCreator::createPacket()
+std::queue<ByteArray> PacketCreator::productQueue;
+std::mutex PacketCreator::mtx;
+
+void PacketCreator::createPacket(int rcvInd)
 {
+    ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
+    ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
 
-    // payload generator()
-    // segment generator(pay)
-    //....
+    PayloadGenerator* payloadGenerator = PayloadGenerator::getInstance();
+    payloadGenerator->regeneratePayload();
+    ByteArray payload = payloadGenerator->getPayload();
+    ByteArray innerProtocol = ByteArray("00",2);
+    FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
+                                                                 payload,
+                                                                 innerProtocol);
+    frameConstructor->constructFrame();
 
-    //gateway.send(frame generator.string)
-
+    mtx.lock();
+    productQueue.push(frameConstructor->getFrame());
+    mtx.unlock();
 }
 
-PacketCreator *PacketCreator::getInstance()
+PacketCreator::PacketCreator() {
+    sender = PacketSender::getInstance();
+}
+
+void PacketCreator::sendHead()
 {
-    return nullptr;
+    if(productQueue.size()<1)
+    {
+        return;
+    }
+    mtx.lock();
+    ByteArray packet = productQueue.front();
+    productQueue.pop();
+    mtx.unlock();
+
+    sender->transmitPackets(packet);
 }

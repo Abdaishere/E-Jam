@@ -4,21 +4,74 @@
 
 #include "PayloadGenerator.h"
 
-PayloadGenerator::PayloadGenerator(int type)
+PayloadGenerator* PayloadGenerator::instance = nullptr;
+
+PayloadGenerator::PayloadGenerator()
 {
-    //TODO
+    int seed = ConfigurationManager::getConfiguration()->getSeed();
+    this->rng.setSeed(seed);
+
+    int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
+    payload = ByteArray(payloadLength,0);
 }
 
-char *PayloadGenerator::generateRandomCharacters()
+void PayloadGenerator::generateRandomCharacters()
 {
-    //TODO
-
-    return nullptr;
+    payload.length=0;
+    for(int i=0; i<payload.capacity; i++)
+    {
+        unsigned char c = rng.gen();
+        payload.at(i) = c;
+        // so copy constructor works correctly
+        payload.length++;
+    }
 }
 
-char *PayloadGenerator::generateAlphabet()
+void PayloadGenerator::regeneratePayload()
 {
-    //TODO
+    PayloadType payloadType = ConfigurationManager::getConfiguration()->getPayloadType();
 
-    return nullptr;
+    switch (payloadType)
+    {
+        case FIRST:
+            generateFirstAlphabet();
+            break;
+        case SECOND:
+            generateSecondAlphabet();
+            break;
+        default:
+            generateRandomCharacters();
+    }
 }
+
+void PayloadGenerator::generateAlphabet()
+{
+    payload = ByteArray("abcdefghijklmnopqrstuvwxyz",26);
+}
+
+ByteArray PayloadGenerator::getPayload()
+{
+    return payload;
+}
+
+void PayloadGenerator::generateFirstAlphabet()
+{
+    payload = ByteArray("abcdefghijklm",13);
+}
+
+void PayloadGenerator::generateSecondAlphabet()
+{
+    payload = ByteArray("nopqrstuvwxyz",13);
+}
+
+
+PayloadGenerator *PayloadGenerator::getInstance()
+{
+    if(instance == nullptr)
+    {
+        instance = new PayloadGenerator();
+    }
+    return instance;
+}
+
+

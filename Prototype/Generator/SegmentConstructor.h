@@ -5,16 +5,14 @@
 #ifndef GENERATOR_SEGMENTCONSTRUCTOR_H
 #define GENERATOR_SEGMENTCONSTRUCTOR_H
 
-
-#include "PayloadGenerator.h"
-
 class SegmentConstructor
 {
 private:
     int protocol;
     char* segment;
+    char* payload;
 public:
-    SegmentConstructor(int protocol, const char* resultingString, int innerProtocol){};
+    SegmentConstructor(const char* payload, int protocol){};
     void constructSegment();
 };
 
