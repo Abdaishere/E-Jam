@@ -5,8 +5,8 @@
 
 void sendingFunction(PacketCreator* pc)
 {
-        while(true)
-            pc->sendHead();
+    while(true)
+        pc->sendHead();
 }
 void creatingFunction(PacketCreator* pc)
 {
@@ -16,13 +16,13 @@ void creatingFunction(PacketCreator* pc)
 
 int main()
 {
-    //TODO (Obviously, there is a segmentation fault)
 
     PacketCreator* pc = new PacketCreator();
 
 
     std::thread creator(creatingFunction,pc);
     std::thread sender(sendingFunction,pc);
+//    std::thread sender();
 
 
     creator.join();
