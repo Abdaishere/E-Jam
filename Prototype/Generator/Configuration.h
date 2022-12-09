@@ -39,7 +39,7 @@ private:
     ByteArray discoverMyMac()
     {
         ByteArray mac;
-        mac = ByteArray("FFFFFF",6,0);
+        mac = ByteArray("xxxxxx",6,0);
         /*
         int macLen = 6;
         mac = ByteArray(macLen,0);
@@ -59,7 +59,7 @@ public:
         myMacAddress = discoverMyMac();
 
         //payload
-        payloadType = RANDOM;
+        payloadType = FIRST;
 
         //Receiver
         receivers.push_back(ByteArray("AABBCC",6,0));

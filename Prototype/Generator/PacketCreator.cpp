@@ -39,7 +39,7 @@ void PacketCreator::createPacket(int rcvInd)
 PacketCreator::PacketCreator() {
     sender = PacketSender::getInstance();
 }
-
+#include <iostream>
 void PacketCreator::sendHead()
 {
     if(productQueue.size()<1)
