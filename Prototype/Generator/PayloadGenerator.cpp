@@ -74,4 +74,9 @@ PayloadGenerator *PayloadGenerator::getInstance()
     return instance;
 }
 
+void PayloadGenerator::addStreamId()
+{
+    payload = ByteArray("abcdefghijklm",13);
+}
+
 

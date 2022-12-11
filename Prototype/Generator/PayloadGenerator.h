@@ -20,6 +20,8 @@ private:
     void generateFirstAlphabet();
     void generateSecondAlphabet();
     void generateRandomCharacters();
+    void addStreamId();
+
     RNG rng;
     void generateAlphabet();
     explicit PayloadGenerator();
@@ -27,7 +29,6 @@ public:
     //must specify the length of the payload and its type
     ByteArray getPayload();
     static PayloadGenerator* getInstance();
-
     void regeneratePayload();
 };
 

@@ -11,6 +11,7 @@
 
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
+#define STREAMID_LEN 3
 
 enum PayloadType {FIRST, SECOND, RANDOM};
 
@@ -26,6 +27,7 @@ private:
     int payloadLength, seed;
     int flowType;
     ull SendingRate;
+    ByteArray* streamID;
 
     unsigned char hexSwitcher(int x)
     {
@@ -54,6 +56,13 @@ public:
     void loadFromFile(char* path)
     {
         freopen(path,"r",stdin);
+
+        //Set stream ID, must be of leangth 3 (STREAMID_LEN)
+        char* sID;
+        std::cin>>sID;
+        setStreamID(sID);
+
+        //Set senders and recievers
         int sndSize, rcvSize;
         std::cin>> sndSize;
         while(sndSize--)    //Read n senders
@@ -180,6 +189,16 @@ public:
     void setMyMacAddress(char* mac)
     {
         myMacAddress = ByteArray(mac,6,0);
+    }
+
+    ByteArray* getStreamID()
+    {
+        return streamID;
+    }
+
+    void setStreamID(char* id)
+    {
+        streamID = new ByteArray(id,STREAMID_LEN,0);
     }
 };
 
