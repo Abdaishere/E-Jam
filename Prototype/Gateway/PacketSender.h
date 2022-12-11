@@ -17,12 +17,14 @@
 using namespace std;
 
 
-#define FIFO_FILE "./tmp/fifo_pipe_gen"
+#define FIFO_FILE "/tmp/fifo_pipe_gen"
 #define protocol 0x88b5
+#define DEFAULT_IF_NAME "wlp0s20f3"
+//#define DEFAULT_IF_NAME "enp34s0"
 typedef unsigned char* Payload;
-const int MAX_PROCESSES = 20;
-const int BUFFER_SIZE = 128;
-const char* DEFAULT_IF_NAME = "enp34s0";
+const int MAX_PROCESSES = 1;
+const int BUFFER_SIZE = 31;
+//const char* DEFAULT_IF_NAME = "enp34s0";
 
 
 class PacketSender {
@@ -30,7 +32,10 @@ private:
     queue<Payload> payloads[MAX_PROCESSES];
     int fd[MAX_PROCESSES];
     unsigned char buffer[BUFFER_SIZE];
-
+    int sock;
+    struct ifreq ifr;
+    int ifIndex;
+    struct sockaddr_ll addr;
 public:
     PacketSender();
     void openPipes();

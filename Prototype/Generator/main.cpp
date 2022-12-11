@@ -4,7 +4,7 @@
 #include <thread>
 
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
-#define FIFO_FILE "./fifo_pipe_gen"
+#define FIFO_FILE "/tmp/fifo_pipe_gen"
 
 void sendingFunction(PacketCreator* pc)
 {

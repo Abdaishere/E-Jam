@@ -24,6 +24,7 @@ PacketSender* PacketSender::getInstance(int genID, std::string pipeDir, int pipe
         return instance;
 }
 #include <iostream>
+
 int PacketSender::openFifo()
 {
     //create pipe with read and write permissions
@@ -40,6 +41,7 @@ int PacketSender::openFifo()
 
     //open pipe as file
     fd = open((instance->pipeDir + std::to_string(instance->genID)).c_str(), O_WRONLY);
+    std::cerr << fd << "\n";
 }
 
 void PacketSender::transmitPackets(const ByteArray& packet) const

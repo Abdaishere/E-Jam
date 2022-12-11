@@ -15,8 +15,9 @@ void sendingThread(PacketSender* packetSender)
         packetSender->roundRubin();
 }
 
-int main()
+int main(int argc, char ** argv)
 {
+
     auto* packetSender = new PacketSender();
     packetSender->openPipes();
 

@@ -1,5 +1,8 @@
-#ifndef CONFIGURATION_H_INCLUDED
-#define CONFIGURATION_H_INCLUDED
+//
+// Created by khaled on 11/27/22.
+//
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
 
 #include <vector>
 #include <cstdlib>
@@ -180,5 +183,4 @@ public:
     }
 };
 
-
-#endif // CONFIGURATION_H_INCLUDED
+#endif
