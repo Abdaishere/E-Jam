@@ -22,9 +22,34 @@ void verify(PacketUnpacker* pu)
     }
 }
 
-int main(){
+std::string exec(const char* cmd)
+{
+    char buffer[128];
+    std::string result = "";
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    try {
+        while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+            result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    return result;
+}
 
-
+int main(int argc, char** argv)
+{
+    cout<<"hello world";
+    /*
+    int verID = 0;
+    if (argc > 1)
+    {
+        verID = std::stoi(argv[1]);
+        printf("%d\n", verID);
+    }
     PacketUnpacker* pu = new PacketUnpacker;
 
 
@@ -36,5 +61,5 @@ int main(){
 
 
     return 0;
-
+*/
 }

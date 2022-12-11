@@ -1,17 +1,52 @@
 #include "ConfigurationManager.h"
 
-Configuration* ConfigurationManager::configuration = nullptr;
 
-Configuration* ConfigurationManager::getConfiguration()
+std::map<char*, Configuration*> ConfigurationManager::configurations;
+
+Configuration *ConfigurationManager::getConfiguration(char * streamID)
 {
-    if(configuration == nullptr) { configuration =  new Configuration(); }
-    return configuration;
+    if(configurations.find(streamID)==configurations.end())
+    {
+        return nullptr;
+    }
+    return configurations[streamID];
 }
 
-void ConfigurationManager::loadConfiguration(ByteArray dir)
+void ConfigurationManager::addConfiguration(char * dir)
 {
-    // TODO actually load from file
+    Configuration* val = new Configuration();
+    val->loadFromFile(dir);
 
-    //For the prototype, we will return the default
-    configuration = new Configuration();
+    char* key = (char*) val->getStreamID()->bytes;
+
+    configurations[key] = val;
 }
+
+void ConfigurationManager::fillMap()
+{
+    std::vector<char*> directories;
+
+    //char* ls= system("ls CONFIG_FOLDER");
+
+    for(char* dir: directories)
+        addConfiguration(dir);
+}
+
+std::string ConfigurationManager::exec(const char * command)
+{
+    char buffer[128];
+    std::string result = "";
+    FILE* pipe = popen(command, "r");
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    try {
+        while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+            result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    return result;
+}
+
