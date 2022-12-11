@@ -5,18 +5,15 @@
 #include "ConfigurationManager.h"
 Configuration* ConfigurationManager::configuration = nullptr;
 
-Configuration* ConfigurationManager::getConfiguration()
+Configuration* ConfigurationManager::getConfiguration(char* path)
 {
     if(configuration == nullptr)
         configuration =  new Configuration();
 
+    configuration->loadFromFile(path);
     return configuration;
 }
-
-void ConfigurationManager::loadConfiguration(ByteArray dir)
+Configuration* ConfigurationManager::getConfiguration()
 {
-    // TODO actually load from file
-
-    //For the prototype, we will return the default
-    configuration = new Configuration();
+    return configuration;
 }

@@ -14,7 +14,7 @@ class ConfigurationManager
 private:
     static Configuration *configuration;
 public:
-    static void loadConfiguration(ByteArray);
+    static Configuration* getConfiguration(char*);
     static Configuration* getConfiguration();
 };
 

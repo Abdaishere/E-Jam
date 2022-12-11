@@ -51,9 +51,9 @@ private:
         return mac;
     }
 public:
-    Configuration()
+    void loadFromFile(char* path)
     {
-        freopen("/tmp/config.txt","r",stdin);
+        freopen(path,"r",stdin);
         int sndSize, rcvSize;
         std::cin>> sndSize;
         while(sndSize--)    //Read n senders

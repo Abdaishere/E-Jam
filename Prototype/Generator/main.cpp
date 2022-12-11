@@ -2,6 +2,7 @@
 #include "ConfigurationManager.h"
 #include <iostream>
 #include <thread>
+#include <string>
 
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
@@ -25,12 +26,19 @@ void creatingFunction(PacketCreator* pc)
     }
 }
 
-
 int main(int argc, char** argv)
 {
     int genID = 0;
-    if(argc > 1)
-        genID = std::stoi(argv[0]);
+    char *configPath;
+    if (argc > 2)
+    {
+        genID = std::stoi(argv[1]);
+        configPath = argv[2];
+        printf("%d\n", genID);
+        printf("%s\n", configPath);
+    }
+    ConfigurationManager::getConfiguration(configPath);
+
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
     PacketCreator* pc = new PacketCreator();
