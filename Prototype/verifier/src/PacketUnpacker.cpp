@@ -5,7 +5,7 @@ void PacketUnpacker::readPacket()
 {
     //hard coded to receive a packet until finishing the gateway //todo
     int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
-    ByteArray* packet = new ByteArray("AABBCCFFFFFF00abcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
+    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     mtx.lock();
     packetQueue.push(packet);
     mtx.unlock();
@@ -32,8 +32,8 @@ void PacketUnpacker::verifiyPacket()
 
     //Extract Stream ID
     int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
-    ByteArray tempBA (0, 3);
-    tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN);
+    ByteArray tempBA (5, 0);
+    tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN-1);
     char* strmID = (char*)tempBA.bytes;
 
     //Check stream id

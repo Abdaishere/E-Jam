@@ -14,9 +14,10 @@
 class ConfigurationManager
 {
 private:
-    static std::map<char*, Configuration*> configurations;
+    static std::map<int, Configuration*> configurations;
     static std::string exec(const char*);
     static char* currentStreamID;
+    static int convertStreamID(char*);
 public:
     static void initConfigurations();
     static void addConfiguration(const char*);

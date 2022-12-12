@@ -7,11 +7,13 @@ char* ConfigurationManager::currentStreamID;
 Configuration *ConfigurationManager::getConfiguration()
 {
     char* streamID = ConfigurationManager::currentStreamID;
-    if(configurations.find(streamID)==configurations.end())
+    int key = convertStreamID(streamID);
+
+    if(configurations.find(key)==configurations.end())
     {
         return nullptr;
     }
-    return configurations[streamID];
+    return configurations[key];
 }
 
 void ConfigurationManager::addConfiguration(const char * dir)
@@ -22,6 +24,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
     char* key = (char*) val->getStreamID()->bytes;
 
     configurations[key] = val;
+    val->print();
 }
 
 void ConfigurationManager::initConfigurations()
@@ -32,6 +35,10 @@ void ConfigurationManager::initConfigurations()
 
     std::string ls= exec(lsStr.c_str());
     std::vector<std::string> directories = splitString(ls,'\n');
+
+    //Augment the parent directory
+    for(std::string& dir: directories)
+        dir = std::string(CONFIG_FOLDER)+"/"+dir;
 
     for(const std::string& dir: directories)
         addConfiguration(dir.c_str());
@@ -77,4 +84,9 @@ void ConfigurationManager::setCurrStreamID(char * newStrmID)
 char *ConfigurationManager::getCurrStreamID()
 {
     return currentStreamID;
+}
+
+int ConfigurationManager::convertStreamID(char* strmID)
+{
+    return strmID[0] + (strmID[1] << 8) + (strmID[2] << 16);
 }

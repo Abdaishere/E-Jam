@@ -60,7 +60,7 @@ public:
         freopen(path,"r",stdin);
 
         //Set stream ID, must be of leangth 3 (STREAMID_LEN)
-        char* sID;
+        char* sID = new char[STREAMID_LEN];
         std::cin>>sID;
         setStreamID(sID);
 
@@ -206,15 +206,20 @@ public:
     //For debugging only
     void print()
     {
+        printf("Stream ID: %s\n", streamID->bytes);
         printf("Senders(%d):\n", senders.size());
         for(auto sender: senders)
+        {
+            printf("%c", 9);
             sender.printChars();
+        }
 
-        printf("###########################\n");
         printf("Receivers(%d):\n", receivers.size());
         for(auto rec: receivers)
+        {
+            printf("%c",9);
             rec.printChars();
-        printf("###########################\n");
+        }
 
         switch (payloadType)
         {
@@ -229,7 +234,9 @@ public:
         }
         printf("Number of packets: %d\n", numberOfPackets);
         printf("Payload length: %d\n", payloadLength);
-        printf("Seed: %d\n", seed);
+        printf("Seed: %d\n\n\n", seed);
+        printf("###########################\n");
+
     }
 };
 
