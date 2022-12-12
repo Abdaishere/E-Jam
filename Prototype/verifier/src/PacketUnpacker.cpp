@@ -3,7 +3,8 @@
 std::queue<ByteArray*> PacketUnpacker::packetQueue;
 void PacketUnpacker::readPacket()
 {
-    //hard coded to receive a packet until finishing the gateway //todo
+    //hard coded to receive a packet until finishing the gateway
+    //TODO make a function that reads from a pipe
     int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
     ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     mtx.lock();

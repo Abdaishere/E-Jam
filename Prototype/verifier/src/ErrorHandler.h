@@ -57,7 +57,7 @@ class ErrorHandler
         ErrorInfo* packetErrorInfo;
         static ErrorHandler* getInstance();
         void logError();
-        void sendErrors(); //todo
+        void sendErrors();
     private:
         ErrorHandler();
         static ErrorHandler* instance;

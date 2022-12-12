@@ -5,7 +5,7 @@ FrameVerifier* FrameVerifier::instance = nullptr;
 
 FrameVerifier::FrameVerifier()
 {
-    //todo
+
 }
 
 //handle singleton instance

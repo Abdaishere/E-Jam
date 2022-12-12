@@ -27,5 +27,9 @@ void ErrorHandler::logError()
 
 void ErrorHandler::sendErrors()
 {
-    //todo
+    //TODO send errors to SysAPI via pipe
+    //This function must run in a third thread
+    //use pipe named verifier_sysApi_verID
+    //pop errors from queue
+        //use pipe to send queue.front
 }

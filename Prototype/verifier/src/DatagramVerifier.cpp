@@ -1,5 +1,5 @@
 #include "DatagramVerifier.h"
 bool DatagramVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
-    //todo
+    return true;
 }

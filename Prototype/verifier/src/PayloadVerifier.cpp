@@ -4,7 +4,7 @@ PayloadVerifier* PayloadVerifier::instance = nullptr;
 
 PayloadVerifier::PayloadVerifier()
 {
-    //ctor
+
 }
 
 //handle singleton instance
@@ -50,13 +50,12 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
             break;
         }
         case RANDOM:
-            //TODO
+            //TODO check random payload type
             status = true;
             break;
     }
     if(!status)
     {
-        //printf("error\n");
         ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
         if(errorInfo == nullptr)
         {
@@ -64,9 +63,6 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         }
         errorInfo->addError(PAYLOAD);
         ErrorHandler::getInstance()->logError();
-    }else
-    {
-        //printf("ok\n");
     }
     return status;
 }
