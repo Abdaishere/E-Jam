@@ -10,7 +10,7 @@ void read(PacketUnpacker* pu)
 {
     while(true)
     {
-        pu->readPacket();
+//        pu->readPacket();
     }
 }
 
@@ -18,7 +18,7 @@ void verify(PacketUnpacker* pu)
 {
     while(true)
     {
-        pu->verifiyPacket();
+//        pu->verifiyPacket();
     }
 }
 
@@ -42,14 +42,14 @@ std::string exec(const char* cmd)
 
 int main(int argc, char** argv)
 {
-    cout<<"hello world";
-    /*
     int verID = 0;
     if (argc > 1)
     {
         verID = std::stoi(argv[1]);
         printf("%d\n", verID);
     }
+    ConfigurationManager::initConfigurations();
+    return 0;
     PacketUnpacker* pu = new PacketUnpacker;
 
 
@@ -61,5 +61,4 @@ int main(int argc, char** argv)
 
 
     return 0;
-*/
 }

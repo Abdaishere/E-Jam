@@ -7,7 +7,6 @@
 #include <queue>
 #include <mutex>
 
-
 class PacketUnpacker
 {
     public:

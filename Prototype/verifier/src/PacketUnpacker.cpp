@@ -30,6 +30,28 @@ void PacketUnpacker::verifiyPacket()
     //nothing to do if no packet
     if(packet == nullptr) return;
 
+    //Extract Stream ID
+    int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
+    ByteArray tempBA (0, 3);
+    tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN);
+    char* strmID = (char*)tempBA.bytes;
+
+    //Check stream id
+    ConfigurationManager::setCurrStreamID(strmID);
+    Configuration* tempConfig = ConfigurationManager::getConfiguration();
+
+    //Report stream id error
+    if(tempConfig == nullptr)
+    {
+        ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+        if(errorInfo == nullptr)
+        {
+            errorInfo = new ErrorInfo(packet);
+        }
+        errorInfo->addError(STREAM_ID);
+        ErrorHandler::getInstance()->logError();
+        return;
+    }
 
     //check for frame errors
     int startIndex = 0, endIndex = packet->length;
@@ -37,8 +59,9 @@ void PacketUnpacker::verifiyPacket()
     bool frameStatus = fv->verifiy(packet, startIndex, endIndex);
 
     //check for payload error
-    int payloadLength = 13;  //todo get payload length from configuration
-    startIndex = 12+2, endIndex = startIndex+payloadLength-1;
+    int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
+    startIndex = streamID_startIndex;
+    endIndex = startIndex+STREAMID_LEN+payloadLength-1;
 
     PayloadVerifier* pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);

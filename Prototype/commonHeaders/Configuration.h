@@ -12,6 +12,7 @@
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
 #define STREAMID_LEN 3
+#define FRAME_TYPE_LEN 2
 
 enum PayloadType {FIRST, SECOND, RANDOM};
 

@@ -15,7 +15,8 @@ enum ErrorType
     PAYLOAD,
     SOURCE_MAC,
     DESTINATION_MAC,
-    CRC
+    CRC,
+    STREAM_ID
 };
 
 struct ErrorInfo

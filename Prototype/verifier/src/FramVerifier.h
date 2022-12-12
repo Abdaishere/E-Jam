@@ -15,8 +15,9 @@ class FrameVerifier
         //singleton class
         FrameVerifier();
         //define accepted macAddr and senders
-        #define acceptedSenders ConfigurationManager::getConfiguration()->getSenders()
+        std::vector<ByteArray>* acceptedSenders;
         #define acceptedRecv ConfigurationManager::getConfiguration()->getMyMacAddress()
+        void updateAcceptedSenders();
 };
 
 #endif // FRAMVERIFIER_H

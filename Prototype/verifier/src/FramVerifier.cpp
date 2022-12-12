@@ -20,6 +20,9 @@ FrameVerifier* FrameVerifier::getInstance()
 
 bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 {
+    updateAcceptedSenders();
+    std::vector<ByteArray>acceptedSenders = *(this->acceptedSenders);
+
     ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
 
     bool status = true;
@@ -43,7 +46,10 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
     if(!correctSender)
     {
-        errorInfo = new ErrorInfo(packet);
+        if(errorInfo == nullptr)
+        {
+            errorInfo = new ErrorInfo(packet);
+        }
         errorInfo->addError(SOURCE_MAC);
         status = false;
     }
@@ -72,4 +78,9 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
     //TODO check for CRC
     return status;
+}
+
+void FrameVerifier::updateAcceptedSenders()
+{
+    acceptedSenders = &ConfigurationManager::getConfiguration()->getSenders();
 }
