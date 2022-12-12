@@ -27,6 +27,7 @@ ByteArray* PacketUnpacker::consumePacket()
 
 void PacketUnpacker::verifiyPacket()
 {
+    //TODO make it adhere to the correct ethernet frame structure
     ByteArray* packet = consumePacket();
     //nothing to do if no packet
     if(packet == nullptr) return;

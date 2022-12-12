@@ -18,6 +18,7 @@ class FrameVerifier
         std::vector<ByteArray>* acceptedSenders;
         #define acceptedRecv ConfigurationManager::getConfiguration()->getMyMacAddress()
         void updateAcceptedSenders();
+        ByteArray* calculateCRC(ByteArray*,int,int);
 };
 
 #endif // FRAMVERIFIER_H

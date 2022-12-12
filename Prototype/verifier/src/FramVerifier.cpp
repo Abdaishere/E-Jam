@@ -33,7 +33,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     {
         //ith index is current sender compare it with first 6 entries in packet
         bool fullMatch = true;
-        for(int j=0;j<6;j++)
+        for(int j=startIndex;j<6;j++)
         {
             if(acceptedSenders[i][j] != packet->at(j)){ fullMatch = false; break; }
         }
@@ -55,8 +55,9 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     }
 
     //check for receiver
+    startIndex+=MAC_ADD_LEN+1;
     bool correctReceiver = true;
-    for(int i=7;i<12;i++)
+    for(int i=startIndex;i<startIndex+MAC_ADD_LEN-1;i++)
     {
         if(acceptedRecv[i-7] != packet->at(i))
         {
@@ -75,12 +76,44 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         status = false;
     }
 
+    //Extract CRC
+    startIndex = endIndex-CRC_LENGTH;
 
-    //TODO check for CRC
+    //Extract payload
+    int payloadStart = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
+    int payloadEnd = payloadStart + STREAMID_LEN + ConfigurationManager::getConfiguration()->getPayloadLength();
+
+    //Calculate the correct CRC
+    ByteArray* correctCRC = calculateCRC(packet, payloadStart, payloadEnd);
+
+    //Try to Match CRCs
+    bool crcCorrect = true;
+    for(int i=startIndex;i<startIndex+CRC_LENGTH;i++)
+    {
+        if(correctCRC->bytes[i] != packet->at(i)){ crcCorrect = false; break; }
+    }
+    if(!crcCorrect)
+    {
+        if(errorInfo == nullptr)
+        {
+            errorInfo = new ErrorInfo(packet);
+        }
+        errorInfo->addError(CRC);
+        status = false;
+    }
+    delete correctCRC;
+
+
     return status;
 }
 
 void FrameVerifier::updateAcceptedSenders()
 {
     acceptedSenders = &ConfigurationManager::getConfiguration()->getSenders();
+}
+
+ByteArray *FrameVerifier::calculateCRC(ByteArray * packet, int startIdx, int endIdx)
+{
+    //TODO calculate CRC
+    return nullptr;
 }
