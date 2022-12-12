@@ -1,7 +1,7 @@
 #include "ConfigurationManager.h"
 
 
-std::map<char*, Configuration*> ConfigurationManager::configurations;
+std::map<int, Configuration*> ConfigurationManager::configurations;
 char* ConfigurationManager::currentStreamID;
 
 Configuration *ConfigurationManager::getConfiguration()
@@ -21,7 +21,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
     Configuration* val = new Configuration();
     val->loadFromFile((char *)dir);
 
-    char* key = (char*) val->getStreamID()->bytes;
+    int key = convertStreamID((char*) val->getStreamID()->bytes);
 
     configurations[key] = val;
     val->print();
