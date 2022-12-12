@@ -41,6 +41,7 @@ private:
     }
     ByteArray discoverMyMac()
     {
+        //TODO get the real mac address
         ByteArray mac;
         mac = ByteArray("EEEEEE",6,0);
         /*
@@ -200,6 +201,35 @@ public:
     void setStreamID(char* id)
     {
         streamID = new ByteArray(id,STREAMID_LEN,0);
+    }
+
+    //For debugging only
+    void print()
+    {
+        printf("Senders(%d):\n", senders.size());
+        for(auto sender: senders)
+            sender.printChars();
+
+        printf("###########################\n");
+        printf("Receivers(%d):\n", receivers.size());
+        for(auto rec: receivers)
+            rec.printChars();
+        printf("###########################\n");
+
+        switch (payloadType)
+        {
+            case FIRST:
+                printf("Payload Type: FIRST\n");
+                break;
+            case SECOND:
+                printf("Payload Type: SECOND\n");
+                break;
+            default:
+                printf("Payload Type: RANDOM\n");
+        }
+        printf("Number of packets: %d\n", numberOfPackets);
+        printf("Payload length: %d\n", payloadLength);
+        printf("Seed: %d\n", seed);
     }
 };
 
