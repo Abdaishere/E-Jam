@@ -5,6 +5,7 @@
 #ifndef GENERATOR_ETHERNETCONSTRUCTOR_H
 #define GENERATOR_ETHERNETCONSTRUCTOR_H
 
+#include "Configuration.h"
 
 #include "FrameConstructor.h"
 #include "Byte.h"
@@ -26,7 +27,7 @@ public:
 
     void constructFrame();
 
-    ByteArray calculateCRC(ByteArray payload);
+    ByteArray calculateCRC(ByteArray*);
 
 };
 

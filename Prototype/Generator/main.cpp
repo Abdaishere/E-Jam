@@ -9,6 +9,7 @@
 
 void sendingFunction(PacketCreator* pc)
 {
+    //TODO if possible, add timeout
     while(true)
             pc->sendHead();
 }
@@ -34,11 +35,9 @@ int main(int argc, char** argv)
     {
         genID = std::stoi(argv[1]);
         configPath = argv[2];
-        printf("%d\n", genID);
-        printf("%s\n", configPath);
     }
-    ConfigurationManager::getConfiguration(configPath);
 
+    ConfigurationManager::getConfiguration(configPath);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
     PacketCreator* pc = new PacketCreator();

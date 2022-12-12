@@ -19,6 +19,7 @@ std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket(int rcvInd)
 {
+    //TODO move ByteArray creating inside each constructor class
     ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
     ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
 
@@ -30,7 +31,7 @@ void PacketCreator::createPacket(int rcvInd)
                                                                  payload,
                                                                  innerProtocol);
     frameConstructor->constructFrame();
-
+    //TODO delete the values inside created ByteArray*
     mtx.lock();
     productQueue.push(frameConstructor->getFrame());
     mtx.unlock();

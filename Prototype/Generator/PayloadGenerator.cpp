@@ -8,6 +8,7 @@ PayloadGenerator* PayloadGenerator::instance = nullptr;
 
 PayloadGenerator::PayloadGenerator()
 {
+    //TODO add stream id before actual Payload
     int seed = ConfigurationManager::getConfiguration()->getSeed();
     this->rng.setSeed(seed);
 
