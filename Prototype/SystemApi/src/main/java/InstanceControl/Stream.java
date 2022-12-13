@@ -9,12 +9,18 @@ public class Stream
 {
     ArrayList<String> senders;
     ArrayList<String> receivers;
-    String myMacAddress;
     PayloadType payloadType;
-    long numberOfPackets = 100;
-    long lifeTime = 100;
+    long numberOfPackets;
+    long lifeTime;
     int payloadLength, seed;
     int flowType;
     long SendingRate;
     String streamID;
+
+    public Stream()
+    {
+        senders = new ArrayList<>();
+        receivers = new ArrayList<>();
+    }
+
 }

@@ -2,7 +2,12 @@ package InstanceControl;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Objects;
 
 /**
@@ -35,6 +40,9 @@ public class InstanceController
                     command += genID++;
                     command += " ";
                     command += configDir;
+                    command += "/config_";
+                    command += stream.streamID + ".txt";
+
                     executeCommand(command);
                 }
             }
@@ -86,7 +94,37 @@ public class InstanceController
 
     private void getMyMacAddress()
     {
-        //TODO
-        myMacAddress = "";
+        byte[] mac;
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while(networkInterfaces.hasMoreElements())
+            {
+                NetworkInterface network = networkInterfaces.nextElement();
+                mac = network.getHardwareAddress();
+                if(mac == null)
+                {
+                    throw new Exception("Mac is null");
+                }
+                else
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < mac.length; i++)
+                    {
+                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                    String mac12 = sb.toString().replaceAll("-","");
+                    //TODO convert mac 12 to mac 6
+//                    for(byte b: mac)
+//                        myMacAddress += (char)b;
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+
+            e.printStackTrace();
+
+        }
     }
 }

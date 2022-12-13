@@ -1,5 +1,8 @@
 package InstanceControl;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -26,6 +29,36 @@ public class ConfigurationManager
     //
     private void writeStreamToFile(Stream stream)
     {
-        //TODO
+        try
+        {
+            String fileName = configDir;
+            fileName += "/";
+            fileName += "config_";
+            fileName += stream.streamID;
+            fileName += ".txt";
+
+            FileWriter fileWriter = new FileWriter(fileName);
+
+            fileWriter.write(stream.streamID+'\n');
+            fileWriter.write(Integer.toString(stream.senders.size())+'\n');
+            for (String sender: stream.senders)
+                fileWriter.write(sender+'\n');
+
+            fileWriter.write(Integer.toString(stream.receivers.size())+'\n');
+            for (String receiver: stream.receivers)
+                fileWriter.write(receiver+'\n');
+
+            fileWriter.write(Integer.toString(stream.payloadType.ordinal())+'\n');
+            fileWriter.write(Long.toString(stream.numberOfPackets)+'\n');
+            fileWriter.write(Integer.toString(stream.payloadLength)+'\n');
+            fileWriter.write(Integer.toString(stream.seed)+'\n');
+
+            fileWriter.close();
+        }
+        catch (IOException e)
+        {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 }
