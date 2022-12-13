@@ -1,7 +1,7 @@
 #ifndef CONFIGURATIONMANAGER_H
 #define CONFIGURATIONMANAGER_H
 
-#define CONFIG_FOLDER "/tmp/config"
+#define CONFIG_FOLDER "/home/EJam/config"
 #define CONFIG_FOLDER_LENGTH 11
 
 #include "Configuration.h"
