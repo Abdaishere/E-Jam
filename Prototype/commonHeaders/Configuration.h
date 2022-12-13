@@ -14,6 +14,8 @@ typedef unsigned long long ull;
 #define STREAMID_LEN 3
 #define FRAME_TYPE_LEN 2
 #define CRC_LENGTH 4
+#define PREMBLE_LENGTH 8
+#define LENGTH_LENGTH 2
 
 enum PayloadType {FIRST, SECOND, RANDOM};
 

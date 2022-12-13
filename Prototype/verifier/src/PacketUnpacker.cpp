@@ -33,7 +33,7 @@ void PacketUnpacker::verifiyPacket()
     if(packet == nullptr) return;
 
     //Extract Stream ID
-    int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
+    int streamID_startIndex = PREMBLE_LENGTH+MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
     ByteArray tempBA (5, 0);
     tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN-1);
     char* strmID = (char*)tempBA.bytes;

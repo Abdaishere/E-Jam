@@ -27,35 +27,9 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
     bool status = true;
 
-    //check first 6 entries with a sender
-    bool correctSender = false;
-    for(int i=0;i<acceptedSenders.size();i++)
-    {
-        //ith index is current sender compare it with first 6 entries in packet
-        bool fullMatch = true;
-        for(int j=startIndex;j<6;j++)
-        {
-            if(acceptedSenders[i][j] != packet->at(j)){ fullMatch = false; break; }
-        }
-        if(fullMatch)
-        {
-            correctSender = true;
-            break;
-        }
-    }
-
-    if(!correctSender)
-    {
-        if(errorInfo == nullptr)
-        {
-            errorInfo = new ErrorInfo(packet);
-        }
-        errorInfo->addError(SOURCE_MAC);
-        status = false;
-    }
+    startIndex+=PREMBLE_LENGTH;
 
     //check for receiver
-    startIndex+=MAC_ADD_LEN+1;
     bool correctReceiver = true;
     for(int i=startIndex;i<startIndex+MAC_ADD_LEN-1;i++)
     {
@@ -76,6 +50,33 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         status = false;
     }
 
+    //check first 6 entries with a sender
+    startIndex+=MAC_ADD_LEN;
+    bool correctSender = false;
+    for(int i=0;i<acceptedSenders.size();i++)
+    {
+        //ith index is current sender compare it with first 6 entries in packet
+        bool fullMatch = true;
+        for(int j=startIndex;j<startIndex+MAC_ADD_LEN;j++)
+        {
+            if(acceptedSenders[i][j] != packet->at(j)){ fullMatch = false; break; }
+        }
+        if(fullMatch)
+        {
+            correctSender = true;
+            break;
+        }
+    }
+
+    if(!correctSender)
+    {
+        if(errorInfo == nullptr)
+        {
+            errorInfo = new ErrorInfo(packet);
+        }
+        errorInfo->addError(SOURCE_MAC);
+        status = false;
+    }
     //Extract CRC
     startIndex = endIndex-CRC_LENGTH;
 
