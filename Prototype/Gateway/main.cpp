@@ -22,7 +22,7 @@ void receivingThread(PacketReceiver* packetReceiver)
     packetReceiver->receiveFromSwitch();
 }
 
-void checkingThread(PacketReceiver* packetReceiver)
+void checkingThreadV(PacketReceiver* packetReceiver)
 {
     packetReceiver->checkBuffer();
 }
@@ -54,11 +54,13 @@ int main(int argc, char ** argv)
 
     while(true)
     {
-        receivingThread(packetReceiver);
-        checkingThread(packetReceiver);
-        packetReceiver->swapBuffers();
+        std::thread t1 (receivingThread, packetReceiver);
+        std::thread t2 (checkingThreadV, packetReceiver);
 
-        printf("gere");
+        t1.join();
+        t2.join();
+
+        packetReceiver->swapBuffers();
     }
 
 }
