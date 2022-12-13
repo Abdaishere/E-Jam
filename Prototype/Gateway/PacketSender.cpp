@@ -5,7 +5,7 @@ PacketSender::PacketSender() {
     sock = socket(AF_PACKET, SOCK_RAW, protocol);
     if (sock == -1)
     {
-        std::cout << "unable to open socket\n";
+        std::cerr << "unable to open socket\n";
         return;
     }
 
@@ -18,10 +18,10 @@ PacketSender::PacketSender() {
         ifr.ifr_name[if_name_len] = 0;
     }
     else
-        std::cout << "interface name too long\n";
+        std::cerr << "interface name too long\n";
 
     if (ioctl(sock,SIOCGIFINDEX,&ifr) == -1)
-        std::cout << "could not get open ethernet interface\n";
+        std::cerr << "could not get open ethernet interface\n";
 
     ifIndex = ifr.ifr_ifindex;
 
@@ -65,7 +65,7 @@ void PacketSender::checkPipes()
     }
 }
 
-void PacketSender::roundRubin()
+void PacketSender::roundRobin()
 {
     auto endTest = std::chrono::system_clock::now() + 5min;
     do {
@@ -94,4 +94,8 @@ bool PacketSender::sendToSwitch(Payload& payload)
     }
 //    cerr << "sent frame\n";
     return true;
+}
+
+PacketSender::~PacketSender() {
+    closePipes();
 }

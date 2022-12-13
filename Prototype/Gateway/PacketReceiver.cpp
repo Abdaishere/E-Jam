@@ -1,82 +1,119 @@
 #include "PacketReceiver.h"
 
-PacketReceiver::PacketReceiver() {}
+PacketReceiver::PacketReceiver() {
+    recBuffer = new unsigned char[BUFFER_SIZE_VER];
+    forwardingBuffer = new unsigned char[BUFFER_SIZE_VER];
+    recSizes = new int[BUFFER_SIZE_VER];
+    forwardingSizes = new int[BUFFER_SIZE_VER];
+    received = toForward = 0;
 
-void PacketReceiver::openPipe()
-{
-    mkfifo(FIFO_FILE, S_IFIFO | 0640);
-    fd = open(FIFO_FILE, O_RDWR);
+    openPipes();
+    initializeSwitchConnection();
 }
 
-void PacketReceiver::closePipe()
+void PacketReceiver::openPipes()
 {
-    close(fd);
+//    string ver = FIFO_FILE + "ver";
+    for(int i=0; i<MAX_VERS; i++)
+    {
+        cerr << mkfifo((FIFO_FILE_VER + std::to_string(i)).c_str()  , S_IFIFO | 0640);
+        fd[i] = open((FIFO_FILE_VER + std::to_string(i)).c_str(), O_RDWR);
+    }
 }
 
-bool PacketReceiver::receiveFromSwitch()
+bool PacketReceiver::initializeSwitchConnection()
 {
-    char ifName[IF_NAMESIZE];
+
     strcpy(ifName, DEFAULT_IF);
     struct ifreq ifopts;
 
     //open socket
-    int sock = socket(AF_PACKET, SOCK_RAW, htons(ETHER_TYPE));
+    sock = socket(AF_PACKET, SOCK_RAW, htons(ETHER_TYPE));
     if (sock == -1)
     {
-        std::cout << "unable to open socket\n";
+        std::cerr << "unable to open socket\n";
         return false;
     }
 
-    //setting timeout for the socket
-    struct timeval read_timeout;
-    read_timeout.tv_sec = 5;
-    read_timeout.tv_usec = 10;
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &read_timeout, sizeof read_timeout);
-
-
-    /* Set interface to promiscuous mode - do we need to do this every time? */
+    /* Set interface to promiscuous mode,
+       i.e. read everything even if the destination
+       mac address doesn't match your address
+       we might not need to do this*/
     strncpy(ifopts.ifr_name, ifName, IFNAMSIZ-1);
+    //get interface flags
     ioctl(sock, SIOCGIFFLAGS, &ifopts);
+    //turn on promiscuous mode mask
     ifopts.ifr_flags |= IFF_PROMISC;
+    //set interface flags
     ioctl(sock, SIOCSIFFLAGS, &ifopts);
 
-//    // Bind to device
+//    Bind this socket to a specific switch to read from, other packets are dropped
 //    if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifName, IFNAMSIZ-1) == -1)	{
 //        perror("SO_BINDTODEVICE");
 //        close(sock);
 //        exit(EXIT_FAILURE);
 //    }
-
-    // construct the receiving buffer
-    char* buff = new char[BUFF_LEN];
-    for (int i = 0; i < BUFF_LEN; i++)
-        buff[i] = 'x';
-
-    // receive the request
-    // ssize_t recvfrom(int sockfd, void *restrict buf, size_t len, int flags,
-    //                  struct sockaddr *restrict src_addr, socklen_t *restrict addrlen)
-
-    int success = -1;
-    int cntr = 3;
-    while (cntr--)
-    {
-        success = recvfrom(sock, buff, BUFF_LEN, 0, nullptr, nullptr);
-        if (success == -1)
-        {
-            std::cout << "not received\n";
-            continue;
-        }
-        std::cout << "finally received\n";
-        for (int i = 0; i < BUFF_LEN; i++)
-            std::cout << buff[i];
-        std::cout << "\n";
-    }
-    return true;
 }
 
-void PacketReceiver::sendToVerifier(Payload& payload)
+
+void PacketReceiver::closePipes()
 {
-    memset(&buffer, 0, sizeof buffer); // clear the buffer
-    strcpy(reinterpret_cast<char *>(buffer), reinterpret_cast<const char *>(payload));
-    write(fd, buffer, strlen(reinterpret_cast<const char *>(buffer)));
+    for(int i=0; i<MAX_VERS; i++)
+        close(fd[i]);
+}
+
+void PacketReceiver::swapBuffers() {
+    swap(recBuffer, forwardingBuffer);
+    swap(recSizes, forwardingSizes);
+    toForward = received;
+}
+
+void PacketReceiver::checkBuffer()
+{
+    int verID = 0;
+    int totSizeFor = 0;
+    for(int ptr=0; ptr < toForward; ptr++)
+    {
+        sendToVerifier(verID++, forwardingBuffer+totSizeFor, forwardingSizes[ptr]);
+        totSizeFor += forwardingSizes[ptr];
+        if(verID == MAX_VERS)
+            verID = 0;
+    }
+}
+
+void PacketReceiver::receiveFromSwitch()
+{
+    received = 0;
+    int totSizeRec = 0;
+    int sizeLeft = BUFFER_SIZE_VER;
+    while(sizeLeft >= MTU)
+    {
+        int bytesRead = recvfrom(sock, recBuffer+totSizeRec, MTU, 0, nullptr, nullptr);
+        if (bytesRead == -1)
+        {
+            std::cerr << "not received\n";
+            return;
+        }
+
+        sizeLeft -= bytesRead;
+        totSizeRec += bytesRead;
+        recSizes[received++] = bytesRead;
+    }
+
+//        std::cout << "finally received\n";
+//        for (int i = 0; i < BUFF_LEN; i++)
+//            std::cout << buff[i];
+//        std::cout << "\n";
+//
+}
+
+void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
+{
+    //assuming the pipe speed is faster than the  network speed
+    write(fd[verID], payload, len);
+}
+
+PacketReceiver::~PacketReceiver()
+{
+    closePipes();
 }

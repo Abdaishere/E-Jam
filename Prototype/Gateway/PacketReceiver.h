@@ -16,26 +16,44 @@
 #include <csignal>
 using namespace std;
 
-#define BUFF_LEN 118
+#define BUFF_LEN 1600
 #define ETHER_TYPE 0x88b5
 #define DEFAULT_IF "enp34s0"
-#define FIFO_FILE "./tmp/fifo_pipe_ver"
+#define FIFO_FILE_VER "./tmp/fifo_pipe_ver"
 typedef unsigned char* Payload;
-const int BUFFER_SIZE = 128;
+const int MAX_VERS = 1;
+const int BUFFER_SIZE_VER = 100000;
+const int MTU = 1600;
 
-
+//this module receives packets from the switch and sends them to the verifiers
 class PacketReceiver {
 private:
-    queue<Payload> payloads;
-    int fd;
-    unsigned char buffer[BUFFER_SIZE];
+    //indices of verifiers in
+    queue<pair<int,int>> payloads;
+    int fd[MAX_VERS];
+    int sock;
 
+    //double buffer to store the next packet size for when
+    unsigned char* recBuffer;
+    unsigned char* forwardingBuffer;
+    //double buffer, one for reading from the switch, and another for writing to the pipes
+    int* recSizes;
+    int* forwardingSizes;
+    //
+    int received;
+    int toForward;
+
+    char ifName[IF_NAMESIZE];
 public:
     PacketReceiver();
-    void openPipe();
-    void closePipe();
-    bool receiveFromSwitch();
-    void sendToVerifier(Payload& payload);
+    void openPipes();
+    void closePipes();
+    bool initializeSwitchConnection();
+    void swapBuffers();
+    void checkBuffer();
+    void receiveFromSwitch();
+    void sendToVerifier(int verID, Payload payload, int len);
+    ~PacketReceiver();
 };
 
 

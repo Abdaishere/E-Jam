@@ -22,11 +22,11 @@ using namespace std;
 #define DEFAULT_IF_NAME "wlp0s20f3"
 //#define DEFAULT_IF_NAME "enp34s0"
 typedef unsigned char* Payload;
-const int MAX_PROCESSES = 1;
+const int MAX_PROCESSES = 20;
 const int BUFFER_SIZE = 31;
 //const char* DEFAULT_IF_NAME = "enp34s0";
 
-
+//this module receives packets from generators and sends them the switch
 class PacketSender {
 private:
     queue<Payload> payloads[MAX_PROCESSES];
@@ -41,8 +41,9 @@ public:
     void openPipes();
     void closePipes();
     void checkPipes();
-    void roundRubin();
+    void roundRobin();
     bool sendToSwitch(Payload& payload);
+    ~PacketSender();
 };
 
 
