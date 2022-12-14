@@ -3,7 +3,6 @@
 #include <thread>
 #include "src/PacketUnpacker.h"
 #include "src/ConfigurationManager.h"
-
 using namespace std;
 
 void receive(PacketUnpacker* pu)
@@ -40,7 +39,6 @@ int main(int argc, char** argv)
 
     reader.join();
     verifier.join();
-
 
     return 0;
 }
