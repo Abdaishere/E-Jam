@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void read(PacketUnpacker* pu)
+void receive(PacketUnpacker* pu)
 {
     while(true)
     {
@@ -32,10 +32,10 @@ int main(int argc, char** argv)
     }
     ConfigurationManager::initConfigurations();
 
-    PacketUnpacker* pu = new PacketUnpacker;
+    PacketUnpacker* pu = new PacketUnpacker(verID);
 
 
-    std::thread reader(read, pu);
+    std::thread reader(receive, pu);
     std::thread verifier(verify, pu);
 
     reader.join();
