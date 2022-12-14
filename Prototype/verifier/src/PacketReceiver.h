@@ -8,9 +8,6 @@
 #include <string>
 #include "Byte.h"
 
-#define FIFO_FILE_VER
-
-
 class PacketReceiver {
 private:
     static PacketReceiver* instance;
@@ -19,12 +16,13 @@ private:
     int fd;
     int verID;
     PacketReceiver();
+    ~PacketReceiver();
     int openFifo();
     void closePipe();
 public:
 
     static PacketReceiver* getInstance(int genID = 0, std::string pipeDir="", int pipePerm = 0777);
-    void receivePackets(ByteArray &packet);
+    void receivePackets(ByteArray* packet);
 };
 
 

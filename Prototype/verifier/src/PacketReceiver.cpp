@@ -21,8 +21,8 @@ PacketReceiver* PacketReceiver::getInstance(int genID, std::string pipeDir, int 
         instance->verID = genID;
         instance->openFifo();
     }
-    else
-        return instance;
+
+    return instance;
 }
 
 
@@ -43,12 +43,20 @@ int PacketReceiver::openFifo()
     //open pipe as file
     fd = open((instance->pipeDir + std::to_string(instance->verID)).c_str(), O_RDONLY);
     std::cerr << fd << "\n";
+    return fd;
 }
 
-void PacketReceiver::receivePackets(ByteArray& packet)
+void PacketReceiver::closePipe() {
+    close(fd);
+}
+
+void PacketReceiver::receivePackets(ByteArray* packet)
 {
-    packet = ByteArray(1600);
-    read(fd, packet.bytes, packet.capacity);
+    read(fd, packet->bytes, packet->capacity);
+}
+
+PacketReceiver::~PacketReceiver() {
+    closePipe();
 }
 
 

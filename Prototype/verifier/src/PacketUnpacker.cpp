@@ -1,21 +1,29 @@
 #include "PacketUnpacker.h"
+#include "PacketReceiver.h"
 #include <iostream>
 std::queue<ByteArray*> PacketUnpacker::packetQueue;
 void PacketUnpacker::readPacket()
 {
     //hard coded to receive a packet until finishing the gateway
-    //TODO make a function that reads from a pipe
-    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
-    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
+//    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
+//    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
+    ByteArray* packet = new ByteArray(1600);
     mtx.lock();
+    packetReceiver->receivePackets(packet);
     packetQueue.push(packet);
     mtx.unlock();
+}
+
+PacketUnpacker::PacketUnpacker(int verID)
+{
+    std::string path = "./tmp/fifo_pipe_ver" + std::to_string(verID);
+    packetReceiver = PacketReceiver::getInstance(verID, path);
 }
 
 ByteArray* PacketUnpacker::consumePacket()
 {
     //return nullptr if queue is empty
-    if(packetQueue.size() == 0) return nullptr;
+    if(packetQueue.empty()) return nullptr;
     //take a packet from the queue and check if
     mtx.lock();
     ByteArray* packet = packetQueue.front();

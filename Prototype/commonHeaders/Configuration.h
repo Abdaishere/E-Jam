@@ -234,14 +234,14 @@ public:
     void print()
     {
         printf("Stream ID: %s\n", streamID->bytes);
-        printf("Senders(%d):\n", senders.size());
+        printf("Senders(%d):\n", (int)senders.size());
         for(auto sender: senders)
         {
             printf("%c", 9);
             sender.printChars();
         }
 
-        printf("Receivers(%d):\n", receivers.size());
+        printf("Receivers(%d):\n", (int)receivers.size());
         for(auto rec: receivers)
         {
             printf("%c",9);
@@ -259,7 +259,7 @@ public:
             default:
                 printf("Payload Type: RANDOM\n");
         }
-        printf("Number of packets: %d\n", numberOfPackets);
+        printf("Number of packets: %d\n", (int)numberOfPackets);
         printf("Payload length: %d\n", payloadLength);
         printf("Seed: %d\n\n\n", seed);
         printf("###########################\n");
