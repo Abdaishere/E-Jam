@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public class ConfigurationManager
 {
-    public static final String configDir = "/home/EJam/config";
+    public static String configDir;
 
 
     public ConfigurationManager(ArrayList<Stream> config)
@@ -60,5 +60,10 @@ public class ConfigurationManager
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+    }
+
+    public static void setConfigDir()
+    {
+        configDir = "/home/"+UTILs.getUserString()+"/EJam";
     }
 }
