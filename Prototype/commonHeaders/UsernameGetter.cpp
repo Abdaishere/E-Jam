@@ -14,6 +14,5 @@ std::string UsernameGetter::exec() {
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         result += buffer.data();
     }
-    std::cout << result;
     return result;
 }

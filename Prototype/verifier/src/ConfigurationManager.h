@@ -1,7 +1,6 @@
 #ifndef CONFIGURATIONMANAGER_H
 #define CONFIGURATIONMANAGER_H
 
-#define CONFIG_FOLDER "/home/EJam/config"
 #define CONFIG_FOLDER_LENGTH 11
 
 #include "Configuration.h"
@@ -9,7 +8,7 @@
 #include <map>
 #include <string>
 #include <sstream>
-
+#include "UsernameGetter.h"
 
 class ConfigurationManager
 {
@@ -18,6 +17,7 @@ private:
     static std::string exec(const char*);
     static char* currentStreamID;
     static int convertStreamID(char*);
+    static std::string CONFIG_FOLDER;
 public:
     static void initConfigurations();
     static void addConfiguration(const char*);
