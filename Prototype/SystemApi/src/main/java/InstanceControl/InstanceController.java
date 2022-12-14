@@ -113,9 +113,13 @@ public class InstanceController
                         sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
                     }
                     String mac12 = sb.toString().replaceAll("-","");
-                    //TODO convert mac 12 to mac 6
-//                    for(byte b: mac)
-//                        myMacAddress += (char)b;
+                    String mac6 = "AAAAAA";
+                    for (int i = 0; i < 12; i+=2)
+                    {
+                        char c = (char)(((int)mac12.charAt(i) - (int)'0') + (((int)mac12.charAt(i+1) - (int)'0') << 4));
+                        mac6 = mac6.substring(0,i/2)+String.valueOf(c)+mac6.substring(6);
+                    }
+                    myMacAddress = mac6;
                     break;
                 }
             }
@@ -126,5 +130,6 @@ public class InstanceController
             e.printStackTrace();
 
         }
+        myMacAddress = "AAAAAA";
     }
 }
