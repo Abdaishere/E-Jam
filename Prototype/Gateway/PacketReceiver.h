@@ -21,7 +21,6 @@ using namespace std;
 #define DEFAULT_IF "enp34s0"
 #define FIFO_FILE_VER "./tmp/fifo_pipe_ver"
 typedef unsigned char* Payload;
-const int MAX_VERS = 1;
 const int BUFFER_SIZE_VER = 100000;
 const int MTU = 1600;
 
@@ -30,8 +29,9 @@ class PacketReceiver {
 private:
     //indices of verifiers in
     queue<pair<int,int>> payloads;
-    int fd[MAX_VERS];
+    int* fd;
     int sock;
+    int MAX_VERS;
 
     //double buffer to store the next packet size for when
     unsigned char* recBuffer;
@@ -45,7 +45,7 @@ private:
 
     char ifName[IF_NAMESIZE];
 public:
-    PacketReceiver();
+    PacketReceiver(int);
     void openPipes();
     void closePipes();
     bool initializeSwitchConnection();

@@ -22,22 +22,22 @@ using namespace std;
 #define DEFAULT_IF_NAME "wlp0s20f3"
 //#define DEFAULT_IF_NAME "enp34s0"
 typedef unsigned char* Payload;
-const int MAX_PROCESSES = 20;
 const int BUFFER_SIZE = 31;
 //const char* DEFAULT_IF_NAME = "enp34s0";
 
 //this module receives packets from generators and sends them the switch
 class PacketSender {
 private:
-    queue<Payload> payloads[MAX_PROCESSES];
-    int fd[MAX_PROCESSES];
+    int genNum;
+    queue<Payload>* payloads;
+    int* fd;
     unsigned char buffer[BUFFER_SIZE];
     int sock;
     struct ifreq ifr;
     int ifIndex;
     struct sockaddr_ll addr;
 public:
-    PacketSender();
+    PacketSender(int genNum);
     void openPipes();
     void closePipes();
     void checkPipes();

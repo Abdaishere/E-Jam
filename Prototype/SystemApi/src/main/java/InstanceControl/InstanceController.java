@@ -22,12 +22,13 @@ public class InstanceController
         getExecutables();
         getMyMacAddress();
 
-        startGenerators(streams);
-        startVerifiers(streams);
+        int genNum = startGenerators(streams);
+        int verNum = startVerifiers(streams);
+        startGateway(genNum, verNum);
     }
 
     //Start generators
-    private void startGenerators(ArrayList<Stream> streams)
+    private int startGenerators(ArrayList<Stream> streams)
     {
         int genID = 0;
         for (Stream stream: streams)
@@ -47,9 +48,11 @@ public class InstanceController
                 }
             }
         }
+        return genID;
     }
+
     //Start Verifiers
-    private void startVerifiers(ArrayList<Stream> streams)
+    private int startVerifiers(ArrayList<Stream> streams)
     {
         int verID = 0;
         for (Stream stream: streams)
@@ -64,6 +67,18 @@ public class InstanceController
                 }
             }
         }
+        return verID;
+    }
+
+    private void startGateway(int numGen, int numVer)
+    {
+        String command = "../Executables/gateway ";
+        command += "0 " + Integer.toString(numGen);
+        executeCommand(command);
+
+        command = "../Executables/gateway ";
+        command += "1 " + Integer.toString(numVer);
+        executeCommand(command);
     }
 
     private void executeCommand(String command)

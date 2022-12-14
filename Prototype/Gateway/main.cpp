@@ -27,40 +27,49 @@ void checkingThreadV(PacketReceiver* packetReceiver)
     packetReceiver->checkBuffer();
 }
 
-//   main in case of sender
-/*
 int main(int argc, char ** argv)
 {
-    auto* packetSender = new PacketSender();
-    packetSender->openPipes();
+    //sender or receiver
+    int mode;
+    // num of either generators or verifiers
+    int num = 1;
+    if(argc > 1)
+        mode = stoi(argv[1]);
+    if(argc > 2)
+        num = stoi(argv[2]);
 
-    thread checker(checkingThread, packetSender);
-    thread sender(sendingThread, packetSender);
-
-    checker.join();
-    sender.join();
-
-    packetSender->closePipes();
-    return 0;
-
-}
-*/
-
-
-int main(int argc, char ** argv)
-{
-
-    PacketReceiver* packetReceiver = new PacketReceiver;
-
-    while(true)
+    //generator
+    if(mode == 0)
     {
-        std::thread t1 (receivingThread, packetReceiver);
-        std::thread t2 (checkingThreadV, packetReceiver);
+        auto* packetSender = new PacketSender(num);
+        packetSender->openPipes();
 
-        t1.join();
-        t2.join();
+        thread checker(checkingThread, packetSender);
+        thread sender(sendingThread, packetSender);
 
-        packetReceiver->swapBuffers();
+        checker.join();
+        sender.join();
+
+        packetSender->closePipes();
+        return 0;
+
     }
+    //verifier
+    else
+    {
+        PacketReceiver* packetReceiver = new PacketReceiver(num);
+
+        while(true)
+        {
+            std::thread t1 (receivingThread, packetReceiver);
+            std::thread t2 (checkingThreadV, packetReceiver);
+
+            t1.join();
+            t2.join();
+
+            packetReceiver->swapBuffers();
+        }
+    }
+
 
 }

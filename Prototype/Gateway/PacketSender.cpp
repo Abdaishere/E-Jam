@@ -1,6 +1,9 @@
 #include "PacketSender.h"
 
-PacketSender::PacketSender() {
+PacketSender::PacketSender(int genNum) {
+    this->genNum = genNum;
+    fd = new int[genNum];
+    payloads = new queue<Payload>[genNum];
     //opening socket
     sock = socket(AF_PACKET, SOCK_RAW, protocol);
     if (sock == -1)
@@ -39,7 +42,7 @@ PacketSender::PacketSender() {
 
 void PacketSender::openPipes()
 {
-    for (int i = 0; i < MAX_PROCESSES; i++)
+    for (int i = 0; i < genNum; i++)
     {
         cerr << mkfifo((FIFO_FILE + std::to_string(i)).c_str(), S_IFIFO | 0640);
         fd[i] = open((FIFO_FILE + std::to_string(i)).c_str(), O_RDWR);
@@ -49,13 +52,13 @@ void PacketSender::openPipes()
 
 void PacketSender::closePipes()
 {
-    for (int i = 0; i < MAX_PROCESSES; i++)
+    for (int i = 0; i < genNum; i++)
         close(fd[i]);
 }
 
 void PacketSender::checkPipes()
 {
-    for (int i = 0; i < MAX_PROCESSES; i++)
+    for (int i = 0; i < genNum; i++)
     {
         while (read(fd[i], buffer, sizeof(buffer)) != 0)
         {
@@ -69,7 +72,7 @@ void PacketSender::roundRobin()
 {
     auto endTest = std::chrono::system_clock::now() + 5min;
     do {
-        for (int i = 0; i < MAX_PROCESSES && std::chrono::system_clock::now() < endTest; i++)
+        for (int i = 0; i < genNum && std::chrono::system_clock::now() < endTest; i++)
         {
             while (payloads[i].empty() && std::chrono::system_clock::now() < endTest);
             if (!payloads[i].empty())

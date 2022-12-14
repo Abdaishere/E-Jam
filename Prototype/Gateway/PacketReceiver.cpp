@@ -1,6 +1,8 @@
 #include "PacketReceiver.h"
 
-PacketReceiver::PacketReceiver() {
+PacketReceiver::PacketReceiver(int verNum) {
+    MAX_VERS = verNum;
+    fd = new int[verNum];
     recBuffer = new unsigned char[BUFFER_SIZE_VER];
     forwardingBuffer = new unsigned char[BUFFER_SIZE_VER];
     recSizes = new int[BUFFER_SIZE_VER];

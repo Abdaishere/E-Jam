@@ -11,15 +11,26 @@ public class Communicator
     /**
      * Get configuration from Admin GUI
      */
+    public String convertToMac6(String mac12)
+    {
+        String mac6 = "AAAAAA";
+        for (int i = 0; i < 12; i+=2)
+        {
+            char c = (char)(((int)mac12.charAt(i) - (int)'0') + (((int)mac12.charAt(i+1) - (int)'0') << 4));
+            mac6 = mac6.substring(0,i/2)+String.valueOf(c)+mac6.substring(6);
+        }
+        return mac6;
+    }
     public ArrayList<Stream> receiveConfig()
     {
         //Hard coded streams (prototype)
         //stream 1
         Stream stream1 = new Stream();
-        stream1.senders.add("AAAAAA");
-        stream1.senders.add("BBBBBB");
-        stream1.receivers.add("CCCCCC");
-        stream1.receivers.add("DDDDDD");
+
+        //rec 00d861a86fda
+        //mac address to send to
+        stream1.senders.add(convertToMac6("8cb87eb05fea"));
+        stream1.receivers.add(convertToMac6("00d861a86fda"));
         stream1.payloadType = PayloadType.FIRST;
         stream1.numberOfPackets = 100;
         stream1.lifeTime = 100;
@@ -29,22 +40,8 @@ public class Communicator
         stream1.streamID = "abc";
 
 
-
-        //stream 1
-        Stream stream2 = new Stream();
-        stream2.senders.add("AAAAAA");
-        stream2.receivers.add("CCCCCC");
-        stream2.payloadType = PayloadType.SECOND;
-        stream2.numberOfPackets = 100;
-        stream2.lifeTime = 100;
-        stream2.payloadLength = 13;
-        stream2.seed = 0;
-        stream2.flowType = 0;
-        stream2.streamID = "XyZ";
-
         ArrayList<Stream> streams  = new ArrayList<>();
         streams.add(stream1);
-        streams.add(stream2);
 
         return streams;
     }
