@@ -15,6 +15,7 @@ public class ConfigurationManager
 
     public ConfigurationManager(ArrayList<Stream> config)
     {
+        setConfigDir();
         writeConfigurationToFiles(config);
     }
 

@@ -107,6 +107,7 @@ ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
 
     // Finalize the CRC-32 value by inverting all the bits
     crc32 ^= 0xFFFFFFFFu;
+    //bug, can't cast to char array
     char* crcChar = (char*) crc32;
     return ByteArray(crcChar, 4,0);
 

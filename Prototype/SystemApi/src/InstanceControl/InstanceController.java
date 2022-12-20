@@ -37,14 +37,10 @@ public class InstanceController
             {
                 if(Objects.equals(sender, myMacAddress))
                 {
-                    String command = "../Executables/Generator ";
-                    command += genID++;
-                    command += " ";
-                    command += configDir;
-                    command += "/config_";
-                    command += stream.streamID + ".txt";
-
-                    executeCommand(command);
+                    String command = "../Executables/Generator";
+                    String path = configDir + "/config_" + stream.streamID + ".txt";
+                    String []args = {Integer.toString(genID++), path };
+                    executeCommand(command, args);
                 }
             }
         }
@@ -61,9 +57,9 @@ public class InstanceController
             {
                 if(Objects.equals(receiver, myMacAddress))
                 {
-                    String command = "../Executables/verifier ";
-                    command += verID++;
-                    executeCommand(command);
+                    String command = "../Executables/verifier";
+                    String []args = {Integer.toString(verID++)};
+                    executeCommand(command, args);
                 }
             }
         }
@@ -72,21 +68,35 @@ public class InstanceController
 
     private void startGateway(int numGen, int numVer)
     {
-        String command = "../Executables/gateway ";
-        command += "0 " + Integer.toString(numGen);
-        executeCommand(command);
+        String command = "../Executables/Gateway";
+        String[] genArgs = {"0", Integer.toString(numGen)};
+        executeCommand(command, genArgs);
 
-        command = "../Executables/gateway ";
-        command += "1 " + Integer.toString(numVer);
-        executeCommand(command);
+        command = "../Executables/Gateway";
+        String[] verArgs = {"1 ", Integer.toString(numVer)};
+        executeCommand(command, verArgs);
     }
 
-    private void executeCommand(String command)
+    private void executeCommand(String command, String... args)
     {
         try
         {
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command("bash", command);
+            switch (args.length)
+            {
+                case 0:
+                    processBuilder.command(command);
+                    break;
+                case 1:
+                    processBuilder.command( command, args[0]);
+                    break;
+                case 2:
+                    processBuilder.command( command, args[0], args[1]);
+                    break;
+                case 3:
+                    processBuilder.command( command, args[0], args[1], args[2]);
+                    break;
+            }
 
             Process process = processBuilder.start();
 
@@ -104,7 +114,8 @@ public class InstanceController
 
     private void getExecutables()
     {
-        executeCommand("../Executables/GetExecutables.sh");
+        String args[] = {};
+        executeCommand("../Executables/GetExecutables.sh", args);
     }
 
     private void getMyMacAddress()
@@ -128,23 +139,15 @@ public class InstanceController
                         sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
                     }
                     String mac12 = sb.toString().replaceAll("-","");
-                    String mac6 = "AAAAAA";
-                    for (int i = 0; i < 12; i+=2)
-                    {
-                        char c = (char)(((int)mac12.charAt(i) - (int)'0') + (((int)mac12.charAt(i+1) - (int)'0') << 4));
-                        mac6 = mac6.substring(0,i/2)+String.valueOf(c)+mac6.substring(6);
-                    }
-                    myMacAddress = mac6;
-                    break;
+                    myMacAddress = mac12;
+                    return;
                 }
             }
         }
         catch (Exception e)
         {
-
             e.printStackTrace();
-
         }
-        myMacAddress = "AAAAAA";
+        myMacAddress = "AAAAAAAAAAAA";
     }
 }

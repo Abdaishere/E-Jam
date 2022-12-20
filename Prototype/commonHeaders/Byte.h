@@ -136,7 +136,6 @@ struct ByteArray
             //to avoid seeing whitespaces
             printf("%d ", this->bytes[i]);
 //            printf("%c", this->bytes[i]);
-
         }
         printf("\n");
 
