@@ -1,14 +1,12 @@
 package InstanceControl;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Objects;
+import java.util.*;
+
+import static java.lang.Thread.sleep;
 
 /**
  * This class initializes and manages the generator and verifier instances
@@ -17,14 +15,56 @@ public class InstanceController
 {
     private final String configDir = ConfigurationManager.configDir;
     private String myMacAddress;
-    public InstanceController(ArrayList<Stream> streams)
-    {
+    InputStream genStream, gatewayStream;
+    ArrayList<Long> pids = new ArrayList<>();
+    
+    public InstanceController (ArrayList<Stream> streams) {
         getExecutables();
         getMyMacAddress();
 
         int genNum = startGenerators(streams);
         int verNum = startVerifiers(streams);
         startGateway(genNum, verNum);
+
+        try {
+            sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        for(Long pid:pids)
+        {
+            String[] args = {"-9", Long.toString(pid)};
+            executeCommand("kill",true , args);
+        }
+
+    }
+
+    //reading the console outputs of the executables,
+    //for debugging
+    private void debugStreams()
+    {
+
+        try {
+            String s = null;
+            if(gatewayStream != null)
+            {
+                BufferedReader gatewayInput = new BufferedReader(new InputStreamReader(gatewayStream));
+                while ((s = gatewayInput.readLine()) != null)
+                    System.out.println(s);
+            }
+            else throw new Exception("Gateway is null");
+            if(genStream != null)
+            {
+                BufferedReader genInput = new BufferedReader(new InputStreamReader(genStream));
+                while ((s = genInput.readLine()) != null)
+                    System.out.println(s);
+            }
+            else throw new Exception("generator in null");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     //Start generators
@@ -40,7 +80,8 @@ public class InstanceController
                     String command = "../Executables/Generator";
                     String path = configDir + "/config_" + stream.streamID + ".txt";
                     String []args = {Integer.toString(genID++), path };
-                    executeCommand(command, args);
+                    executeCommand(command, false, args);
+
                 }
             }
         }
@@ -59,7 +100,7 @@ public class InstanceController
                 {
                     String command = "../Executables/verifier";
                     String []args = {Integer.toString(verID++)};
-                    executeCommand(command, args);
+                    executeCommand(command, false, args);
                 }
             }
         }
@@ -68,16 +109,20 @@ public class InstanceController
 
     private void startGateway(int numGen, int numVer)
     {
-        String command = "../Executables/Gateway";
-        String[] genArgs = {"0", Integer.toString(numGen)};
-        executeCommand(command, genArgs);
+        if(numGen > 0) {
+            String command = "sudo";
+            String[] genArgs = {"../Executables/Gateway","0", Integer.toString(numGen)};
+            executeCommand(command, false, genArgs);
+        }
 
-        command = "../Executables/Gateway";
-        String[] verArgs = {"1 ", Integer.toString(numVer)};
-        executeCommand(command, verArgs);
+        if(numVer > 0) {
+            String command = "../Executables/Gateway";
+            String[] verArgs = {"1 ", Integer.toString(numVer)};
+            executeCommand(command, false, verArgs);
+        }
     }
 
-    private void executeCommand(String command, String... args)
+    private void executeCommand(String command, boolean waitFor, String... args)
     {
         try
         {
@@ -99,12 +144,27 @@ public class InstanceController
             }
 
             Process process = processBuilder.start();
+            long pid = process.pid();
 
-            int exitVal = process.waitFor();
-            if (exitVal != 0)
-            {
-                throw new Exception("Could not execute command: "+ command);
+            System.out.println(command + " " + Arrays.toString(args) + " " + pid);
+
+            if(waitFor) {
+                int exitVal = process.waitFor();
+                if (exitVal != 0) {
+                    throw new Exception("Could not execute command: " + command);
+                }
+                System.out.println(command + " " + pid + " exited");
             }
+            else
+            {
+                System.out.println(command + " " + pid + " is executing without wait");
+                pids.add(pid);
+                if(command.contains("Generator"))
+                    genStream = process.getErrorStream();
+                else if(command.contains("Gateway") || command.contains("sudo"))
+                    gatewayStream = process.getErrorStream();
+            }
+
         }
         catch (Exception e)
         {
@@ -115,7 +175,7 @@ public class InstanceController
     private void getExecutables()
     {
         String args[] = {};
-        executeCommand("../Executables/GetExecutables.sh", args);
+        executeCommand("../Executables/GetExecutables.sh", true, args);
     }
 
     private void getMyMacAddress()

@@ -95,7 +95,7 @@ bool PacketSender::sendToSwitch(Payload& payload)
         cerr << "couldn't send frame " << errno << "\n";
         return false;
     }
-//    cerr << "sent frame\n";
+    cerr << "sent frame\n";
     return true;
 }
 

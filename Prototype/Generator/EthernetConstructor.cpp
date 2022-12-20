@@ -19,7 +19,7 @@ void EthernetConstructor::constructFrame() {
     preamble = ByteArray(pre, 8);
 
     frame.reset(source_address.capacity + destination_address.capacity + type.capacity + payload.capacity + CRC_LENGTH);
-    frame.write(preamble);
+//    frame.write(preamble);
     frame.write(destination_address);
     frame.write(source_address);
     frame.write(type);
@@ -108,7 +108,7 @@ ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
     // Finalize the CRC-32 value by inverting all the bits
     crc32 ^= 0xFFFFFFFFu;
     //bug, can't cast to char array
-    char* crcChar = (char*) crc32;
-    return ByteArray(crcChar, 4,0);
-
+//    char* crcChar = (char*) crc32;
+//    return ByteArray(crcChar, 4,0);
+    return ByteArray("4444",4,0);
 }
