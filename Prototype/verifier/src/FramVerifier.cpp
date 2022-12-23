@@ -27,7 +27,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
     bool status = true;
 
-    startIndex+=PREMBLE_LENGTH;
+//    startIndex+=PREMBLE_LENGTH;
 
     //check for receiver
     bool correctReceiver = true;
@@ -85,6 +85,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     int payloadEnd = payloadStart + STREAMID_LEN + ConfigurationManager::getConfiguration()->getPayloadLength();
 
     //Calculate the correct CRC
+    //CRC includes stream len ID
     ByteArray* correctCRC = calculateCRC(packet, payloadStart, payloadEnd);
 
     //Try to Match CRCs
@@ -115,6 +116,10 @@ void FrameVerifier::updateAcceptedSenders()
 
 ByteArray *FrameVerifier::calculateCRC(ByteArray * packet, int startIdx, int endIdx)
 {
+    char* crc = new char[4];
+    for(int i=0; i<4;i++)
+        crc[i] = '4';
+    return new ByteArray(crc,4,0);
     //TODO calculate CRC
     return nullptr;
 }

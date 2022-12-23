@@ -102,7 +102,7 @@ void PacketReceiver::receiveFromSwitch()
         recSizes[received++] = bytesRead;
     }
 
-//        std::cout << "finally received\n";
+        std::cerr << "packet received\n";
 //        for (int i = 0; i < BUFF_LEN; i++)
 //            std::cout << buff[i];
 //        std::cout << "\n";
