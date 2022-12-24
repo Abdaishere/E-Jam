@@ -15,7 +15,7 @@ public class InstanceController
 {
     private final String configDir = ConfigurationManager.configDir;
     private String myMacAddress;
-    InputStream genStream, gatewayStream;
+    InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
     
     public InstanceController (ArrayList<Stream> streams) {
@@ -27,10 +27,12 @@ public class InstanceController
         startGateway(genNum, verNum);
 
         try {
-            sleep(2000);
+            sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("sleep finished");
+        debugStreams();
         for(Long pid:pids)
         {
             String[] args = {"-9", Long.toString(pid)};
@@ -49,17 +51,35 @@ public class InstanceController
             if(gatewayStream != null)
             {
                 BufferedReader gatewayInput = new BufferedReader(new InputStreamReader(gatewayStream));
-                while ((s = gatewayInput.readLine()) != null)
+                while (gatewayInput.ready() && (s = gatewayInput.readLine()) != null)
+                {
+                    if(s.contains("end"))
+                        break;
                     System.out.println(s);
+                }
             }
             else throw new Exception("Gateway is null");
             if(genStream != null)
             {
                 BufferedReader genInput = new BufferedReader(new InputStreamReader(genStream));
-                while ((s = genInput.readLine()) != null)
+                while (genInput.ready() && (s = genInput.readLine()) != null)
+                {
+                    if(s.contains("end"))
+                        break;
                     System.out.println(s);
+                }
             }
-            else throw new Exception("generator in null");
+            if(verStream != null)
+            {
+                BufferedReader verInput = new BufferedReader(new InputStreamReader(verStream));
+                while (verInput.ready() && (s = verInput.readLine()) != null)
+                {
+                    if(s.contains("end"))
+                        break;
+                    System.out.println(s);
+                }
+            }
+
         }
         catch (Exception e)
         {
@@ -116,8 +136,8 @@ public class InstanceController
         }
 
         if(numVer > 0) {
-            String command = "../Executables/Gateway";
-            String[] verArgs = {"1 ", Integer.toString(numVer)};
+            String command = "sudo";
+            String[] verArgs = {"../Executables/Gateway","1 ", Integer.toString(numVer)};
             executeCommand(command, false, verArgs);
         }
     }
@@ -163,6 +183,8 @@ public class InstanceController
                     genStream = process.getErrorStream();
                 else if(command.contains("Gateway") || command.contains("sudo"))
                     gatewayStream = process.getErrorStream();
+                else if(command.contains("verifier"))
+                    verStream = process.getErrorStream();
             }
 
         }

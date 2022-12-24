@@ -7,7 +7,8 @@ using namespace std;
 
 void receive(PacketUnpacker* pu)
 {
-    while(true)
+    int iters = 1000;
+    while(iters--)
     {
         pu->readPacket();
     }
@@ -15,7 +16,8 @@ void receive(PacketUnpacker* pu)
 
 void verify(PacketUnpacker* pu)
 {
-    while(true)
+    int iters = 1000;
+    while(iters--)
     {
         pu->verifiyPacket();
     }
@@ -32,7 +34,6 @@ int main(int argc, char** argv)
     ConfigurationManager::initConfigurations();
 
     PacketUnpacker* pu = new PacketUnpacker(verID);
-
 
     std::thread reader(receive, pu);
     std::thread verifier(verify, pu);

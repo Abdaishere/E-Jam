@@ -27,7 +27,7 @@ public class UTILs {
             }
             process.destroyForcibly();
             if(name.equals("root"))
-                name = "mohamedelhagry";
+                name = "mohamed";
             return name;
         }
         catch (Exception e)

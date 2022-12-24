@@ -3,6 +3,7 @@
 
 std::map<int, Configuration*> ConfigurationManager::configurations;
 char* ConfigurationManager::currentStreamID;
+std::string ConfigurationManager::CONFIG_FOLDER;
 
 Configuration *ConfigurationManager::getConfiguration()
 {

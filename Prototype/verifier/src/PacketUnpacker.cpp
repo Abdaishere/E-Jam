@@ -9,7 +9,8 @@ void PacketUnpacker::readPacket()
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
     ByteArray* packet = new ByteArray(1600);
     packetReceiver->receivePackets(packet);
-    std::cerr << "packet received\n";
+//    std::cerr << "packet received\n";
+//    packet->print();
     mtx.lock();
     packetQueue.push(packet);
     mtx.unlock();
@@ -17,7 +18,7 @@ void PacketUnpacker::readPacket()
 
 PacketUnpacker::PacketUnpacker(int verID)
 {
-    std::string path = "./tmp/fifo_pipe_ver" + std::to_string(verID);
+    std::string path = "/tmp/fifo_pipe_ver" + std::to_string(verID);
     packetReceiver = PacketReceiver::getInstance(verID, path);
 }
 
@@ -79,12 +80,12 @@ void PacketUnpacker::verifiyPacket()
 
     PayloadVerifier* pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
-    if(!frameStatus)
-        std::cerr << "frame corrupted\n";
-    if(!payloadStatus)
-        std::cerr << "payload corrupted\n";
-    if(frameStatus && payloadStatus)
-        std::cerr << "frame correct\n";
+//    if(!frameStatus)
+//        std::cerr << "frame corrupted\n";
+//    if(!payloadStatus)
+//        std::cerr << "payload corrupted\n";
+//    if(frameStatus && payloadStatus)
+//        std::cerr << "frame correct\n";
 }
 
 

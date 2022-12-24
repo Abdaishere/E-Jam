@@ -29,7 +29,8 @@ PacketReceiver* PacketReceiver::getInstance(int genID, std::string pipeDir, int 
 int PacketReceiver::openFifo()
 {
     //create pipe with read and write permissions
-    int status = mkfifo((instance->pipeDir + std::to_string(instance->verID)).c_str(), permissions);
+
+    int status = mkfifo((instance->pipeDir).c_str(), permissions);
 
     if(status == -1) {
         if (errno != EEXIST) //if the error was more than the file already existing
@@ -41,7 +42,7 @@ int PacketReceiver::openFifo()
     }
 
     //open pipe as file
-    fd = open((instance->pipeDir + std::to_string(instance->verID)).c_str(), O_RDONLY);
+    fd = open((instance->pipeDir).c_str(), O_RDONLY);
     std::cerr << fd << "\n";
     return fd;
 }
