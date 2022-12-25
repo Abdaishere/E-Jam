@@ -41,7 +41,7 @@ int PacketSender::openFifo()
 
     //open pipe as file
     fd = open((instance->pipeDir + std::to_string(instance->genID)).c_str(), O_WRONLY);
-    std::cerr << fd << "\n";
+    std::cerr << "File descriptor " << fd << "\n";
 }
 
 void PacketSender::transmitPackets(const ByteArray& packet) const

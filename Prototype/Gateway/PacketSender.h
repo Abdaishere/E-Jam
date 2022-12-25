@@ -14,6 +14,7 @@
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include "Byte.h"
 using namespace std;
 
 
@@ -22,14 +23,14 @@ using namespace std;
 #define DEFAULT_IF_NAME "wlp0s20f3"
 //#define DEFAULT_IF_NAME "enp34s0"
 typedef unsigned char* Payload;
-const int BUFFER_SIZE = 31;
+const int BUFFER_SIZE = 1600;
 //const char* DEFAULT_IF_NAME = "enp34s0";
 
 //this module receives packets from generators and sends them the switch
 class PacketSender {
 private:
     int genNum;
-    queue<Payload>* payloads;
+    queue<ByteArray>* payloads;
     int* fd;
     unsigned char buffer[BUFFER_SIZE];
     int sock;
@@ -42,7 +43,7 @@ public:
     void closePipes();
     void checkPipes();
     void roundRobin();
-    bool sendToSwitch(Payload& payload);
+    bool sendToSwitch(ByteArray payload);
     ~PacketSender();
 };
 

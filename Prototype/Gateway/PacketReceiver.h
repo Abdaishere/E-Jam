@@ -27,16 +27,15 @@ const int MTU = 1600;
 //this module receives packets from the switch and sends them to the verifiers
 class PacketReceiver {
 private:
-    //indices of verifiers in
-    queue<pair<int,int>> payloads;
+    //array which holds pipe file descriptors for each pipe
     int* fd;
     int sock;
     int MAX_VERS;
 
-    //double buffer to store the next packet size for when
+    //double buffer for storing / consuming the actual packets
     unsigned char* recBuffer;
     unsigned char* forwardingBuffer;
-    //double buffer, one for reading from the switch, and another for writing to the pipes
+    //double buffer to store the sizes read from the pipe, one for reading from the switch, and another for writing to the pipes
     int* recSizes;
     int* forwardingSizes;
     //

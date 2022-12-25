@@ -18,17 +18,8 @@ void PacketReceiver::openPipes()
 //    string ver = FIFO_FILE + "ver";
     for(int i=0; i<MAX_VERS; i++)
     {
-        int status = mkfifo((FIFO_FILE_VER + std::to_string(i)).c_str()  , S_IFIFO | 0640);
-        if(status == -1) {
-            if (errno != EEXIST) //if the error was more than the file already existing
-            {
-                printf("Error in creating the FIFO file\n");
-            } else {
-                printf("File already exists, skipping creation...\n");
-            }
-        }
+        cerr << mkfifo((FIFO_FILE_VER + std::to_string(i)).c_str()  , S_IFIFO | 0640);
         fd[i] = open((FIFO_FILE_VER + std::to_string(i)).c_str(), O_RDWR);
-        std::cerr << fd[i] << "\n";
     }
 }
 
@@ -45,8 +36,6 @@ bool PacketReceiver::initializeSwitchConnection()
         std::cerr << "unable to open socket\n";
         return false;
     }
-    else
-        std::cerr << "opened socket\n";
 
     /* Set interface to promiscuous mode,
        i.e. read everything even if the destination
@@ -60,16 +49,12 @@ bool PacketReceiver::initializeSwitchConnection()
     //set interface flags
     ioctl(sock, SIOCSIFFLAGS, &ifopts);
 
-    return true;
 //    Bind this socket to a specific switch to read from, other packets are dropped
 //    if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifName, IFNAMSIZ-1) == -1)	{
 //        perror("SO_BINDTODEVICE");
-//        std::cerr << "here\n";
 //        close(sock);
 //        exit(EXIT_FAILURE);
 //    }
-//    else
-//        std::cerr << " all is well\n";
 }
 
 
@@ -105,9 +90,7 @@ void PacketReceiver::receiveFromSwitch()
     int sizeLeft = BUFFER_SIZE_VER;
     while(sizeLeft >= MTU)
     {
-        std::cerr << "here\n";
-        int bytesRead = recvfrom(sock, recBuffer, MTU, 0, NULL, NULL);
-        std::cerr << "there\n";
+        int bytesRead = recvfrom(sock, recBuffer+totSizeRec, MTU, 0, nullptr, nullptr);
         if (bytesRead == -1)
         {
             std::cerr << "not received\n";
@@ -119,11 +102,11 @@ void PacketReceiver::receiveFromSwitch()
         recSizes[received++] = bytesRead;
     }
 
-    std::cerr << "packet received\n";
-    for (int i = 0; i < BUFF_LEN; i++)
-        std::cout << recBuffer[i];
-    std::cout << "\n";
-
+        std::cerr << "packet received\n";
+//        for (int i = 0; i < BUFF_LEN; i++)
+//            std::cout << buff[i];
+//        std::cout << "\n";
+//
 }
 
 void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
