@@ -65,6 +65,6 @@ public class ConfigurationManager
 
     public static void setConfigDir()
     {
-        configDir = "/home/"+UTILs.getUserString()+"/EJam";
+        configDir = "/etc/EJam";
     }
 }

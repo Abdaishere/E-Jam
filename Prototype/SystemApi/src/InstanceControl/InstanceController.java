@@ -95,7 +95,6 @@ public class InstanceController
                     String path = configDir + "/config_" + stream.streamID + ".txt";
                     String []args = {Integer.toString(genID++), path };
                     executeCommand(command, false, args);
-
                 }
             }
         }
