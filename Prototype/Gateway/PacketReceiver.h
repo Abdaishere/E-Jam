@@ -21,7 +21,7 @@ using namespace std;
 #define DEFAULT_IF "enp34s0"
 #define FIFO_FILE_VER "/tmp/fifo_pipe_ver"
 typedef unsigned char* Payload;
-const int BUFFER_SIZE_VER = 100000;
+const int BUFFER_SIZE_VER = 2000;
 const int MTU = 1600;
 
 //this module receives packets from the switch and sends them to the verifiers

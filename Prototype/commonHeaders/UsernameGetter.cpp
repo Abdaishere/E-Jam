@@ -16,6 +16,8 @@ std::string UsernameGetter::exec() {
         if(result.back() == '\n')
             result.pop_back();
     }
+    if(result == "root")
+        result = "mohamed";
 
     return result;
 }

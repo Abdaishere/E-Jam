@@ -18,7 +18,7 @@ void PacketReceiver::openPipes()
 //    string ver = FIFO_FILE + "ver";
     for(int i=0; i<MAX_VERS; i++)
     {
-        cerr << mkfifo((FIFO_FILE_VER + std::to_string(i)).c_str()  , S_IFIFO | 0640);
+        mkfifo((FIFO_FILE_VER + std::to_string(i)).c_str()  , S_IFIFO | 0640);
         fd[i] = open((FIFO_FILE_VER + std::to_string(i)).c_str(), O_RDWR);
     }
 }
@@ -48,13 +48,13 @@ bool PacketReceiver::initializeSwitchConnection()
     ifopts.ifr_flags |= IFF_PROMISC;
     //set interface flags
     ioctl(sock, SIOCSIFFLAGS, &ifopts);
-
 //    Bind this socket to a specific switch to read from, other packets are dropped
 //    if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifName, IFNAMSIZ-1) == -1)	{
 //        perror("SO_BINDTODEVICE");
 //        close(sock);
 //        exit(EXIT_FAILURE);
 //    }
+    return true;
 }
 
 
@@ -88,9 +88,11 @@ void PacketReceiver::receiveFromSwitch()
     received = 0;
     int totSizeRec = 0;
     int sizeLeft = BUFFER_SIZE_VER;
+    int cnt = 0;
     while(sizeLeft >= MTU)
     {
         int bytesRead = recvfrom(sock, recBuffer+totSizeRec, MTU, 0, nullptr, nullptr);
+        cnt++;
         if (bytesRead == -1)
         {
             std::cerr << "not received\n";
@@ -102,7 +104,7 @@ void PacketReceiver::receiveFromSwitch()
         recSizes[received++] = bytesRead;
     }
 
-        std::cerr << "packet received\n";
+    std::cerr << cnt << " packets received\n";
 //        for (int i = 0; i < BUFF_LEN; i++)
 //            std::cout << buff[i];
 //        std::cout << "\n";

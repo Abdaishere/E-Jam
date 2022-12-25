@@ -27,7 +27,7 @@ public class InstanceController
         startGateway(genNum, verNum);
 
         try {
-            sleep(10000);
+            sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -53,8 +53,6 @@ public class InstanceController
                 BufferedReader gatewayInput = new BufferedReader(new InputStreamReader(gatewayStream));
                 while (gatewayInput.ready() && (s = gatewayInput.readLine()) != null)
                 {
-                    if(s.contains("end"))
-                        break;
                     System.out.println(s);
                 }
             }
@@ -64,8 +62,6 @@ public class InstanceController
                 BufferedReader genInput = new BufferedReader(new InputStreamReader(genStream));
                 while (genInput.ready() && (s = genInput.readLine()) != null)
                 {
-                    if(s.contains("end"))
-                        break;
                     System.out.println(s);
                 }
             }
@@ -74,8 +70,6 @@ public class InstanceController
                 BufferedReader verInput = new BufferedReader(new InputStreamReader(verStream));
                 while (verInput.ready() && (s = verInput.readLine()) != null)
                 {
-                    if(s.contains("end"))
-                        break;
                     System.out.println(s);
                 }
             }

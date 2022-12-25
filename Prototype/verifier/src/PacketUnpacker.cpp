@@ -10,7 +10,7 @@ void PacketUnpacker::readPacket()
     ByteArray* packet = new ByteArray(1600);
     packetReceiver->receivePackets(packet);
 //    std::cerr << "packet received\n";
-//    packet->print();
+    std::cerr <<"packet in verification queue\n";
     mtx.lock();
     packetQueue.push(packet);
     mtx.unlock();
@@ -80,12 +80,12 @@ void PacketUnpacker::verifiyPacket()
 
     PayloadVerifier* pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
-//    if(!frameStatus)
-//        std::cerr << "frame corrupted\n";
-//    if(!payloadStatus)
-//        std::cerr << "payload corrupted\n";
-//    if(frameStatus && payloadStatus)
-//        std::cerr << "frame correct\n";
+    if(!frameStatus)
+        std::cerr << "frame corrupted\n";
+    if(!payloadStatus)
+        std::cerr << "payload corrupted\n";
+    if(frameStatus && payloadStatus)
+        std::cerr << "frame correct\n";
 }
 
 

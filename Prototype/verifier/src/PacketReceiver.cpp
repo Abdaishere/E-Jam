@@ -43,7 +43,7 @@ int PacketReceiver::openFifo()
 
     //open pipe as file
     fd = open((instance->pipeDir).c_str(), O_RDONLY);
-    std::cerr << fd << "\n";
+    std::cerr << "File descriptor "<< fd << "\n";
     return fd;
 }
 
@@ -53,7 +53,12 @@ void PacketReceiver::closePipe() {
 
 void PacketReceiver::receivePackets(ByteArray* packet)
 {
-    read(fd, packet->bytes, packet->capacity);
+    int received = read(fd, packet->bytes, packet->capacity);
+    std::cerr << "packet reached receiver " << received << " \n";
+    packet->length = received;
+    for(int i=0; i<packet->length; i++)
+        std::cerr<<(int)packet->at(i) << " ";
+    std::cerr << "\n";
 }
 
 PacketReceiver::~PacketReceiver() {
