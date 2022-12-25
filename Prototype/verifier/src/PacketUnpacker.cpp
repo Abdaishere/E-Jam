@@ -4,19 +4,21 @@
 std::queue<ByteArray*> PacketUnpacker::packetQueue;
 void PacketUnpacker::readPacket()
 {
-    //hard coded to receive a packet until finishing the gateway
 //    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
 //    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
+    //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
     ByteArray* packet = new ByteArray(1600);
-    mtx.lock();
     packetReceiver->receivePackets(packet);
+//    std::cerr << "packet received\n";
+    std::cerr <<"packet in verification queue\n";
+    mtx.lock();
     packetQueue.push(packet);
     mtx.unlock();
 }
 
 PacketUnpacker::PacketUnpacker(int verID)
 {
-    std::string path = "./tmp/fifo_pipe_ver" + std::to_string(verID);
+    std::string path = "/tmp/fifo_pipe_ver" + std::to_string(verID);
     packetReceiver = PacketReceiver::getInstance(verID, path);
 }
 
@@ -41,7 +43,8 @@ void PacketUnpacker::verifiyPacket()
     if(packet == nullptr) return;
 
     //Extract Stream ID
-    int streamID_startIndex = PREMBLE_LENGTH+MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
+//    int streamID_startIndex = PREMBLE_LENGTH+MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
+    int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
     ByteArray tempBA (5, 0);
     tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN-1);
     char* strmID = (char*)tempBA.bytes;
@@ -64,17 +67,25 @@ void PacketUnpacker::verifiyPacket()
     }
 
     //check for frame errors
+    //by matching receiver and sender mac addresses and checking the CRCs
     int startIndex = 0, endIndex = packet->length;
     FrameVerifier* fv = FrameVerifier::getInstance();
     bool frameStatus = fv->verifiy(packet, startIndex, endIndex);
 
     //check for payload error
+    //by matching payloads
     int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
     startIndex = streamID_startIndex;
     endIndex = startIndex+STREAMID_LEN+payloadLength-1;
 
     PayloadVerifier* pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
+    if(!frameStatus)
+        std::cerr << "frame corrupted\n";
+    if(!payloadStatus)
+        std::cerr << "payload corrupted\n";
+    if(frameStatus && payloadStatus)
+        std::cerr << "frame correct\n";
 }
 
 

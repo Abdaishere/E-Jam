@@ -52,7 +52,6 @@ int main(int argc, char ** argv)
 
         packetSender->closePipes();
         return 0;
-
     }
     //verifier
     else

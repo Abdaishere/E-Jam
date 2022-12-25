@@ -1,9 +1,9 @@
 #include "PacketSender.h"
-
+// potential improvement : use a double buffer for transmission, similar approach to the verifier
 PacketSender::PacketSender(int genNum) {
     this->genNum = genNum;
     fd = new int[genNum];
-    payloads = new queue<Payload>[genNum];
+    payloads = new queue<ByteArray>[genNum];
     //opening socket
     sock = socket(AF_PACKET, SOCK_RAW, protocol);
     if (sock == -1)
@@ -44,7 +44,7 @@ void PacketSender::openPipes()
 {
     for (int i = 0; i < genNum; i++)
     {
-        cerr << mkfifo((FIFO_FILE + std::to_string(i)).c_str(), S_IFIFO | 0640);
+        mkfifo((FIFO_FILE + std::to_string(i)).c_str(), S_IFIFO | 0640);
         fd[i] = open((FIFO_FILE + std::to_string(i)).c_str(), O_RDWR);
         cout << fd[i] << endl;
     }
@@ -60,10 +60,13 @@ void PacketSender::checkPipes()
 {
     for (int i = 0; i < genNum; i++)
     {
-        while (read(fd[i], buffer, sizeof(buffer)) != 0)
+        int bytesRead = read(fd[i], buffer, sizeof(buffer));
+        while (bytesRead != 0)
         {
-            payloads[i].push(buffer);
-            memset(&buffer, 0, sizeof buffer); // clear the buffer
+            payloads[i].push(ByteArray((char*)buffer, bytesRead, 0));
+//            memcpy(bytesRead, );
+//            memset(&buffer, 0, sizeof buffer); // clear the buffer
+            bytesRead = read(fd[i], buffer, sizeof(buffer));
         }
     }
 }
@@ -84,18 +87,21 @@ void PacketSender::roundRobin()
     } while (std::chrono::system_clock::now() < endTest);
 }
 
-bool PacketSender::sendToSwitch(Payload& payload)
+bool PacketSender::sendToSwitch(ByteArray payload)
 {
-    cerr << payload << endl;
+    std::cerr << payload.length << "\n";
+    for(int i=0; i<payload.length;i++)
+        cerr << (int)payload.at(i)<< " ";
+    cerr <<"\n";
     // send the request
     // ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
     //                const struct sockaddr *dest_addr, socklen_t addrlen);
-    if (sendto(sock, payload, 31, 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+    if (sendto(sock, payload.bytes, payload.length, 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     {
         cerr << "couldn't send frame " << errno << "\n";
         return false;
     }
-//    cerr << "sent frame\n";
+    cerr << "sent frame\n";
     return true;
 }
 

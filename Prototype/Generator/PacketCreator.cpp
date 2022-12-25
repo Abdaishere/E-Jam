@@ -27,6 +27,7 @@ void PacketCreator::createPacket(int rcvInd)
     payloadGenerator->regeneratePayload();
     ByteArray payload = payloadGenerator->getPayload();
     ByteArray innerProtocol = ByteArray("00",2);
+    innerProtocol[0] = (char)0x88;innerProtocol[1] = (char) 0xb5;
     FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
                                                                  payload,
                                                                  innerProtocol);
@@ -52,5 +53,7 @@ void PacketCreator::sendHead()
     productQueue.pop();
     mtx.unlock();
 
+    packet.print();
     sender->transmitPackets(packet);
+    std::cerr << ("Packet transmitted\n");
 }

@@ -3,6 +3,7 @@
 
 std::map<int, Configuration*> ConfigurationManager::configurations;
 char* ConfigurationManager::currentStreamID;
+std::string ConfigurationManager::CONFIG_FOLDER;
 
 Configuration *ConfigurationManager::getConfiguration()
 {
@@ -30,7 +31,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
 void ConfigurationManager::initConfigurations()
 {
     CONFIG_FOLDER = "";
-    CONFIG_FOLDER+="/home/" +UsernameGetter::exec() + "/EJam";
+    CONFIG_FOLDER+="/etc/EJam";
 
     std::string lsStr = "ls ";
     std::string dirStr(CONFIG_FOLDER);

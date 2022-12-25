@@ -11,16 +11,18 @@ public class Communicator
     /**
      * Get configuration from Admin GUI
      */
-    public String convertToMac6(String mac12)
-    {
-        String mac6 = "AAAAAA";
-        for (int i = 0; i < 12; i+=2)
-        {
-            char c = (char)(((int)mac12.charAt(i) - (int)'0') + (((int)mac12.charAt(i+1) - (int)'0') << 4));
-            mac6 = mac6.substring(0,i/2)+String.valueOf(c)+mac6.substring(6);
-        }
-        return mac6;
-    }
+
+//    public String convertToMac6(String mac12)
+//    {
+//        String mac6 = "AAAAAA";
+//        for (int i = 0; i < 12; i+=2)
+//        {
+//            char c = (char)(((int)mac12.charAt(i) - (int)'0') + (((int)mac12.charAt(i+1) - (int)'0') << 4));
+//            // bug: last substring was not taken correctly, the line below is correct
+//            mac6 = mac6.substring(0,i/2)+String.valueOf(c)+mac6.substring(i/2 + 1);
+//        }
+//        return mac6;
+//    }
     public ArrayList<Stream> receiveConfig()
     {
         //Hard coded streams (prototype)
@@ -29,8 +31,8 @@ public class Communicator
 
         //rec 00d861a86fda
         //mac address to send to
-        stream1.senders.add(convertToMac6("8cb87eb05fea"));
-        stream1.receivers.add(convertToMac6("00d861a86fda"));
+        stream1.senders.add("8CB87EB05FEA");
+        stream1.receivers.add("00D861A86FDA");
         stream1.payloadType = PayloadType.FIRST;
         stream1.numberOfPackets = 100;
         stream1.lifeTime = 100;

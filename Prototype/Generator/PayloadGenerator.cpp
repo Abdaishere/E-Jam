@@ -57,7 +57,8 @@ ByteArray PayloadGenerator::getPayload()
 
 void PayloadGenerator::generateFirstAlphabet()
 {
-    payload = ByteArray("abcdefghijklm",13);
+    payload = ByteArray("abcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklm"
+                        "abcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklm",104,0);
 }
 
 void PayloadGenerator::generateSecondAlphabet()

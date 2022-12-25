@@ -130,6 +130,49 @@ public:
         myMacAddress = discoverMyMac();
     }
 
+    char hexToNum(char c)
+    {
+        if(c >= 'A' && c <='F')
+            return c - 'A' + 10;
+        return  c - '0';
+    }
+
+    std::string convertToMac6(std::string mac12)
+    {
+        std::string mac6(6, 'x');
+        if(mac12.size() != 12)
+        {
+            throw std::invalid_argument("SIZE NOT 12");
+        }
+        for(int i=0,j=0; i<12; i+=2,j++)
+        {
+            char half1 = 0, half2 = 0;
+            half1 = hexToNum(mac12[i]);
+            // ABFF000
+            half2 = hexToNum(mac12[i+1]);
+            mac6[j] = (half1 << 4) + half2;
+        }
+        return mac6;
+    }
+
+    void Mac12toMac6()
+    {
+        for(auto& e:receivers)
+        {
+            std::string temp(12, 'x');
+            for(int i=0; i<12; i++) temp[i] = e.at(i);
+            ByteArray mac6 = ByteArray(convertToMac6(temp).c_str(), 6);
+            e = mac6;
+        }
+        for(auto& e:senders)
+        {
+            std::string temp(12, 'x');
+            for(int i=0; i<12; i++) temp[i] = e.at(i);
+            ByteArray mac6 = ByteArray(convertToMac6(temp).c_str(), 6);
+            e = mac6;
+        }
+    }
+
     std::vector<ByteArray> &getSenders()
     {
         return senders;
@@ -263,7 +306,6 @@ public:
         printf("Payload length: %d\n", payloadLength);
         printf("Seed: %d\n\n\n", seed);
         printf("###########################\n");
-
     }
 };
 

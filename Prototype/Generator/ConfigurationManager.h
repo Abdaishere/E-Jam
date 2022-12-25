@@ -16,6 +16,7 @@ private:
 public:
     static Configuration* getConfiguration(char*);
     static Configuration* getConfiguration();
+    static void run();
 };
 
 

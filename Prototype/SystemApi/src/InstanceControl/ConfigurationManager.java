@@ -15,6 +15,7 @@ public class ConfigurationManager
 
     public ConfigurationManager(ArrayList<Stream> config)
     {
+        setConfigDir();
         writeConfigurationToFiles(config);
     }
 
@@ -64,6 +65,6 @@ public class ConfigurationManager
 
     public static void setConfigDir()
     {
-        configDir = "/home/"+UTILs.getUserString()+"/EJam";
+        configDir = "/etc/EJam";
     }
 }
