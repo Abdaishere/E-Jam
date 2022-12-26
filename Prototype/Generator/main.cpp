@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <string>
+#include "StatsManager.h"
 
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
@@ -27,6 +28,12 @@ void creatingFunction(PacketCreator* pc)
     }
 }
 
+void sendStatsFunction(StatsManager* sm)
+{
+    while (true)
+        sm->sendStats();
+}
+
 int main(int argc, char** argv)
 {
     int genID = 0;
@@ -38,13 +45,17 @@ int main(int argc, char** argv)
     }
 
     ConfigurationManager::getConfiguration(configPath);
+    StatsManager* sm = StatsManager::getInstance(genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
     PacketCreator* pc = new PacketCreator();
     std::thread creator(creatingFunction,pc);
     std::thread sender(sendingFunction,pc);
+    std::thread statWriter(sendStatsFunction, sm);
+
 
     creator.join();
     sender.join();
+    statWriter.join();
 }
 

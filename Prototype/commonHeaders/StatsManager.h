@@ -21,13 +21,14 @@ private:
     long numberOfPackets;
     long numberOfErrors;
     clock_t timer;
-    StatsManager(int);
+    StatsManager(int, bool);
     void resetStats(bool);
     void writeStatFile();
-    int verID;
+    bool is_gen;
+    int instanceID;
 
 public:
-    static StatsManager* getInstance(int verID = 0);
+    static StatsManager* getInstance(int instanceID = 0,bool is_gen = false);
     void sendStats();
     void increaseNumPackets(long val = 1);
     void increaseNumErrors(long val = 1);

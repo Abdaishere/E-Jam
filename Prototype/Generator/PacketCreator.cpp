@@ -13,12 +13,17 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <StatsManager.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
 std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket(int rcvInd)
 {
+    //Signal a packet created
+    StatsManager* statsManager = StatsManager::getInstance();
+    statsManager->increaseNumPackets();
+
     //TODO move ByteArray creating inside each constructor class
     ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
     ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];

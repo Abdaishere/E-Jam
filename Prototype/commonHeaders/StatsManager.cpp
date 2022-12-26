@@ -8,16 +8,18 @@
 
 StatsManager* StatsManager::instance;
 
-StatsManager *StatsManager::getInstance(int verID)
+StatsManager *StatsManager::getInstance(int verID, bool is_gen)
 {
     if (instance == nullptr)
-        instance = new StatsManager(verID);
+        instance = new StatsManager(verID, is_gen);
     return instance;
 }
 
 
-StatsManager::StatsManager(int verID)
+StatsManager::StatsManager(int id, bool is_gen1)
 {
+    is_gen = is_gen1;
+    instanceID = id;
     resetStats(false);
 }
 
@@ -53,8 +55,11 @@ void StatsManager::increaseNumErrors(long val)
 void StatsManager::writeStatFile()
 {
     std::string dir = CONFIG_DIR;
-    dir += "/Ver_";
-    dir += std::to_string(verID);
+    if(is_gen)
+        dir += "/Ver_";
+    else
+        dir += "/Gen_";
+    dir += std::to_string(instanceID);
     dir += ".txt";
 
     FILE* file = fopen(dir.c_str(),"w");

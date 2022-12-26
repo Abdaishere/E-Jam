@@ -3,7 +3,7 @@
 #include <thread>
 #include "src/PacketUnpacker.h"
 #include "src/ConfigurationManager.h"
-#include "src/StatsManager.h"
+#include "StatsManager.h"
 
 using namespace std;
 
@@ -52,6 +52,7 @@ int main(int argc, char** argv)
 
     reader.join();
     verifier.join();
+    statWriter.join();
 
     return 0;
 }
