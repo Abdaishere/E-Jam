@@ -31,7 +31,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
 void ConfigurationManager::initConfigurations()
 {
     CONFIG_FOLDER = "";
-    CONFIG_FOLDER+="/etc/EJam";
+    CONFIG_FOLDER+= CONFIG_DIR;
 
     std::string lsStr = "ls ";
     std::string dirStr(CONFIG_FOLDER);

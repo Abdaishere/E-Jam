@@ -21,6 +21,7 @@ typedef unsigned long long ull;
 #define CRC_LENGTH 4
 #define PREMBLE_LENGTH 8
 #define LENGTH_LENGTH 2
+#define CONFIG_DIR "/etc/EJam"
 
 enum PayloadType {FIRST, SECOND, RANDOM};
 
