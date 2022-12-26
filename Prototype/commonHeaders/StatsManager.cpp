@@ -54,7 +54,7 @@ void StatsManager::increaseNumErrors(long val)
 
 void StatsManager::writeStatFile()
 {
-    std::string dir = CONFIG_DIR;
+    std::string dir = STAT_DIR;
     if(is_gen)
         dir += "/Ver_";
     else

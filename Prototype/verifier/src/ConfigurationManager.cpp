@@ -45,7 +45,10 @@ void ConfigurationManager::initConfigurations()
         dir = std::string(CONFIG_FOLDER)+"/"+dir;
 
     for(const std::string& dir: directories)
-        addConfiguration(dir.c_str());
+    {
+        if(dir.substr(dir.size()-3) == "txt")
+            addConfiguration(dir.c_str());
+    }
 }
 
 std::string ConfigurationManager::exec(const char * command)

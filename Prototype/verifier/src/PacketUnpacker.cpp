@@ -47,8 +47,10 @@ void PacketUnpacker::verifiyPacket()
     //nothing to do if no packet
     if(packet == nullptr) return;
 
+    std::cerr << "verifying packet\n";
     //Extract Stream ID
     //    int streamID_startIndex = PREMBLE_LENGTH+MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
+    packet->print();
     int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
     ByteArray tempBA (5, 0);
     tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN-1);
@@ -61,6 +63,7 @@ void PacketUnpacker::verifiyPacket()
     //Report stream id error
     if(tempConfig == nullptr)
     {
+        std::cerr << strmID << "temp config null\n";
         ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
         if(errorInfo == nullptr)
         {
@@ -85,6 +88,9 @@ void PacketUnpacker::verifiyPacket()
 
     PayloadVerifier* pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
+    //must delete pointer holding onto packet to avoid memory leak
+    delete packet;
+    std::cerr << "reached verification point\n";
     if(!frameStatus)
         std::cerr << "frame corrupted\n";
     if(!payloadStatus)

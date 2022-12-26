@@ -18,8 +18,8 @@ void receive(PacketUnpacker* pu)
 
 void verify(PacketUnpacker* pu)
 {
-    int iters = 1000;
-    while(iters--)
+//    int iters = 100000000;
+    while(true)
     {
         pu->verifiyPacket();
     }
