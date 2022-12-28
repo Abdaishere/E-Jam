@@ -60,13 +60,14 @@ void PacketSender::checkPipes()
 {
     for (int i = 0; i < genNum; i++)
     {
-        int bytesRead = read(fd[i], buffer, sizeof(buffer));
+        int len;
+        read(fd[i], &len, 4);
+        int bytesRead = read(fd[i], buffer, len);
         while (bytesRead != 0)
         {
             payloads[i].push(ByteArray((char*)buffer, bytesRead, 0));
-//            memcpy(bytesRead, );
-//            memset(&buffer, 0, sizeof buffer); // clear the buffer
-            bytesRead = read(fd[i], buffer, sizeof(buffer));
+            read(fd[i], &len, 4);
+            bytesRead = read(fd[i], buffer, len);
         }
     }
 }

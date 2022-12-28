@@ -7,9 +7,11 @@
 //TODO Get values from Configuration manager
 EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
                                          ByteArray& payload,
-                                         ByteArray& innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
+                                         ByteArray& innerProtocol,
+                                         ByteArray& streamID) : FrameConstructor(sourceAddress, destinationAddress){
     this->payload = payload;
     type=innerProtocol;
+    this->streamID = streamID;
 }
 
 void EthernetConstructor::constructFrame() {
