@@ -18,11 +18,12 @@ void EthernetConstructor::constructFrame() {
     pre [7] = 0xAB;
     preamble = ByteArray(pre, 8);
 
-    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + payload.capacity + CRC_LENGTH);
+    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + STREAMID_LEN + payload.capacity + CRC_LENGTH);
 //    frame.write(preamble);
     frame.write(destination_address);
     frame.write(source_address);
     frame.write(type);
+    frame.write(streamID);
     frame.write(payload);
 
 

@@ -56,14 +56,14 @@ void StatsManager::writeStatFile()
 {
     std::string dir = STAT_DIR;
     if(is_gen)
-        dir += "/Ver_";
-    else
         dir += "/Gen_";
+    else
+        dir += "/Ver_";
     dir += std::to_string(instanceID);
     dir += ".txt";
 
     FILE* file = fopen(dir.c_str(),"w");
-    std::string line = std::to_string(numberOfPackets) + '\n' + std::to_string(numberOfErrors);
+    std::string line = std::to_string(numberOfPackets) + '\n' + std::to_string(numberOfErrors) + '\n';
     fwrite(line.c_str(), sizeof(char), line.length()*sizeof(char), file);
     fclose(file);
 }

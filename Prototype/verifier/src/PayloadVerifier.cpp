@@ -33,6 +33,7 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
                     status = false;
                 }
                 offset++;
+                if(offset == 13)offset = 0;
             }
             break;
         }

@@ -9,8 +9,8 @@ using namespace std;
 
 void receive(PacketUnpacker* pu)
 {
-    int iters = 1000;
-    while(iters--)
+//    int iters = 1000;
+    while(true)
     {
         pu->readPacket();
     }

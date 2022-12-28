@@ -7,7 +7,7 @@
 
 //Send interval in seconds
 #define SEND_DELAY 1
-#define STAT_DIR "/etc/EJam/stats/"
+#define STAT_DIR "/etc/EJam/stats"
 
 
 #include <chrono>

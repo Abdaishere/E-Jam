@@ -129,6 +129,7 @@ public:
 
         //handle macaddres
         myMacAddress = discoverMyMac();
+        Mac12toMac6();
     }
 
     char hexToNum(char c)
