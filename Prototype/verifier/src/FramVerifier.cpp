@@ -28,7 +28,6 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     bool status = true;
 
 //    startIndex+=PREMBLE_LENGTH;
-
     //check for receiver
     bool correctReceiver = true;
     for(int i=0;i<MAC_ADD_LEN;i++)
@@ -59,7 +58,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         bool fullMatch = true;
         for(int j=0;j<MAC_ADD_LEN;j++)
         {
-            if(acceptedSenders[i][j] != packet->at(j+startIndex)){ fullMatch = false; break; }
+            if(acceptedSenders[i][j]!= packet->at(j+startIndex)){ fullMatch = false; break; }
         }
         if(fullMatch)
         {
@@ -77,22 +76,22 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
         errorInfo->addError(SOURCE_MAC);
         status = false;
     }
-    //Extract CRC
-    startIndex = endIndex-CRC_LENGTH;
+
 
     //Extract payload
-    int payloadStart = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
-    int payloadEnd = payloadStart + STREAMID_LEN + ConfigurationManager::getConfiguration()->getPayloadLength();
+    int payloadStart = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN + STREAMID_LEN ;
+    int payloadEnd = payloadStart + ConfigurationManager::getConfiguration()->getPayloadLength();
 
+    //Extract CRC
     //Calculate the correct CRC
     //CRC includes stream len ID
     ByteArray* correctCRC = calculateCRC(packet, payloadStart, payloadEnd);
-
+    startIndex = endIndex-CRC_LENGTH;
     //Try to Match CRCs
     bool crcCorrect = true;
-    for(int i=startIndex;i<startIndex+CRC_LENGTH;i++)
+    for(int i=0;i<CRC_LENGTH;i++)
     {
-        if(correctCRC->bytes[i] != packet->at(i)){ crcCorrect = false; break; }
+        if(correctCRC->bytes[i] != packet->at(i+startIndex)){ crcCorrect = false; break; }
     }
     if(!crcCorrect)
     {

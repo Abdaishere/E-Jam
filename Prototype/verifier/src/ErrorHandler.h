@@ -6,6 +6,7 @@
 #include <vector>
 #include "Byte.h"
 #include "time.h"
+#include "StatsManager.h"
 
 //supported errors
 enum ErrorType
@@ -37,6 +38,10 @@ struct ErrorInfo
 
     void addError(ErrorType error)
     {
+        //Signal error detection
+        StatsManager* statsManager = StatsManager::getInstance();
+        statsManager->increaseNumErrors();
+
         //printf("%d", error);
         errorTypes.push_back(error);
     }

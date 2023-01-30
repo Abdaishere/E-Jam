@@ -16,6 +16,7 @@ private:
     ByteArray preamble;
     //type of network layer protocol or capacity of data
     ByteArray type;
+    ByteArray streamID;
     ByteArray payload;
     ByteArray CRC;
     //may need to insert 12-byte inter-packet gap, not sure
@@ -23,7 +24,7 @@ private:
 public:
     EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
                         ByteArray& payload,
-                        ByteArray& innerProtocol) ;
+                        ByteArray& innerProtocol, ByteArray& streamID) ;
 
     void constructFrame();
 

@@ -23,15 +23,13 @@ void ConfigurationManager::addConfiguration(const char * dir)
     val->loadFromFile((char *)dir);
 
     int key = convertStreamID((char*) val->getStreamID()->bytes);
-
     configurations[key] = val;
-    val->print();
 }
 
 void ConfigurationManager::initConfigurations()
 {
     CONFIG_FOLDER = "";
-    CONFIG_FOLDER+="/etc/EJam";
+    CONFIG_FOLDER+= CONFIG_DIR;
 
     std::string lsStr = "ls ";
     std::string dirStr(CONFIG_FOLDER);
@@ -45,7 +43,10 @@ void ConfigurationManager::initConfigurations()
         dir = std::string(CONFIG_FOLDER)+"/"+dir;
 
     for(const std::string& dir: directories)
-        addConfiguration(dir.c_str());
+    {
+        if(dir.substr(dir.size()-3) == "txt")
+            addConfiguration(dir.c_str());
+    }
 }
 
 std::string ConfigurationManager::exec(const char * command)
@@ -76,13 +77,9 @@ std::vector<std::string> ConfigurationManager::splitString(const std::string& s,
     return arr;
 }
 
-void ConfigurationManager::setCurrStreamID(char * newStrmID)
+void ConfigurationManager::setCurrStreamID(ByteArray& streamID)
 {
-    //delete old stream id
-    delete[] currentStreamID;
-
-    //set new stream id
-    currentStreamID = newStrmID;
+    currentStreamID = (char*)streamID.bytes;
 }
 
 char *ConfigurationManager::getCurrStreamID()

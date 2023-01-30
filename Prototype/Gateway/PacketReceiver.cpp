@@ -92,6 +92,7 @@ void PacketReceiver::receiveFromSwitch()
     while(sizeLeft >= MTU)
     {
         int bytesRead = recvfrom(sock, recBuffer+totSizeRec, MTU, 0, nullptr, nullptr);
+        std::cerr<<bytesRead << " ";
         cnt++;
         if (bytesRead == -1)
         {
@@ -108,11 +109,13 @@ void PacketReceiver::receiveFromSwitch()
 //        for (int i = 0; i < BUFF_LEN; i++)
 //            std::cout << buff[i];
 //        std::cout << "\n";
-//
+
 }
 
 void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
 {
+    //converting int to char
+    write(fd[verID], &len,4);
     //assuming the pipe speed is faster than the  network speed
     write(fd[verID], payload, len);
 }

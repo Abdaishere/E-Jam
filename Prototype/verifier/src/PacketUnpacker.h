@@ -7,6 +7,7 @@
 #include "PacketReceiver.h"
 #include <queue>
 #include <mutex>
+#include "StatsManager.h"
 
 class PacketUnpacker
 {
