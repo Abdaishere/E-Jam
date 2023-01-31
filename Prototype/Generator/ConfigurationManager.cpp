@@ -7,13 +7,16 @@ Configuration* ConfigurationManager::configuration = nullptr;
 
 Configuration* ConfigurationManager::getConfiguration(char* path)
 {
+    //get unique instance
     if(configuration == nullptr)
         configuration =  new Configuration();
-
+    //load configuration from file
     configuration->loadFromFile(path);
+    //convert all mac12 addressess for to mac6
     configuration->Mac12toMac6();
     return configuration;
 }
+
 Configuration* ConfigurationManager::getConfiguration()
 {
     return configuration;

@@ -7,6 +7,7 @@
 
 using namespace std;
 
+//thread function for receiving packets
 void receive(PacketUnpacker* pu)
 {
 //    int iters = 1000;
@@ -16,6 +17,7 @@ void receive(PacketUnpacker* pu)
     }
 }
 
+//thread function to verifiy received packets
 void verify(PacketUnpacker* pu)
 {
 //    int iters = 100000000;
@@ -25,6 +27,7 @@ void verify(PacketUnpacker* pu)
     }
 }
 
+//thread function to send stats
 void sendStats(StatsManager* sm)
 {
     while (true)

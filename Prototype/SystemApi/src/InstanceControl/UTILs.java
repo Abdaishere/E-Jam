@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 public class UTILs {
     public String username;
+    //get username from cmd
     public static String getUserString()
     {
         String name = "";

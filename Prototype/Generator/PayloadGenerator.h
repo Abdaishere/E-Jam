@@ -17,8 +17,8 @@ class PayloadGenerator
 private:
     static PayloadGenerator* instance;
     ByteArray payload;
-    void generateFirstAlphabet();
-    void generateSecondAlphabet();
+    void generateFirstAlphabet(); // a -- m
+    void generateSecondAlphabet(); // n -- z
     void generateRandomCharacters();
     void addStreamId();
 

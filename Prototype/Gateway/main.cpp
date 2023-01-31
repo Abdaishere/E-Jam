@@ -7,13 +7,13 @@ using namespace std;
 void checkingThread(PacketSender* packetSender)
 {
     while (true)
-        packetSender->checkPipes();
+        packetSender->checkPipes(); //check the buffe to read payloads 
 }
 
 void sendingThread(PacketSender* packetSender)
 {
     while (true)
-        packetSender->roundRobin();
+        packetSender->roundRobin(); //round robin technique to send to switch
 }
 
 //functions used in receiving part of the gateway
@@ -24,12 +24,12 @@ void receivingThread(PacketReceiver* packetReceiver)
 
 void checkingThreadV(PacketReceiver* packetReceiver)
 {
-    packetReceiver->checkBuffer();
+    packetReceiver->checkBuffer(); //checking the buffer then send to verifiers
 }
 
 int main(int argc, char ** argv)
 {
-    //sender or receiver
+    //sender or receiver mode
     int mode;
     // num of either generators or verifiers
     int num = 1;
@@ -38,6 +38,7 @@ int main(int argc, char ** argv)
     if(argc > 2)
         num = stoi(argv[2]);
 
+    //if mode == 0 then it's a generator otherwise it's a verifier
     //generator
     if(mode == 0)
     {
@@ -60,7 +61,9 @@ int main(int argc, char ** argv)
 
         while(true)
         {
-            std::thread t1 (receivingThread, packetReceiver);
+            //synchronization without locks by swapping the two buffers
+
+            std::thread t1 (receivingThread, packetReceiver); 
             std::thread t2 (checkingThreadV, packetReceiver);
 
             t1.join();

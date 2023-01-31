@@ -2,7 +2,7 @@ package InstanceControl;
 
 import java.util.ArrayList;
 
-public class InstanceControlFacade
+public class InstanceControlFacade //facade class to hide dependencies and the order of creation 
 {
     public void executeComponents()
     {

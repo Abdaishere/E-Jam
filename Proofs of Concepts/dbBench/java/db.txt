@@ -1,7 +1,0 @@
-full insertion from 0:
-	1e3 -> 400 milliseconds
-	1e4 -> 2600 milliseconds
-	1e5 -> 24414 ms
-	1e6 -> 286153 ms
-
-

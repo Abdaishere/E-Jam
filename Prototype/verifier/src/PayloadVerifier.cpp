@@ -22,7 +22,7 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     bool status = true;
     switch(ConfigurationManager::getConfiguration()->getPayloadType())
     {
-        case FIRST:
+        case FIRST: //verify first half of alphabet a--m
         {
             int offset = 0;
             for(int i=startIndex;i<=endIndex;i++)
@@ -37,7 +37,7 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
             }
             break;
         }
-        case SECOND:
+        case SECOND: //verify second half of alphabet n--z
         {
             int offset = 0;
             for(int i=startIndex;i<=endIndex;i++)

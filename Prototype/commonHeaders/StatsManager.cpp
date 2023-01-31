@@ -5,9 +5,11 @@
 #include <cstdio>
 #include "StatsManager.h"
 
-
+//initialize the unique instance
 StatsManager* StatsManager::instance;
 
+
+//handle unique instance
 StatsManager *StatsManager::getInstance(int verID, bool is_gen)
 {
     if (instance == nullptr)
@@ -27,17 +29,17 @@ void StatsManager::resetStats(bool send)
 {
     numberOfPackets = 0;
     numberOfErrors = 0;
-    timer = clock();
+    timer = clock(); //start time of stats 
 }
 
 void StatsManager::sendStats()
 {
-    clock_t now = clock();
-    clock_t delta_t = (now - timer) / CLOCKS_PER_SEC;
+    clock_t now = clock(); //end time of stats
+    clock_t delta_t = (now - timer) / CLOCKS_PER_SEC; //delta: total time to do stats
     if((double) delta_t > SEND_DELAY )
     {
         writeStatFile();
-        resetStats(false);
+        resetStats(false); //to reset variables
     }
 }
 

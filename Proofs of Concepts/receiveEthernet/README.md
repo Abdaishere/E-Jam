@@ -1,1 +1,0 @@
-Run this project on a different device than the one you run sendEthernet from, but on the same LAN. If you run the send project when this project is running, the packets will be received in this project and displayed fully including all headers.

@@ -1,10 +1,11 @@
 #include "ConfigurationManager.h"
 
 
-std::map<int, Configuration*> ConfigurationManager::configurations;
+std::map<int, Configuration*> ConfigurationManager::configurations; //map stream id to configuration
 char* ConfigurationManager::currentStreamID;
 std::string ConfigurationManager::CONFIG_FOLDER;
 
+//get configuration related to stream id
 Configuration *ConfigurationManager::getConfiguration()
 {
     char* streamID = ConfigurationManager::currentStreamID;
@@ -49,6 +50,7 @@ void ConfigurationManager::initConfigurations()
     }
 }
 
+//execute command in cmd
 std::string ConfigurationManager::exec(const char * command)
 {
     char buffer[128];
@@ -67,6 +69,7 @@ std::string ConfigurationManager::exec(const char * command)
     return result;
 }
 
+//split string in vector based on specific delimeter
 std::vector<std::string> ConfigurationManager::splitString(const std::string& s, char delim)
 {
     std::stringstream raw(s);

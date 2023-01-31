@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 enum PayloadType {FIRST, SECOND, RANDOM}
 
-
+//steam information 
 public class Stream
 {
-    ArrayList<String> senders;
-    ArrayList<String> receivers;
+    ArrayList<String> senders; //senders mac addresses
+    ArrayList<String> receivers; //receivers mac addresses
     PayloadType payloadType;
     long numberOfPackets;
     long lifeTime;

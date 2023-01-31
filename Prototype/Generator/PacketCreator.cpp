@@ -16,7 +16,7 @@
 #include <StatsManager.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
-std::mutex PacketCreator::mtx;
+std::mutex PacketCreator::mtx; //to avoid data race on product queue
 
 void PacketCreator::createPacket(int rcvInd)
 {
@@ -39,6 +39,7 @@ void PacketCreator::createPacket(int rcvInd)
                                                                  innerProtocol,streamID);
     frameConstructor->constructFrame();
     //TODO delete the values inside created ByteArray*
+    //lock the mutex and push to queue then unlock it
     mtx.lock();
     productQueue.push(frameConstructor->getFrame());
     mtx.unlock();
@@ -54,6 +55,7 @@ void PacketCreator::sendHead()
     {
         return;
     }
+    //lock the mutex and consume then unloack it
     mtx.lock();
     ByteArray packet = productQueue.front();
     productQueue.pop();

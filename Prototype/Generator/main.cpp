@@ -8,12 +8,15 @@
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
 
+//thread function to send the packets
 void sendingFunction(PacketCreator* pc)
 {
     //TODO if possible, add timeout
     while(true)
             pc->sendHead();
 }
+
+//thread function to send packets
 void creatingFunction(PacketCreator* pc)
 {
     unsigned long long numberOfPackets = ConfigurationManager::getConfiguration()->getNumberOfPackets();
@@ -28,6 +31,7 @@ void creatingFunction(PacketCreator* pc)
     }
 }
 
+//thread function to send the stats
 void sendStatsFunction(StatsManager* sm)
 {
     while (true)
@@ -43,7 +47,7 @@ int main(int argc, char** argv)
         genID = std::stoi(argv[1]);
         configPath = argv[2];
     }
-
+    
     ConfigurationManager::getConfiguration(configPath);
     StatsManager* sm = StatsManager::getInstance(genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);

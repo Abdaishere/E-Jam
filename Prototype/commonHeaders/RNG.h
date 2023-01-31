@@ -5,6 +5,7 @@
 #ifndef GENERATOR_RNG_H
 #define GENERATOR_RNG_H
 #include <random>
+//masks used to genetare a random number
 const unsigned long long masks[] = {255,
                                     65280,
                                     16711680,
@@ -18,9 +19,9 @@ private:
     int index;
     unsigned long long currRandomNumber;
     int seed;
-    std::mt19937_64 rng;
+    std::mt19937_64 rng; //random device
 public:
-    RNG(int seed = 0)
+    RNG(int seed = 0) //set the initial seed by defult to zero
     {
         index = 8;
         this->seed = seed;

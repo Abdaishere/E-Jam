@@ -17,10 +17,10 @@
 class StatsManager
 {
 private:
-    static StatsManager* instance;
+    static StatsManager* instance; //singleton unique instance
     long numberOfPackets;
     long numberOfErrors;
-    clock_t timer;
+    clock_t timer; 
     StatsManager(int, bool);
     void resetStats(bool);
     void writeStatFile();

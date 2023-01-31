@@ -18,21 +18,22 @@ public class InstanceController
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
     
-    public InstanceController (ArrayList<Stream> streams) {
-        getExecutables();
+    public InstanceController (ArrayList<Stream> streams)
+    {
+        getExecutables(); 
         getMyMacAddress();
-
-        int genNum = startGenerators(streams);
-        int verNum = startVerifiers(streams);
-        startGateway(genNum, verNum);
+        int genNum = startGenerators(streams); //start executable generators instances
+        int verNum = startVerifiers(streams); //start executable verifiers instances
+        startGateway(genNum, verNum); //start the gateway
 
         try {
-            sleep(5000);
+            sleep(5000); //test duration
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         System.out.println("sleep finished");
         debugStreams();
+        //kill the current running executables  
         for(Long pid:pids)
         {
             String[] args = {"-9", Long.toString(pid)};
@@ -135,6 +136,7 @@ public class InstanceController
         }
     }
 
+    //to execute commands in cmd 
     private void executeCommand(String command, boolean waitFor, String... args)
     {
         try

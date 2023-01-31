@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #include <string.h>
 
+//constants of configuration
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
 #define STREAMID_LEN 3
@@ -23,13 +24,16 @@ typedef unsigned long long ull;
 #define LENGTH_LENGTH 2
 #define CONFIG_DIR "/etc/EJam"
 
+
+
 enum PayloadType {FIRST, SECOND, RANDOM};
 
 class Configuration
 {
 private:
-    std::vector<ByteArray> senders;
-    std::vector<ByteArray> receivers;
+    //stream attributes
+    std::vector<ByteArray> senders; //list of senders mac addresses
+    std::vector<ByteArray> receivers; //list of receivers mac addressess
     ByteArray myMacAddress;
     PayloadType payloadType;
     ull numberOfPackets = 100;
@@ -39,6 +43,7 @@ private:
     ull SendingRate;
     ByteArray* streamID;
 
+    //convert int to corresponding hexa character
     unsigned char hexSwitcher(int x)
     {
         if(x<10 && x>=0)
@@ -48,6 +53,7 @@ private:
         else
             return 'F';
     }
+
     ByteArray discoverMyMac()
     {
         struct ifreq ifr;
@@ -132,6 +138,7 @@ public:
         Mac12toMac6();
     }
 
+    //convert hexa character to corresponding char value in decimal
     char hexToNum(char c)
     {
         if(c >= 'A' && c <='F')
@@ -139,6 +146,7 @@ public:
         return  c - '0';
     }
 
+    //converting mac of length 12 (hexadecimal notation) to mac length 6
     std::string convertToMac6(std::string mac12)
     {
         std::string mac6(6, 'x');
@@ -157,6 +165,7 @@ public:
         return mac6;
     }
 
+    //convert all senders and receivers to mac 6
     void Mac12toMac6()
     {
         for(auto& e:receivers)
@@ -175,6 +184,8 @@ public:
         }
     }
 
+    //getters and setters
+    
     std::vector<ByteArray> &getSenders()
     {
         return senders;

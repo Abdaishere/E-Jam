@@ -3,12 +3,12 @@
 
 #include <cstdio>
 
+//ByteArray it's just a string class optimized for speed
 struct ByteArray
 {
     unsigned char * bytes;
     int capacity, length, extraBuffer;
-
-
+    //extra buffer is just some small addition space to be used before copying 
     ByteArray(int len=0, int extraBuffer = 10)
     {
         if(len==0)
@@ -25,6 +25,7 @@ struct ByteArray
         this->extraBuffer = extraBuffer;
     }
 
+    //delete string content
     void reset(int len)
     {
         if(len==length)
@@ -35,6 +36,7 @@ struct ByteArray
         bytes = new unsigned char[capacity];
     }
 
+    //copy constructor
     ByteArray(ByteArray const &other)
     {
         this->capacity = other.capacity;
@@ -75,6 +77,8 @@ struct ByteArray
         return true;
     }
 
+    //operator overloading 
+    
     void operator= (const ByteArray& other)
     {
         this->capacity = other.capacity;

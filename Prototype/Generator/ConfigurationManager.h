@@ -12,6 +12,7 @@
 class ConfigurationManager
 {
 private:
+    //singleton instance from configuration
     static Configuration *configuration;
 public:
     static Configuration* getConfiguration(char*);

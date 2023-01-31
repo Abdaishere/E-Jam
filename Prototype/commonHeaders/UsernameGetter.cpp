@@ -3,6 +3,7 @@
 //
 
 #include "UsernameGetter.h"
+//get the username from cmd
 std::string UsernameGetter::exec() {
     const char* cmd = "whoami";
     std::array<char, 128> buffer;
@@ -17,7 +18,7 @@ std::string UsernameGetter::exec() {
             result.pop_back();
     }
     if(result == "root")
-        result = "mohamed";
+        result = "mohamed"; //hardcoded ###########
 
     return result;
 }

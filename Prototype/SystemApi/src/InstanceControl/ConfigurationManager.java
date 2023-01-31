@@ -27,7 +27,7 @@ public class ConfigurationManager
             writeStreamToFile(stream);
     }
 
-    //
+    //write steam information to file
     private void writeStreamToFile(Stream stream)
     {
         try

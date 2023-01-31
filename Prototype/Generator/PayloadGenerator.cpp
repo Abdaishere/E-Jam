@@ -31,17 +31,17 @@ void PayloadGenerator::generateRandomCharacters()
 void PayloadGenerator::regeneratePayload()
 {
     PayloadType payloadType = ConfigurationManager::getConfiguration()->getPayloadType();
-
+    //heuristic for payload type 
     switch (payloadType)
     {
         case FIRST:
-            generateFirstAlphabet();
+            generateFirstAlphabet(); //first half of alphabet a--m
             break;
         case SECOND:
-            generateSecondAlphabet();
+            generateSecondAlphabet(); //second half of alphabet n--z
             break;
         default:
-            generateRandomCharacters();
+            generateRandomCharacters(); //random chars
     }
 }
 

@@ -1,6 +1,8 @@
 #include "PacketReceiver.h"
 
-PacketReceiver::PacketReceiver(int verNum) {
+PacketReceiver::PacketReceiver(int verNum)
+{
+    //initialize maximum number of verifiers and initialize the connection to pipes
     MAX_VERS = verNum;
     fd = new int[verNum];
     recBuffer = new unsigned char[BUFFER_SIZE_VER];
@@ -8,11 +10,11 @@ PacketReceiver::PacketReceiver(int verNum) {
     recSizes = new int[BUFFER_SIZE_VER];
     forwardingSizes = new int[BUFFER_SIZE_VER];
     received = toForward = 0;
-
     openPipes();
     initializeSwitchConnection();
 }
 
+//open pipe for each verifier
 void PacketReceiver::openPipes()
 {
 //    string ver = FIFO_FILE + "ver";
@@ -58,18 +60,23 @@ bool PacketReceiver::initializeSwitchConnection()
 }
 
 
+//closing the pipes
 void PacketReceiver::closePipes()
 {
     for(int i=0; i<MAX_VERS; i++)
         close(fd[i]);
 }
 
-void PacketReceiver::swapBuffers() {
+
+//synchronization without locks by swapping the buffers
+void PacketReceiver::swapBuffers()
+{
     swap(recBuffer, forwardingBuffer);
     swap(recSizes, forwardingSizes);
     toForward = received;
 }
 
+//send forward buffer to its corresponding verifier
 void PacketReceiver::checkBuffer()
 {
     int verID = 0;
@@ -78,11 +85,12 @@ void PacketReceiver::checkBuffer()
     {
         sendToVerifier(verID++, forwardingBuffer+totSizeFor, forwardingSizes[ptr]);
         totSizeFor += forwardingSizes[ptr];
-        if(verID == MAX_VERS)
+        if(verID == MAX_VERS) //reset verifier id 
             verID = 0;
     }
 }
 
+//receive packets from switch in recBuffer
 void PacketReceiver::receiveFromSwitch()
 {
     received = 0;
@@ -112,6 +120,7 @@ void PacketReceiver::receiveFromSwitch()
 
 }
 
+//send payload to single verifier used in checkBuffer to send to all verifiers
 void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
 {
     //converting int to char

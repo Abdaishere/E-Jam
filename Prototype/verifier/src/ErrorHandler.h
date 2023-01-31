@@ -8,7 +8,7 @@
 #include "time.h"
 #include "StatsManager.h"
 
-//supported errors
+//supported errors each type corresponds to unique error
 enum ErrorType
 {
     DATAGRAM,
@@ -29,13 +29,14 @@ struct ErrorInfo
 
     ErrorInfo(ByteArray* packet)
     {
-        firstErrorTime = time(NULL);
+        firstErrorTime = time(NULL); //observe the error time
         senderMac = new ByteArray(6, 0);
         senderMac->write(*packet, 0, 5);
         recvMac = new ByteArray(6, 0);
         recvMac->write(*packet, 6, 11);
     }
 
+    //add new error to current errors
     void addError(ErrorType error)
     {
         //Signal error detection
@@ -43,7 +44,7 @@ struct ErrorInfo
         statsManager->increaseNumErrors();
 
         //printf("%d", error);
-        errorTypes.push_back(error);
+        errorTypes.push_back(error); 
     }
 
     ~ErrorInfo()

@@ -12,7 +12,7 @@
 class PacketUnpacker
 {
 private:
-    std::mutex mtx;
+    std::mutex mtx; //to protect packetQueue from data races
     ByteArray* consumePacket();
     PacketReceiver* packetReceiver;
 public:
