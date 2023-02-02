@@ -1,0 +1,367 @@
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+b,
+strong {
+    font-weight: bolder;
+}
+
+
+small {
+    font-size: 80%;
+}
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+sup {
+    top: -0.5em;
+}
+
+
+table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+button,
+select {
+    text-transform: none;
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+}
+
+:-moz-focusring {
+    outline: auto;
+}
+
+:-moz-ui-invalid {
+    box-shadow: none;
+}
+
+progress {
+    vertical-align: baseline;
+}
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+    height: auto;
+}
+
+[type='search'] {
+    -webkit-appearance: textfield;
+    outline-offset: -2px;
+}
+
+::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    font: inherit;
+}
+
+summary {
+    display: list-item;
+}
+
+*,
+::before,
+::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+::before,
+::after {
+    --tw-content: '';
+}
+
+html {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+    font-family: Poppins, sans-serif;
+
+}
+
+abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+}
+
+hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+}
+
+p:hover {
+    overflow: visible;
+}
+
+/*custom scroll bar*/
+/* width */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.39);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.71);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #ec6b51;
+}
+
+::-webkit-scrollbar-corner {
+    background: black;
+}
+
+/* The side navigation menu */
+body {
+    background-color: #172231;
+    color: white;
+    margin: 0;
+    line-height: inherit;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#mainSidenav div:hover{
+    cursor: pointer;
+}
+
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 2; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    background-color: #25354c; /* Black*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 60px; /* Place content 60px from the top */
+    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+/* When you mouse over the navigation links, change their color */
+#pausePlayBtn {
+    padding: 8px 8px 8px 8px;
+    font-size: 35px;
+    transition: 0.3s;
+}
+
+#topbtns {
+    border-top: 2px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.14);
+    padding-top: 5px;
+    padding-bottom: 0;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.fa-pause {
+    color: #00ff00;
+    filter: drop-shadow(1px 1px 1px #66fc66);
+    margin-left: 32px;
+    transition: .1s;
+}
+
+.fa-play {
+    color: #ff2c2c;
+    filter: drop-shadow(1px 1px 1px red);
+    margin-left: 30px;
+    transition: .1s;
+}
+
+.fa-camera {
+    margin-left: 30px;
+    padding: 8px 8px 8px 8px;
+    font-size: 35px;
+    transition: 0.1s;
+}
+
+/* The navigation menu links */
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #ffffff;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover {
+    color: #ec6b51;
+    filter: drop-shadow(0px 0px 5px rgba(252, 117, 91, 0.47));
+}
+
+.sidenav a:active {
+    color: #ffffff;
+    filter: drop-shadow(0px 0px 10px rgb(255, 255, 255));
+    transition: 0s;
+}
+
+.fa-play:hover {
+    color: #ff0000;
+    filter: drop-shadow(1px 1px 3px #ff7e7e);
+}
+
+.fa-pause:hover {
+    color: #58fa58;
+    filter: drop-shadow(1px 1px 3px #9afd9a);
+}
+
+.fa-pause:active, .fa-play:active {
+    color: #ffffff;
+    filter: drop-shadow(0px 0px 10px rgb(255, 255, 255));
+    transition: 0s;
+}
+
+.fa-camera {
+    color: #00ffd1;
+}
+
+.fa-camera:hover {
+    color: #7fffb9;
+    filter: drop-shadow(1px 1px 3px #1abc9c)
+}
+
+.fa-camera:active:after {
+    opacity: 0.8;
+    transition: all 0s;
+}
+
+.fa-camera:after {
+    content: "";
+    /*pointer-events: none;*/
+    background: white;
+    filter: drop-shadow(0px 0px 30px white);
+    border-radius: 60px;
+    display: block;
+    position: relative;
+    height: 50px;
+    width: 50px;
+    margin-left: -7px !important;
+    margin-top: -100%;
+    opacity: 0;
+    transition: all 0.6s;
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#main {
+    transition: margin-left .5s;
+    padding: 3px;
+    background-color: transparent;
+    border-radius: 50px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+    .sidenav {
+        padding-top: 15px;
+    }
+
+    .sidenav a {
+        font-size: 18px;
+    }
+}
+
+span div {
+    transition: .3s;
+}
+
+span:hover div {
+    background-color: #ec6b51;
+    filter: drop-shadow(0px 0px 5px rgba(252, 117, 91, 0.47));
+}
+
+span:hover {
+    cursor: pointer;
+}
+
+.bar1, .bar2, .bar3 {
+    width: 25px;
+    height: 3px;
+    background-color: #ffffff;
+    margin: 6px 13px;
+}
+
+.bar1 {
+    margin-top: 17px;
+}

@@ -1,0 +1,33 @@
+body {
+    background-color: #172231;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.chart-viewer {
+    background-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 1px 3px 5px black inset;
+    border-radius: 9px;
+    margin: 50px 40px 15px 40px;
+}
+
+#chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#canvasL {
+    width: 750px;
+}
+
+#canvasD {
+    width: 300px;
+}
+
+@media (min-width: 960px) {
+    .chart-viewer {
+        padding: 25px;
+    }
+}

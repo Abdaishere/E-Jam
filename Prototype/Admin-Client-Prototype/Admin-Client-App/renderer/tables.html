@@ -1,0 +1,33 @@
+<script defer src="js/tablesRenderer.js" type="module"></script>
+<link href="css/tables.css" rel="stylesheet"/>
+<link href="css/style.css" rel="stylesheet"/>
+<div id="tables">
+    <div id="tables-viewer">
+        <div id="uploadTable">
+            <table>
+                <tbody id="uploadData">
+                <tr class="header" id="up-header">
+                    <th class="date-header"> Date</th>
+                    <th class="mac-header"> Address</th>
+                    <th class="rate-header"> Rate <b style="font-size: small">Bytes/s</b></th>
+                    <th class="paket"> sent <b style="font-size: small">Pkt</b></th>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="mid-space"></div>
+        <div id="downloadTable">
+            <table>
+                <tbody id="downloadData">
+                <tr class="header" id="down-header">
+                    <th class="date-header"> Date</th>
+                    <th class="mac-header"> Address</th>
+                    <th class="rate-header"> Rate <b style="font-size: small">Bytes/s</b></th>
+                    <th class="paket"> Total <b style="font-size: small">Pkt</b></th>
+                    <th class="paket"> Rejected <b style="font-size: small">Pkt</b></th>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

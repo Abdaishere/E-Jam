@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <link href="css/style.css" rel="stylesheet"/>
+    <script crossorigin="anonymous" src="https://kit.fontawesome.com/ac946b52e5.js"></script>
+    <script defer src="js/renderer.js"></script>
+    <script src="js/lib/jquery-3.6.1.min.js"></script>
+    <script defer src="js/communicator.js" type="module"></script>
+    <script defer src="js/tablesRenderer.js" type="module"></script>
+    <script defer src="js/homeRenderer.js" type="module"></script>
+    <title>E-Jam</title>
+</head>
+<body class="bg-teal-700">
+<div class="sidenav" id="mainSidenav">
+    <a class="closebtn" href="javascript:void(0)" onclick="closeNav()">&times;</a>
+    <div id="topbtns"><i class="fa-solid fa-pause" id="pausePlayBtn" onclick="pausePlay()"></i><i
+            class="fa-solid fa-camera" onclick="snapShot()"></i></div>
+    <a href="javascript:void(0)" onclick="activateScreen(0)">
+        <object data="images/home-icon.svg" height="39" width="49"></object>
+        Home</a>
+    <a href="javascript:void(0)" onclick="activateScreen(1)">
+        <object data="images/table.svg" height="39" width="49"></object>
+        Table</a>
+    <a href="javascript:void(0)" onclick="activateScreen(2)">
+        <object data="images/graph-icon.svg" height="39" width="49"></object>
+        Graph</a>
+    <a href="javascript:void(0)" onclick="activateScreen(3)">
+        <object data="./images/about.svg" height="39" width="49"></object>
+        About</a>
+</div>
+
+<span onclick="openNav()">
+  <div class="bar1"></div>
+  <div class="bar2"></div>
+  <div class="bar3"></div>
+</span>
+
+<div id="main">
+</div>
+
+<script>
+
+    // Save snapShot
+    function snapShot() {
+        ipcRenderer.send('snapshot');
+    }
+
+    // Pause/Play Button
+    let paused = false;
+
+    function pausePlay() {
+        try {
+            if (paused) {
+                paused = false;
+                ipcRenderer.send('play');
+            } else {
+                paused = true;
+                ipcRenderer.send('pause');
+            }
+        } catch (e) {
+            console.log(e)
+        }
+        let btn = $("#pausePlayBtn");
+        btn.toggleClass('fa-pause')
+        btn.toggleClass('fa-play')
+    }
+
+    const screens = [["home.html", "#home"], ["tables.html", "#tables"],
+        ["chart.html", "#chart"], ["about.html", "#about"]];
+
+
+    $('#main').load("home.html");
+
+    for (let i = 1; i < screens.length; i++) {
+        renderScreens(screens[i][0], screens[i][1]);
+    }
+
+
+    function renderScreens(file, id) {
+        console.log(file);
+        let http;
+        if (file) {
+
+            http = new XMLHttpRequest();
+            http.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        $('#main').append(this.responseText);
+                        $(id).css('z-index', 0);
+                        $(id).hide();
+                    }
+                    if (this.status === 404) {
+                        alertError(`Page ${file} not found`);
+                    }
+                }
+            }
+            http.open("GET", file, true);
+            http.send();
+        }
+    }
+
+    function activateScreen(index) {
+
+        screens.forEach(screen => {
+            $(screen[1]).css('z-index', 0);
+            $(screen[1]).hide();
+        });
+
+        $(screens[index][1]).css('z-index', 1);
+        $(screens[index][1]).show();
+        if (index == 2)
+            console.log(screens[index][1])
+    }
+</script>
+<script defer src="js/chartsRenderer.js" type="module"></script>
+</body>
+</html>

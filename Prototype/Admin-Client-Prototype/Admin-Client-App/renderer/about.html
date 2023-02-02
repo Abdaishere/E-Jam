@@ -1,0 +1,84 @@
+<style>
+    #about {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #about-view {
+        max-height: 720px;
+        font-family: "Verdana", Verdana, serif;
+        box-shadow: 1px 3px 4px black inset;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        padding: 160px 0;
+        background-image: linear-gradient(to top left, #172231, #26354b);
+        border-radius: 9px;
+    }
+
+    #about-view > div {
+        min-width: 800px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    img {
+        filter: drop-shadow(1px 1px 6px rgba(32, 40, 44, 0.64));
+        margin-left: 290px;
+        justify-content: space-between;
+        animation: spin-cat-1 2s;
+    }
+
+    img:hover {
+        cursor: pointer;
+    }
+
+    img:active {
+        animation: spin-cat-2 2s;
+    }
+
+    @keyframes spin-cat-1 {
+        50% {
+            transform: rotateY(180deg);
+        }
+    }
+
+    @keyframes spin-cat-2 {
+        50% {
+            transform: rotateY(180deg);
+        }
+    }
+
+    .aboutData {
+        text-shadow: 4px 4px 15px #000;
+    }
+
+    .siemens {
+        background-image: linear-gradient(to bottom right, #78dad8, #0ccda3);
+        background-size: 100%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0px 0px 20px rgba(0, 255, 255, 0.6);
+        font-size: 36px;
+        margin: 25px 0px -50px 0px;
+    }
+</style>
+<div id="about">
+    <div id="about-view">
+        <img
+                alt="Logo"
+                class="mx-auto mb-5"
+                height="170"
+                width="165"
+                src="./images/Icon_256x256.png"
+        />
+        <div>
+            <h2 class="text-xl text-teal-100 text-center aboutData">E-Jam&trade;</h2>
+            <h2 class="text-xl text-teal-100 text-center aboutData">Ethernet Network Traffic Jam Monitor</h2>
+            <p class="text-xl text-teal-300 mt-2 aboutData">Prototype Version 1.0.0</p>
+            <b class="text-xl text-teal-300 mt-2 aboutData siemens">SIEMENS</b>
+        </div>
+    </div>
+</div>

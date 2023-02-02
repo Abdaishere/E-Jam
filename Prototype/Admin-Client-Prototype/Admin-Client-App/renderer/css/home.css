@@ -1,0 +1,124 @@
+body {
+    font-family: "Calibri", Calibri, serif;
+    background-color: #172231;
+    color: white;
+}
+
+/* for the home tap*/
+#home {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#home-view {
+    max-width: 1080px;
+    max-height: 1720px;
+    font-family: "Verdana", Verdana, serif;
+    box-shadow: 4px 4px 15px #000;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 160px 0;
+    background-image: linear-gradient(to top left, #172231, #26354b);
+    border-radius: 9px;
+}
+
+#home-view > div {
+    min-width: 800px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+@media screen and (max-width: 780px) {
+    #home-view > div {
+        min-width: min-content;
+    }
+}
+
+#home-view div > div {
+    border-radius: 16px 16px 8px 8px;
+}
+
+#streams {
+    display: inline-block;
+    padding: 10px 10px 10px 20px;
+}
+
+.variable {
+    box-shadow: 4px 4px 15px #172231;
+    background-color: rgba(255, 255, 255, 0.05);
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: .5vw;
+    max-width: 210px;
+}
+
+/*all the titles*/
+.rate {
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+#pending-txt {
+    background-color: orange;
+    font-size: large;
+}
+
+#accepted-txt {
+    background-color: limegreen;
+    font-size: large;
+}
+
+#rejected-txt {
+    background-color: red;
+    font-size: large;
+}
+
+#a-t-txt {
+    background-color: limegreen;
+    font-size: large;
+}
+
+#r-t-txt {
+    background-color: red;
+    font-size: large;
+}
+
+#t-txt {
+    padding: 5px 40px 5px 40px;
+    background-color: #51b2a7;
+    font-size: larger;
+}
+
+#up {
+    background-image: linear-gradient(to bottom left, #a5b2ff, #9600ff);
+    padding: 5px 40px 5px 40px;
+}
+
+#down {
+    background-image: linear-gradient(to bottom right, #91eeaa, #0ccda3);
+}
+
+.title {
+    margin-top: 0;
+    padding: 5px 15px 3px 15px;
+    border-radius: 13px 13px 0 0;
+    color: beige;
+    font-weight: bold;
+}
+
+/* the changing values*/
+#up-rate, #down-rate {
+    font-size: x-large;
+}
+
+#pending, #received, #error {
+    font-size: medium;
+}
+
+#a-total, #r-total, #total {
+    font-size: small;
+}

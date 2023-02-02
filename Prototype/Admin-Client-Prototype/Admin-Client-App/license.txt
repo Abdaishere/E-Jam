@@ -1,0 +1,2 @@
+This is a prototype of E-Jam an application made for Simulating and Monitoring of Ethernet Network Traffic for Testing Switches.
+

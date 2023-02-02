@@ -1,0 +1,54 @@
+{
+  "namespace": "com.ejam.avro.statistics",
+  "type": "record",
+  "name": "statisticsValue",
+  "fields": [
+    {
+      "name": "ErrorTotal",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "Rate",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "Source",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "Total",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "Date",
+      "type": {
+        "type": "long",
+        "logicalType": "local-timestamp-millis"
+      }
+    },
+    {
+      "name": "Verifier",
+      "type": "boolean"
+    }
+  ]
+}
