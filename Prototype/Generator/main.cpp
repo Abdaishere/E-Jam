@@ -3,17 +3,44 @@
 #include <iostream>
 #include <thread>
 #include <string>
+#include <time.h>
 #include "StatsManager.h"
 
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
 
+//TODO naming style and coding style 
+//TODO standarize the units
+
 //thread function to send the packets
 void sendingFunction(PacketCreator* pc)
 {
-    //TODO if possible, add timeout
     while(true)
             pc->sendHead();
+}
+
+
+//sending for specific time 
+void sendingTimeBasedPackets(PacketCreator* pc, int seconds)
+{
+    if(seconds <= 0) return;
+    time_t beginTime = time(NULL);
+    time_t endTime = time(NULL);
+    while ((endTime - beginTime) <= seconds)
+    {
+        pc->sendHead();
+        endTime = time(NULL);
+    }
+}
+
+//sending N packets
+void sendingNPackets(PacketCreator* pc, int packetsToSend)
+{
+    if(packetsToSend <= 0) return; 
+    while(packetsToSend--)
+    {
+        pc->sendHead();
+    }
 }
 
 //thread function to send packets
