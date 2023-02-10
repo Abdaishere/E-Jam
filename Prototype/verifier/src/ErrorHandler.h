@@ -4,9 +4,9 @@
 
 #include <queue>
 #include <vector>
-#include "Byte.h"
+#include "../commonHeaders/Byte.h"
 #include "time.h"
-#include "StatsManager.h"
+#include "../commonHeaders/StatsManager.h"
 
 //supported errors each type corresponds to unique error
 enum ErrorType

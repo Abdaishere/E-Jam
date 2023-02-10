@@ -6,7 +6,7 @@
 #define VERIFIER_PACKETRECEIVER_H
 
 #include <string>
-#include "Byte.h"
+#include "../commonHeaders/Byte.h"
 
 class PacketReceiver {
 private:
