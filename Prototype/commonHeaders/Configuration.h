@@ -27,21 +27,25 @@ typedef unsigned long long ull;
 
 
 enum PayloadType {FIRST, SECOND, RANDOM};
+enum TransprtProtocol {TCP, UDP};
+enum FlowType {BACK_TO_BACK, BURSTY};
 
 class Configuration
 {
 private:
     //stream attributes
+    ByteArray* streamID;
     std::vector<ByteArray> senders; //list of senders mac addresses
     std::vector<ByteArray> receivers; //list of receivers mac addressess
     ByteArray myMacAddress;
     PayloadType payloadType;
-    ull numberOfPackets = 100;
-    ull lifeTime = 100;
+    ull numberOfPackets = 100, bcFramesNum;
     int payloadLength, seed;
-    int flowType;
-    ull SendingRate;
-    ByteArray* streamID;
+    ull interFrameGap, lifeTime = 1000;
+    TransprtProtocol transprtProtocol;
+    FlowType flowType;
+    bool checkContent;
+
 
     //convert int to corresponding hexa character
     unsigned char hexSwitcher(int x)
@@ -115,9 +119,9 @@ public:
             receivers.push_back(ByteArray(s.c_str(),s.size(),0));
         }
         //Read payload type
-        int pt;
-        std::cin>>pt;
-        switch (pt)
+        int input;
+        std::cin>>input;
+        switch (input)
         {
             case 0:
                 payloadType = FIRST;
@@ -132,6 +136,38 @@ public:
         std::cin>>numberOfPackets;
         std::cin>>payloadLength;
         std::cin>>seed;
+        std::cin>>bcFramesNum;
+        std::cin>>interFrameGap;
+        std::cin>>lifeTime;
+
+        //Read transport protocol
+        std::cin>>input;
+        switch (input)
+        {
+            case 0:
+                transprtProtocol = TCP;
+                break;
+            default:
+                transprtProtocol = UDP;
+        }
+
+        //Read Flow type
+        std::cin>>input;
+        switch (input)
+        {
+            case 0:
+                flowType = BACK_TO_BACK;
+                break;
+            default:
+                flowType = BURSTY;
+        }
+
+        //Read check content
+        char cInput;
+        std::cin>>cInput;
+        cInput-='0'; //convert to int
+        checkContent = cInput;
+
 
         //handle macaddres
         myMacAddress = discoverMyMac();
@@ -191,9 +227,9 @@ public:
         return senders;
     }
 
-    void setSenders(const std::vector<ByteArray> &senders)
+    void setSenders(const std::vector<ByteArray> &inSenders)
     {
-        Configuration::senders = senders;
+        Configuration::senders = inSenders;
     }
 
     const std::vector<ByteArray> &getReceivers() const
@@ -201,9 +237,9 @@ public:
         return receivers;
     }
 
-    void setReceivers(const std::vector<ByteArray> &receivers)
+    void setReceivers(const std::vector<ByteArray> &inReceivers)
     {
-        Configuration::receivers = receivers;
+        Configuration::receivers = inReceivers;
     }
 
     PayloadType getPayloadType() const
@@ -211,9 +247,9 @@ public:
         return payloadType;
     }
 
-    void setPayloadType(PayloadType payloadType)
+    void setPayloadType(PayloadType pt)
     {
-        Configuration::payloadType = payloadType;
+        Configuration::payloadType = pt;
     }
 
     long long int getNumberOfPackets() const
@@ -221,9 +257,9 @@ public:
         return numberOfPackets;
     }
 
-    void setNumberOfPackets(long long int numberOfPackets)
+    void setNumberOfPackets(long long int nop)
     {
-        Configuration::numberOfPackets = numberOfPackets;
+        Configuration::numberOfPackets = nop;
     }
 
     long long int getLifeTime() const
@@ -231,29 +267,9 @@ public:
         return lifeTime;
     }
 
-    void setLifeTime(long long int lifeTime)
+    void setLifeTime(long long int lt)
     {
-        Configuration::lifeTime = lifeTime;
-    }
-
-    int getFlowType() const
-    {
-        return flowType;
-    }
-
-    void setFlowType(int flowType)
-    {
-        Configuration::flowType = flowType;
-    }
-
-    long long int getSendingRate() const
-    {
-        return SendingRate;
-    }
-
-    void setSendingRate(long long int sendingRate)
-    {
-        SendingRate = sendingRate;
+        Configuration::lifeTime = lt;
     }
 
     ByteArray getMyMacAddress()
@@ -286,6 +302,34 @@ public:
         streamID = new ByteArray(id,STREAMID_LEN,0);
     }
 
+    ull getBcFramesNum()
+    {
+        return bcFramesNum;
+    }
+
+    ull getInterFrameGap()
+    {
+        return interFrameGap;
+    }
+
+    ull getLifeTime()
+    {
+        return lifeTime;
+    }
+    TransprtProtocol getTransprtProtocol()
+    {
+        return transprtProtocol;
+    }
+    FlowType getFlowType()
+    {
+        return flowType;
+    }
+    bool getCheckContent()
+    {
+        return checkContent;
+    }
+
+
     //For debugging only
     void print()
     {
@@ -317,7 +361,29 @@ public:
         }
         printf("Number of packets: %d\n", (int)numberOfPackets);
         printf("Payload length: %d\n", payloadLength);
-        printf("Seed: %d\n\n\n", seed);
+        printf("Seed: %d\n", seed);
+        printf("bcFramesNum: %llu\n", bcFramesNum);
+        printf("interFrameGap: %llu\n", interFrameGap);
+        printf("lifeTime: %llu\n", lifeTime);
+
+        switch (transprtProtocol)
+        {
+            case TCP:
+                printf("Transprt Protocol Type: TCP\n");
+                break;
+            default:
+                printf("Transprt Protocol Type: UDP\n");
+        }
+        switch (flowType)
+        {
+            case BACK_TO_BACK:
+                printf("Flow Type: Back to back\n");
+                break;
+            default:
+                printf("Flow Type: Bursty\n");
+        }
+
+        printf("checkContent: %d\n", checkContent);
         printf("###########################\n");
     }
 };
