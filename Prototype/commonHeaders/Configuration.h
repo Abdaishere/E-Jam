@@ -27,7 +27,7 @@ typedef unsigned long long ull;
 
 
 enum PayloadType {FIRST, SECOND, RANDOM};
-enum TransprtProtocol {TCP, UDP};
+enum TransportProtocol {TCP, UDP};
 enum FlowType {BACK_TO_BACK, BURSTY};
 
 class Configuration
@@ -42,9 +42,9 @@ private:
     ull numberOfPackets = 100;          //Number of packets flowing in the stream before it ends
     ull bcFramesNum;                    //after x regular frame, send a broadcast frame
     int payloadLength, seed;            //Payload length, and seed to use in RNGs
-    ull interFrameGap;                  //Time to wait between each packet generation in the stream
-    ull lifeTime = 1000;                //Time to live before ending execution
-    TransprtProtocol transprtProtocol;  //The protocol used in the transport layer
+    ull interFrameGap;                  //Time to wait between each packet generation in the stream in ms
+    ull lifeTime = 1000;                //Time to live before ending execution in ms
+    TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
     bool checkContent;                  //Whether to check content or not
 
@@ -149,10 +149,10 @@ public:
         switch (input)
         {
             case 0:
-                transprtProtocol = TCP;
+                transportProtocol = TCP;
                 break;
             default:
-                transprtProtocol = UDP;
+                transportProtocol = UDP;
         }
 
         //Read Flow type
@@ -320,9 +320,9 @@ public:
     {
         return lifeTime;
     }
-    TransprtProtocol getTransprtProtocol()
+    TransportProtocol getTransportProtocol()
     {
-        return transprtProtocol;
+        return transportProtocol;
     }
     FlowType getFlowType()
     {
@@ -370,7 +370,7 @@ public:
         printf("interFrameGap: %llu\n", interFrameGap);
         printf("lifeTime: %llu\n", lifeTime);
 
-        switch (transprtProtocol)
+        switch (transportProtocol)
         {
             case TCP:
                 printf("Transprt Protocol Type: TCP\n");
