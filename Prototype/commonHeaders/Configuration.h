@@ -34,17 +34,19 @@ class Configuration
 {
 private:
     //stream attributes
-    ByteArray* streamID;
-    std::vector<ByteArray> senders; //list of senders mac addresses
-    std::vector<ByteArray> receivers; //list of receivers mac addressess
-    ByteArray myMacAddress;
-    PayloadType payloadType;
-    ull numberOfPackets = 100, bcFramesNum;
-    int payloadLength, seed;
-    ull interFrameGap, lifeTime = 1000;
-    TransprtProtocol transprtProtocol;
-    FlowType flowType;
-    bool checkContent;
+    ByteArray* streamID;                //A 3 alphanumeric charaters defining a stream
+    std::vector<ByteArray> senders;     //list of senders mac addresses
+    std::vector<ByteArray> receivers;   //list of receivers mac addressess
+    ByteArray myMacAddress;             //The mac address of this machine (Inferred)
+    PayloadType payloadType;            //The type of the payload
+    ull numberOfPackets = 100;          //Number of packets flowing in the stream before it ends
+    ull bcFramesNum;                    //after x regular frame, send a broadcast frame
+    int payloadLength, seed;            //Payload length, and seed to use in RNGs
+    ull interFrameGap;                  //Time to wait between each packet generation in the stream
+    ull lifeTime = 1000;                //Time to live before ending execution
+    TransprtProtocol transprtProtocol;  //The protocol used in the transport layer
+    FlowType flowType;                  //The production pattern that the packets uses
+    bool checkContent;                  //Whether to check content or not
 
 
     //convert int to corresponding hexa character
@@ -58,6 +60,7 @@ private:
             return 'F';
     }
 
+    //Discover the mac address of this machine
     ByteArray discoverMyMac()
     {
         struct ifreq ifr;
@@ -93,6 +96,7 @@ private:
         return ByteArray((char*) mac_address, MAC_ADD_LEN,0);
     }
 public:
+    //Read configuration from a file of the correct format
     void loadFromFile(char* path)
     {
         freopen(path,"r",stdin);
@@ -330,7 +334,7 @@ public:
     }
 
 
-    //For debugging only
+    //Printing for debugging only
     void print()
     {
         printf("Stream ID: %s\n", streamID->bytes);
