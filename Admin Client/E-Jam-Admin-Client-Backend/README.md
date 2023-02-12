@@ -1,4 +1,14 @@
-# Welcome to the E-Jam API documentation
+# E-Jam API
+
+<img src="E-Jam-api-logo.png" alt="E-Jam API" width="400"/>
+
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
+![Actix Web](https://img.shields.io/badge/Actix-%23000000.svg?style=for-the-badge&logo=actix&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-%23000000.svg?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-%23000000.svg?style=for-the-badge&logo=raspberry-pi&logoColor=white)
+![RestFul API](https://img.shields.io/badge/RestFul%20API-%23000000.svg?style=for-the-badge&logo=restful-api&logoColor=white)
+
+## The E-Jam API documentation
 
 This API is used to create and manage streams.
 The E-Jam API is a REST API that allows you to manage the list of streams in the E-Jam application.
@@ -16,6 +26,12 @@ The API is hosted on the IP address
 The stream state machine is as follows:
 
 ![Stream State Machine](./stream_state_machine.png)
+
+note: The stream state finished is only applied when all devices have finished sending and receiving packets.
+
+The Device State Machine is as follows:
+
+![Device State Machine](./device_state_machine.png)
 
 ## API Documentation
 
@@ -75,6 +91,26 @@ Returns the status of the stream with the given stream_id.
 
 Returns the status of all streams in the list of streams.
 
+### GET /devices
+
+Returns a list of all devices in the list of devices.
+
+### GET /devices/{device_ip}
+
+Returns the device with the given device ip address.
+
+### POST /devices
+
+Adds a new device to the list
+
+### DELETE /devices/{device_ip}
+
+Deletes the device with the given device_ip.
+
+### PUT /devices/{device_ip}
+
+Updates the device with the given device_ip.
+
 ## Stream object
 
 The structure of the Stream object as a table is as follows:
@@ -108,8 +144,8 @@ The structure of the Stream object as a table is as follows:
     <td>stream_start_time must be greater than 0</td>
 </tr>
 <tr>
-    <td>senders_mac</td>
-    <td>Vec<MacAddress></td>
+    <td>senders_name</td>
+    <td>Vec of Strings (name or ip of device)</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
@@ -117,8 +153,8 @@ The structure of the Stream object as a table is as follows:
     <td>number_of_senders must be greater than 0</td>
 </tr>
 <tr>
-    <td>receiver_macs</td>
-    <td>Vec<MacAddress></td>
+    <td>receivers_name</td>
+    <td>Vec of Strings (name or ip of device)</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
@@ -232,5 +268,90 @@ The structure of the Stream object as a table is as follows:
     <td>0</td>
     <td></td>
     <td></td>
+</tr>
+</table>
+
+## Device object
+
+The structure of the Device object as a table is as follows:
+
+<table>
+<tr>
+    <th>Field</th>
+    <th>Type</th>
+    <th>Required</th>
+    <th>Default</th>
+    <th>Min</th>
+    <th>Max</th>
+    <th>Validation</th>
+</tr>
+<tr>
+    <td>device_name</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td>defaulted to be either mac or ip address from client side</td>
+    <td>1</td>
+    <td></td>
+    <td>device_name must be greater than 0 characters long</td>
+</tr>
+<tr>
+    <td>device_ip</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td></td>
+    <td>7</td>
+    <td>15</td>
+    <td>device_ip must be between 7 and 15 characters long, device_ip must be a valid ip address</td>
+</tr>
+<tr>
+    <td>mac</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>must be a valid mac address</td>
+</tr>
+</table>
+
+## System API endpoints
+
+The following endpoints are available for the system API:
+
+<table>
+<tr>
+    <th>Endpoint</th>
+    <th>Method</th>
+    <th>Body</th>
+    <th>Response</th>
+    <th>Description</th>
+</tr>
+<tr>
+    <td>/connect</td>
+    <td>GET</td>
+    <td>mac address of the device</td>
+    <td></td>
+    <td>Connect to the system API</td>
+</tr>
+<tr>
+    <td>/finish</td>
+    <td>POST</td>
+    <td></td>
+    <td>Stream_id</td>
+    <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side</td>
+</tr>
+<tr>
+    <td>/start</td>
+    <td>POST</td>
+    <td>Stream.to_string()</td>
+    <td>Success</td>
+    <td>Try to Start the Stream</td>
+</tr>
+<tr>
+    <td>/stop</td>
+    <td>POST</td>
+    <td>stream_id</td>
+    <td>Success</td>
+    <td>Stop a currently running Stream</td>
 </tr>
 </table>

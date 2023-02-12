@@ -1,30 +1,34 @@
 use lazy_static::lazy_static;
 use regex::Regex;
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, sync::Mutex, thread};
+use std::{collections::HashMap, sync::Mutex};
 use tokio::time::{sleep, Duration, Sleep};
 use validator::Validate;
 
 lazy_static! {
     static ref STREAM_ID_COUNTER: Mutex<u32> = Mutex::new(0); // stream id counter (3 alphanumeric characters)
-    static ref DEVICE_LIST : Mutex<HashMap<MacAddress,String>> = Mutex::new(HashMap::new()); // mac address, device name
     static ref QUEUED_STREAMS : Mutex<HashMap<String , Sleep>> = Mutex::new(HashMap::new()); // stream id, sleep
-    static ref RUNNING_STREAMS: Mutex<HashMap<String ,thread::JoinHandle<()>>> = Mutex::new(HashMap::new()); // stream id, thread
+    static ref RUNNING_STREAMS: Mutex<HashMap<String , Vec<String>>> = Mutex::new(HashMap::new()); // stream id, thread
     static ref STREAM_ID : Regex = Regex::new(r"^[a-zA-Z0-9]+$").unwrap(); // 3 alphanumeric characters
     static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").unwrap(); // mac address
+    static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap(); // ip address
 }
 
 pub struct AppState {
     pub streams_entries: Mutex<Vec<StreamEntry>>,
+    pub device_list: Mutex<Vec<Device>>, // mac address, device name for all devices by name
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
             streams_entries: Mutex::new(Vec::new()),
+            device_list: Mutex::new(Vec::new()),
         }
     }
 }
+
 // Stream ID (3 alphanumeric characters)
 // number of senders		(n)
 // sender 1 mac
@@ -49,6 +53,7 @@ impl Default for AppState {
 
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct StreamEntry {
+    // max number for three alphanumeric characters is 46655 (36^3) so the max number of streams is 46655
     #[validate(
         length(equal = 3, message = "stream_id must be 3 characters long"),
         regex(path = "STREAM_ID", message = "stream_id must be alphanumeric")
@@ -58,9 +63,9 @@ pub struct StreamEntry {
     #[validate(range(min = 0, message = "stream_start_time must be greater than 0"))]
     stream_start_time: u64,
     #[validate(length(min = 1, message = "number_of_senders must be greater than 0"))]
-    senders_mac: Vec<MacAddress>,
+    senders_name: Vec<String>,
     #[validate(length(min = 1, message = "number_of_receivers must be greater than 0"))]
-    receiver_macs: Vec<MacAddress>,
+    receivers_name: Vec<String>,
     #[validate(range(min = 0, max = 2, message = "payload_type must be 0, 1 or 2"))]
     payload_type: u8,
     #[validate(range(min = 0, message = "number_of_packets must be greater than 0"))]
@@ -110,18 +115,25 @@ impl StreamEntry {
     */
 
     // create a new stream entry from a json string
-    pub fn to_string(&self) -> String {
+    pub fn to_string(&self, device_list: &Vec<Device>) -> String {
         let mut stream_entry_string = String::new();
+
         stream_entry_string.push_str(&format!("Stream ID: {}\n ", self.stream_id));
 
-        stream_entry_string.push_str(&format!("Senders: {}\n ", self.senders_mac.len()));
-        for mac in &self.senders_mac {
-            stream_entry_string.push_str(&format!("Sender MAC: {}\n ", mac.to_string()));
+        stream_entry_string.push_str(&format!("Senders: {}\n ", self.senders_name.len()));
+        for name in &self.senders_name {
+            stream_entry_string.push_str(&format!(
+                "Sender MAC: {}\n ",
+                Device::find_device(name, &device_list).unwrap().mac_address
+            ));
         }
 
-        stream_entry_string.push_str(&format!("Receivers: {}\n ", self.receiver_macs.len()));
-        for mac in &self.receiver_macs {
-            stream_entry_string.push_str(&format!("Receiver MAC: {}\n ", mac.to_string()));
+        stream_entry_string.push_str(&format!("Receivers: {}\n ", self.receivers_name.len()));
+        for name in &self.receivers_name {
+            stream_entry_string.push_str(&format!(
+                "Receiver MAC: {}\n ",
+                Device::find_device(name, &device_list).unwrap().mac_address
+            ));
         }
 
         stream_entry_string.push_str(&format!("Payload Type: {}\n ", self.payload_type));
@@ -143,37 +155,58 @@ impl StreamEntry {
 
     // start the stream by sending a start request to all the senders and receivers
     // this will force the stream to start immediately
-    pub async fn send_stream(&self) -> Result<(), reqwest::Error> {
-        let devices = DEVICE_LIST.lock().unwrap();
-
-        for mac in &self.receiver_macs {
-            let receiver = devices.get(mac).unwrap();
-            reqwest::Client::new()
-                .post(&format!("http://{}:8080/start", receiver))
-                .body(self.to_string())
-                .send()
-                .await?;
-        }
-
-        for mac in &self.senders_mac {
-            let sender = devices.get(mac).unwrap();
-            reqwest::Client::new()
-                .post(&format!("http://{}:8080/start", sender))
-                .body(self.to_string())
-                .send()
-                .await?;
-        }
-
-        // run the stream in another thread
-        let mut stream = self.clone();
+    pub async fn send_stream(&self, device_list: &Vec<Device>) -> Result<(), reqwest::Error> {
+        // add the stream to the list of running streams
         let mut running_streams = RUNNING_STREAMS.lock().unwrap();
-        running_streams.insert(
-            self.get_stream_id().clone(),
-            thread::spawn(move || {
-                stream.run_stream();
-            }),
-        );
+        running_streams.insert(self.stream_id.clone(), Vec::new());
 
+        let device = running_streams.get_mut(&self.stream_id).unwrap();
+
+        for name in &self.receivers_name {
+            let mut receiver = Device::find_device(name, &device_list).unwrap();
+            let response = reqwest::Client::new()
+                .post(&format!("http://{}/start", &receiver.get_device_address()))
+                .body(self.to_string(&device_list))
+                .send()
+                .await?;
+            match response.status() {
+                StatusCode::OK => {
+                    receiver.status = DeviceStatus::Running;
+                    device.push(receiver.get_device_address());
+                }
+                _ => {
+                    println!("Error: {}", response.text().await.unwrap());
+
+                    // set the receiver status to offline (generic error)
+                    receiver.status = DeviceStatus::Offline;
+                }
+            }
+        }
+
+        for name in &self.senders_name {
+            let mut sender = Device::find_device(name, &device_list).unwrap();
+            let response = reqwest::Client::new()
+                .post(&format!("http://{}/start", &sender.get_device_address()))
+                .body(self.to_string(&device_list))
+                .send()
+                .await?;
+            match response.status() {
+                StatusCode::OK => {
+                    sender.status = DeviceStatus::Running;
+                    device.push(sender.get_device_address());
+                }
+                _ => {
+                    println!("Error: {}", response.text().await.unwrap());
+
+                    // set the receiver status to offline (generic error)
+                    sender.status = DeviceStatus::Offline;
+                }
+            }
+        }
+
+        if device.is_empty() {
+            running_streams.remove(&self.stream_id);
+        }
         Ok(())
     }
 
@@ -188,26 +221,36 @@ impl StreamEntry {
 
     // force the stream to stop immediately
     // this is done by sending a stop request to all the senders and receivers with the stream id
-    pub async fn stop_stream(&mut self) -> Result<(), reqwest::Error> {
-        let devices = DEVICE_LIST.lock().unwrap();
+    pub async fn stop_stream(&mut self, device_list: &Vec<Device>) -> Result<(), reqwest::Error> {
+        // add the stream to the list of running streams
+        let running_streams = RUNNING_STREAMS.lock().unwrap();
+        let devices = running_streams
+            .get(&self.get_stream_id().to_string())
+            .unwrap()
+            .clone();
 
         // stop the stream
-        for mac in &self.receiver_macs {
-            let receiver = devices.get(mac).unwrap();
-            reqwest::Client::new()
-                .post(&format!("http://{}:8080/stop", receiver))
+        for name in &devices {
+            let mut receiver = Device::find_device(name, &device_list).unwrap();
+            let response = reqwest::Client::new()
+                .post(&format!("http://{}/stop", &receiver.get_device_address()))
                 .body(self.get_stream_id().clone())
                 .send()
                 .await?;
-        }
 
-        for mac in &self.senders_mac {
-            let sender = devices.get(mac).unwrap();
-            reqwest::Client::new()
-                .post(&format!("http://{}:8080/stop", sender))
-                .body(self.get_stream_id().clone())
-                .send()
-                .await?;
+            match response.status() {
+                StatusCode::OK => {
+                    receiver.running_streams -= 1;
+                    if receiver.running_streams == 0 {
+                        receiver.status = DeviceStatus::Idle;
+                    }
+                }
+                _ => {
+                    println!("Error: {}", response.text().await.unwrap());
+                    // set the receiver status to offline (generic error)
+                    receiver.status = DeviceStatus::Offline;
+                }
+            }
         }
 
         self.stream_status = StreamStatus::Stopped;
@@ -255,6 +298,43 @@ impl StreamEntry {
 
     pub fn get_stream_id(&self) -> &String {
         &self.stream_id
+    }
+
+    pub fn finish_stream(&mut self, device_address: &String, device_list: &mut Vec<Device>) {
+        // check if there are any devices left in the running streams list for this stream id
+        // if there are no devices left, remove the stream from the running streams list and set the stream status to stopped
+        // if there are devices left, set the stream status to finished and remove the device from the running streams list
+
+        let mut running_streams = RUNNING_STREAMS.lock().unwrap();
+        let devices = running_streams
+            .get_mut(&self.get_stream_id().to_string())
+            .unwrap();
+
+        let index = devices
+            .iter()
+            .position(|x| x.contains(device_address))
+            .unwrap();
+
+        devices.remove(index);
+
+        if devices.len() == 0 {
+            running_streams.remove(&self.get_stream_id().clone());
+
+            let device = device_list
+                .iter()
+                .position(|x| &x.ip_address == device_address)
+                .unwrap();
+            
+            device_list[device].running_streams -= 1;
+            if device_list[device].running_streams == 0 {
+                device_list[device].status = DeviceStatus::Idle;
+            }
+
+            self.stream_status = StreamStatus::Stopped;
+            return;
+        }
+
+        self.stream_status = StreamStatus::Finished;
     }
 }
 
@@ -312,17 +392,132 @@ impl FlowType {
     }
 }
 
-#[derive(Validate, Serialize, Deserialize, Default, Debug, Clone, Eq, Hash, PartialEq)]
-struct MacAddress {
-    #[validate(regex(
-        path = "MAC_ADDRESS",
-        message = "mac_address must be a valid mac address"
-    ))]
-    mac_address: String,
+// Devices model
+#[derive(Serialize, Deserialize, Validate, Debug, Clone)]
+pub struct Device {
+    // if name not given then use ip address as name
+    #[validate(length(min = 1, message = "name must be greater than 0"))]
+    pub name: String,
+    #[validate(
+        regex(path = "IP_ADDRESS", message = "ip must be a valid ip address"),
+        length(
+            min = 7,
+            max = 15,
+            message = "ip must be between 7 and 15 characters long"
+        )
+    )]
+    #[serde(rename = "ip")]
+    pub ip_address: String,
+    #[validate(
+        regex(
+            path = "MAC_ADDRESS",
+            message = "mac_address must be a valid mac address"
+        ),
+        length(equal = 17, message = "mac_address must be 17 characters long")
+    )]
+    #[serde(rename = "mac")]
+    pub mac_address: String,
+    #[serde(default, skip_serializing)]
+    pub running_streams: u16,
+    #[serde(rename = "status", skip_serializing)]
+    pub status: DeviceStatus,
 }
 
-impl MacAddress {
-    pub fn to_string(&self) -> String {
-        self.mac_address.clone()
+// find the device either by name or ip or mac address
+impl Device {
+    pub fn find_device(name: &str, device_list: &Vec<Device>) -> Option<Device> {
+        // search for the device in the list of devices by iterating over the list of devices
+        // the list of devices is known to be small so this is not a performance issue
+        // this is method is used to find the device by ip first then by mac address and then by name
+        // this is done to make sure that the device is found even if the user enters the wrong ip address or mac address
+        // this is also done to make sure that the user can find the device by name if the ip address or mac address is not known
+
+        // find in all ip addresses
+        for device in device_list.iter() {
+            if device.ip_address == name {
+                return Some(device.clone());
+            }
+        }
+
+        // find in all mac addresses
+        for device in device_list.iter() {
+            if device.mac_address == name {
+                return Some(device.clone());
+            }
+        }
+
+        // find in all names
+        for device in device_list.iter() {
+            if device.name == name {
+                return Some(device.clone());
+            }
+        }
+
+        None
     }
+
+    pub fn get_device_address(&self) -> String {
+        format!("{}:8080", self.ip_address.clone())
+    }
+}
+
+// Device status
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
+#[serde(tag = "type")]
+pub enum DeviceStatus {
+    #[serde(rename = "Online")]
+    Online,
+    #[default]
+    #[serde(rename = "Offline")]
+    Offline,
+    #[serde(rename = "Running")]
+    Running,
+    #[serde(rename = "Idle")]
+    Idle,
+}
+
+// device status to string
+impl DeviceStatus {
+    fn to_string(&self) -> String {
+        match self {
+            DeviceStatus::Online => "Online".to_string(),
+            DeviceStatus::Offline => "Offline".to_string(),
+            DeviceStatus::Running => "Running".to_string(),
+            DeviceStatus::Idle => "Idle".to_string(),
+        }
+    }
+}
+
+
+
+pub fn get_devices_table(device_list: &Vec<Device>) -> String {
+    let mut data = String::from(
+        "<table>
+    <tr>
+        <th>Device name</th>
+        <th>Device ip</th>
+        <th>Device mac</th>
+        <th>Device status</th>
+    </tr>
+    ",
+    );
+    for device in device_list.iter() {
+        let row = format!(
+            "<tr>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+            <td>{}</td>
+        </tr>",
+            device.name,
+            device.ip_address,
+            device.mac_address,
+            device.status.to_string(),
+            device.running_streams
+        );
+        data.push_str(&row);
+    }
+    data.push_str("</table>");
+    data
 }

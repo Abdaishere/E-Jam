@@ -1,5 +1,6 @@
 use super::models::{AppState, StreamEntry, StreamStatus};
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use crate::models::{get_devices_table, Device};
+use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse, Responder};
 
 // get the list of streams
 #[get("/streams")]
@@ -41,8 +42,12 @@ async fn post_stream(
     match stream_entry_check {
         Some(_) => HttpResponse::Conflict().finish(),
         None => {
-            streams_entries.push(stream_entry.into_inner());
-            HttpResponse::Created().finish()
+            let stream_entry = stream_entry.into_inner();
+
+            streams_entries.push(stream_entry.clone());
+
+            // send the stream back to the client with the default values for all the fields
+            HttpResponse::Created().json(stream_entry)
         }
     }
 }
@@ -85,7 +90,7 @@ async fn update_stream(
         Some(stream_entry) => {
             // if the stream is running, stop it
             if stream_entry.get_stream_status() == &StreamStatus::Running {
-                stream_entry.stop_stream().await.unwrap();
+                stream_entry.stop_stream(&data.device_list.lock().unwrap()).await.unwrap();
             }
 
             // if the stream is queued, remove it from the queue
@@ -145,7 +150,10 @@ async fn force_start_stream(
             // if the stream is running, stop it
             // if the stream is queued, remove it from the queue
             if stream_entry.get_stream_status() == &StreamStatus::Running {
-                stream_entry.stop_stream().await.unwrap();
+                stream_entry
+                    .stop_stream(&data.device_list.lock().unwrap())
+                    .await
+                    .unwrap();
             }
 
             if stream_entry.get_stream_status() == &StreamStatus::Queued {
@@ -153,7 +161,10 @@ async fn force_start_stream(
             }
 
             // start the stream
-            stream_entry.send_stream().await.unwrap();
+            stream_entry
+                .send_stream(&data.device_list.lock().unwrap())
+                .await
+                .unwrap();
             HttpResponse::Ok().finish()
         }
         None => HttpResponse::NotFound().finish(),
@@ -194,7 +205,10 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
             {
                 HttpResponse::Conflict().finish()
             } else {
-                stream_entry.stop_stream().await.unwrap();
+                stream_entry
+                    .stop_stream(&data.device_list.lock().unwrap())
+                    .await
+                    .unwrap();
                 HttpResponse::Ok().finish()
             }
         }
@@ -216,7 +230,10 @@ async fn force_stop_stream(
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
     match stream_entry {
         Some(stream_entry) => {
-            stream_entry.stop_stream().await.unwrap();
+            stream_entry
+                .stop_stream(&data.device_list.lock().unwrap())
+                .await
+                .unwrap();
             HttpResponse::Ok().finish()
         }
         None => HttpResponse::NotFound().finish(),
@@ -238,7 +255,10 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             if stream_entry.get_stream_status() == &StreamStatus::Queued {
                 stream_entry.remove_stream_from_queue().await;
             } else {
-                stream_entry.stop_stream().await.unwrap();
+                stream_entry
+                    .stop_stream(&data.device_list.lock().unwrap())
+                    .await
+                    .unwrap();
             }
         }
     }
@@ -279,17 +299,135 @@ async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
 
 // index page for the API documentation and the html table for the Stream object structure
 #[get("/")]
-async fn index() -> &'static str {
+async fn index(data: web::Data<AppState>) -> String {
     "
     <style>
-        h1 {
+        * {
             text-align: center;
         }
     </style>
     <h1>Welcome to the E-Jam API!</h1>
     <h1>Read the documentation at README.md</h1>
+    return the html table for all connected devices and their ip addresses and mac addresses    
     "
+    .to_string()
+        + &get_devices_table(&data.device_list.lock().unwrap())
 }
+
+// devices services
+// get the list of all connected devices
+#[get("/devices")]
+async fn get_devices(data: web::Data<AppState>) -> impl Responder {
+    let devices = data.device_list.lock().unwrap().to_vec();
+    HttpResponse::Ok().json(devices)
+}
+
+// get a device in the list of devices by its ip address
+// if the device is not found, return a 404 Not Found
+#[get("/devices/{device_ip}")]
+async fn get_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    let device_ip = device_ip.into_inner();
+    let devices = data.device_list.lock().unwrap();
+    let device = devices
+        .iter()
+        .find(|device| device.ip_address.to_string() == device_ip);
+    match device {
+        Some(device) => HttpResponse::Ok().json(device),
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
+// add a device in the list of devices
+// if the device is already in the list, return a 409 Conflict
+// if the device is not in the list, add it and return a 201 Created
+#[post("/devices")]
+async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
+    let mut devices = data.device_list.lock().unwrap();
+    let device_index = devices
+        .iter()
+        .position(|device| device.ip_address.to_string() == device.ip_address.to_string());
+    match device_index {
+        Some(_device_index) => HttpResponse::Conflict().finish(),
+        None => {
+            devices.push(device.into_inner());
+            HttpResponse::Created().finish()
+        }
+    }
+}
+
+// update a divice in the list of devices by its ip address
+// if the device is not found, return a 404 Not Found
+// if the device is found, update it and return a 200 OK
+#[put("/devices/{device_ip}")]
+async fn update_device(
+    device_ip: web::Path<String>,
+    device: web::Json<Device>,
+    data: web::Data<AppState>,
+) -> impl Responder {
+    let device_ip = device_ip.into_inner();
+    let mut devices = data.device_list.lock().unwrap();
+    let device_index = devices
+        .iter()
+        .position(|device| device.ip_address.to_string() == device_ip);
+    match device_index {
+        Some(device_index) => {
+            devices[device_index] = device.into_inner();
+            HttpResponse::Ok().finish()
+        }
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
+// delete a device in the list of devices
+// if the device is not found, return a 404 Not Found
+// if the device is found, delete it and return a 200 OK
+#[delete("/devices/{device_ip}")]
+async fn delete_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    let device_ip = device_ip.into_inner();
+    let mut devices = data.device_list.lock().unwrap();
+    let device_index = devices
+        .iter()
+        .position(|device| device.ip_address.to_string() == device_ip);
+    match device_index {
+        Some(device_index) => {
+            devices.remove(device_index);
+            HttpResponse::Ok().finish()
+        }
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
+// notify the system that the stream is finished by the client device
+// if the stream is not found, return a 404 Not Found
+// if the stream is found, update its status and return a 200 OK
+#[post("/streams/{stream_id}/finished")]
+async fn stream_finished(
+    stream_id: web::Path<String>,
+    data: web::Data<AppState>,
+    req: HttpRequest,
+) -> impl Responder {
+    let stream_id = stream_id.into_inner();
+    let mut streams_entries = data.streams_entries.lock().unwrap();
+    let stream_entry = streams_entries
+        .iter_mut()
+        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+    match stream_entry {
+        Some(stream_entry) => {
+            if let Some(val) = req.peer_addr() {
+                // get the ip address of the client
+                let ip = val.ip().to_string();
+
+                stream_entry.finish_stream(&ip, &mut data.device_list.lock().unwrap().to_vec());
+                println!("Address {:?}", val.ip());
+            };
+
+            HttpResponse::Ok().finish()
+        }
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
+// TODO: add a route to ping any device in the list of devices to check if it is connected or not and update its status accordingly (online/offline)
 
 // Initializes all routes for the application
 // This is called in main.rs
@@ -308,5 +446,11 @@ pub fn init_routes(config: &mut web::ServiceConfig) {
         .service(stop_all_streams)
         .service(force_stop_stream)
         .service(get_stream_status)
-        .service(get_all_streams_status);
+        .service(get_all_streams_status)
+        .service(get_devices)
+        .service(get_device)
+        .service(add_device)
+        .service(update_device)
+        .service(delete_device)
+        .service(stream_finished);
 }
