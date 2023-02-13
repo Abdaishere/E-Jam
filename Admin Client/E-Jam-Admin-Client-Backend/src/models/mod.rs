@@ -1,30 +1,27 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use reqwest::StatusCode;
+use reqwest::{header::HeaderName, StatusCode};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, sync::Mutex};
-use tokio::time::{sleep, Duration, Sleep};
+use std::sync::Mutex;
 use validator::Validate;
 
 lazy_static! {
     static ref STREAM_ID_COUNTER: Mutex<u32> = Mutex::new(0); // stream id counter (3 alphanumeric characters)
-    static ref QUEUED_STREAMS : Mutex<HashMap<String , Sleep>> = Mutex::new(HashMap::new()); // stream id, sleep
-    static ref RUNNING_STREAMS: Mutex<HashMap<String , Vec<String>>> = Mutex::new(HashMap::new()); // stream id, thread
     static ref STREAM_ID : Regex = Regex::new(r"^[a-zA-Z0-9]+$").unwrap(); // 3 alphanumeric characters
+    static ref QUEUED_STREAMS : Mutex<Vec<String>> = Mutex::new(Vec::new()); // stream id, sleep
     static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").unwrap(); // mac address
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap(); // ip address
+    pub static ref DEVICE_LIST : Mutex<Vec<Device>> =  Mutex::new(Vec::new()); // mac address, device name and ip address for all devices
 }
 
 pub struct AppState {
     pub streams_entries: Mutex<Vec<StreamEntry>>,
-    pub device_list: Mutex<Vec<Device>>, // mac address, device name for all devices by name
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
             streams_entries: Mutex::new(Vec::new()),
-            device_list: Mutex::new(Vec::new()),
         }
     }
 }
@@ -50,22 +47,24 @@ impl Default for AppState {
 // transport layer Protocol(0 TCP or 1 UDP)
 // Flow type				(0 BtB or 1 Bursts)
 // check content			(0 false or 1 true)
-
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct StreamEntry {
+    #[serde(default, rename = "delay")]
+    #[validate(range(min = 0, message = "delay must be greater than 0"))]
+    delay: u64,
     // max number for three alphanumeric characters is 46655 (36^3) so the max number of streams is 46655
     #[validate(
         length(equal = 3, message = "stream_id must be 3 characters long"),
         regex(path = "STREAM_ID", message = "stream_id must be alphanumeric")
     )]
+    #[serde(rename = "id")]
     stream_id: String,
-    #[serde(default)]
-    #[validate(range(min = 0, message = "stream_start_time must be greater than 0"))]
-    stream_start_time: u64,
     #[validate(length(min = 1, message = "number_of_senders must be greater than 0"))]
-    senders_name: Vec<String>,
+    #[serde(rename = "generators")]
+    generators_name: Vec<String>,
     #[validate(length(min = 1, message = "number_of_receivers must be greater than 0"))]
-    receivers_name: Vec<String>,
+    #[serde(rename = "verifiers")]
+    verifiers_name: Vec<String>,
     #[validate(range(min = 0, max = 2, message = "payload_type must be 0, 1 or 2"))]
     payload_type: u8,
     #[validate(range(min = 0, message = "number_of_packets must be greater than 0"))]
@@ -76,7 +75,10 @@ pub struct StreamEntry {
         message = "payload_length must be between 0 and 1500"
     ))]
     payload_length: u16,
+    #[validate(range(min = 0, message = "seed must be greater than 0"))]
+    #[serde(default)]
     seed: u32,
+    #[validate(range(min = 0, message = "broadcast_frames must be greater than 0"))]
     broadcast_frames: u32,
     // time in ms
     #[validate(range(min = 0, message = "inter_frame_gap must be greater than 0"))]
@@ -90,89 +92,62 @@ pub struct StreamEntry {
     flow_type: FlowType,
     #[serde(default)]
     check_content: bool,
-    #[serde(default)]
+    #[serde(default, rename = "running_devices")]
+    running_devices: Vec<String>, // ip address of the devices that are running the stream
+    #[serde(default, rename = "status")]
     stream_status: StreamStatus,
 }
 
 impl StreamEntry {
-    // create a new stream entry
-    // the stream id is generated automatically
-    // the stream status is set to "created"
-    // Default values:
-    // the delay is set to 0
-    // the transport layer protocol is set to TCP
-    // the flow type is set to BtB
-    // the check content is set to false
-    /*
-    pub fn new() -> Self {
-        let mut stream_entry = StreamEntry::default();
-        // calculate the next stream id
+    pub fn generate_new_stream_id(&mut self) {
         let mut stream_id_counter = STREAM_ID_COUNTER.lock().unwrap();
-        stream_entry.stream_id = format!("{:03}", *stream_id_counter);
+        if (*stream_id_counter) > 46655 {
+            *stream_id_counter = 0;
+        }
+        let stream_id = char::from_digit(*stream_id_counter / 36 / 36, 36)
+            .unwrap()
+            .to_uppercase()
+            .to_string()
+            + &char::from_digit((*stream_id_counter / 36) % 36, 36)
+                .unwrap()
+                .to_uppercase()
+                .to_string()
+            + &char::from_digit(*stream_id_counter % 36, 36)
+                .unwrap()
+                .to_uppercase()
+                .to_string();
         *stream_id_counter += 1;
-        stream_entry
-    }
-    */
-
-    // create a new stream entry from a json string
-    pub fn to_string(&self, device_list: &Vec<Device>) -> String {
-        let mut stream_entry_string = String::new();
-
-        stream_entry_string.push_str(&format!("Stream ID: {}\n ", self.stream_id));
-
-        stream_entry_string.push_str(&format!("Senders: {}\n ", self.senders_name.len()));
-        for name in &self.senders_name {
-            stream_entry_string.push_str(&format!(
-                "Sender MAC: {}\n ",
-                Device::find_device(name, &device_list).unwrap().mac_address
-            ));
-        }
-
-        stream_entry_string.push_str(&format!("Receivers: {}\n ", self.receivers_name.len()));
-        for name in &self.receivers_name {
-            stream_entry_string.push_str(&format!(
-                "Receiver MAC: {}\n ",
-                Device::find_device(name, &device_list).unwrap().mac_address
-            ));
-        }
-
-        stream_entry_string.push_str(&format!("Payload Type: {}\n ", self.payload_type));
-        stream_entry_string.push_str(&format!("Number of Packets: {}\n ", self.number_of_packets));
-        stream_entry_string.push_str(&format!("Payload Length: {}\n ", self.payload_length));
-        stream_entry_string.push_str(&format!("Seed: {}\n ", self.seed));
-        stream_entry_string.push_str(&format!("Broadcast Frames: {}\n ", self.broadcast_frames));
-        stream_entry_string.push_str(&format!("Inter Frame Gap: {}\n ", self.inter_frame_gap));
-        stream_entry_string.push_str(&format!("Time to Live: {}\n ", self.time_to_live));
-        stream_entry_string.push_str(&format!(
-            "Transport Layer Protocol: {}\n ",
-            self.transport_layer_protocol.to_string()
-        ));
-        stream_entry_string.push_str(&format!("Flow Type: {}\n ", self.flow_type.to_string()));
-        stream_entry_string.push_str(&format!("Check Content: {}\n ", self.check_content));
-
-        stream_entry_string
+        self.stream_id = stream_id
     }
 
+    pub fn get_delay(&self) -> &u64 {
+        &self.delay
+    }
     // start the stream by sending a start request to all the senders and receivers
     // this will force the stream to start immediately
-    pub async fn send_stream(&self, device_list: &Vec<Device>) -> Result<(), reqwest::Error> {
-        // add the stream to the list of running streams
-        let mut running_streams = RUNNING_STREAMS.lock().unwrap();
-        running_streams.insert(self.stream_id.clone(), Vec::new());
+    pub async fn send_stream(&mut self, delay: u64) -> Result<(), reqwest::Error> {
+        // send the start request to all the senders and receivers
+        // if the request is successful, add the device to the running devices list
+        // if the request fails, set the device status to offline
 
-        let device = running_streams.get_mut(&self.stream_id).unwrap();
-
-        for name in &self.receivers_name {
-            let mut receiver = Device::find_device(name, &device_list).unwrap();
+        for name in &self.verifiers_name {
+            let receiver = Device::find_device(name);
+            if receiver.is_none() {
+                println!("Device not found: {}, skipping", name);
+                continue;
+            }
+            let mut receiver = receiver.unwrap();
             let response = reqwest::Client::new()
-                .post(&format!("http://{}/start", &receiver.get_device_address()))
-                .body(self.to_string(&device_list))
+                .post(&format!("http://{}/verify", &receiver.get_device_address()))
+                // send the stream details as a json
+                .body(serde_json::to_string(&self).unwrap())
+                .header(HeaderName::from_static("Delay"), delay)
                 .send()
                 .await?;
             match response.status() {
                 StatusCode::OK => {
                     receiver.status = DeviceStatus::Running;
-                    device.push(receiver.get_device_address());
+                    self.running_devices.push(receiver.get_device_address());
                 }
                 _ => {
                     println!("Error: {}", response.text().await.unwrap());
@@ -183,17 +158,23 @@ impl StreamEntry {
             }
         }
 
-        for name in &self.senders_name {
-            let mut sender = Device::find_device(name, &device_list).unwrap();
+        for name in &self.generators_name {
+            let sender = Device::find_device(name);
+            if sender.is_none() {
+                println!("Device not found: {}, skipping", name);
+                continue;
+            }
+            let mut sender = sender.unwrap();
             let response = reqwest::Client::new()
-                .post(&format!("http://{}/start", &sender.get_device_address()))
-                .body(self.to_string(&device_list))
+                .post(&format!("http://{}/generate", &sender.get_device_address()))
+                .body(serde_json::to_string(&self).unwrap())
+                .header(HeaderName::from_static("Delay"), delay)
                 .send()
                 .await?;
             match response.status() {
                 StatusCode::OK => {
                     sender.status = DeviceStatus::Running;
-                    device.push(sender.get_device_address());
+                    self.running_devices.push(sender.get_device_address());
                 }
                 _ => {
                     println!("Error: {}", response.text().await.unwrap());
@@ -204,44 +185,48 @@ impl StreamEntry {
             }
         }
 
-        if device.is_empty() {
-            running_streams.remove(&self.stream_id);
+        if self.running_devices.is_empty() {
+            self.stream_status = StreamStatus::Error;
+            println!("Error: No devices are running the stream")
+        } else {
+            self.stream_status = StreamStatus::Running;
+            println!("Stream started")
         }
+
         Ok(())
     }
 
-    pub fn run_stream(&mut self) {
+    pub fn start_stream(&mut self) {
         self.stream_status = StreamStatus::Running;
-        // add the stream to the list of running streams
-        let _time = sleep(Duration::from_millis(self.time_to_live));
-
-        // wait for the stream to finish
-        self.stream_status = StreamStatus::Stopped;
     }
 
     // force the stream to stop immediately
     // this is done by sending a stop request to all the senders and receivers with the stream id
-    pub async fn stop_stream(&mut self, device_list: &Vec<Device>) -> Result<(), reqwest::Error> {
-        // add the stream to the list of running streams
-        let running_streams = RUNNING_STREAMS.lock().unwrap();
-        let devices = running_streams
-            .get(&self.get_stream_id().to_string())
-            .unwrap()
-            .clone();
+    pub async fn stop_stream(&mut self, forced: u64) -> Result<(), reqwest::Error> {
+        // send the stop reto all the senders and receivers with the stream id
+        // if the request is successful, remove the device from the running devices list
+        // if the request fails, set the device status to offline
 
         // stop the stream
-        for name in &devices {
-            let mut receiver = Device::find_device(name, &device_list).unwrap();
+        for name in &self.running_devices {
+            let receiver = Device::find_device(name);
+            if receiver.is_none() {
+                println!("Device not found: {}, skipping", name);
+                continue;
+            }
+
+            let mut receiver = receiver.unwrap();
             let response = reqwest::Client::new()
                 .post(&format!("http://{}/stop", &receiver.get_device_address()))
                 .body(self.get_stream_id().clone())
+                .header(HeaderName::from_static("forced"), forced)
                 .send()
                 .await?;
 
             match response.status() {
                 StatusCode::OK => {
-                    receiver.running_streams -= 1;
-                    if receiver.running_streams == 0 {
+                    receiver.processes -= 1;
+                    if receiver.processes == 0 {
                         receiver.status = DeviceStatus::Idle;
                     }
                 }
@@ -254,8 +239,7 @@ impl StreamEntry {
         }
 
         self.stream_status = StreamStatus::Stopped;
-        let mut running_streams = RUNNING_STREAMS.lock().unwrap();
-        running_streams.remove(&self.get_stream_id().clone());
+        self.running_devices.clear();
 
         Ok(())
     }
@@ -268,22 +252,21 @@ impl StreamEntry {
     }
 
     // queue the stream to start at a later time
-    // this will start the stream after the delay time
+    // this will start the stream after the delay time this is used on a low reslution timer and can be implemented differently if needed (e.g. a high resolution timer)
     pub async fn queue_stream(&mut self) {
+        // set the stream status to queued
         self.stream_status = StreamStatus::Queued;
 
-        // wait for the start time
-        let mut queue_stream = QUEUED_STREAMS.lock().unwrap();
-        let timer = sleep(Duration::from_millis(self.stream_start_time));
-        queue_stream.insert(self.get_stream_id().clone(), timer);
+        // set the start time
+        print!("Stream queued to start in {} seconds", self.delay / 1000);
 
-        // start the stream after the delay time if the stream is still queued
-        if self.stream_status == StreamStatus::Queued {
-            self.stream_status = StreamStatus::Running;
+        self.send_stream(self.delay).await.unwrap();
 
-            // call the run stream function
-            self.run_stream();
-        }
+        // add the thread to the queued streams list
+        QUEUED_STREAMS
+            .lock()
+            .expect("Error: Failed to lock the queued streams list")
+            .push(self.get_stream_id().clone());
     }
 
     // remove the stream from the queue
@@ -291,46 +274,74 @@ impl StreamEntry {
     pub async fn remove_stream_from_queue(&mut self) {
         self.stream_status = StreamStatus::Stopped; // set the stream status to stopped
 
-        // abort the queued thread
-        let mut queue_stream = QUEUED_STREAMS.lock().unwrap();
-        queue_stream.remove(&self.get_stream_id().clone());
+        // stop the stream
+        let result = self.stop_stream(self.delay).await;
+
+        if result.is_err() {
+            println!("Error: {}", result.err().unwrap());
+        }
+
+        // remove the stream from the queued streams list
+        let mut queue = QUEUED_STREAMS
+            .lock()
+            .expect("Error: Failed to lock the queued streams list");
+
+        // remove the stream from the queued streams vector
+        let index = queue.iter().position(|x| x == self.get_stream_id());
+        if index.is_some() {
+            queue.remove(index.unwrap());
+        } else {
+            println!("Error: Stream not found in the queued streams list!!!");
+        }
     }
 
     pub fn get_stream_id(&self) -> &String {
         &self.stream_id
     }
 
-    pub fn finish_stream(&mut self, device_address: &String, device_list: &mut Vec<Device>) {
+    pub fn finish_stream(&mut self, device_address: &String) {
         // check if there are any devices left in the running streams list for this stream id
         // if there are no devices left, remove the stream from the running streams list and set the stream status to stopped
         // if there are devices left, set the stream status to finished and remove the device from the running streams list
+        let mut device_list = DEVICE_LIST
+            .lock()
+            .expect("Error: Failed to lock the device list");
 
-        let mut running_streams = RUNNING_STREAMS.lock().unwrap();
-        let devices = running_streams
-            .get_mut(&self.get_stream_id().to_string())
-            .unwrap();
-
-        let index = devices
+        let index = self
+            .running_devices
             .iter()
             .position(|x| x.contains(device_address))
-            .unwrap();
+            .expect("Error: Device not found");
 
-        devices.remove(index);
+        self.running_devices.remove(index);
 
-        if devices.len() == 0 {
-            running_streams.remove(&self.get_stream_id().clone());
-
+        if self.running_devices.len() == 0 {
             let device = device_list
                 .iter()
                 .position(|x| &x.ip_address == device_address)
-                .unwrap();
-            
-            device_list[device].running_streams -= 1;
-            if device_list[device].running_streams == 0 {
+                .expect("Error: Device not found");
+
+            device_list[device].processes -= 1;
+            if device_list[device].processes == 0 {
                 device_list[device].status = DeviceStatus::Idle;
             }
 
             self.stream_status = StreamStatus::Stopped;
+            return;
+        }
+        // get all the devices in the running streams list that are offline
+        // if there are any devices in the running streams list that are offline, set the stream status to error
+        // if there are no devices in the running streams list that are offline, set the stream status to finished
+        let mut offline_devices = 0;
+        for name in &self.running_devices {
+            let device = Device::find_device(name).expect("Device not found");
+            if device.status == DeviceStatus::Offline {
+                offline_devices += 1;
+            }
+        }
+
+        if offline_devices > 0 {
+            self.stream_status = StreamStatus::Error;
             return;
         }
 
@@ -339,7 +350,7 @@ impl StreamEntry {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(tag = "type")]
+#[serde(tag = "status")]
 pub enum StreamStatus {
     #[default]
     #[serde(rename = "Created")]
@@ -352,25 +363,18 @@ pub enum StreamStatus {
     Finished,
     #[serde(rename = "Queued")]
     Queued,
+    #[serde(rename = "Error")]
+    Error,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
-#[serde(tag = "type")]
+#[serde(tag = "protocol")]
 enum TransportLayerProtocol {
     #[default]
     #[serde(rename = "TCP")]
     TCP,
     #[serde(rename = "UDP")]
     UDP,
-}
-
-impl TransportLayerProtocol {
-    fn to_string(&self) -> String {
-        match self {
-            TransportLayerProtocol::TCP => "TCP".to_string(),
-            TransportLayerProtocol::UDP => "UDP".to_string(),
-        }
-    }
 }
 
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
@@ -383,20 +387,12 @@ enum FlowType {
     Bursts,
 }
 
-impl FlowType {
-    fn to_string(&self) -> String {
-        match self {
-            FlowType::BtB => "BtB".to_string(),
-            FlowType::Bursts => "Bursts".to_string(),
-        }
-    }
-}
-
 // Devices model
 #[derive(Serialize, Deserialize, Validate, Debug, Clone)]
 pub struct Device {
     // if name not given then use ip address as name
     #[validate(length(min = 1, message = "name must be greater than 0"))]
+    #[serde(default, rename = "name")]
     pub name: String,
     #[validate(
         regex(path = "IP_ADDRESS", message = "ip must be a valid ip address"),
@@ -417,20 +413,25 @@ pub struct Device {
     )]
     #[serde(rename = "mac")]
     pub mac_address: String,
+    // processes is the number of streams running on the device
     #[serde(default, skip_serializing)]
-    pub running_streams: u16,
+    pub processes: u16,
     #[serde(rename = "status", skip_serializing)]
     pub status: DeviceStatus,
 }
 
 // find the device either by name or ip or mac address
 impl Device {
-    pub fn find_device(name: &str, device_list: &Vec<Device>) -> Option<Device> {
+    pub fn find_device(name: &str) -> Option<Device> {
         // search for the device in the list of devices by iterating over the list of devices
         // the list of devices is known to be small so this is not a performance issue
         // this is method is used to find the device by ip first then by mac address and then by name
         // this is done to make sure that the device is found even if the user enters the wrong ip address or mac address
         // this is also done to make sure that the user can find the device by name if the ip address or mac address is not known
+
+        let device_list = DEVICE_LIST
+            .lock()
+            .expect("Error: Failed to lock the device list");
 
         // find in all ip addresses
         for device in device_list.iter() {
@@ -463,7 +464,7 @@ impl Device {
 
 // Device status
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(tag = "type")]
+#[serde(tag = "status")]
 pub enum DeviceStatus {
     #[serde(rename = "Online")]
     Online,
@@ -476,21 +477,11 @@ pub enum DeviceStatus {
     Idle,
 }
 
-// device status to string
-impl DeviceStatus {
-    fn to_string(&self) -> String {
-        match self {
-            DeviceStatus::Online => "Online".to_string(),
-            DeviceStatus::Offline => "Offline".to_string(),
-            DeviceStatus::Running => "Running".to_string(),
-            DeviceStatus::Idle => "Idle".to_string(),
-        }
-    }
-}
+pub fn get_devices_table() -> String {
+    let device_list = DEVICE_LIST
+        .lock()
+        .expect("Error: Failed to lock the device list");
 
-
-
-pub fn get_devices_table(device_list: &Vec<Device>) -> String {
     let mut data = String::from(
         "<table>
     <tr>
@@ -507,14 +498,10 @@ pub fn get_devices_table(device_list: &Vec<Device>) -> String {
             <td>{}</td>
             <td>{}</td>
             <td>{}</td>
-            <td>{}</td>
+            <td>{:#?}</td>
             <td>{}</td>
         </tr>",
-            device.name,
-            device.ip_address,
-            device.mac_address,
-            device.status.to_string(),
-            device.running_streams
+            device.name, device.ip_address, device.mac_address, device.status, device.processes
         );
         data.push_str(&row);
     }

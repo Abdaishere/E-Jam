@@ -55,13 +55,13 @@ Adds a new stream to the list
 
 Deletes the stream with the given stream_id.
 
-### PUT /streams/{stream_id}
+### PUT /streams
 
 Updates the stream with the given stream_id.
 
 ### POST /streams/{stream_id}/start
 
-Starts the stream with the given stream_id.
+Starts the stream with the given stream_id in body.
 
 ### POST /streams/{stream_id}/force_start
 
@@ -132,34 +132,34 @@ The structure of the Stream object as a table is as follows:
     <td></td>
     <td>3</td>
     <td>3</td>
-    <td>stream_id must be 3 characters long, stream_id must be alphanumeric</td>
+    <td>stream_id must be 3 characters long alphanumeric</td>
 </tr>
 <tr>
-    <td>stream_start_time</td>
+    <td>delay</td>
     <td>u64</td>
     <td>No</td>
     <td>0</td>
     <td>0</td>
-    <td></td>
-    <td>stream_start_time must be greater than 0</td>
+    <td>2^63-1</td>
+    <td>stream start time must be greater than 0</td>
 </tr>
 <tr>
-    <td>senders_name</td>
+    <td>generators</td>
     <td>Vec of Strings (name or ip of device)</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
     <td></td>
-    <td>number_of_senders must be greater than 0</td>
+    <td>number of generators must be greater than 0</td>
 </tr>
 <tr>
-    <td>receivers_name</td>
+    <td>verifiers</td>
     <td>Vec of Strings (name or ip of device)</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
     <td></td>
-    <td>number_of_receivers must be greater than 0</td>
+    <td>number of verifiers must be greater than 0</td>
 </tr>
 <tr>
     <td>payload_type</td>
@@ -191,20 +191,20 @@ The structure of the Stream object as a table is as follows:
 <tr>
     <td>seed</td>
     <td>u32</td>
-    <td>Yes</td>
+    <td>NO</td>
     <td></td>
+    <td>0</td>
     <td></td>
-    <td></td>
-    <td></td>
+    <td>seed must be greater than 0</td>
 </tr>
 <tr>
     <td>broadcast_frames</td>
     <td>u32</td>
     <td>Yes</td>
     <td></td>
+    <td>0</td>
     <td></td>
-    <td></td>
-    <td></td>
+    <td>broadcast_frames must be greater than 0</td>
 </tr>
 <tr>
     <td>inter_frame_gap</td>
@@ -217,7 +217,7 @@ The structure of the Stream object as a table is as follows:
 </tr>
 <tr>
     <td>time_to_live</td>
-    <td>u32</td>
+    <td>u64</td>
     <td>Yes</td>
     <td></td>
     <td>0</td>
@@ -247,18 +247,18 @@ The structure of the Stream object as a table is as follows:
     <td>bool</td>
     <td>No</td>
     <td>false</td>
-    <td></td>
-    <td></td>
+    <td>0</td>
+    <td>1</td>
     <td>check_content must be true or false</td>
 </tr>
 <tr>
-    <td>check_content</td>
-    <td>bool</td>
+    <td>running_devices</td>
+    <td>Vec of IPs</td>
     <td>No</td>
-    <td>false</td>
+    <td>empty</td>
+    <td>0</td>
     <td></td>
-    <td></td>
-    <td>check_content must be true or false</td>
+    <td>must containe devices running courent stream only when running it</td>
 </tr>
 <tr>
     <td>stream_status</td>
@@ -267,7 +267,7 @@ The structure of the Stream object as a table is as follows:
     <td>0</td>
     <td>0</td>
     <td></td>
-    <td></td>
+    <td>must containe the status of the Stream at the current point in time</td>
 </tr>
 </table>
 
@@ -286,30 +286,30 @@ The structure of the Device object as a table is as follows:
     <th>Validation</th>
 </tr>
 <tr>
-    <td>device_name</td>
+    <td>name</td>
     <td>String</td>
     <td>Yes</td>
-    <td>defaulted to be either mac or ip address from client side</td>
+    <td>ip Variable</td>
     <td>1</td>
     <td></td>
-    <td>device_name must be greater than 0 characters long</td>
+    <td>name must be greater than 0</td>
 </tr>
 <tr>
-    <td>device_ip</td>
+    <td>ip</td>
     <td>String</td>
     <td>Yes</td>
     <td></td>
     <td>7</td>
     <td>15</td>
-    <td>device_ip must be between 7 and 15 characters long, device_ip must be a valid ip address</td>
+    <td>ip must be between 7 and 15 characters long, ip must be a valid ip address</td>
 </tr>
 <tr>
     <td>mac</td>
     <td>String</td>
     <td>Yes</td>
     <td></td>
-    <td></td>
-    <td></td>
+    <td>17</td>
+    <td>17</td>
     <td>must be a valid mac address</td>
 </tr>
 </table>
@@ -323,34 +323,55 @@ The following endpoints are available for the system API:
     <th>Endpoint</th>
     <th>Method</th>
     <th>Body</th>
+    <th>header</th>
     <th>Response</th>
     <th>Description</th>
+</tr>
+<tr>
+    <td>/streams/{stream_id}/finished</td>
+    <td>POST</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side</td>
+</tr>
+<tr>
+    <td>/streams/{stream_id}/started</td>
+    <td>POST</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's</td>
 </tr>
 <tr>
     <td>/connect</td>
     <td>GET</td>
     <td>mac address of the device</td>
     <td></td>
-    <td>Connect to the system API</td>
-</tr>
-<tr>
-    <td>/finish</td>
-    <td>POST</td>
     <td></td>
-    <td>Stream_id</td>
-    <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side</td>
+    <td>will be called to Connect to the system API</td>
 </tr>
 <tr>
-    <td>/start</td>
+    <td>/verify</td>
     <td>POST</td>
-    <td>Stream.to_string()</td>
+    <td>StreamEntry</td>
+    <td>delay</td>
     <td>Success</td>
-    <td>Try to Start the Stream</td>
+    <td>Verify the Provided Stream</td>
+</tr>
+<tr>
+    <td>/generate</td>
+    <td>POST</td>
+    <td>StreamEntry</td>
+    <td>delay</td>
+    <td>Success</td>
+    <td>generate the Provided Stream</td>
 </tr>
 <tr>
     <td>/stop</td>
     <td>POST</td>
     <td>stream_id</td>
+    <td>is_forced</td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>
 </tr>
