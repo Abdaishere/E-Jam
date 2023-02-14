@@ -3,12 +3,12 @@
 
 #define CONFIG_FOLDER_LENGTH 11
 
-#include "Configuration.h"
-#include "Byte.h"
+#include "../commonHeaders/Configuration.h"
+#include "../commonHeaders/Byte.h"
 #include <map>
 #include <string>
 #include <sstream>
-#include "UsernameGetter.h"
+#include "../commonHeaders/UsernameGetter.h"
 
 class ConfigurationManager
 {

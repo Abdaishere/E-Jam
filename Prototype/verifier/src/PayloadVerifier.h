@@ -2,7 +2,7 @@
 #define PAYLOADVERIFIER_H
 
 
-#include "Byte.h"
+#include "../commonHeaders/Byte.h"
 #include "ConfigurationManager.h"
 #include "ErrorHandler.h"
 

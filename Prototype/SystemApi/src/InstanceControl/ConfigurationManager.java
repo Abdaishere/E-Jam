@@ -1,6 +1,5 @@
 package InstanceControl;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -53,6 +52,14 @@ public class ConfigurationManager
             fileWriter.write(Long.toString(stream.numberOfPackets)+'\n');
             fileWriter.write(Integer.toString(stream.payloadLength)+'\n');
             fileWriter.write(Integer.toString(stream.seed)+'\n');
+            fileWriter.write(Long.toString(stream.bcFramesNum)+'\n');
+            fileWriter.write(Long.toString(stream.interFrameGap)+'\n');
+            fileWriter.write(Long.toString(stream.lifeTime)+'\n');
+            fileWriter.write(stream.transportProtocol.toString()+'\n');
+            fileWriter.write(stream.flowType.toString()+'\n');
+            int checkContent = stream.checkContent ? 1 : 0;
+            fileWriter.write(checkContent+'\n');
+
 
             fileWriter.close();
         }
