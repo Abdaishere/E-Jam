@@ -1,0 +1,6 @@
+*node_modules
+*.idea
+*.ini
+Admin-Client-App/dist/
+
+Admin-Client-App/logs/

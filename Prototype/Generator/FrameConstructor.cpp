@@ -1,0 +1,16 @@
+//
+// Created by khaled on 11/27/22.
+//
+
+#include "FrameConstructor.h"
+
+ByteArray FrameConstructor::getFrame()
+{
+    return frame;
+}
+
+FrameConstructor::FrameConstructor(ByteArray source_address, ByteArray destination_address)
+{
+        this->source_address = source_address;
+        this->destination_address = destination_address;
+}

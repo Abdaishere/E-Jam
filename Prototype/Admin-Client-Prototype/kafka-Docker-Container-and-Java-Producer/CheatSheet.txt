@@ -1,0 +1,20 @@
+Create topic:
+docker exec -it broker kafka-topics --bootstrap-server broker:9092 --create --topic statistics --partitions 1 --replication-factor 1
+
+docker exec -it broker kafka-topics --bootstrap-server broker:9092 --create --topic statistics
+
+List topic:
+docker exec -it broker kafka-topics --bootstrap-server broker:9092 --list
+
+verify that Avro based Order records are making it into Kafka: 
+docker exec -it schema-registry kafka-avro-console-consumer --bootstrap-server broker:29092 --from-beginning --topic statistics --property schema.registry.url=http://schema-registry:8081
+
+
+Run producer:
+./gradlew run
+
+Using the HttpPie HTTP CLI client but or use curl or Postman use the Confluent Schema Registry REST API to inspect the data its managing for schemas.
+GET http://0.0.0.0:8081/schemas
+
+and you can use Offset Explorer 2.3
+

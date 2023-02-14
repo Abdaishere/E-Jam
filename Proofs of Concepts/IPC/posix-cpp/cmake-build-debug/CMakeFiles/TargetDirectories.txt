@@ -1,3 +1,0 @@
-/home/mostafa-abdullah/CLionProjects/GP/posixTest/cmake-build-debug/CMakeFiles/posixTest.dir
-/home/mostafa-abdullah/CLionProjects/GP/posixTest/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/mostafa-abdullah/CLionProjects/GP/posixTest/cmake-build-debug/CMakeFiles/rebuild_cache.dir

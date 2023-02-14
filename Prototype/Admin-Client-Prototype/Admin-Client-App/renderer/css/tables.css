@@ -1,0 +1,109 @@
+body {
+    background-color: #172231;
+    color: white;
+    margin: 0;
+    line-height: inherit;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#tables-viewer {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 1px 3px 5px black inset;
+    border-radius: 9px;
+    padding: 40px;
+    min-height: 750px;
+}
+
+#tables {
+    display: flex;
+    justify-content: center;
+    transition: background-color, .5s;
+}
+
+th {
+    min-width: 100px;
+}
+
+td, tr {
+    border: 1px solid white;
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 5px;
+    text-align: center;
+}
+
+@media screen and (min-height: 1000px) and (max-width: 650px) {
+    #tables-viewer {
+        flex-direction: column;
+    }
+}
+
+#mid-space {
+    width: 7px;
+}
+
+#up-header {
+    background-image: linear-gradient(to bottom left, #a5b2ff, #9600ff);
+}
+
+#down-header {
+    background-image: linear-gradient(to bottom right, #91eeaa, #0ccda3);
+}
+
+
+table {
+    box-shadow: 2px 4px 10px #000 inset;
+    border: hidden;
+}
+
+#downloadTable {
+    max-height: 700px;
+    min-width: 450px;
+    max-width: 850px;
+    border-left: 5px double #0ccda3;
+    padding: 0px 4px 4px 10px;
+    overflow-y: scroll;
+}
+
+/* Handle */
+#downloadTable::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(to bottom right, #91eeaa, #0ccda3);
+    border-radius: 6px;
+}
+
+/* Handle on hover */
+#downloadTable::-webkit-scrollbar-thumb:hover {
+    background: #91eeaa;
+}
+
+
+#uploadTable {
+    max-height: 700px;
+    min-width: 450px;
+    max-width: 750px;
+    border-right: 5px double #9600ff;
+    padding: 0px 4px 4px 5px;
+    overflow-y: scroll;
+}
+
+/* Handle */
+#uploadTable::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(to bottom left, #a5b2ff, #9600ff);
+    border-radius: 6px;
+}
+
+/* Handle on hover */
+#uploadTable::-webkit-scrollbar-thumb:hover {
+    background: #ba8df5;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
