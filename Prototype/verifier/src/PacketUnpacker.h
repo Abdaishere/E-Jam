@@ -7,14 +7,16 @@
 #include "PacketReceiver.h"
 #include <queue>
 #include <mutex>
+#include "SeqChecker.h"
 #include "../commonHeaders/StatsManager.h"
 
 class PacketUnpacker
 {
 private:
-    std::mutex mtx; //to protect packetQueue from data races
+    std::mutex mtx;
     ByteArray* consumePacket();
     PacketReceiver* packetReceiver;
+    SeqChecker seqChecker;
 public:
     static std::queue<ByteArray*> packetQueue;
     PacketUnpacker(int verID);

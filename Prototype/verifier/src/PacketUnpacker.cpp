@@ -20,6 +20,7 @@ PacketUnpacker::PacketUnpacker(int verID)
 {
     std::string path = "/tmp/fifo_pipe_ver" + std::to_string(verID);
     packetReceiver = PacketReceiver::getInstance(verID, path);
+    seqChecker = SeqChecker();
 }
 
 ByteArray* PacketUnpacker::consumePacket()
@@ -70,6 +71,15 @@ void PacketUnpacker::verifiyPacket()
         ErrorHandler::getInstance()->logError();
         return;
     }
+
+    //unpack sequence number
+    long long seqNum = 0;
+    int seqNumStartIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN+STREAMID_LEN;
+    for(int i=0; i<8; i++)
+        seqNum |= ((long long )packet->at(seqNumStartIndex+i) << (i*8));
+    seqChecker.receive(seqNum);
+    std::cerr << seqNum << "\n";
+
 
     //check for frame errors
     //by matching receiver and sender mac addresses and checking the CRCs
