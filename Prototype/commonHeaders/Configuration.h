@@ -27,21 +27,27 @@ typedef unsigned long long ull;
 
 
 enum PayloadType {FIRST, SECOND, RANDOM};
+enum TransportProtocol {TCP, UDP};
+enum FlowType {BACK_TO_BACK, BURSTY};
 
 class Configuration
 {
 private:
     //stream attributes
-    std::vector<ByteArray> senders; //list of senders mac addresses
-    std::vector<ByteArray> receivers; //list of receivers mac addressess
-    ByteArray myMacAddress;
-    PayloadType payloadType;
-    ull numberOfPackets = 100;
-    ull lifeTime = 100;
-    int payloadLength, seed;
-    int flowType;
-    ull SendingRate;
-    ByteArray* streamID;
+    ByteArray* streamID;                //A 3 alphanumeric charaters defining a stream
+    std::vector<ByteArray> senders;     //list of senders mac addresses
+    std::vector<ByteArray> receivers;   //list of receivers mac addressess
+    ByteArray myMacAddress;             //The mac address of this machine (Inferred)
+    PayloadType payloadType;            //The type of the payload
+    ull numberOfPackets = 100;          //Number of packets flowing in the stream before it ends
+    ull bcFramesNum;                    //after x regular frame, send a broadcast frame
+    int payloadLength, seed;            //Payload length, and seed to use in RNGs
+    ull interFrameGap;                  //Time to wait between each packet generation in the stream in ms
+    ull lifeTime = 1000;                //Time to live before ending execution in ms
+    TransportProtocol transportProtocol;  //The protocol used in the transport layer
+    FlowType flowType;                  //The production pattern that the packets uses
+    bool checkContent;                  //Whether to check content or not
+
 
     //convert int to corresponding hexa character
     unsigned char hexSwitcher(int x)
@@ -54,6 +60,7 @@ private:
             return 'F';
     }
 
+    //Discover the mac address of this machine
     ByteArray discoverMyMac()
     {
         struct ifreq ifr;
@@ -89,6 +96,7 @@ private:
         return ByteArray((char*) mac_address, MAC_ADD_LEN,0);
     }
 public:
+    //Read configuration from a file of the correct format
     void loadFromFile(char* path)
     {
         freopen(path,"r",stdin);
@@ -115,9 +123,9 @@ public:
             receivers.push_back(ByteArray(s.c_str(),s.size(),0));
         }
         //Read payload type
-        int pt;
-        std::cin>>pt;
-        switch (pt)
+        int input;
+        std::cin>>input;
+        switch (input)
         {
             case 0:
                 payloadType = FIRST;
@@ -132,6 +140,38 @@ public:
         std::cin>>numberOfPackets;
         std::cin>>payloadLength;
         std::cin>>seed;
+        std::cin>>bcFramesNum;
+        std::cin>>interFrameGap;
+        std::cin>>lifeTime;
+
+        //Read transport protocol
+        std::cin>>input;
+        switch (input)
+        {
+            case 0:
+                transportProtocol = TCP;
+                break;
+            default:
+                transportProtocol = UDP;
+        }
+
+        //Read Flow type
+        std::cin>>input;
+        switch (input)
+        {
+            case 0:
+                flowType = BACK_TO_BACK;
+                break;
+            default:
+                flowType = BURSTY;
+        }
+
+        //Read check content
+        char cInput;
+        std::cin>>cInput;
+        cInput-='0'; //convert to int
+        checkContent = cInput;
+
 
         //handle macaddres
         myMacAddress = discoverMyMac();
@@ -191,9 +231,9 @@ public:
         return senders;
     }
 
-    void setSenders(const std::vector<ByteArray> &senders)
+    void setSenders(const std::vector<ByteArray> &inSenders)
     {
-        Configuration::senders = senders;
+        Configuration::senders = inSenders;
     }
 
     const std::vector<ByteArray> &getReceivers() const
@@ -201,9 +241,9 @@ public:
         return receivers;
     }
 
-    void setReceivers(const std::vector<ByteArray> &receivers)
+    void setReceivers(const std::vector<ByteArray> &inReceivers)
     {
-        Configuration::receivers = receivers;
+        Configuration::receivers = inReceivers;
     }
 
     PayloadType getPayloadType() const
@@ -211,9 +251,9 @@ public:
         return payloadType;
     }
 
-    void setPayloadType(PayloadType payloadType)
+    void setPayloadType(PayloadType pt)
     {
-        Configuration::payloadType = payloadType;
+        Configuration::payloadType = pt;
     }
 
     long long int getNumberOfPackets() const
@@ -221,9 +261,9 @@ public:
         return numberOfPackets;
     }
 
-    void setNumberOfPackets(long long int numberOfPackets)
+    void setNumberOfPackets(long long int nop)
     {
-        Configuration::numberOfPackets = numberOfPackets;
+        Configuration::numberOfPackets = nop;
     }
 
     long long int getLifeTime() const
@@ -231,29 +271,9 @@ public:
         return lifeTime;
     }
 
-    void setLifeTime(long long int lifeTime)
+    void setLifeTime(long long int lt)
     {
-        Configuration::lifeTime = lifeTime;
-    }
-
-    int getFlowType() const
-    {
-        return flowType;
-    }
-
-    void setFlowType(int flowType)
-    {
-        Configuration::flowType = flowType;
-    }
-
-    long long int getSendingRate() const
-    {
-        return SendingRate;
-    }
-
-    void setSendingRate(long long int sendingRate)
-    {
-        SendingRate = sendingRate;
+        Configuration::lifeTime = lt;
     }
 
     ByteArray getMyMacAddress()
@@ -286,7 +306,35 @@ public:
         streamID = new ByteArray(id,STREAMID_LEN,0);
     }
 
-    //For debugging only
+    ull getBcFramesNum()
+    {
+        return bcFramesNum;
+    }
+
+    ull getInterFrameGap()
+    {
+        return interFrameGap;
+    }
+
+    ull getLifeTime()
+    {
+        return lifeTime;
+    }
+    TransportProtocol getTransportProtocol()
+    {
+        return transportProtocol;
+    }
+    FlowType getFlowType()
+    {
+        return flowType;
+    }
+    bool getCheckContent()
+    {
+        return checkContent;
+    }
+
+
+    //Printing for debugging only
     void print()
     {
         printf("Stream ID: %s\n", streamID->bytes);
@@ -317,7 +365,29 @@ public:
         }
         printf("Number of packets: %d\n", (int)numberOfPackets);
         printf("Payload length: %d\n", payloadLength);
-        printf("Seed: %d\n\n\n", seed);
+        printf("Seed: %d\n", seed);
+        printf("bcFramesNum: %llu\n", bcFramesNum);
+        printf("interFrameGap: %llu\n", interFrameGap);
+        printf("lifeTime: %llu\n", lifeTime);
+
+        switch (transportProtocol)
+        {
+            case TCP:
+                printf("Transprt Protocol Type: TCP\n");
+                break;
+            default:
+                printf("Transprt Protocol Type: UDP\n");
+        }
+        switch (flowType)
+        {
+            case BACK_TO_BACK:
+                printf("Flow Type: Back to back\n");
+                break;
+            default:
+                printf("Flow Type: Bursty\n");
+        }
+
+        printf("checkContent: %d\n", checkContent);
         printf("###########################\n");
     }
 };

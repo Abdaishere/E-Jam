@@ -7,7 +7,14 @@
 *.cbp
 *.cmake
 *.marks
-*/cmake-build-debug/*
+*/cmake-build-debug/
+*/clion-environment.txt
+*/clion-log.txt
+*clion*
+*CMake*
+/Prototype/verifier/cmake-build-debug/
+/Prototype/Generator/cmake-build-debug/
+/Prototype/Gateway/cmake-build-debug/
 
 # Compiled Object files
 *.slo
@@ -38,6 +45,7 @@
 *.exe
 *.out
 *.app
+/Prototype/Executables/
 
 # OS files
 .directory
