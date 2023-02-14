@@ -145,7 +145,7 @@ The structure of the Stream object as a table is as follows:
 </tr>
 <tr>
     <td>generators</td>
-    <td>Vec of Strings (name or ip of device)</td>
+    <td>Vec of Devices</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
@@ -154,7 +154,7 @@ The structure of the Stream object as a table is as follows:
 </tr>
 <tr>
     <td>verifiers</td>
-    <td>Vec of Strings (name or ip of device)</td>
+    <td>Vec of Devices</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
@@ -221,7 +221,7 @@ The structure of the Stream object as a table is as follows:
     <td>Yes</td>
     <td></td>
     <td>0</td>
-    <td></td>
+    <td>2^63-1</td>
     <td>time_to_live must be greater than 0</td>
 </tr>
 <tr>
@@ -348,7 +348,7 @@ The following endpoints are available for the system API:
     <td>GET</td>
     <td>mac address of the device</td>
     <td></td>
-    <td></td>
+    <td>Success</td>
     <td>will be called to Connect to the system API</td>
 </tr>
 <tr>

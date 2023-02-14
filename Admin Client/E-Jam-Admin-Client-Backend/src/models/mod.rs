@@ -26,27 +26,6 @@ impl Default for AppState {
     }
 }
 
-// Stream ID (3 alphanumeric characters)
-// number of senders		(n)
-// sender 1 mac
-// sender 2 mac
-// ...
-// sender n mac
-// number of receivers     (m)
-// receiver 1 mac
-// receiver 2 mac
-// ...
-// receiver m mac
-// Payload Type			(0 or 1 or 2)
-// numberOfPackets			(+ve int)
-// payloadLength			(+ve int < 1500)
-// seed
-// broadcast frames		(after x regular frame send a broadcast, x = 0 to disable)
-// inter-frame gap			(+ve int in ms)
-// Time to live			(+ve int in ms)
-// transport layer Protocol(0 TCP or 1 UDP)
-// Flow type				(0 BtB or 1 Bursts)
-// check content			(0 false or 1 true)
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct StreamEntry {
     #[serde(default, rename = "delay")]
