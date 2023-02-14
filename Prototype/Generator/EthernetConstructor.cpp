@@ -7,34 +7,28 @@
 //TODO Get values from Configuration manager
 EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
                                          ByteArray& payload,
-                                         ByteArray& innerProtocol,
-                                         ByteArray& streamID) : FrameConstructor(sourceAddress, destinationAddress){
+                                         ByteArray& innerProtocol) : FrameConstructor(sourceAddress, destinationAddress){
     this->payload = payload;
     type=innerProtocol;
-    this->streamID = streamID;
 }
 
-//construct frame 
 void EthernetConstructor::constructFrame() {
     char* pre = new char[8];
     pre[0] = pre[1] = pre[2] = pre[3] = pre[4] = pre[5] = pre[6] = 0xAA;
     pre [7] = 0xAB;
     preamble = ByteArray(pre, 8);
 
-    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + STREAMID_LEN + payload.capacity + CRC_LENGTH);
+    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + payload.capacity + CRC_LENGTH);
 //    frame.write(preamble);
     frame.write(destination_address);
     frame.write(source_address);
     frame.write(type);
-    frame.write(streamID);
     frame.write(payload);
 
 
     CRC = calculateCRC(&payload);
     frame.write(CRC);
 }
-
-//crc table
 static uint32_t CRCTable[256] = {
         0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
         0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
@@ -102,7 +96,6 @@ static uint32_t CRCTable[256] = {
         0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 };
 
-//calculate crc to current payload 
 ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
 {
     unsigned int crc32 = 0xFFFFFFFFu;
