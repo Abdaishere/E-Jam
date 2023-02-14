@@ -1,0 +1,10 @@
+@ 2022:10:19:17:40:00.000000 + Abdallah
+@ 2022:10:19:17:40:05.000000 - Abdallah
+@ 2022:10:19:17:40:10.000000 + Abdallah & Mohamed & Khaled & Islam
+@ 2022:10:19:17:40:25.000000 = Abdallah 100 Mohamed & 100 Khaled & 1000 Islam
+@ 2022:10:19:17:40:50.000000 - Abdallah & Mohamed & Khaled & Islam
+! 00:00:10.000000 + Abdallah
+! 00:00:10.000000 + Ahmed
+! 00:00:15.000000 = Ahmed 100 Abdallah
+! 00:00:20.000000 - Abdallah
+! 00:00:20.000000 - Ahmed
