@@ -120,7 +120,7 @@ async fn update_stream(
             // if the stream is running, stop it
             if stream_entry.get_stream_status() == &StreamStatus::Running {
                 stream_entry
-                    .stop_stream(1)
+                    .stop_stream()
                     .await
                     .expect("Failed to stop stream");
             }
@@ -197,7 +197,7 @@ async fn force_start_stream(
             // if the stream is queued, remove it from the queue
             if stream_entry.get_stream_status() == &StreamStatus::Running {
                 stream_entry
-                    .stop_stream(1)
+                    .stop_stream()
                     .await
                     .expect(format!("Failed to stop stream {}", stream_id).as_str());
             }
@@ -208,7 +208,7 @@ async fn force_start_stream(
 
             // start the stream
             stream_entry
-                .send_stream(*stream_entry.get_delay())
+                .send_stream(true)
                 .await
                 .expect(format!("Failed to send stream {}", stream_id).as_str());
             println!("Stream {} force started", stream_id);
@@ -262,7 +262,7 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
                 HttpResponse::Conflict().finish()
             } else {
                 stream_entry
-                    .stop_stream(1)
+                    .stop_stream()
                     .await
                     .expect(format!("Failed to stop stream in stop_stream {}", stream_id).as_str());
                 HttpResponse::Ok().finish()
@@ -293,7 +293,7 @@ async fn force_stop_stream(
     match stream_entry {
         Some(stream_entry) => {
             stream_entry
-                .stop_stream(1)
+                .stop_stream()
                 .await
                 .expect("Failed to stop stream");
             HttpResponse::Ok().finish()
@@ -317,7 +317,7 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             stream_entry.remove_stream_from_queue().await;
         } else if stream_entry.get_stream_status() == &StreamStatus::Running {
             stream_entry
-                .stop_stream(1)
+                .stop_stream()
                 .await
                 .expect("Failed to stop stream");
         }

@@ -323,7 +323,6 @@ The following endpoints are available for the system API:
     <th>Endpoint</th>
     <th>Method</th>
     <th>Body</th>
-    <th>header</th>
     <th>Response</th>
     <th>Description</th>
 </tr>
@@ -332,46 +331,33 @@ The following endpoints are available for the system API:
     <td>POST</td>
     <td></td>
     <td></td>
-    <td></td>
-    <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side</td>
+    <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side (must be sent from the systemapi to the admin client)</td>
 </tr>
 <tr>
     <td>/streams/{stream_id}/started</td>
     <td>POST</td>
     <td></td>
     <td></td>
-    <td></td>
-    <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's</td>
+    <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's (must be sent from the systemapi to the admin client)</td>
 </tr>
 <tr>
     <td>/connect</td>
     <td>GET</td>
     <td>mac address of the device</td>
-    <td></td>
     <td>Success</td>
     <td>will be called to Connect to the system API</td>
 </tr>
 <tr>
-    <td>/verify</td>
+    <td>/start</td>
     <td>POST</td>
-    <td>StreamEntry</td>
-    <td>delay</td>
+    <td>StreamDetails</td>
     <td>Success</td>
-    <td>Verify the Provided Stream</td>
-</tr>
-<tr>
-    <td>/generate</td>
-    <td>POST</td>
-    <td>StreamEntry</td>
-    <td>delay</td>
-    <td>Success</td>
-    <td>generate the Provided Stream</td>
+    <td>generate or verify the Provided Stream</td>
 </tr>
 <tr>
     <td>/stop</td>
     <td>POST</td>
     <td>stream_id</td>
-    <td>is_forced</td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>
 </tr>
