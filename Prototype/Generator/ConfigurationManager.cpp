@@ -11,7 +11,7 @@ Configuration* ConfigurationManager::getConfiguration(char* path)
         configuration =  new Configuration();
 
     configuration->loadFromFile(path);
-    configuration->Mac12toMac6();
+//    configuration->Mac12toMac6();
     return configuration;
 }
 Configuration* ConfigurationManager::getConfiguration()

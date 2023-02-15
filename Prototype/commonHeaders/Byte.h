@@ -67,6 +67,15 @@ struct ByteArray
         return true;
     }
 
+    bool write(long long num)
+    {
+        if(length + 8 > capacity)
+            return false;
+        for(int i=0; i<8; i++)
+            bytes[length++] = (num >> (i * 8)) & 0xff;
+        return true;
+    }
+
     //appends a sub-range [start, end] of bytesToWrite to the current byteArray
     bool write(ByteArray& bytesToWrite, int start, int end)
     {

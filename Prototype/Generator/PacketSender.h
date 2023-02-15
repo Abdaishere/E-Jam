@@ -22,7 +22,7 @@ private:
     int genID;
     PacketSender();
 //    std::string getNewPacket();
-    int openFifo();
+    void openFifo();
 public:
     static PacketSender* getInstance(int genID = 0, std::string pipeDir = "", int pipePerm = 0777);
     void transmitPackets(const ByteArray &packet) const;

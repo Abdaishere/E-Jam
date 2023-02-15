@@ -55,8 +55,8 @@ public class ConfigurationManager
             fileWriter.write(Long.toString(stream.bcFramesNum)+'\n');
             fileWriter.write(Long.toString(stream.interFrameGap)+'\n');
             fileWriter.write(Long.toString(stream.lifeTime)+'\n');
-            fileWriter.write(stream.transportProtocol.toString()+'\n');
-            fileWriter.write(stream.flowType.toString()+'\n');
+            fileWriter.write(Integer.toString(stream.transportProtocol.ordinal())+'\n');
+            fileWriter.write(Integer.toString(stream.flowType.ordinal())+'\n');
             int checkContent = stream.checkContent ? 1 : 0;
             fileWriter.write(checkContent+'\n');
 

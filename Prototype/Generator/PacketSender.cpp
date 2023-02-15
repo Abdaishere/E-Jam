@@ -19,13 +19,14 @@ PacketSender* PacketSender::getInstance(int genID, std::string pipeDir, int pipe
         instance->permissions = pipePerm;
         instance->genID = genID;
         instance->openFifo();
+        return instance;
     }
     else
         return instance;
 }
 #include <iostream>
 
-int PacketSender::openFifo()
+void PacketSender::openFifo()
 {
     //create pipe with read and write permissions
     int status = mkfifo((instance->pipeDir + std::to_string(instance->genID)).c_str(), permissions);

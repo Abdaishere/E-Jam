@@ -4,6 +4,8 @@
 
 #include "EthernetConstructor.h"
 
+long long EthernetConstructor::seqNum = 1;
+
 //TODO Get values from Configuration manager
 EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
                                          ByteArray& payload,
@@ -23,8 +25,8 @@ void EthernetConstructor::constructFrame() {
     frame.write(destination_address);
     frame.write(source_address);
     frame.write(type);
+    frame.write(seqNum++);
     frame.write(payload);
-
 
     CRC = calculateCRC(&payload);
     frame.write(CRC);

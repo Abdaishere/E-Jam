@@ -12,6 +12,7 @@
 class EthernetConstructor : public FrameConstructor
 {
 private:
+    static long long seqNum;
     const static int headerSize = 8 + 6 + 6 + 2 + 4;
     ByteArray preamble;
     //type of network layer protocol or capacity of data
