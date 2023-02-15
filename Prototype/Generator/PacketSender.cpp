@@ -47,5 +47,7 @@ void PacketSender::openFifo()
 
 void PacketSender::transmitPackets(const ByteArray& packet) const
 {
+    int len = packet.length;
+    write(fd, &len, 4);
     write(fd, packet.bytes,packet.length);
 }

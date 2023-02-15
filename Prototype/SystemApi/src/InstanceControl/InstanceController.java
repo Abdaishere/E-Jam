@@ -32,8 +32,10 @@ public class InstanceController
             e.printStackTrace();
         }
         System.out.println("sleep finished");
+        for(Long pid:pids)
+            System.out.println("PID : " + pid);
         debugStreams();
-        //kill the current running executables  
+        //kill the current running executables
         for(Long pid:pids)
         {
             String[] args = {"-9", Long.toString(pid)};
