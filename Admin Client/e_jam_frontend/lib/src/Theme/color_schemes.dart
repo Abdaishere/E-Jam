@@ -1,3 +1,4 @@
+import 'package:e_jam/src/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 const lightColorScheme = ColorScheme(
@@ -67,3 +68,44 @@ const darkColorScheme = ColorScheme(
   outlineVariant: Color(0xFF42474E),
   scrim: Color(0xFF000000),
 );
+
+// final colorlight = [
+//   const Color.fromARGB(255, 255, 197, 117),
+//   const Color.fromARGB(255, 255, 117, 117),
+// ];
+
+// final colordark = [
+//   const Color(0xFF001B3D),
+//   const Color(0xFF003062),
+// ];
+
+class ThemeModel extends ChangeNotifier {
+  bool _isDark = false;
+  ThemePrefrences themePrefrences = ThemePrefrences();
+
+  bool get isDark => _isDark;
+  ThemeMode get themeMode => _isDark ? ThemeMode.dark : ThemeMode.light;
+  ColorScheme get colorScheme => _isDark ? darkColorScheme : lightColorScheme;
+
+  ThemeModel() {
+    _isDark = false;
+    getTheme();
+  }
+
+  getTheme() async {
+    _isDark = await themePrefrences.isDarkMode();
+    notifyListeners();
+  }
+
+  toggleTheme() {
+    _isDark = !_isDark;
+    themePrefrences.setDarkMode(_isDark);
+    notifyListeners();
+  }
+
+  set isDark(bool value) {
+    _isDark = value;
+    themePrefrences.setDarkMode(value);
+    notifyListeners();
+  }
+}

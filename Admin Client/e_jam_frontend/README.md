@@ -1,16 +1,27 @@
-# e_jam_frontend
+# E-Jam App
 
-A new Flutter project.
+![E-Jam App](assets/Icon-logo.ico)
 
-## Getting Started
+## A GUI for Project E-Jam for Testing, Monitoring, and Debugging Switches
 
-This project is a starting point for a Flutter application.
+![Flutter](https://img.shields.io/badge/Flutter-3.7.3-blue)
+![Dart](https://img.shields.io/badge/dart-2.19.2-blue)
+![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Linux%20%7C%20Windows%20%7C%20MacOS-greenlight)
+![License](https://img.shields.io/badge/license-MIT-red)
+![Version](https://img.shields.io/badge/version-0.0.1-orange)
 
-A few resources to get you started if this is your first Flutter project:
+### About
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+This is a GUI for Project E-Jam for Testing, Monitoring, and Debugging Switches. It is written in Dart using the Flutter framework. It is currently in development for Our graduation project and is not ready for use.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Installation
+
+To install, clone the repository and run `flutter pub get` to install dependencies. Then, run `flutter run` to run the app.
+
+### User Flow Diagram
+
+![User Flow Diagram](UserFlowDiagram.jpg)
+
+Note: This is a work in progress and is not ready for use.
+
+Note: Any Details View Can be accessed by clicking on the corresponding item in the list view and it will reveal a Graph View filtered by the Item Chosen.
