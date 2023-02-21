@@ -91,7 +91,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     bool crcCorrect = true;
     for(int i=0;i<CRC_LENGTH;i++)
     {
-        if(correctCRC->bytes[i] != packet->at(i+startIndex)){ crcCorrect = false; break; }
+        if(correctCRC->at(i) != packet->at(i+startIndex)){ crcCorrect = false; break; }
     }
     if(!crcCorrect)
     {
@@ -115,10 +115,7 @@ void FrameVerifier::updateAcceptedSenders()
 
 ByteArray *FrameVerifier::calculateCRC(ByteArray * packet, int startIdx, int endIdx)
 {
-    char* crc = new char[4];
-    for(int i=0; i<4;i++)
-        crc[i] = '4';
-    return new ByteArray(crc,4,0);
-    //TODO calculate CRC
+    return new ByteArray(4, '4');
+    ///TODO calculate CRC carefulllllllll ya hagryyyyyy
     return nullptr;
 }

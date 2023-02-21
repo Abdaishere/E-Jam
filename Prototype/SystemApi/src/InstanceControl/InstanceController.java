@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.rmi.server.ExportException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -20,7 +21,7 @@ public class InstanceController
     
     public InstanceController (ArrayList<Stream> streams)
     {
-        getExecutables(); 
+        getExecutables();
         getMyMacAddress();
         int genNum = startGenerators(streams); //start executable generators instances
         int verNum = startVerifiers(streams); //start executable verifiers instances

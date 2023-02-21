@@ -1,6 +1,7 @@
-package InstanceControl;
+//package InstanceControl;
 
 import NetworkUtilities.BroadcastUtil;
+import InstanceControl.InstanceControlFacade;
 
 public class Main
 {

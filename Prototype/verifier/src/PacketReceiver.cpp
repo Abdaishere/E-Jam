@@ -54,9 +54,11 @@ void PacketReceiver::closePipe() {
 void PacketReceiver::receivePackets(ByteArray* packet)
 {
     int packetSize; read(fd, &packetSize,4);
-    int received = read(fd, packet->bytes, packetSize);
+    unsigned char* cstr = new unsigned char[packetSize];
+    int received = read(fd, cstr, packetSize);
+    packet = new ByteArray(packetSize, 'a');
+    memcpy(packet, cstr, sizeof(cstr));
     std::cerr << "packet reached receiver " << received << " \n";
-    packet->length = received;
 //    for(int i=0; i<packet->length; i++)
 //        std::cerr<<(int)packet->at(i) << " ";
 //    std::cerr << "\n";

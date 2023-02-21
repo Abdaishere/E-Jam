@@ -91,9 +91,8 @@ private:
         }
 
         unsigned char mac_address[MAC_ADD_LEN];
-
         if (success) memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
-        return ByteArray((char*) mac_address, MAC_ADD_LEN,0);
+        return ByteArray(mac_address, MAC_ADD_LEN);
     }
 public:
     //Read configuration from a file of the correct format
@@ -102,8 +101,9 @@ public:
         freopen(path,"r",stdin);
 
         //Set stream ID, must be of leangth 3 (STREAMID_LEN)
-        char* sID = new char[STREAMID_LEN];
-        std::cin>>sID;
+        unsigned char* sID =  new unsigned char[STREAMID_LEN];
+        for(int i=0;i<STREAMID_LEN;i++) std::cin>>sID[i];
+
         setStreamID(sID);
 
         //Set senders and recievers
@@ -113,14 +113,14 @@ public:
         {
             std::string s;
             std::cin>>s;
-            senders.push_back(ByteArray(s.c_str(),s.size(),0));
+            senders.push_back(ByteArray(s.begin(), s.end()));
         }
         std::cin>> rcvSize;
         while(rcvSize--)    //Read n reciever
         {
             std::string s;
             std::cin>>s;
-            receivers.push_back(ByteArray(s.c_str(),s.size(),0));
+            receivers.push_back(ByteArray(s.begin(), s.end()));
         }
         //Read payload type
         int input;
@@ -212,14 +212,16 @@ public:
         {
             std::string temp(12, 'x');
             for(int i=0; i<12; i++) temp[i] = e.at(i);
-            ByteArray mac6 = ByteArray(convertToMac6(temp).c_str(), 6);
+            std::string ma6 = convertToMac6(temp);
+            ByteArray mac6 = ByteArray(ma6.begin(), ma6.end());
             e = mac6;
         }
         for(auto& e:senders)
         {
             std::string temp(12, 'x');
             for(int i=0; i<12; i++) temp[i] = e.at(i);
-            ByteArray mac6 = ByteArray(convertToMac6(temp).c_str(), 6);
+            std::string ma6 = convertToMac6(temp);
+            ByteArray mac6 = ByteArray(ma6.begin(), ma6.end());
             e = mac6;
         }
     }
@@ -291,9 +293,9 @@ public:
         return payloadLength;
     }
 
-    void setMyMacAddress(char* mac)
+    void setMyMacAddress(const unsigned char* mac)
     {
-        myMacAddress = ByteArray(mac,6,0);
+        myMacAddress = ByteArray(mac,6);
     }
 
     ByteArray* getStreamID()
@@ -301,9 +303,9 @@ public:
         return streamID;
     }
 
-    void setStreamID(char* id)
+    void setStreamID(const unsigned char* id)
     {
-        streamID = new ByteArray(id,STREAMID_LEN,0);
+        streamID = new ByteArray(id, STREAMID_LEN);
     }
 
     ull getBcFramesNum()
@@ -337,19 +339,19 @@ public:
     //Printing for debugging only
     void print()
     {
-        printf("Stream ID: %s\n", streamID->bytes);
+        printf("Stream ID: %s\n", streamID->c_str());
         printf("Senders(%d):\n", (int)senders.size());
         for(auto sender: senders)
         {
             printf("%c", 9);
-            sender.printChars();
+            printChars(&sender);
         }
 
         printf("Receivers(%d):\n", (int)receivers.size());
         for(auto rec: receivers)
         {
             printf("%c",9);
-            rec.printChars();
+            printChars(&rec);
         }
 
         switch (payloadType)

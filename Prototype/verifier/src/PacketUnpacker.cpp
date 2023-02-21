@@ -7,7 +7,7 @@ void PacketUnpacker::readPacket()
 //    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
 //    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
-    ByteArray* packet = new ByteArray(1600);
+    ByteArray* packet = new ByteArray(1600, 'a');
     packetReceiver->receivePackets(packet);
 //    std::cerr << "packet received\n";
     std::cerr <<"packet in verification queue\n";
@@ -51,8 +51,8 @@ void PacketUnpacker::verifiyPacket()
     std::cerr << "verifying packet\n";
     //Extract Stream ID
     int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
-    ByteArray tempBA (5, 0);
-    tempBA.write(*packet, streamID_startIndex, streamID_startIndex + STREAMID_LEN-1);
+    ByteArray tempBA (5, 'a');
+    tempBA.append(*packet, streamID_startIndex, STREAMID_LEN);
 
     //Check stream id
     ConfigurationManager::setCurrStreamID(tempBA);
@@ -83,7 +83,7 @@ void PacketUnpacker::verifiyPacket()
 
     //check for frame errors
     //by matching receiver and sender mac addresses and checking the CRCs
-    int startIndex = 0, endIndex = packet->length;
+    int startIndex = 0, endIndex = packet->length();
     FrameVerifier* fv = FrameVerifier::getInstance();
     bool frameStatus = fv->verifiy(packet, startIndex, endIndex);
 
