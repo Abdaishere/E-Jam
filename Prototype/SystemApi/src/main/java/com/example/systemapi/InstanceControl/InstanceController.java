@@ -1,9 +1,7 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -88,7 +86,7 @@ public class InstanceController
         int genID = 0;
         for (Stream stream: streams)
         {
-            for(String sender: stream.senders)
+            for(String sender: stream.generators)
             {
                 if(Objects.equals(sender, myMacAddress))
                 {
@@ -108,7 +106,7 @@ public class InstanceController
         int verID = 0;
         for (Stream stream: streams)
         {
-            for(String receiver: stream.receivers)
+            for(String receiver: stream.verifiers)
             {
                 if(Objects.equals(receiver, myMacAddress))
                 {

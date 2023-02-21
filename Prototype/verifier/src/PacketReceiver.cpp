@@ -8,6 +8,7 @@
 #include <csignal>
 #include <error.h>
 #include <iostream>
+#include <unistd.h>
 PacketReceiver* PacketReceiver::instance = nullptr;
 PacketReceiver::PacketReceiver() {}
 

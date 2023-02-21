@@ -1,6 +1,6 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
-import NetworkUtilities.BroadcastUtil;
+import com.example.systemapi.NetworkUtilities.BroadcastUtil;
 
 public class Main
 {

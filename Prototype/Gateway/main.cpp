@@ -2,6 +2,7 @@
 #include "PacketReceiver.h"
 #include <iostream>
 #include <thread>
+#include <pthread.h>
 using namespace std;
 // functions used in the sender part of the gateway
 void checkingThread(PacketSender* packetSender)
