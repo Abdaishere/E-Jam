@@ -1,7 +1,3 @@
-//
-// Created by khaled on 12/3/22.
-//
-
 #ifndef GENERATOR_CONFIGURATIONMANAGER_H
 #define GENERATOR_CONFIGURATIONMANAGER_H
 

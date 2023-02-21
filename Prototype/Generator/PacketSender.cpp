@@ -1,12 +1,11 @@
-//
-// Created by khaled on 11/29/22.
-//
 
 #include "PacketSender.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <csignal>
 #include <error.h>
+#include <iostream>
+
 PacketSender* PacketSender::instance = nullptr;
 PacketSender::PacketSender() {}
 
@@ -20,12 +19,10 @@ PacketSender* PacketSender::getInstance(int genID, std::string pipeDir, int pipe
         instance->genID = genID;
         instance->openFifo();
     }
-    else
-        return instance;
+    return instance;
 }
-#include <iostream>
 
-int PacketSender::openFifo()
+void PacketSender::openFifo()
 {
     //create pipe with read and write permissions
     int status = mkfifo((instance->pipeDir + std::to_string(instance->genID)).c_str(), permissions);
@@ -46,5 +43,5 @@ int PacketSender::openFifo()
 
 void PacketSender::transmitPackets(const ByteArray& packet) const
 {
-    write(fd, packet.bytes,packet.length);
+    write(fd, packet.c_str(), packet.size());
 }

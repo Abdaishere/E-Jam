@@ -1,6 +1,4 @@
-//
-// Created by khaled on 11/27/22.
-//
+
 
 #include "PacketCreator.h"
 #include "ConfigurationManager.h"
@@ -26,10 +24,14 @@ void PacketCreator::createPacket(int rcvInd)
     PayloadGenerator* payloadGenerator = PayloadGenerator::getInstance();
     payloadGenerator->regeneratePayload();
     ByteArray payload = payloadGenerator->getPayload();
-    ByteArray innerProtocol = ByteArray("00",2);
+    ByteArray innerProtocol = ByteArray(2, '0');
+    innerProtocol[0] = (unsigned char) 0x88;
+    innerProtocol[1] = (unsigned char) 0xb5;
+    ByteArray streamID = *ConfigurationManager::getConfiguration()->getStreamID();
     FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
                                                                  payload,
-                                                                 innerProtocol);
+                                                                 innerProtocol, 
+                                                                 streamID);
     frameConstructor->constructFrame();
     //TODO delete the values inside created ByteArray*
     mtx.lock();
@@ -52,7 +54,7 @@ void PacketCreator::sendHead()
     productQueue.pop();
     mtx.unlock();
 
-    packet.print();
+    print(&packet);
     sender->transmitPackets(packet);
     std::cerr << ("Packet transmitted\n");
 }

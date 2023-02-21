@@ -22,6 +22,7 @@ typedef unsigned long long ull;
 #define CRC_LENGTH 4
 #define PREMBLE_LENGTH 8
 #define LENGTH_LENGTH 2
+#define SeqNum_LEN 8
 #define CONFIG_DIR "/etc/EJam"
 
 
@@ -228,7 +229,7 @@ public:
 
     //getters and setters
     
-    std::vector<ByteArray> &getSenders()
+    std::vector<ByteArray>& getSenders()
     {
         return senders;
     }
@@ -238,7 +239,7 @@ public:
         Configuration::senders = inSenders;
     }
 
-    const std::vector<ByteArray> &getReceivers() const
+    std::vector<ByteArray>& getReceivers() 
     {
         return receivers;
     }
