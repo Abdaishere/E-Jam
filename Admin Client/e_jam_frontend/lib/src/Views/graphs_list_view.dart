@@ -12,15 +12,19 @@ class GraphsListView extends StatelessWidget {
         centerTitle: true,
         leading: const DrawerWidget(),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            Text(
-              'Graphs Screen',
-            ),
-          ],
+      body: GridView.builder(
+        itemCount: 10,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.5,
         ),
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: Center(
+              child: Text('Graph $index'),
+            ),
+          );
+        },
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:e_jam/main.dart';
 import 'package:flutter/material.dart';
 
+// should not be scrollable
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
@@ -18,6 +19,7 @@ class SettingsView extends StatelessWidget {
           children: const <Widget>[
             Text(
               'Settings Screen',
+              style: TextStyle(fontSize: 24),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:e_jam/main.dart';
 import 'package:flutter/material.dart';
 
+// should not be scrollable
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 

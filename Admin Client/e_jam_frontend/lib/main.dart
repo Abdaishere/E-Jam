@@ -1,4 +1,6 @@
+import 'package:e_jam/src/Models/main_chart_data.dart';
 import 'package:e_jam/src/Views/graphs_list_view.dart';
+import 'package:e_jam/src/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'src/Theme/color_schemes.dart';
@@ -8,6 +10,7 @@ import 'package:e_jam/src/Views/home_view.dart';
 import 'package:e_jam/src/Views/streams_list-view.dart';
 import 'package:e_jam/src/Views/settings_view.dart';
 import 'package:e_jam/src/Views/devices_list_view.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -91,28 +94,68 @@ class _HomeState extends State<Home> {
                   colors: theme.isDark ? colordark : colorlight,
                 ),
               ),
-              // TODO: main graph canvas in the bottom middle of the screen
               child: Scaffold(
                 backgroundColor: Colors.transparent,
-                bottomNavigationBar: BottomNavigationBar(
-                  backgroundColor: Colors.transparent,
+                bottomNavigationBar: BottomAppBar(
                   elevation: 0,
-                  selectedItemColor: Colors.white,
-                  unselectedItemColor: Colors.white,
-                  items: const [
-                    BottomNavigationBarItem(
-                      icon: FaIcon(FontAwesomeIcons.houseUser),
-                      label: 'Home',
+                  padding: const EdgeInsets.only(left: 200),
+                  height: MediaQuery.of(context).size.height * 0.14,
+                  child: SfCartesianChart(
+                    plotAreaBorderWidth: 0,
+                    primaryXAxis: NumericAxis(
+                      labelStyle: const TextStyle(color: Colors.transparent),
+                      majorTickLines: const MajorTickLines(size: 0),
+                      labelPosition: ChartDataLabelPosition.inside,
                     ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.search),
-                      label: 'Search',
+                    primaryYAxis: NumericAxis(
+                      labelStyle: const TextStyle(color: Colors.transparent),
+                      majorTickLines: const MajorTickLines(size: 0),
+                      labelPosition: ChartDataLabelPosition.inside,
                     ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person),
-                      label: 'Profile',
-                    ),
-                  ],
+                    series: <ChartSeries>[
+                      // Renders line chart
+                      LineSeries<ChartData, double>(
+                        dataSource: chartData,
+                        xValueMapper: (ChartData chartData, _) =>
+                            chartData.date,
+                        yValueMapper: (ChartData chartData, _) =>
+                            chartData.value,
+                        color: upload,
+                        width: 2,
+                      ),
+
+                      // Renders spline area chart
+                      SplineAreaSeries<ChartData, double>(
+                        dataSource: chartData,
+                        xValueMapper: (ChartData chartData, _) =>
+                            chartData.date,
+                        yValueMapper: (ChartData chartData, _) =>
+                            chartData.value,
+                        color: upload.withOpacity(0.2),
+                      ),
+
+                      // Renders line chart
+                      LineSeries<ChartData, double>(
+                        dataSource: chartData2,
+                        xValueMapper: (ChartData chartData, _) =>
+                            chartData.date,
+                        yValueMapper: (ChartData chartData, _) =>
+                            chartData.value,
+                        color: download,
+                        width: 2,
+                      ),
+
+                      // Renders spline area chart
+                      SplineAreaSeries<ChartData, double>(
+                        dataSource: chartData2,
+                        xValueMapper: (ChartData chartData, _) =>
+                            chartData.date,
+                        yValueMapper: (ChartData chartData, _) =>
+                            chartData.value,
+                        color: download.withOpacity(0.2),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -148,6 +191,8 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  bool isSwitched = true;
+  bool isFrozen = false;
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -163,6 +208,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   onPressed: () {
                     ZoomDrawer.of(context)!.close();
                   },
+                  color: theme.colorScheme.secondary,
                   icon: const Icon(Icons.arrow_forward_ios_outlined),
                 ),
               ),
@@ -171,7 +217,7 @@ class _MenuScreenState extends State<MenuScreen> {
               Container(
                 decoration: BoxDecoration(
                   border:
-                      Border.all(color: theme.colorScheme.onSurface, width: 1),
+                      Border.all(color: theme.colorScheme.secondary, width: 1),
                   borderRadius: BorderRadius.circular(18),
                 ),
                 padding: const EdgeInsets.only(
@@ -181,22 +227,36 @@ class _MenuScreenState extends State<MenuScreen> {
                   children: [
                     // start and pause icon button
                     IconButton(
-                      onPressed: () {},
-                      // make icon color red when hover
-                      icon: const FaIcon(
-                        FontAwesomeIcons.play,
+                      onPressed: () {
+                        setState(() {
+                          isSwitched = !isSwitched;
+                        });
+                      },
+                      color: !isSwitched
+                          ? theme.colorScheme.error
+                          : theme.colorScheme.secondary,
+                      icon: FaIcon(
+                        isSwitched
+                            ? FontAwesomeIcons.play
+                            : FontAwesomeIcons.pause,
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
-                      // make icon color red when hover
-
-                      icon: const FaIcon(
-                        FontAwesomeIcons.camera,
-                      ),
+                      onPressed: () {
+                        setState(() {
+                          isFrozen = !isFrozen;
+                        });
+                      },
+                      color: isFrozen
+                          ? theme.colorScheme.surfaceTint
+                          : theme.colorScheme.secondary,
+                      icon: FaIcon(isFrozen
+                          ? FontAwesomeIcons.solidSnowflake
+                          : FontAwesomeIcons.camera),
                     ),
                     IconButton(
                       onPressed: () {},
+                      color: theme.colorScheme.secondary,
                       icon: const FaIcon(
                         FontAwesomeIcons.solidFloppyDisk,
                       ),
@@ -211,7 +271,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 title: const Text('Home'),
                 onTap: () {
                   widget.setIndex(0);
-                  ZoomDrawer.of(context)!.close();
                 },
               ),
               ListTile(
@@ -220,7 +279,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 title: const Text('Streams'),
                 onTap: () {
                   widget.setIndex(1);
-                  ZoomDrawer.of(context)!.close();
                 },
               ),
               ListTile(
@@ -229,7 +287,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 title: const Text('Devices'),
                 onTap: () {
                   widget.setIndex(2);
-                  ZoomDrawer.of(context)!.close();
                 },
               ),
               ListTile(
@@ -238,7 +295,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 title: const Text('Graphs'),
                 onTap: () {
                   widget.setIndex(3);
-                  ZoomDrawer.of(context)!.close();
                 },
               ),
               ListTile(
@@ -247,7 +303,6 @@ class _MenuScreenState extends State<MenuScreen> {
                 title: const Text('Settings'),
                 onTap: () {
                   widget.setIndex(4);
-                  ZoomDrawer.of(context)!.close();
                 },
               ),
               AboutListTile(
@@ -264,13 +319,33 @@ class _MenuScreenState extends State<MenuScreen> {
                 child: const Text('About'),
               ),
               const Spacer(),
-              IconButton(
-                icon: Icon(theme.isDark ? Icons.dark_mode : Icons.light_mode),
-                onPressed: () {
-                  theme.toggleTheme();
-                },
+              Container(
+                padding: const EdgeInsets.only(bottom: 30, right: 15, left: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.logout),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 25),
+                    IconButton(
+                      icon: Icon(
+                          theme.isDark ? Icons.dark_mode : Icons.light_mode),
+                      onPressed: () {
+                        theme.toggleTheme();
+                      },
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
             ],
           ),
         );
