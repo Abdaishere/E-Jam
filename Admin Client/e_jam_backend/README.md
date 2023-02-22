@@ -1,12 +1,14 @@
 # E-Jam API
 
-<img src="E-Jam-api-logo.png" alt="E-Jam API" width="400"/>
+<img src="E-Jam-api-logo.png" alt="E-Jam API" width="300"/>
 
-![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
-![Actix Web](https://img.shields.io/badge/Actix-%23000000.svg?style=for-the-badge&logo=actix&logoColor=white)
-![Ubuntu](https://img.shields.io/badge/Ubuntu-%23000000.svg?style=for-the-badge&logo=ubuntu&logoColor=white)
-![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-%23000000.svg?style=for-the-badge&logo=raspberry-pi&logoColor=white)
-![RestFul API](https://img.shields.io/badge/RestFul%20API-%23000000.svg?style=for-the-badge&logo=restful-api&logoColor=white)
+![Rust](https://img.shields.io/badge/rust-latest-blue)
+![Actix](https://img.shields.io/badge/actix-4.3.0-blue)
+![Raspberry Pi](https://img.shields.io/badge/raspberry%20pi-4%20model%20b-blue)
+![Ubuntu](https://img.shields.io/badge/ubuntu-20.04%20LTS-blue)
+![License](https://img.shields.io/badge/license-MIT-red)
+![Version](https://img.shields.io/badge/version-0.0.1-orange)
+![Status](https://img.shields.io/badge/status-Development-yellow)
 
 ## The E-Jam API documentation
 
