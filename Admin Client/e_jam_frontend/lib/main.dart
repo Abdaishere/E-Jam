@@ -1,18 +1,18 @@
-import 'package:e_jam/src/Models/main_chart_data.dart';
-import 'package:e_jam/src/Views/graphs_list_view.dart';
-import 'package:e_jam/src/login_screen.dart';
+import 'package:e_jam/src/Model/main_chart_data.dart';
+import 'package:e_jam/src/View/graphs_list_view.dart';
+import 'package:e_jam/src/View/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
-import 'src/Theme/color_schemes.dart';
+import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:e_jam/src/Views/home_view.dart';
-import 'package:e_jam/src/Views/streams_list-view.dart';
-import 'package:e_jam/src/Views/settings_view.dart';
-import 'package:e_jam/src/Views/devices_list_view.dart';
+import 'package:e_jam/src/View/home_view.dart';
+import 'package:e_jam/src/View/streams_list_view.dart';
+import 'package:e_jam/src/View/settings_view.dart';
+import 'package:e_jam/src/View/devices_list_view.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
@@ -34,6 +34,8 @@ class MyApp extends StatelessWidget {
                 ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
             themeMode: theme.themeMode,
             home: const Home(),
+            // TODO: Add routes
+            // TODO: Add splash screen
           );
         },
       ),
@@ -71,11 +73,13 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final colorlight = [
+      const Color.fromARGB(255, 253, 209, 146),
       const Color.fromARGB(255, 255, 197, 117),
       const Color.fromARGB(255, 255, 117, 117),
     ];
 
     final colordark = [
+      const Color.fromARGB(255, 0, 21, 48),
       const Color(0xFF001B3D),
       const Color(0xFF003062),
     ];
@@ -120,7 +124,7 @@ class _HomeState extends State<Home> {
                             chartData.date,
                         yValueMapper: (ChartData chartData, _) =>
                             chartData.value,
-                        color: upload,
+                        color: uploadColor,
                         width: 2,
                       ),
 
@@ -131,7 +135,7 @@ class _HomeState extends State<Home> {
                             chartData.date,
                         yValueMapper: (ChartData chartData, _) =>
                             chartData.value,
-                        color: upload.withOpacity(0.2),
+                        color: uploadColor.withOpacity(0.2),
                       ),
 
                       // Renders line chart
@@ -141,7 +145,7 @@ class _HomeState extends State<Home> {
                             chartData.date,
                         yValueMapper: (ChartData chartData, _) =>
                             chartData.value,
-                        color: download,
+                        color: downloadColor,
                         width: 2,
                       ),
 
@@ -152,7 +156,7 @@ class _HomeState extends State<Home> {
                             chartData.date,
                         yValueMapper: (ChartData chartData, _) =>
                             chartData.value,
-                        color: download.withOpacity(0.2),
+                        color: downloadColor.withOpacity(0.2),
                       ),
                     ],
                   ),
@@ -168,7 +172,9 @@ class _HomeState extends State<Home> {
                 },
               ),
               mainScreen: mainscreen(),
+              androidCloseOnBackTap: true,
               showShadow: true,
+              mainScreenTapClose: true,
               shadowLayer1Color: const Color.fromARGB(183, 255, 197, 117),
               angle: 0.0,
               slideWidth: 250.0,
@@ -203,7 +209,7 @@ class _MenuScreenState extends State<MenuScreen> {
             children: [
               // back button to close drawer menu
               Container(
-                padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
+                padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
                 child: IconButton(
                   onPressed: () {
                     ZoomDrawer.of(context)!.close();
@@ -212,9 +218,10 @@ class _MenuScreenState extends State<MenuScreen> {
                   icon: const Icon(Icons.arrow_forward_ios_outlined),
                 ),
               ),
-              const SizedBox(height: 40),
-              // TODO: controll panel with icons start and camera icon
+              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+              // TODO: controll panel with icons start and camera icon and save icon
               Container(
+                margin: const EdgeInsets.only(left: 5),
                 decoration: BoxDecoration(
                   border:
                       Border.all(color: theme.colorScheme.secondary, width: 1),
@@ -264,7 +271,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.035),
               ListTile(
                 leading: const Icon(Icons.home),
                 iconColor: Colors.white,
@@ -310,19 +317,25 @@ class _MenuScreenState extends State<MenuScreen> {
                 applicationName: "E-Jam",
                 applicationVersion: "1.0.0",
                 applicationIcon: Image.asset("assets/Icon-logo.ico",
-                    width: 100, height: 100),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center),
                 applicationLegalese: "© 2023 E-Jam",
                 aboutBoxChildren: const <Widget>[
                   Text(
-                      'E-Jam is a graducation project for Testing, Monitoring, and Debugging Switches.'),
+                      'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.'),
+                  Text(
+                      'Developed by:\n\nAbdullah Elbelkasy\nKhaled Waleed\nMohamed Elhagery\nIslam Wagih\nMostafa Abdullah'),
                 ],
                 child: const Text('About'),
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.only(bottom: 30, right: 15, left: 10),
+                margin: const EdgeInsets.only(right: 50),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.logout),
@@ -346,6 +359,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
             ],
           ),
         );

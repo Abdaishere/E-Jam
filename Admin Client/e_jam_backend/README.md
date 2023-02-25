@@ -6,7 +6,6 @@
 ![Actix](https://img.shields.io/badge/actix-4.3.0-blue)
 ![Raspberry Pi](https://img.shields.io/badge/raspberry%20pi-4%20model%20b-blue)
 ![Ubuntu](https://img.shields.io/badge/ubuntu-20.04%20LTS-blue)
-![License](https://img.shields.io/badge/license-MIT-red)
 ![Version](https://img.shields.io/badge/version-0.0.1-orange)
 ![Status](https://img.shields.io/badge/status-Development-yellow)
 
