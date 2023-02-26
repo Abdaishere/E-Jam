@@ -1,16 +1,16 @@
-import 'package:e_jam/src/Model/main_chart_data.dart';
-import 'package:e_jam/src/View/graphs_list_view.dart';
+import 'package:e_jam/src/View/Charts/bottom_line_chart.dart';
+import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/home_view.dart';
-import 'package:e_jam/src/View/streams_list_view.dart';
+import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/View/settings_view.dart';
-import 'package:e_jam/src/View/devices_list_view.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:e_jam/src/View/Lists/devices_list_view.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -104,62 +104,7 @@ class _HomeState extends State<Home> {
                   elevation: 0,
                   padding: const EdgeInsets.only(left: 200),
                   height: MediaQuery.of(context).size.height * 0.14,
-                  child: SfCartesianChart(
-                    plotAreaBorderWidth: 0,
-                    primaryXAxis: NumericAxis(
-                      labelStyle: const TextStyle(color: Colors.transparent),
-                      majorTickLines: const MajorTickLines(size: 0),
-                      labelPosition: ChartDataLabelPosition.inside,
-                    ),
-                    primaryYAxis: NumericAxis(
-                      labelStyle: const TextStyle(color: Colors.transparent),
-                      majorTickLines: const MajorTickLines(size: 0),
-                      labelPosition: ChartDataLabelPosition.inside,
-                    ),
-                    series: <ChartSeries>[
-                      // Renders line chart
-                      LineSeries<ChartData, double>(
-                        dataSource: chartData,
-                        xValueMapper: (ChartData chartData, _) =>
-                            chartData.date,
-                        yValueMapper: (ChartData chartData, _) =>
-                            chartData.value,
-                        color: uploadColor,
-                        width: 2,
-                      ),
-
-                      // Renders spline area chart
-                      SplineAreaSeries<ChartData, double>(
-                        dataSource: chartData,
-                        xValueMapper: (ChartData chartData, _) =>
-                            chartData.date,
-                        yValueMapper: (ChartData chartData, _) =>
-                            chartData.value,
-                        color: uploadColor.withOpacity(0.2),
-                      ),
-
-                      // Renders line chart
-                      LineSeries<ChartData, double>(
-                        dataSource: chartData2,
-                        xValueMapper: (ChartData chartData, _) =>
-                            chartData.date,
-                        yValueMapper: (ChartData chartData, _) =>
-                            chartData.value,
-                        color: downloadColor,
-                        width: 2,
-                      ),
-
-                      // Renders spline area chart
-                      SplineAreaSeries<ChartData, double>(
-                        dataSource: chartData2,
-                        xValueMapper: (ChartData chartData, _) =>
-                            chartData.date,
-                        yValueMapper: (ChartData chartData, _) =>
-                            chartData.value,
-                        color: downloadColor.withOpacity(0.2),
-                      ),
-                    ],
-                  ),
+                  child: const BottomLineChart(),
                 ),
               ),
             ),
@@ -273,7 +218,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.035),
               ListTile(
-                leading: const Icon(Icons.home),
+                leading: const Icon(MaterialCommunityIcons.home),
                 iconColor: Colors.white,
                 title: const Text('Home'),
                 onTap: () {
@@ -282,7 +227,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.dashboard),
-                iconColor: Colors.deepOrangeAccent,
+                iconColor: Colors.blueAccent,
                 title: const Text('Streams'),
                 onTap: () {
                   widget.setIndex(1);
@@ -290,30 +235,30 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               ListTile(
                 leading: const FaIcon(FontAwesomeIcons.microchip),
-                iconColor: Colors.deepPurpleAccent,
+                iconColor: Colors.deepOrangeAccent,
                 title: const Text('Devices'),
                 onTap: () {
                   widget.setIndex(2);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.auto_graph),
-                iconColor: Colors.cyanAccent,
+                leading: const Icon(Icons.auto_graph_outlined),
+                iconColor: Colors.deepPurpleAccent,
                 title: const Text('Graphs'),
                 onTap: () {
                   widget.setIndex(3);
                 },
               ),
               ListTile(
-                leading: const FaIcon(FontAwesomeIcons.gear),
-                iconColor: Colors.lightBlueAccent,
+                leading: const FaIcon(FontAwesomeIcons.gears, size: 21),
+                iconColor: Colors.blueGrey.shade500,
                 title: const Text('Settings'),
                 onTap: () {
                   widget.setIndex(4);
                 },
               ),
               AboutListTile(
-                icon: const Icon(Icons.info),
+                icon: const Icon(MaterialCommunityIcons.information),
                 applicationName: "E-Jam",
                 applicationVersion: "1.0.0",
                 applicationIcon: Image.asset("assets/Icon-logo.ico",

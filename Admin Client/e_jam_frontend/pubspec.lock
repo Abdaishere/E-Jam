@@ -147,6 +147,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_vector_icons:
+    dependency: "direct main"
+    description:
+      name: flutter_vector_icons
+      sha256: "20a77e282f8cb438c8edcee4eec85d8497d5f4cbeb07d116e9d2d01c9edfc5e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -498,6 +506,14 @@ packages:
     description:
       name: syncfusion_flutter_core
       sha256: "5f7dae40707df507325ee045d1a172aea9f449ac4244d7c52391dd97208eeef8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "20.4.51"
+  syncfusion_flutter_gauges:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_gauges
+      sha256: e11893a8680f65dcdcb00937f0ddb3e41e4186292d580757a47c08b76ad688ec
       url: "https://pub.dev"
     source: hosted
     version: "20.4.51"

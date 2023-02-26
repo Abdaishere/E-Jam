@@ -1,8 +1,8 @@
 import 'package:e_jam/src/Model/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
-const uploadColor = Color.fromARGB(255, 0, 146, 190);
-const downloadColor = Color.fromARGB(255, 187, 109, 0);
+const uploadColor = Color.fromARGB(255, 0, 175, 228);
+const downloadColor = Color.fromARGB(255, 224, 131, 0);
 const backcolor = Color.fromARGB(255, 21, 0, 255);
 
 const lightColorScheme = ColorScheme(

@@ -6,6 +6,7 @@ import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 
@@ -16,8 +17,10 @@ class StreamsListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Streams',
-            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Streams',
+          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         leading: const DrawerWidget(),
         actions: <Widget>[
@@ -43,11 +46,11 @@ class StreamsListView extends StatelessWidget {
           GridView.builder(
             padding: const EdgeInsets.all(8.0),
             shrinkWrap: true,
-            itemCount: 120,
+            itemCount: 10,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount:
                   max(MediaQuery.of(context).copyWith().size.width ~/ 342.0, 1),
-              childAspectRatio: 1.6,
+              childAspectRatio: 3 / 2,
               mainAxisSpacing: 5.0,
               crossAxisSpacing: 3.0,
             ),
@@ -74,17 +77,15 @@ class AddStreamButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      heroTag: 'add-stream-button',
       tooltip: 'Add Stream',
+      heroTag: 'addStream',
       backgroundColor: Colors.blueAccent,
-      splashColor: Colors.blueAccent.shade100,
-      hoverColor: Colors.blueAccent.shade100,
-      focusColor: Colors.blueAccent.shade100,
       mini: true,
       onPressed: () {
         Navigator.of(context).push(
           HeroDialogRoute(
-            builder: (BuildContext context) => const AddStreamView(),
+            builder: (BuildContext context) =>
+                const Center(child: AddStreamView()),
             settings: const RouteSettings(name: 'AddStreamView'),
           ),
         );
@@ -112,20 +113,20 @@ class _StreamCardState extends State<StreamCard> {
       onTap: () {
         Navigator.of(context).push(
           HeroDialogRoute(
-            builder: (BuildContext context) => StreamDetailsView(index: index),
+            builder: (BuildContext context) =>
+                Center(child: StreamDetailsView(index)),
             settings: const RouteSettings(name: 'StreamDetailsView'),
           ),
         );
       },
       child: Hero(
         tag: 'stream$index',
+        createRectTween: (begin, end) =>
+            CustomRectTween(begin: begin!, end: end!),
         child: Card(
-          // should be the color status of the stream (blue (running), red (error, stopped), orange (queued), green (finished, ready))
-          surfaceTintColor: Colors.blueAccent,
-          elevation: 5.0,
           child: Padding(
             padding: const EdgeInsets.only(
-                top: 10.0, left: 8.0, right: 8.0, bottom: 4.0),
+                top: 15.0, left: 8.0, right: 8.0, bottom: 5.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -133,15 +134,37 @@ class _StreamCardState extends State<StreamCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // new icon for new streams (not yet started)
-                    // should be another icon for other states streams (running, queued, finished, etc.)
-                    // should be a different color for each state
-                    // click on the icon to show a card for description of the current state of the stream
                     IconButton(
+                      tooltip: 'New Stream',
                       icon: const FaIcon(
                         Icons.new_releases,
                         color: Colors.blueAccent,
+                        size: 20.0,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: const Text('This stream is new!'),
+                            content: const Text(
+                                'This stream is new and has not been started yet. Would you like to start it now?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Start'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     // stream ID
                     Text(
@@ -151,10 +174,98 @@ class _StreamCardState extends State<StreamCard> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    // menu icon for more options and details (delete, edit, details, etc.)
-                    IconButton(
-                      icon: const FaIcon(FontAwesomeIcons.ellipsis),
-                      onPressed: () {},
+                    // menu icon for more options and details (delete, edit, details, etc.) for the stream card (should be in a popup menu button)
+                    // on click should show a card with the details of the stream with edit and delete options for the stream and the graphs of the stream
+                    // see if you need to add a new icon for a task for quick access to the stream task
+                    PopupMenuButton(
+                      tooltip: 'More Options',
+                      icon: const FaIcon(
+                        Icons.more_vert,
+                        size: 20.0,
+                      ),
+                      onSelected: (dynamic value) {
+                        if (value == 'Details') {
+                          Navigator.of(context).push(
+                            HeroDialogRoute(
+                              builder: (BuildContext context) =>
+                                  Center(child: StreamDetailsView(index)),
+                              settings: const RouteSettings(
+                                  name: 'StreamDetailsView'),
+                            ),
+                          );
+                        } else if (value == 'Delete') {
+                          // delete the stream
+                          showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Delete Stream'),
+                              content: Text(
+                                  'Are you sure you want to delete stream $index?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else if (value == 'Edit') {
+                          // edit the stream
+                          // Navigator.of(context).push(
+                          //   HeroDialogRoute(
+                          //     builder: (BuildContext context) =>
+                          //         EditStreamView(index), TODO: add edit stream view
+                          //     settings:
+                          //         const RouteSettings(name: 'EditStreamView'),
+                          //   ),
+                          // );
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return <PopupMenuEntry>[
+                          PopupMenuItem(
+                            value: 'View',
+                            child: Row(
+                              children: const [
+                                Icon(MaterialCommunityIcons.view_quilt,
+                                    color: Colors.blueAccent),
+                                SizedBox(width: 10.0),
+                                Text('View'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'Edit',
+                            child: Row(
+                              children: const [
+                                Icon(MaterialCommunityIcons.pencil,
+                                    color: Colors.green),
+                                SizedBox(width: 10.0),
+                                Text('Edit'),
+                              ],
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 'Delete',
+                            child: Row(
+                              children: const [
+                                FaIcon(MaterialCommunityIcons.trash_can,
+                                    color: Colors.red),
+                                SizedBox(width: 10.0),
+                                Text('Delete'),
+                              ],
+                            ),
+                          ),
+                        ];
+                      },
                     ),
                   ],
                 ),
@@ -212,35 +323,25 @@ class _StreamCardState extends State<StreamCard> {
                   children: <Widget>[
                     IconButton(
                       icon: const FaIcon(FontAwesomeIcons.play),
+                      tooltip: "Start",
                       onPressed: () {},
                     ),
                     IconButton(
                       icon: const FaIcon(FontAwesomeIcons.hourglassStart),
+                      tooltip: "Delay",
                       onPressed: () {},
                     ),
                     IconButton(
                       icon: const FaIcon(FontAwesomeIcons.stop),
+                      tooltip: "Stop",
                       onPressed: () {},
                     ),
-                    // TODO: the following should be in a more details view of the stream (not in the list view) and should be accessible from the menu icon
-                    // IconButton(
-                    //   icon: const FaIcon(FontAwesomeIcons.chartLine),
-                    //   onPressed: () {},
-                    // ),
-                    // IconButton(
-                    //   icon: const FaIcon(FontAwesomeIcons.trashCan),
-                    //   onPressed: () {},
-                    // ),
-                    // IconButton(
-                    //   icon: const FaIcon(FontAwesomeIcons.penToSquare),
-                    //   onPressed: () {},
-                    // ),
                   ],
                 ),
                 const ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   child: LinearProgressIndicator(
-                    value: 0.7,
+                    value: 0.4,
                     valueColor:
                         // hormonize the color with the color and status of the stream (blue (running), red (error, stopped), orange (queued), green (finished, ready))
                         AlwaysStoppedAnimation<Color>(Colors.blueAccent),

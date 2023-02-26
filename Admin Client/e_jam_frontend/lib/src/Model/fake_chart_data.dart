@@ -1,0 +1,171 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+
+class ChartData {
+  int date = 0;
+  int value;
+  static int i = 0;
+  ChartData(this.value) {
+    if (value == 0) i = 0;
+    date = i += 1 + Random().nextInt(1000);
+    value = value;
+  }
+}
+
+class RunningDevices {
+  final String state;
+  final int value;
+
+  RunningDevices(this.state, this.value);
+}
+
+List<RunningDevices> runningDevices = [
+  RunningDevices('Running', Random().nextInt(100)),
+  RunningDevices('Finished', Random().nextInt(100)),
+  RunningDevices('Error', Random().nextInt(100)),
+  RunningDevices('Stopped', Random().nextInt(100)),
+];
+
+class PacketsState {
+  final String state;
+  final int value;
+
+  PacketsState(this.state, this.value);
+}
+
+List<PacketsState> packetsState = [
+  PacketsState('Sent', Random().nextInt(100)),
+  PacketsState('Received', Random().nextInt(100)),
+  PacketsState('Error', Random().nextInt(100)),
+  PacketsState('Dropped', Random().nextInt(100)),
+];
+
+List<ChartData> chartData2 = [
+  ChartData(0),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+];
+List<ChartData> chartData = [
+  ChartData(0),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+  ChartData(1 + Random().nextInt(1000)),
+];
+
+const String loremIpsum =
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl.';
