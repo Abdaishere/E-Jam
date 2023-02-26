@@ -12,14 +12,14 @@ import java.util.Map;
 @RequestMapping(path = "/")
 public class StreamController {
     @PostMapping("/streams/{streamId}/started")
-    public Map<String, Boolean> started(@PathVariable("streamId") String streamId) {
+    public static Map<String, Boolean> started(@PathVariable("streamId") String streamId) {
         HashMap<String, Boolean> map = new HashMap<>();
         map.put(streamId, true);
         return map;
     }
 
     @PostMapping("/streams/{streamId}/finished")
-    public Map<String, Boolean> finished(@PathVariable("streamId") String streamId) {
+    public static Map<String, Boolean> finished(@PathVariable("streamId") String streamId) {
         HashMap<String, Boolean> map = new HashMap<>();
         map.put(streamId, true);
         return map;

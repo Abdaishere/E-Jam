@@ -12,11 +12,18 @@ import java.util.Map;
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
  */
-public class Communicator implements Runnable {
+public class Communicator {
 
     /**
      * Get configuration from Admin GUI
      */
+
+    private final ArrayList<Stream> waitingStreams, runningStreams;
+
+    public Communicator() {
+        waitingStreams = new ArrayList<>();
+        runningStreams = new ArrayList<>();
+    }
 
     public ArrayList<Stream> receiveConfig() {
         String url = "http://localhost:8080/start";
@@ -46,6 +53,9 @@ public class Communicator implements Runnable {
                 numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap,
                 lifeTime, transportProtocol, flowType, checkContent));
 
+        Thread thread = new Thread(new InstanceController(streams));
+        thread.start();
+
         return streams;
     }
 
@@ -62,11 +72,5 @@ public class Communicator implements Runnable {
     public static void main(String[] args) {
         Communicator communicator = new Communicator();
         communicator.receiveConfig();
-    }
-
-    @Override
-    public void run() {
-//        receiveConfig();
-        Object obj = new Object();
     }
 }

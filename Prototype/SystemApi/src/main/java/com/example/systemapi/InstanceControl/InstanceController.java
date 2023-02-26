@@ -9,35 +9,34 @@ import static java.lang.Thread.sleep;
 /**
  * This class initializes and manages the generator and verifier instances
  */
-public class InstanceController
+public class InstanceController implements Runnable
 {
     private final String configDir = ConfigurationManager.configDir;
     private String myMacAddress;
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
+    ArrayList<Stream> streams;
     
     public InstanceController (ArrayList<Stream> streams)
     {
-        getExecutables(); 
         getMyMacAddress();
+        this.streams = streams;
+    }
+
+    public void startStreams() {
+        getExecutables();
         int genNum = startGenerators(streams); //start executable generators instances
         int verNum = startVerifiers(streams); //start executable verifiers instances
         startGateway(genNum, verNum); //start the gateway
+    }
 
-        try {
-            sleep(5000); //test duration
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("sleep finished");
-        debugStreams();
-        //kill the current running executables  
+    public void killStreams() {
+        //kill the current running executables
         for(Long pid:pids)
         {
             String[] args = {"-9", Long.toString(pid)};
             executeCommand("kill",true , args);
         }
-
     }
 
     //reading the console outputs of the executables,
@@ -224,5 +223,35 @@ public class InstanceController
             e.printStackTrace();
         }
         myMacAddress = "AAAAAAAAAAAA";
+    }
+
+    @Override
+    public void run() {
+        Stream stream = streams.get(0);
+
+        // wait until the start time of the stream
+        try {
+            Thread.sleep(stream.delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // start the generators, verifiers and gateway
+        startStreams();
+
+        // notify Admin-client that the stream is finished
+        StreamController.started(stream.streamID);
+
+        try {
+            Thread.sleep(stream.lifeTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // kill the generators, verifiers and gateway
+        killStreams();
+
+        // notify Admin-client that the stream is finished
+        StreamController.finished(stream.streamID);
     }
 }
