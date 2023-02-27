@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       child: Consumer(
         builder: (context, ThemeModel theme, child) {
           return MaterialApp(
-            title: 'E-Jam',
+            title: 'E Jam',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
             darkTheme:
