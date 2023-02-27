@@ -9,6 +9,6 @@ public class Main
         BroadcastUtil.broadcastAlive(5);
 
         InstanceControlFacade instanceControlFacade = new InstanceControlFacade();
-        instanceControlFacade.executeComponents();
+//        instanceControlFacade.executeComponents();
     }
 }

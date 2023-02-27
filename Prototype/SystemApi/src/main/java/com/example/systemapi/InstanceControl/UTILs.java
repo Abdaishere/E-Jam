@@ -1,6 +1,8 @@
 package com.example.systemapi.InstanceControl;
 
 import java.io.*;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 public class UTILs {
@@ -36,6 +38,39 @@ public class UTILs {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String getMyMacAddress() {
+        String myMacAddress = "AAAAAAAAAAAA";
+        byte[] mac;
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while(networkInterfaces.hasMoreElements())
+            {
+                NetworkInterface network = networkInterfaces.nextElement();
+                mac = network.getHardwareAddress();
+                if(mac == null)
+                {
+                    throw new Exception("Mac is null");
+                }
+                else
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < mac.length; i++)
+                    {
+                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                    }
+                    String mac12 = sb.toString().replaceAll("-","");
+                    myMacAddress = mac12;
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return myMacAddress;
     }
 
 //    public String convertToMac6(String mac12)

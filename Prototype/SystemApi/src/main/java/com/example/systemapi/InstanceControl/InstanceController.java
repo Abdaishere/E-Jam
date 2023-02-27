@@ -12,14 +12,14 @@ import static java.lang.Thread.sleep;
 public class InstanceController implements Runnable
 {
     private final String configDir = ConfigurationManager.configDir;
-    private String myMacAddress;
+    private final String myMacAddress;
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
     ArrayList<Stream> streams;
     
     public InstanceController (ArrayList<Stream> streams)
     {
-        getMyMacAddress();
+        myMacAddress = UTILs.getMyMacAddress();
         this.streams = streams;
     }
 
@@ -192,38 +192,6 @@ public class InstanceController implements Runnable
         executeCommand("../Executables/GetExecutables.sh", true, args);
     }
 
-    private void getMyMacAddress()
-    {
-        byte[] mac;
-        try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while(networkInterfaces.hasMoreElements())
-            {
-                NetworkInterface network = networkInterfaces.nextElement();
-                mac = network.getHardwareAddress();
-                if(mac == null)
-                {
-                    throw new Exception("Mac is null");
-                }
-                else
-                {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < mac.length; i++)
-                    {
-                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                    }
-                    String mac12 = sb.toString().replaceAll("-","");
-                    myMacAddress = mac12;
-                    return;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        myMacAddress = "AAAAAAAAAAAA";
-    }
 
     @Override
     public void run() {
@@ -239,8 +207,11 @@ public class InstanceController implements Runnable
         // start the generators, verifiers and gateway
         startStreams();
 
+        // add stream to running streams
+        StreamController.addStream(this);
+
         // notify Admin-client that the stream is finished
-        StreamController.started(stream.streamID);
+        Communicator.started(stream.streamID);
 
         try {
             Thread.sleep(stream.lifeTime);
@@ -252,6 +223,6 @@ public class InstanceController implements Runnable
         killStreams();
 
         // notify Admin-client that the stream is finished
-        StreamController.finished(stream.streamID);
+        Communicator.finished(stream.streamID);
     }
 }

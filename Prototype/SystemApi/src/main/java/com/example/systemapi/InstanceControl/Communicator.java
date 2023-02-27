@@ -1,9 +1,8 @@
 package com.example.systemapi.InstanceControl;
 
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -12,41 +11,39 @@ import java.util.Map;
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
  */
+@RestController
+@RequestMapping(path = "/")
 public class Communicator {
 
     /**
      * Get configuration from Admin GUI
      */
-
-    private final ArrayList<Stream> waitingStreams, runningStreams;
-
-    public Communicator() {
-        waitingStreams = new ArrayList<>();
-        runningStreams = new ArrayList<>();
+    @PostMapping("/connect")
+    public ResponseEntity connect(@RequestBody Map<String, Object> jsonObj) {
+        String macAddress = (String) jsonObj.get("mac_address");
+        System.out.println("Received mac address: " + macAddress);
+        if (macAddress.equals(UTILs.getMyMacAddress())) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
-    public ArrayList<Stream> receiveConfig() {
-        String url = "http://localhost:8080/start";
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(url, String.class);
-        JsonParser springParser = JsonParserFactory.getJsonParser();
-        Map<String, Object> map = springParser.parseMap(result);
-        ArrayList<Object> values = new ArrayList<>(map.values());
-
-        String streamID = (String) values.get(0);
-        Long delay = (Long) values.get(1);
-        ArrayList<String> generators = (ArrayList<String>) values.get(2);
-        ArrayList<String> verifiers = (ArrayList<String>) values.get(3);
-        PayloadType payloadType = PayloadType.valueOf((String) values.get(4));
-        long numberOfPackets = (Long) values.get(5);
-        long bcFramesNum = (Long) values.get(6);
-        int payloadLength = (Integer) values.get(7);
-        int seed = (Integer) values.get(8);
-        long interFrameGap = (Long) values.get(9);
-        long lifeTime = (Long) values.get(10);
-        TransportProtocol transportProtocol = TransportProtocol.valueOf((String) values.get(11));
-        FlowType flowType = FlowType.valueOf((String) values.get(12));
-        boolean checkContent = (Boolean) values.get(13);
+    @PostMapping("/start")
+    public ResponseEntity startStream(@RequestBody Map<String, Object> jsonObj) {
+        String streamID = (String) jsonObj.get("stream_id");
+        long delay = Long.valueOf(jsonObj.get("delay").toString());
+        ArrayList<String> generators = (ArrayList<String>) jsonObj.get("generators");
+        ArrayList<String> verifiers = (ArrayList<String>) jsonObj.get("verifiers");
+        PayloadType payloadType = PayloadType.values()[Integer.valueOf(jsonObj.get("payload_type").toString())];
+        long numberOfPackets = Long.valueOf(jsonObj.get("number_of_packets").toString());
+        long bcFramesNum = Long.valueOf(jsonObj.get("broadcast_frames").toString());
+        int payloadLength = Integer.valueOf(jsonObj.get("broadcast_frames").toString());
+        int seed = Integer.valueOf(jsonObj.get("seed").toString());
+        long interFrameGap = Long.valueOf(jsonObj.get("inter_frame_gap").toString());
+        long lifeTime = Long.valueOf(jsonObj.get("time_to_live").toString());
+        TransportProtocol transportProtocol = TransportProtocol.values()[Integer.valueOf(jsonObj.get("transport_layer_protocol").toString())];
+        FlowType flowType = FlowType.values()[Integer.valueOf(jsonObj.get("flow_type").toString())];
+        boolean checkContent = Boolean.valueOf(jsonObj.get("check_content").toString());
 
         ArrayList<Stream> streams = new ArrayList<>();
         streams.add(new Stream(streamID, delay, generators, verifiers, payloadType,
@@ -56,21 +53,46 @@ public class Communicator {
         Thread thread = new Thread(new InstanceController(streams));
         thread.start();
 
-        return streams;
+        return ResponseEntity.ok().build();
     }
 
-    public int receiveStreamToBeStopped() {
-        String url = "http://localhost:8080/stop";
+    @PostMapping("/stop")
+    public ResponseEntity stopStream(@RequestBody Map<String, Object> jsonObj) {
+        String streamId = (String) jsonObj.get("stream_id");
+
+        // stream is not running
+        if (!StreamController.containsStream(streamId)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // get stream from its id
+        InstanceController instanceController = StreamController.getStreamById(streamId);
+
+        // kill all processes of the stream
+        instanceController.killStreams();
+
+        // remove stream from running streams
+        StreamController.removeStream(streamId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // notify admin-client that stream has started
+    public static void started(String streamId) {
+        String url = "http://localhost:8080/streams/" + streamId + "/started";
         RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(url, String.class);
-        JsonParser springParser = JsonParserFactory.getJsonParser();
-        Map<String, Object> map = springParser.parseMap(result);
-        ArrayList<Object> values = new ArrayList<>(map.values());
-        return (Integer) values.get(0);
+        restTemplate.postForObject(url, null, String.class);
+    }
+
+    // notify admin-client that stream has finished
+    public static void finished(String streamId) {
+        String url = "http://localhost:8080/streams/" + streamId + "/finished";
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.postForObject(url, null, String.class);
     }
 
     public static void main(String[] args) {
-        Communicator communicator = new Communicator();
-        communicator.receiveConfig();
+//        Communicator.started("000");
+//        Communicator.finished("000");
     }
 }

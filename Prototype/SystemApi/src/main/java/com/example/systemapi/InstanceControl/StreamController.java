@@ -1,27 +1,27 @@
 package com.example.systemapi.InstanceControl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-@RestController
-@RequestMapping(path = "/")
 public class StreamController {
-    @PostMapping("/streams/{streamId}/started")
-    public static Map<String, Boolean> started(@PathVariable("streamId") String streamId) {
-        HashMap<String, Boolean> map = new HashMap<>();
-        map.put(streamId, true);
-        return map;
+    private static HashMap<String, InstanceController> runningStreams;
+
+    public StreamController() {
+        runningStreams = new HashMap<>();
     }
 
-    @PostMapping("/streams/{streamId}/finished")
-    public static Map<String, Boolean> finished(@PathVariable("streamId") String streamId) {
-        HashMap<String, Boolean> map = new HashMap<>();
-        map.put(streamId, true);
-        return map;
+    public static void addStream(InstanceController instance) {
+        runningStreams.put(instance.streams.get(0).streamID, instance);
+    }
+
+    public static void removeStream(String streamID) {
+        runningStreams.remove(streamID);
+    }
+
+    public static InstanceController getStreamById(String streamID) {
+        return runningStreams.get(streamID);
+    }
+
+    public static boolean containsStream(String streamID) {
+        return runningStreams.containsKey(streamID);
     }
 }
