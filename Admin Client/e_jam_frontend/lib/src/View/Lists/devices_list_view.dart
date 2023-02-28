@@ -5,7 +5,6 @@ import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
-import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

@@ -124,8 +124,9 @@ class _StreamGraphState extends State<StreamGraph> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-            height: MediaQuery.of(context).size.height * 0.25,
-            child: const LineChartStream()),
+          height: MediaQuery.of(context).size.height * 0.25,
+          child: LineChartStream(index),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [

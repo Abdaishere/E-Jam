@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 class ChartData {
   int date = 0;
   int value;
@@ -164,8 +162,64 @@ List<ChartData> chartData = [
   ChartData(1 + Random().nextInt(1000)),
   ChartData(1 + Random().nextInt(1000)),
   ChartData(1 + Random().nextInt(1000)),
-  ChartData(1 + Random().nextInt(1000)),
 ];
-
+List<ChartData> chartData3 = [
+  ChartData(0),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+  ChartData(1 + Random().nextInt(800)),
+];
 const String loremIpsum =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl. Nullam auctor, nisl eget ultricies aliquam, nunc nisl aliquet nisl, eget aliquam nunc nisl sit amet nisl.';

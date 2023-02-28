@@ -2,27 +2,23 @@ import 'package:e_jam/src/Model/fake_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class DoughnutChartPackets extends StatefulWidget {
-  const DoughnutChartPackets(this.packetsState, {super.key});
+class DynamicDoughnutChartPackets extends StatefulWidget {
+  const DynamicDoughnutChartPackets(this.packetsState, {super.key});
 
   final List<PacketsState> packetsState;
   @override
-  State<DoughnutChartPackets> createState() => _DoughnutChartPacketsState();
+  State<DynamicDoughnutChartPackets> createState() => _DynamicDoughnutChartPacketsState();
 }
 
-class _DoughnutChartPacketsState extends State<DoughnutChartPackets> {
+class _DynamicDoughnutChartPacketsState extends State<DynamicDoughnutChartPackets> {
   get packetsState => widget.packetsState;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onLongPress: () {
-          print('Long Pressed');
-        },
-        child: _buildDefaultDoughnutChart());
+    return _buildDynamicDoughnutChart();
   }
 
   /// Return the circular chart with default doughnut series.
-  SfCircularChart _buildDefaultDoughnutChart() {
+  SfCircularChart _buildDynamicDoughnutChart() {
     return SfCircularChart(
       title: ChartTitle(
         text: 'Packets',

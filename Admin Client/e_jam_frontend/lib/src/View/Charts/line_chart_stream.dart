@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LineChartStream extends StatefulWidget {
-  const LineChartStream({super.key});
+  const LineChartStream(this.index, {super.key});
 
+  final int index;
   @override
   State<LineChartStream> createState() => _LineChartStreamState();
 }
 
 class _LineChartStreamState extends State<LineChartStream> {
+  get index => widget.index;
   @override
   Widget build(BuildContext context) {
     return SfCartesianChart(
@@ -23,15 +25,17 @@ class _LineChartStreamState extends State<LineChartStream> {
       ),
       plotAreaBorderWidth: 0,
       primaryXAxis: NumericAxis(
+        edgeLabelPlacement: EdgeLabelPlacement.shift,
         labelStyle: const TextStyle(fontSize: 10),
         majorTickLines: const MajorTickLines(size: 1),
-        labelIntersectAction: AxisLabelIntersectAction.multipleRows,
+        labelIntersectAction: AxisLabelIntersectAction.trim,
         labelFormat: '{value} Sec',
       ),
       primaryYAxis: NumericAxis(
         labelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w400),
         majorTickLines: const MajorTickLines(size: 1),
-        labelIntersectAction: AxisLabelIntersectAction.multipleRows,
+        labelIntersectAction: AxisLabelIntersectAction.trim,
+        // TODO: Make this show the Packets per second not the size of the packets
         labelFormat: '{value} MB',
         labelRotation: 90,
       ),
@@ -61,16 +65,20 @@ class _LineChartStreamState extends State<LineChartStream> {
             height: 3,
             width: 3,
           ),
+          // TODO: add Settings for the SplineType to the Settings Page and make them changeable by the user
+          splineType: SplineType.monotonic,
+          // cardinalSplineTension: 0.5,
           dataSource: chartData,
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: uploadColor.withOpacity(0.2),
         ),
 
-        // Renders spline area chart
+        // Renders Download area chart
         SplineAreaSeries<ChartData, int>(
           name: 'Download',
           borderColor: downloadColor,
+
           // animationDelay: 100,
           borderWidth: 1,
           markerSettings: const MarkerSettings(
@@ -81,10 +89,33 @@ class _LineChartStreamState extends State<LineChartStream> {
             height: 3,
             width: 3,
           ),
+          splineType: SplineType.monotonic,
+          // cardinalSplineTension: 0.3,
           dataSource: chartData2,
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: downloadColor.withOpacity(0.2),
+        ),
+
+        // Renders Error line chart
+        SplineSeries<ChartData, int>(
+          name: 'Error',
+          animationDelay: 1000,
+          color: packetErrorColor,
+          markerSettings: const MarkerSettings(
+            isVisible: true,
+            color: packetErrorColor,
+            borderColor: packetErrorColor,
+            borderWidth: 1,
+            height: 3,
+            width: 3,
+          ),
+          width: 2,
+          splineType: SplineType.monotonic,
+          // cardinalSplineTension: 0.3,
+          dataSource: chartData3,
+          xValueMapper: (ChartData chartData, _) => chartData.date,
+          yValueMapper: (ChartData chartData, _) => chartData.value,
         ),
       ],
     );

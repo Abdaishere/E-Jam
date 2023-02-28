@@ -13,6 +13,18 @@ import 'package:e_jam/src/View/settings_view.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
 
 void main() async {
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return Container(
+      color: Colors.black.withOpacity(0.5),
+      child: Center(
+        child: Text(
+          'Error: ${details.exception}',
+          style: const TextStyle(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  };
   runApp(const MyApp());
 }
 
@@ -234,7 +246,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 },
               ),
               ListTile(
-                leading: const FaIcon(FontAwesomeIcons.microchip),
+                leading: const FaIcon(FontAwesomeIcons.microchip, size: 21),
                 iconColor: Colors.deepOrangeAccent,
                 title: const Text('Devices'),
                 onTap: () {
@@ -244,7 +256,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ListTile(
                 leading: const Icon(Icons.auto_graph_outlined),
                 iconColor: Colors.deepPurpleAccent,
-                title: const Text('Graphs'),
+                title: const Text('Charts'),
                 onTap: () {
                   widget.setIndex(3);
                 },

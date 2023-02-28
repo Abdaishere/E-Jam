@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 const uploadColor = Color.fromARGB(255, 0, 175, 228);
 const downloadColor = Color.fromARGB(255, 224, 131, 0);
-const backcolor = Color.fromARGB(255, 21, 0, 255);
+const backColor = Color.fromARGB(255, 21, 0, 255);
+const packetErrorColor = Color(0xFFBA1A1A);
 
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,

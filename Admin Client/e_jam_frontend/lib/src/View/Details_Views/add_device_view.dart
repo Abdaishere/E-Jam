@@ -18,8 +18,8 @@ class _AddDeviceViewState extends State<AddDeviceView> {
       createRectTween: (begin, end) =>
           CustomRectTween(begin: begin!, end: end!),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.35,
         height: MediaQuery.of(context).size.height * 0.8,
+        width: MediaQuery.of(context).size.width * 0.4,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Scaffold(
@@ -27,15 +27,21 @@ class _AddDeviceViewState extends State<AddDeviceView> {
             appBar: AppBar(
               title: const Text('Add Device'),
               centerTitle: true,
-              leading: IconButton(
-                icon: const Icon(
-                  MaterialCommunityIcons.wifi_sync,
-                  size: 20,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                    icon: const Icon(
+                      MaterialCommunityIcons.wifi_sync,
+                      size: 20,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    tooltip: 'Ping Device',
+                    color: Colors.lightBlueAccent,
+                  ),
                 ),
-                onPressed: () => Navigator.pop(context),
-                tooltip: 'Ping Device',
-                color: Colors.lightBlueAccent,
-              ),
+              ],
+              automaticallyImplyLeading: false,
             ),
             body: Column(
               children: const [

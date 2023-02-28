@@ -273,45 +273,48 @@ class _StreamCardState extends State<StreamCard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Column(
-                      children: const <Widget>[
-                        FaIcon(FontAwesomeIcons.caretUp,
-                            color: uploadColor, size: 35.0),
-                        SizedBox(
-                          width: 155,
-                          child: Text(
-                            '987654321MB/s',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              height: 1.5,
-                              letterSpacing: 1.0,
+                    Expanded(
+                      child: Column(
+                        children: const <Widget>[
+                          FaIcon(FontAwesomeIcons.caretUp,
+                              color: uploadColor, size: 35.0),
+                          SizedBox(
+                            child: Text(
+                              '987654321MB/s',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                height: 1.5,
+                                letterSpacing: 1.0,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: const <Widget>[
-                        FaIcon(FontAwesomeIcons.caretDown,
-                            color: downloadColor, size: 35.0),
-                        SizedBox(
-                          width: 155,
-                          child: Text(
-                            '987654321MB/s',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              height: 1.5,
-                              letterSpacing: 1.0,
+                    const VerticalDivider(),
+                    Expanded(
+                      child: Column(
+                        children: const <Widget>[
+                          FaIcon(FontAwesomeIcons.caretDown,
+                              color: downloadColor, size: 35.0),
+                          SizedBox(
+                            child: Text(
+                              '987654321MB/s',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                height: 1.5,
+                                letterSpacing: 1.0,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -341,10 +344,10 @@ class _StreamCardState extends State<StreamCard> {
                 const ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   child: LinearProgressIndicator(
-                    value: 0.4,
+                    value: 0.5,
                     valueColor:
                         // hormonize the color with the color and status of the stream (blue (running), red (error, stopped), orange (queued), green (finished, ready))
-                        AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+                        AlwaysStoppedAnimation<Color>(Colors.greenAccent),
                   ),
                 )
               ],

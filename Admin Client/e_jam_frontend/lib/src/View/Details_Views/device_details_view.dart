@@ -1,6 +1,12 @@
+import 'dart:math';
+
+import 'package:e_jam/src/Model/fake_chart_data.dart';
+import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
+import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class DevicesDetailsView extends StatefulWidget {
   const DevicesDetailsView(this.index, {super.key});
@@ -25,9 +31,13 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(
             appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
+              leading: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
               ),
               title: Text(
                 'Device $index',
@@ -38,6 +48,15 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               ),
               centerTitle: true,
               actions: [
+                IconButton(
+                  icon: const Icon(
+                    MaterialCommunityIcons.wifi_sync,
+                    size: 20,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: 'Ping Device',
+                  color: Colors.lightBlueAccent,
+                ),
                 IconButton(
                   icon: const Icon(MaterialCommunityIcons.pencil),
                   color: Colors.green,
@@ -54,20 +73,18 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
             body: Column(
               children: [
                 Expanded(
-                  flex: 2,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: DeviceGraph(index),
-                      ),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        flex: 2,
-                        child: DeviceFieldsDetails(index),
-                      ),
-                    ],
-                  ),
+                  flex: 3,
+                  child: DeviceGraph(index),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  flex: 3,
+                  child: DeviceFieldsDetails(index),
+                ),
+                const Divider(
+                  thickness: 2,
+                  indent: 10,
+                  endIndent: 10,
                 ),
                 ProgressDeviceDetails(index),
                 const SizedBox(height: 10),
@@ -92,7 +109,11 @@ class _DeviceGraphState extends State<DeviceGraph> {
   get index => widget.index;
   @override
   Widget build(BuildContext context) {
-    return const Text('Device Graph');
+    return Column(
+      children: [
+        Expanded(flex: 4, child: DoughnutChartPackets(packetsState)),
+      ],
+    );
   }
 }
 
@@ -108,7 +129,73 @@ class _DeviceFieldsDetailsState extends State<DeviceFieldsDetails> {
   get index => widget.index;
   @override
   Widget build(BuildContext context) {
-    return const Text('Device Fields Details');
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    IconButton(
+                      icon: Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.rotationY(pi),
+                        child: const Icon(
+                            MaterialCommunityIcons.progress_upload,
+                            semanticLabel: 'Devices'),
+                      ),
+                      color: uploadColor,
+                      tooltip: 'Generating Processes',
+                      onPressed: () {},
+                    ),
+                    const SizedBox(
+                      child: Text(
+                        '7',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        semanticsLabel: 'Number of Processes',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    IconButton(
+                      icon: const Icon(MaterialCommunityIcons.progress_check,
+                          semanticLabel: 'Devices'),
+                      color: downloadColor,
+                      tooltip: 'Verifying Processes',
+                      onPressed: () {},
+                    ),
+                    const SizedBox(
+                      child: Text(
+                        '742',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        semanticsLabel: 'Number of Processes',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Expanded(child: Text(loremIpsum)),
+        ],
+      ),
+    );
   }
 }
 
@@ -124,6 +211,48 @@ class _ProgressDeviceDetailsState extends State<ProgressDeviceDetails> {
   get index => widget.index;
   @override
   Widget build(BuildContext context) {
-    return const Text('Progress Device Details');
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            children: const <Widget>[
+              FaIcon(FontAwesomeIcons.caretUp, color: uploadColor),
+              SizedBox(
+                child: Text(
+                  '987654321MB/s',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    height: 1.5,
+                    letterSpacing: 1.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            children: const <Widget>[
+              FaIcon(FontAwesomeIcons.caretDown, color: downloadColor),
+              SizedBox(
+                child: Text(
+                  '987654321MB/s',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    height: 1.5,
+                    letterSpacing: 1.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
