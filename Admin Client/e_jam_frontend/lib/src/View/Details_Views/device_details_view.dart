@@ -31,14 +31,6 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(
             appBar: AppBar(
-              leading: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
               title: Text(
                 'Device $index',
                 style: const TextStyle(
@@ -60,11 +52,13 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                 IconButton(
                   icon: const Icon(MaterialCommunityIcons.pencil),
                   color: Colors.green,
+                  tooltip: 'Edit Device',
                   onPressed: () {},
                 ),
                 IconButton(
                   icon: const Icon(MaterialCommunityIcons.trash_can),
                   color: Colors.red,
+                  tooltip: 'Delete Device',
                   onPressed: () {},
                 ),
                 const SizedBox(width: 10),
@@ -76,7 +70,6 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                   flex: 3,
                   child: DeviceGraph(index),
                 ),
-                const SizedBox(width: 15),
                 Expanded(
                   flex: 3,
                   child: DeviceFieldsDetails(index),
@@ -145,22 +138,20 @@ class _DeviceFieldsDetailsState extends State<DeviceFieldsDetails> {
                         transform: Matrix4.rotationY(pi),
                         child: const Icon(
                             MaterialCommunityIcons.progress_upload,
-                            semanticLabel: 'Devices'),
+                            semanticLabel: 'Processes'),
                       ),
                       color: uploadColor,
                       tooltip: 'Generating Processes',
                       onPressed: () {},
                     ),
-                    const SizedBox(
-                      child: Text(
-                        '7',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        semanticsLabel: 'Number of Processes',
+                    const Text(
+                      '7',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      semanticsLabel: 'Number of Processes',
                     ),
                   ],
                 ),
@@ -170,21 +161,19 @@ class _DeviceFieldsDetailsState extends State<DeviceFieldsDetails> {
                   children: <Widget>[
                     IconButton(
                       icon: const Icon(MaterialCommunityIcons.progress_check,
-                          semanticLabel: 'Devices'),
+                          semanticLabel: 'Processes'),
                       color: downloadColor,
                       tooltip: 'Verifying Processes',
                       onPressed: () {},
                     ),
-                    const SizedBox(
-                      child: Text(
-                        '742',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        semanticsLabel: 'Number of Processes',
+                    const Text(
+                      '742',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      semanticsLabel: 'Number of Processes',
                     ),
                   ],
                 ),
@@ -218,17 +207,15 @@ class _ProgressDeviceDetailsState extends State<ProgressDeviceDetails> {
           child: Column(
             children: const <Widget>[
               FaIcon(FontAwesomeIcons.caretUp, color: uploadColor),
-              SizedBox(
-                child: Text(
-                  '987654321MB/s',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    height: 1.5,
-                    letterSpacing: 1.0,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
+              Text(
+                '987654321MB/s',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  height: 1.5,
+                  letterSpacing: 1.0,
                 ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -237,17 +224,15 @@ class _ProgressDeviceDetailsState extends State<ProgressDeviceDetails> {
           child: Column(
             children: const <Widget>[
               FaIcon(FontAwesomeIcons.caretDown, color: downloadColor),
-              SizedBox(
-                child: Text(
-                  '987654321MB/s',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    height: 1.5,
-                    letterSpacing: 1.0,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
+              Text(
+                '987654321MB/s',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  height: 1.5,
+                  letterSpacing: 1.0,
                 ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ],
           ),

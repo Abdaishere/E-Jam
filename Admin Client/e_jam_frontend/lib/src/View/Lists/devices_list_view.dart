@@ -18,24 +18,24 @@ class DevicesListView extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Devices',
-          style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: const DrawerWidget(),
         actions: <Widget>[
           // refresh icon for refreshing the Devices list view
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.arrowsRotate),
+            icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
             onPressed: () {},
           ),
           // gear icon for settings and preferences related to the Devices list view (sort by, filter by, etc.)
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.gear),
+            icon: const FaIcon(FontAwesomeIcons.gear, size: 20.0),
             onPressed: () {},
           ),
           // Explaination icon for details about how the Device card works and what the icons mean and what the colors mean
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.circleQuestion),
+            icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
             onPressed: () {},
           ),
         ],

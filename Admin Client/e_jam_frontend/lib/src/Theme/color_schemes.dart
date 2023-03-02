@@ -1,10 +1,39 @@
 import 'package:e_jam/src/Model/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
-const uploadColor = Color.fromARGB(255, 0, 175, 228);
-const downloadColor = Color.fromARGB(255, 224, 131, 0);
-const backColor = Color.fromARGB(255, 21, 0, 255);
-const packetErrorColor = Color(0xFFBA1A1A);
+const uploadColor =
+    Color.fromARGB(255, 0, 175, 228); // Color for Uploads indicators
+const downloadColor =
+    Color.fromARGB(255, 224, 131, 0); // Color for Downloads indicators
+const backColor =
+    Color.fromARGB(255, 21, 0, 255); // Color for some Background buttons
+const packetErrorColor =
+    Color(0xFFBA1A1A); // Color for Packet Errors indicators (charts only)
+
+// Stream Colors
+const streamCreatedColor = Colors.blueGrey; // or no color (transparent)
+const streamQueuedColor = Colors.orangeAccent; // hourglass button pressed
+const streamRunningColor = Colors.greenAccent; // start button pressed
+const streamStoppedColor = Colors.grey; // stop button pressed
+const streamErrorColor = Colors.redAccent; // any error
+const streamFinishedColor = Colors.blueAccent; // finished successfully
+
+// Device Colors
+const deviceRunningOrOnlineColor = Color(0xFF3dcc77); // online
+const deviceIdleColor = Colors.orangeAccent; // idle
+const deviceOfflineOrErrorColor = Color(0xFFe34845); // offline or error
+
+final colorlight = [
+  const Color.fromARGB(255, 253, 209, 146),
+  const Color.fromARGB(255, 255, 197, 117),
+  const Color.fromARGB(255, 255, 117, 117),
+];
+
+final colordark = [
+  const Color.fromARGB(255, 0, 21, 48),
+  const Color(0xFF001B3D),
+  const Color(0xFF003062),
+];
 
 const lightColorScheme = ColorScheme(
   brightness: Brightness.light,

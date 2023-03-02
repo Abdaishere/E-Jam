@@ -41,12 +41,7 @@ class _AddStreamViewState extends State<AddStreamView>
             height: MediaQuery.of(context).size.height * 0.75,
             width: MediaQuery.of(context).size.width * 0.45,
             child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomLeft: Radius.circular(20),
-                topLeft: Radius.circular(20),
-                bottomRight: Radius.circular(5),
-              ),
+              borderRadius: const BorderRadius.all(Radius.circular(15)),
               child: Scaffold(
                 // top bar with back button for navigation bettwen presets and higher level details view
                 appBar: TabBar(

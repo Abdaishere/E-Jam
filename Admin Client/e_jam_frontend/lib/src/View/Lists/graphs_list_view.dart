@@ -16,7 +16,10 @@ class _GraphsListViewState extends State<GraphsListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Graphs List Screen'),
+        title: const Text(
+          'Pinned Charts',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         leading: const DrawerWidget(),
       ),

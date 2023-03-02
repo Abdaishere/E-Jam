@@ -505,10 +505,10 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "5f7dae40707df507325ee045d1a172aea9f449ac4244d7c52391dd97208eeef8"
+      sha256: "4319454a92fe5aea1e90ff68c17703a39517ab05dd3074c34c9553e5f7cbf414"
       url: "https://pub.dev"
     source: hosted
-    version: "20.4.51"
+    version: "20.4.52"
   syncfusion_flutter_gauges:
     dependency: "direct main"
     description:
@@ -517,6 +517,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "20.4.51"
+  syncfusion_flutter_treemap:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_treemap
+      sha256: abc22cf6a8510a1eb757113305a40ed4df75560013a87b40d71a8cf6c91371c1
+      url: "https://pub.dev"
+    source: hosted
+    version: "20.4.52-beta"
   term_glyph:
     dependency: transitive
     description:

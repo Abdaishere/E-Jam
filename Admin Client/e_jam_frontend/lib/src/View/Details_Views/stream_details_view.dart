@@ -65,14 +65,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             body: Column(
               children: [
                 Expanded(
-                  flex: 2,
                   child: Row(
                     children: [
                       Expanded(
                         flex: 4,
                         child: StreamGraph(index),
                       ),
-                      const SizedBox(width: 15),
                       Expanded(
                         flex: 2,
                         child: StreamFieldsDetails(index),
@@ -120,27 +118,19 @@ class _StreamGraphState extends State<StreamGraph> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.25,
+        Expanded(
           child: LineChartStream(index),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.3,
-              width: MediaQuery.of(context).size.width * 0.26,
-              child: Expanded(child: PieDevices(runningDevices)),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.3,
-              width: MediaQuery.of(context).size.width * 0.26,
-              child: Expanded(child: DoughnutChartPackets(packetsState)),
-            ),
-          ],
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(child: PieDevices(runningDevices)),
+              Expanded(child: DoughnutChartPackets(packetsState)),
+            ],
+          ),
         ),
       ],
     );

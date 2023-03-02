@@ -84,18 +84,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final colorlight = [
-      const Color.fromARGB(255, 253, 209, 146),
-      const Color.fromARGB(255, 255, 197, 117),
-      const Color.fromARGB(255, 255, 117, 117),
-    ];
-
-    final colordark = [
-      const Color.fromARGB(255, 0, 21, 48),
-      const Color(0xFF001B3D),
-      const Color(0xFF003062),
-    ];
-
     return Consumer(
       builder: (context, ThemeModel theme, child) {
         return Stack(
@@ -108,7 +96,9 @@ class _HomeState extends State<Home> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: theme.isDark ? colordark : colorlight,
+                  transform: const GradientRotation(0.5),
                 ),
+                backgroundBlendMode: BlendMode.darken,
               ),
               child: Scaffold(
                 backgroundColor: Colors.transparent,
@@ -191,6 +181,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   children: [
                     // start and pause icon button
                     IconButton(
+                      tooltip: isSwitched ? 'Pause' : 'Start',
                       onPressed: () {
                         setState(() {
                           isSwitched = !isSwitched;
@@ -203,9 +194,11 @@ class _MenuScreenState extends State<MenuScreen> {
                         isSwitched
                             ? FontAwesomeIcons.play
                             : FontAwesomeIcons.pause,
+                        size: 21,
                       ),
                     ),
                     IconButton(
+                      tooltip: isFrozen ? 'Unfreeze Graphs' : 'Freeze Graphs',
                       onPressed: () {
                         setState(() {
                           isFrozen = !isFrozen;
@@ -214,15 +207,19 @@ class _MenuScreenState extends State<MenuScreen> {
                       color: isFrozen
                           ? theme.colorScheme.surfaceTint
                           : theme.colorScheme.secondary,
-                      icon: FaIcon(isFrozen
-                          ? FontAwesomeIcons.solidSnowflake
-                          : FontAwesomeIcons.camera),
+                      icon: FaIcon(
+                          isFrozen
+                              ? FontAwesomeIcons.solidSnowflake
+                              : FontAwesomeIcons.camera,
+                          size: 21),
                     ),
                     IconButton(
+                      tooltip: 'Save as CSV or PDF',
                       onPressed: () {},
                       color: theme.colorScheme.secondary,
                       icon: const FaIcon(
                         FontAwesomeIcons.solidFloppyDisk,
+                        size: 21,
                       ),
                     ),
                   ],
@@ -270,20 +267,24 @@ class _MenuScreenState extends State<MenuScreen> {
                 },
               ),
               AboutListTile(
-                icon: const Icon(MaterialCommunityIcons.information),
+                icon: const Icon(MaterialCommunityIcons.information, size: 21),
                 applicationName: "E-Jam",
                 applicationVersion: "1.0.0",
                 applicationIcon: Image.asset("assets/Icon-logo.ico",
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center),
+                    width: 100, height: 100),
                 applicationLegalese: "© 2023 E-Jam",
                 aboutBoxChildren: const <Widget>[
                   Text(
-                      'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.'),
-                  Text(
-                      'Developed by:\n\nAbdullah Elbelkasy\nKhaled Waleed\nMohamed Elhagery\nIslam Wagih\nMostafa Abdullah'),
+                      'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
+                      style: TextStyle(fontSize: 15)),
+                  // Text('Developed by:',
+                  //     style:
+                  //         TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  // Text('\tAbdullah Elbelkasy'),
+                  // Text('\tMohamed Elhagery'),
+                  // Text('\tKhaled Waleed'),
+                  // Text('\tIslam Wagih'),
+                  // Text('\tMostafa Abdullah'),
                 ],
                 child: const Text('About'),
               ),
@@ -295,6 +296,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
+                      tooltip: 'Change Switch',
                       icon: const Icon(Icons.logout),
                       onPressed: () {
                         Navigator.push(
