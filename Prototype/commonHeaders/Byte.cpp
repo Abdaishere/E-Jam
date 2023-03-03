@@ -1,23 +1,24 @@
 //
-// Created by mohamedelhagry on 12/2/22.
+// Created by mohamedelhagry on 2/21/23.
 //
-
 #include "Byte.h"
-#include <iostream>
-//unit testing for ByteArray struct
 
-
-/*
-int main()
+void print(ByteArray* ptr)
 {
-    ByteArray arr2("mkdfg4", 6);
-    ByteArray arr3("ioasdf", 6);
-
-    ByteArray arr(15);
-    arr.write(arr2);
-    arr.write(arr3);
-    for(int i=0; i<15; i++)
-        printf("%c", arr.bytes[i]);
-
+    int sz = ptr->size();
+    for(int i=0;i<sz;i++)
+    {
+        std::cout<<(int)ptr->at(i);
+    }
+    std::cout<<std::endl;
 }
-*/
+
+void printChars(ByteArray* ptr)
+{
+    int sz = ptr->size();
+    for(int i=0;i<sz;i++)
+    {
+        std::cout<<ptr->at(i);
+    }
+    std::cout<<std::endl;
+}

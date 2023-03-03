@@ -1,6 +1,4 @@
-//
-// Created by khaled on 11/29/22.
-//
+
 
 #ifndef GENERATOR_PACKETSENDER_H
 #define GENERATOR_PACKETSENDER_H
@@ -22,7 +20,7 @@ private:
     int genID;
     PacketSender();
 //    std::string getNewPacket();
-    int openFifo();
+    void openFifo();
 public:
     static PacketSender* getInstance(int genID = 0, std::string pipeDir = "", int pipePerm = 0777);
     void transmitPackets(const ByteArray &packet) const;

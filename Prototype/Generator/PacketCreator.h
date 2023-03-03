@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H

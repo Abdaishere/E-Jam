@@ -73,6 +73,10 @@ int main(int argc, char** argv)
     {
         genID = std::stoi(argv[1]);
         configPath = argv[2];
+    }else
+    {
+        std::cout<<"No ARGS ARE PASSED\n";
+        return 0;
     }
     
     ConfigurationManager::getConfiguration(configPath);

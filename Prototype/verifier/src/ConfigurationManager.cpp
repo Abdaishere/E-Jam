@@ -23,7 +23,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
     Configuration* val = new Configuration();
     val->loadFromFile((char *)dir);
 
-    int key = convertStreamID((char*) val->getStreamID()->bytes);
+    int key = convertStreamID((char*) val->getStreamID()->c_str());
     configurations[key] = val;
 }
 
@@ -82,7 +82,7 @@ std::vector<std::string> ConfigurationManager::splitString(const std::string& s,
 
 void ConfigurationManager::setCurrStreamID(ByteArray& streamID)
 {
-    currentStreamID = (char*)streamID.bytes;
+    currentStreamID = (char*) streamID.c_str();
 }
 
 char *ConfigurationManager::getCurrStreamID()

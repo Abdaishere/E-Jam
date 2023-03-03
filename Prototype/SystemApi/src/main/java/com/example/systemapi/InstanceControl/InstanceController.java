@@ -2,6 +2,8 @@ package com.example.systemapi.InstanceControl;
 
 import java.io.*;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.rmi.server.ExportException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -16,7 +18,7 @@ public class InstanceController implements Runnable
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
     ArrayList<Stream> streams;
-    
+
     public InstanceController (ArrayList<Stream> streams)
     {
         myMacAddress = UTILs.getMyMacAddress();
@@ -206,7 +208,7 @@ public class InstanceController implements Runnable
 
         // start the generators, verifiers and gateway
         startStreams();
-
+//        debugStreams(); //TODO
         // add stream to running streams
         StreamController.addStream(this);
 

@@ -30,10 +30,11 @@ struct ErrorInfo
     ErrorInfo(ByteArray* packet)
     {
         firstErrorTime = time(NULL); //observe the error time
-        senderMac = new ByteArray(6, 0);
-        senderMac->write(*packet, 0, 5);
-        recvMac = new ByteArray(6, 0);
-        recvMac->write(*packet, 6, 11);
+        senderMac = new ByteArray(6, 'a');
+        //append packet[0:5] into sendermac
+        senderMac->append(*packet, 0, 6);
+        recvMac = new ByteArray(6, 'a');
+        recvMac->append(*packet, 6, 6);
     }
 
     //add new error to current errors
