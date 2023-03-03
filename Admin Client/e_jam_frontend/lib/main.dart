@@ -277,14 +277,14 @@ class _MenuScreenState extends State<MenuScreen> {
                   Text(
                       'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
                       style: TextStyle(fontSize: 15)),
-                  // Text('Developed by:',
-                  //     style:
-                  //         TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  // Text('\tAbdullah Elbelkasy'),
-                  // Text('\tMohamed Elhagery'),
-                  // Text('\tKhaled Waleed'),
-                  // Text('\tIslam Wagih'),
-                  // Text('\tMostafa Abdullah'),
+                  Text('Developed by:',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  Text('\tAbdullah Elbelkasy'),
+                  Text('\tMohamed Elhagery'),
+                  Text('\tKhaled Waleed'),
+                  Text('\tIslam Wagih'),
+                  Text('\tMostafa Abdullah'),
                 ],
                 child: const Text('About'),
               ),
@@ -336,7 +336,7 @@ class DrawerWidget extends StatelessWidget {
       onPressed: () {
         ZoomDrawer.of(context)!.toggle();
       },
-      icon: const Icon(Icons.menu),
+      icon: const Icon(MaterialCommunityIcons.menu),
     );
   }
 }
