@@ -1,9 +1,7 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -11,35 +9,34 @@ import static java.lang.Thread.sleep;
 /**
  * This class initializes and manages the generator and verifier instances
  */
-public class InstanceController
+public class InstanceController implements Runnable
 {
     private final String configDir = ConfigurationManager.configDir;
-    private String myMacAddress;
+    private final String myMacAddress;
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
+    ArrayList<Stream> streams;
     
     public InstanceController (ArrayList<Stream> streams)
     {
-        getExecutables(); 
-        getMyMacAddress();
+        myMacAddress = UTILs.getMyMacAddress();
+        this.streams = streams;
+    }
+
+    public void startStreams() {
+        getExecutables();
         int genNum = startGenerators(streams); //start executable generators instances
         int verNum = startVerifiers(streams); //start executable verifiers instances
         startGateway(genNum, verNum); //start the gateway
+    }
 
-        try {
-            sleep(5000); //test duration
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("sleep finished");
-        debugStreams();
-        //kill the current running executables  
+    public void killStreams() {
+        //kill the current running executables
         for(Long pid:pids)
         {
             String[] args = {"-9", Long.toString(pid)};
             executeCommand("kill",true , args);
         }
-
     }
 
     //reading the console outputs of the executables,
@@ -88,7 +85,7 @@ public class InstanceController
         int genID = 0;
         for (Stream stream: streams)
         {
-            for(String sender: stream.senders)
+            for(String sender: stream.generators)
             {
                 if(Objects.equals(sender, myMacAddress))
                 {
@@ -108,7 +105,7 @@ public class InstanceController
         int verID = 0;
         for (Stream stream: streams)
         {
-            for(String receiver: stream.receivers)
+            for(String receiver: stream.verifiers)
             {
                 if(Objects.equals(receiver, myMacAddress))
                 {
@@ -195,36 +192,37 @@ public class InstanceController
         executeCommand("../Executables/GetExecutables.sh", true, args);
     }
 
-    private void getMyMacAddress()
-    {
-        byte[] mac;
+
+    @Override
+    public void run() {
+        Stream stream = streams.get(0);
+
+        // wait until the start time of the stream
         try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while(networkInterfaces.hasMoreElements())
-            {
-                NetworkInterface network = networkInterfaces.nextElement();
-                mac = network.getHardwareAddress();
-                if(mac == null)
-                {
-                    throw new Exception("Mac is null");
-                }
-                else
-                {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < mac.length; i++)
-                    {
-                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                    }
-                    String mac12 = sb.toString().replaceAll("-","");
-                    myMacAddress = mac12;
-                    return;
-                }
-            }
+            Thread.sleep(stream.delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+
+        // start the generators, verifiers and gateway
+        startStreams();
+
+        // add stream to running streams
+        StreamController.addStream(this);
+
+        // notify Admin-client that the stream is finished
+        Communicator.started(stream.streamID);
+
+        try {
+            Thread.sleep(stream.lifeTime);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        myMacAddress = "AAAAAAAAAAAA";
+
+        // kill the generators, verifiers and gateway
+        killStreams();
+
+        // notify Admin-client that the stream is finished
+        Communicator.finished(stream.streamID);
     }
 }

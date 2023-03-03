@@ -1,6 +1,6 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
-import NetworkUtilities.BroadcastUtil;
+import com.example.systemapi.NetworkUtilities.BroadcastUtil;
 
 public class Main
 {
@@ -9,6 +9,6 @@ public class Main
         BroadcastUtil.broadcastAlive(5);
 
         InstanceControlFacade instanceControlFacade = new InstanceControlFacade();
-        instanceControlFacade.executeComponents();
+//        instanceControlFacade.executeComponents();
     }
 }

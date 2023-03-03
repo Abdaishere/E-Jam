@@ -1,4 +1,4 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,12 +40,12 @@ public class ConfigurationManager
             FileWriter fileWriter = new FileWriter(fileName);
 
             fileWriter.write(stream.streamID+'\n');
-            fileWriter.write(Integer.toString(stream.senders.size())+'\n');
-            for (String sender: stream.senders)
+            fileWriter.write(Integer.toString(stream.generators.size())+'\n');
+            for (String sender: stream.generators)
                 fileWriter.write(sender+'\n');
 
-            fileWriter.write(Integer.toString(stream.receivers.size())+'\n');
-            for (String receiver: stream.receivers)
+            fileWriter.write(Integer.toString(stream.verifiers.size())+'\n');
+            for (String receiver: stream.verifiers)
                 fileWriter.write(receiver+'\n');
 
             fileWriter.write(Integer.toString(stream.payloadType.ordinal())+'\n');

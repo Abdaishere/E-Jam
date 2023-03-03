@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <csignal>
+#include <pthread.h>
 using namespace std;
 //constants
 #define BUFF_LEN 1600

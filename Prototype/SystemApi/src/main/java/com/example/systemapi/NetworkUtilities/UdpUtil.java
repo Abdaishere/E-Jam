@@ -1,4 +1,4 @@
-package NetworkUtilities;
+package com.example.systemapi.NetworkUtilities;
 
 import java.io.IOException;
 import java.net.*;

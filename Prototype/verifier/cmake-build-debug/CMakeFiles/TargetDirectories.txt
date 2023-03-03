@@ -1,3 +1,3 @@
-/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/verifier/cmake-build-debug/CMakeFiles/verifier.dir
-/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/verifier/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/mohamedelhagry/CLionProjects/E-Jam/Prototype/verifier/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/mostafa/Desktop/E-Jam/Prototype/verifier/cmake-build-debug/CMakeFiles/verifier.dir
+/home/mostafa/Desktop/E-Jam/Prototype/verifier/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mostafa/Desktop/E-Jam/Prototype/verifier/cmake-build-debug/CMakeFiles/rebuild_cache.dir
