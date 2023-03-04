@@ -77,54 +77,55 @@ this function is used to update the device status according to the status of the
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
     pub fn update_device_status(
-        ip: String,
-        status: ProcessStatus,
-        type_of_process: ProcessType,
+        device_mac: &String,
+        status: &ProcessStatus,
+        type_of_process: &ProcessType,
         device_list: &Mutex<Vec<Device>>,
     ) {
+        // TODO: Recheck the logic of this function
         let mut devices = device_list
             .lock()
             .expect("Error: Failed to Change the device status");
 
-        let index = devices.iter().position(|x| x.ip_address == ip);
+        let index = devices.iter().position(|x| &x.mac_address == device_mac);
 
         // if the device is not found then panic
         let index = match index {
             Some(index) => index,
-            None => panic!("Error: Device not found {}", ip),
+            None => panic!("Error: Device not found {}", device_mac),
         };
 
         // update the number of processes that are running on the device
-        if type_of_process == ProcessType::Generation {
-            if status == ProcessStatus::Running {
+        if type_of_process == &ProcessType::Generation {
+            if status == &ProcessStatus::Queued {
                 devices[index].gen_processes += 1;
-            } else if status == ProcessStatus::Idle {
+            } else if status == &ProcessStatus::Completed {
                 devices[index].gen_processes -= 1;
-            } else if status == ProcessStatus::Offline {
-                devices[index].gen_processes = 0;
             }
         } else {
-            if status == ProcessStatus::Running {
+            if status == &ProcessStatus::Queued {
                 devices[index].ver_processes += 1;
-            } else if status == ProcessStatus::Idle {
+            } else if status == &ProcessStatus::Completed {
                 devices[index].ver_processes -= 1;
-            } else if status == ProcessStatus::Offline {
-                devices[index].ver_processes = 0;
             }
         }
 
         // update the status of the device according to the number of processes that are running on the device
         if devices[index].gen_processes == 0 && devices[index].ver_processes == 0 {
-            if ProcessStatus::Offline == status {
+            if status == &ProcessStatus::Offline {
                 devices[index].status = DeviceStatus::Offline;
             } else {
-                devices[index].status = DeviceStatus::Idle;
+                devices[index].status = DeviceStatus::Online;
             }
         } else if devices[index].gen_processes > 0 || devices[index].ver_processes > 0 {
-            if ProcessStatus::Offline == status {
+            if status == &ProcessStatus::Offline {
                 devices[index].status = DeviceStatus::Offline;
             } else {
-                devices[index].status = DeviceStatus::Running;
+                if status == &ProcessStatus::Running {
+                    devices[index].status = DeviceStatus::Running;
+                } else if status == &ProcessStatus::Queued {
+                    devices[index].status = DeviceStatus::Idle;
+                }
             }
         } else {
             // if for some reason the number of processes is less than 0 then set the status of the device to offline
@@ -199,9 +200,13 @@ this is used to get the device port
     #[doc = r"Get the Device Connection Address
 this is used to get the device connection address
 # Returns
-* `(String,String)` - the device IP address and port"]
-    pub fn get_device_address(&self) -> (String, String) {
-        (self.get_ip_address(), self.get_port().to_string())
+* `(String, u16, String)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
+    pub fn get_device_info_tuple(&self) -> (String, u16, String) {
+        (
+            self.get_ip_address(),
+            self.get_port(),
+            self.get_device_mac(),
+        )
     }
 }
 

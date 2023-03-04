@@ -328,14 +328,14 @@ The following endpoints are available for the system API:
     <th>Description</th>
 </tr>
 <tr>
-    <td>/streams/{stream_id}/finished</td>
+    <td>/streams/{stream_id}/{mac_address}/finished</td>
     <td>POST</td>
-    <td></td>
+    <td>the mac address of the card that finished the stream</td>
     <td></td>
     <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side (must be sent from the systemapi to the admin client)</td>
 </tr>
 <tr>
-    <td>/streams/{stream_id}/started</td>
+    <td>/streams/{stream_id}/{mac_address}/started</td>
     <td>POST</td>
     <td></td>
     <td></td>
@@ -344,20 +344,20 @@ The following endpoints are available for the system API:
 <tr>
     <td>/connect</td>
     <td>GET</td>
-    <td>mac address of the device</td>
+    <td>mac address of the card used in the testing process</td>
     <td>Success</td>
     <td>will be called to Connect to the system API</td>
 </tr>
 <tr>
     <td>/start</td>
-    <td>POST</td>
+    <td>GET</td>
     <td>StreamDetails</td>
     <td>Success</td>
     <td>generate or verify the Provided Stream</td>
 </tr>
 <tr>
     <td>/stop</td>
-    <td>POST</td>
+    <td>GET</td>
     <td>stream_id</td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>

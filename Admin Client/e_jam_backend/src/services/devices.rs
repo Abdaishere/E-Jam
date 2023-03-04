@@ -180,9 +180,10 @@ if the stream is found, update its status and return a 200 OK
 * `Failed to lock streams_entries in stream finished {stream_id}` - if the streams_entries is not found in the mutex lock
 ## Logs
 * `stream finished {stream_id} by {ip}` - if the stream is found and updated"]
-#[post("/streams/{stream_id}/finished")]
+#[post("/streams/{stream_id}/{mac_address}/finished")]
 async fn stream_finished(
     stream_id: web::Path<String>,
+    mac_address: web::Path<String>,
     data: web::Data<AppState>,
     req: HttpRequest,
 ) -> impl Responder {
@@ -204,7 +205,7 @@ async fn stream_finished(
                 // get the ip address of the client
                 let ip = val.ip().to_string();
 
-                stream_entry.notify_stream_finished(&ip, &data.device_list);
+                stream_entry.notify_stream_finished(&mac_address, &data.device_list);
                 println!("stream finished {} by {}", stream_id, ip);
             };
 
@@ -228,9 +229,10 @@ if the stream is found, update its status and return a 200 OK
 * `Failed to lock streams_entries in stream started {stream_id}` - if the streams entries are not found in the mutex lock
 ## Logs
 * `Address {ip} started the stream {stream_id}` - if the stream is found and updated"]
-#[post("/streams/{stream_id}/started")]
+#[post("/streams/{stream_id}/{mac_address}/started")]
 async fn stream_started(
     stream_id: web::Path<String>,
+    mac_address: web::Path<String>,
     data: web::Data<AppState>,
     req: HttpRequest,
 ) -> impl Responder {
@@ -249,7 +251,7 @@ async fn stream_started(
         Some(stream_entry) => {
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
-                stream_entry.notify_stream_running(val.ip().to_string(), &data.device_list);
+                stream_entry.notify_stream_running(&mac_address, &data.device_list);
                 println!("Address {} started the stream {}", val.ip(), stream_id);
             };
 
