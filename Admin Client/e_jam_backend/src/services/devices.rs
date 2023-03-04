@@ -3,15 +3,15 @@ use crate::models::devices::Device;
 use actix_web::Responder;
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
 
-/// # Get all devices
-/// get all devices in the list of devices
-/// if the list is empty, return a 204 No Content
-/// if the list is not empty, return a 200 OK
-/// if the list is not found, return a 500 Internal Server Error
-/// ## Arguments
-/// * `device_list` - the list of devices
-/// ## Returns
-/// * `HttpResponse` - the http response
+#[doc = r"# Get all devices
+get all devices in the list of devices
+if the list is empty, return a 204 No Content
+if the list is not empty, return a 200 OK
+if the list is not found, return a 500 Internal Server Error
+## Arguments
+* `device_list` - the list of devices
+## Returns
+* `HttpResponse` - the http response"]
 #[get("/devices")]
 async fn get_devices(data: web::Data<AppState>) -> impl Responder {
     let devices = data
@@ -26,16 +26,16 @@ async fn get_devices(data: web::Data<AppState>) -> impl Responder {
     }
 }
 
-/// # Get a device
-/// get a device in the list of devices
-/// if the device is not found, return a 404 Not Found
-/// if the device is found, return a 200 OK
-/// ## Arguments
-/// * `device_ip` - the ip address of the device
-/// ## Returns
-/// * `HttpResponse` - the http response
-/// ## Panics
-/// * `failed to lock device list in get device {device_ip}` - if the device list is not found in the mutex lock
+#[doc = r"# Get a device
+get a device in the list of devices
+if the device is not found, return a 404 Not Found
+if the device is found, return a 200 OK
+## Arguments
+* `device_ip` - the ip address of the device
+## Returns
+* `HttpResponse` - the http response
+## Panics
+* `failed to lock device list in get device {device_ip}` - if the device list is not found in the mutex lock"]
 #[get("/devices/{device_ip}")]
 async fn get_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_ip = device_ip.into_inner();
@@ -53,16 +53,16 @@ async fn get_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> 
     }
 }
 
-/// # Delete a device
-/// add a device to the list of devices
-/// if the device is already in the list, return a 409 Conflict
-/// if the device is not in the list, add it and return a 201 Created
-/// ## Arguments
-/// * `device` - the device to add
-/// ## Returns
-/// * `HttpResponse` - the http response
-/// ## Panics
-/// * `failed to lock device list in add device {device_ip}` - if the device list is not found in the mutex lock
+#[doc = r"# Delete a device
+add a device to the list of devices
+if the device is already in the list, return a 409 Conflict
+if the device is not in the list, add it and return a 201 Created
+## Arguments
+* `device` - the device to add
+## Returns
+* `HttpResponse` - the http response
+## Panics
+* `failed to lock device list in add device {device_ip}` - if the device list is not found in the mutex lock"]
 #[post("/devices")]
 async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
     let mut devices = data.device_list.lock().expect(
@@ -84,14 +84,14 @@ async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> imp
     }
 }
 
-/// # Ping a device
-/// ping a device in the list of devices
-/// if the device is not reachable, return a 404 Not Found
-/// if the device is reachable, return a 200 OK
-/// ## Arguments
-/// * `device` - the device to ping
-/// ## Returns
-/// * `HttpResponse` - the http response
+#[doc = r"# Ping a device
+ping a device in the list of devices
+if the device is not reachable, return a 404 Not Found
+if the device is reachable, return a 200 OK
+## Arguments
+* `device` - the device to ping
+## Returns
+* `HttpResponse` - the http response"]
 #[get("/devices/ping")]
 async fn ping_device(device: web::Json<Device>) -> impl Responder {
     let device = device.into_inner();
@@ -103,17 +103,17 @@ async fn ping_device(device: web::Json<Device>) -> impl Responder {
     }
 }
 
-/// # Update a device
-/// update a device in the list of devices
-/// if the device is not found, return a 404 Not Found
-/// if the device is found, update it and return a 200 OK
-/// ## Arguments
-/// * `device_ip` - the ip address of the device
-/// * `device` - the device data to update
-/// ## Returns
-/// * `HttpResponse` - the http response
-/// ## Panics
-/// * `failed to lock device list in update device {device_ip}` - if the device list is not found in the mutex lock
+#[doc = r"# Update a device
+update a device in the list of devices
+if the device is not found, return a 404 Not Found
+if the device is found, update it and return a 200 OK
+## Arguments
+* `device_ip` - the ip address of the device
+* `device` - the device data to update
+## Returns
+* `HttpResponse` - the http response
+## Panics
+* `failed to lock device list in update device {device_ip}` - if the device list is not found in the mutex lock"]
 #[put("/devices/{device_ip}")]
 async fn update_device(
     device_ip: web::Path<String>,
@@ -137,16 +137,16 @@ async fn update_device(
     }
 }
 
-/// # Delete a device
-/// delete a device in the list of devices
-/// if the device is not found, return a 404 Not Found
-/// if the device is found, delete it and return a 200 OK
-/// ## Arguments
-/// * `device_ip` - the ip address of the device
-/// ## Returns
-/// * `HttpResponse` - the http response
-/// ## Panics
-/// * `failed to lock device list in delete device {device_ip}` - if the device list is not found in the mutex lock
+#[doc = r"# Delete a device
+delete a device in the list of devices
+if the device is not found, return a 404 Not Found
+if the device is found, delete it and return a 200 OK
+## Arguments
+* `device_ip` - the ip address of the device
+## Returns
+* `HttpResponse` - the http response
+## Panics
+* `failed to lock device list in delete device {device_ip}` - if the device list is not found in the mutex lock"]
 #[delete("/devices/{device_ip}")]
 async fn delete_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_ip = device_ip.into_inner();
@@ -166,20 +166,20 @@ async fn delete_device(device_ip: web::Path<String>, data: web::Data<AppState>) 
     }
 }
 
-/// # Notify Stream Finished
-/// notify the system that the stream is finished by the device
-/// if the stream is not found, return a 404 Not Found
-/// if the stream is found, update its status and return a 200 OK
-/// ## Arguments
-/// * `stream_id` - the id of the stream
-/// * `data` - the app state
-/// * `req` - the http request to get the client ip address
-/// ## Returns
-/// * `HttpResponse` - the http response
-/// ## Panics
-/// * `Failed to lock streams_entries in stream finished {stream_id}` - if the streams_entries is not found in the mutex lock
-/// ## Logs
-/// * `stream finished {stream_id} by {ip}` - if the stream is found and updated
+#[doc = r"# Notify Stream Finished
+notify the system that the stream is finished by the device
+if the stream is not found, return a 404 Not Found
+if the stream is found, update its status and return a 200 OK
+## Arguments
+* `stream_id` - the id of the stream
+* `data` - the app state
+* `req` - the http request to get the client ip address
+## Returns
+* `HttpResponse` - the http response
+## Panics
+* `Failed to lock streams_entries in stream finished {stream_id}` - if the streams_entries is not found in the mutex lock
+## Logs
+* `stream finished {stream_id} by {ip}` - if the stream is found and updated"]
 #[post("/streams/{stream_id}/finished")]
 async fn stream_finished(
     stream_id: web::Path<String>,
@@ -214,20 +214,20 @@ async fn stream_finished(
     }
 }
 
-/// # Notify Stream Started
-/// notify the system that the stream is started by the device
-/// if the stream is not found, return a 404 Not Found
-/// if the stream is found, update its status and return a 200 OK
-/// ## Arguments
-/// * `stream_id` - the id of the stream
-/// * `data` - the app state
-/// * `req` - the http request to get the client ip address
-/// ## Returns
-/// * `HttpResponse` - the http response
-/// ## Panics
-/// * `Failed to lock streams_entries in stream started {stream_id}` - if the streams entries are not found in the mutex lock
-/// ## Logs
-/// * `Address {ip} started the stream {stream_id}` - if the stream is found and updated
+#[doc = r"# Notify Stream Started
+notify the system that the stream is started by the device
+if the stream is not found, return a 404 Not Found
+if the stream is found, update its status and return a 200 OK
+## Arguments
+* `stream_id` - the id of the stream
+* `data` - the app state
+* `req` - the http request to get the client ip address
+## Returns
+* `HttpResponse` - the http response
+## Panics
+* `Failed to lock streams_entries in stream started {stream_id}` - if the streams entries are not found in the mutex lock
+## Logs
+* `Address {ip} started the stream {stream_id}` - if the stream is found and updated"]
 #[post("/streams/{stream_id}/started")]
 async fn stream_started(
     stream_id: web::Path<String>,

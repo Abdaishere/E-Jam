@@ -12,35 +12,35 @@ use self::devices::{Device, DeviceStatus};
 use self::processes::{ProcessStatus, ProcessType};
 
 lazy_static! {
-    /// Regex for the stream id that is used to identify the stream in the device must be alphanumeric
+    #[doc = r"Regex for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)"]
     static ref STREAM_ID : Regex = Regex::new(r"^[a-zA-Z0-9]+$").unwrap();
 
 
-    /// Regex for the mac address of the device's mac address must
+    #[doc = r"Regex for the mac address of the device's mac address"]
     static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").unwrap();
 
-    /// Regex for the ip address of the device's ip address must
+    #[doc = r"Regex for the ip address of the device's ip address"]
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
 }
 
-/// The state of the Server that is shared between all the threads of the server
-/// This is used to store the list of all the devices that are connected to the server and the list of all the streams and the list of all the streams that are currently Queued to be started on the devices
-/// This is also used to store the counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)
-/// ## Values
-/// * `streams_entries` - A Vec<StreamEntry> that represents the list of all the streams that are currently running on the devices
-/// * `queued_streams` - A Vec<String> that represents the list of all the streams that are currently Queued to be started on the devices
-/// * `device_list` - A Vec<Device> that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
-/// * `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)
+#[doc = r"The state of the Server that is shared between all the threads of the server
+This is used to store the list of all the devices that are connected to the server and the list of all the streams and the list of all the streams that are currently Queued to be started on the devices
+This is also used to store the counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)
+## Values
+* `streams_entries` - A Vec<StreamEntry> that represents the list of all the streams that are currently running on the devices
+* `queued_streams` - A Vec<String> that represents the list of all the streams that are currently Queued to be started on the devices
+* `device_list` - A Vec<Device> that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
+* `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)"]
 pub struct AppState {
     pub streams_entries: Mutex<Vec<StreamEntry>>,
 
-    /// List of all the streams that are currently Queued to be started on the devices
+    #[doc = r"List of all the streams that are currently Queued to be started on the devices"]
     pub queued_streams: Mutex<Vec<String>>,
 
-    /// List of all the devices that are currently connected to the server (mac address, device name and ip address)
+    #[doc = r"List of all the devices that are currently connected to the server (mac address, device name and ip address)"]
     pub device_list: Mutex<Vec<Device>>,
 
-    /// Counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)
+    #[doc = r"Counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 bytes (36^3 = 46656)"]
     pub stream_id_counter: Mutex<u32>,
 }
 
@@ -55,25 +55,25 @@ impl Default for AppState {
     }
 }
 
-/// The StreamEntry struct is used to store the information about the stream that is sent to the UI
-/// ## Values
-/// * `delay` - A u64 that represents the time in ms that the stream will wait before starting
-/// * `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
-/// * `generators_ids` - A Vec<String> that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
-/// * `verifiers_ids` - A Vec<String> that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
-/// * `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
-/// * `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
-/// * `payload_length` - A u16 that represents the length of the payload that will be used in the stream
-/// * `seed` - A u32 that represents the seed that will be used to generate the payload
-/// * `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
-/// * `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
-/// * `time_to_live` - A u64 that represents the time to live that will be used for the stream
-/// * `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
-/// * `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts)
-/// * `check_content` - A bool that represents if the content of the packets will be checked
-/// * `running_generators` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a generator and their status
-/// * `running_verifiers` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a verifier and their status
-/// * `stream_status` - A StreamStatus that represents the status of the stream
+#[doc = r"The StreamEntry struct is used to store the information about the stream that is sent to the UI
+## Values
+* `delay` - A u64 that represents the time in ms that the stream will wait before starting
+* `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
+* `generators_ids` - A Vec<String> that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
+* `verifiers_ids` - A Vec<String> that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
+* `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
+* `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
+* `payload_length` - A u16 that represents the length of the payload that will be used in the stream
+* `seed` - A u32 that represents the seed that will be used to generate the payload
+* `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
+* `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
+* `time_to_live` - A u64 that represents the time to live that will be used for the stream
+* `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
+* `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts)
+* `check_content` - A bool that represents if the content of the packets will be checked
+* `running_generators` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a generator and their status
+* `running_verifiers` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a verifier and their status
+* `stream_status` - A StreamStatus that represents the status of the stream"]
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct StreamEntry {
     #[serde(default, rename = "delay")]
@@ -140,22 +140,22 @@ pub struct StreamEntry {
     stream_status: StreamStatus,
 }
 
-/// The StreamDetails struct is used to store the information about the stream that is sent to the device to start or queue the stream
-/// ## Values
-/// * `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
-/// * `delay` - A u64 that represents the time in ms that the stream will wait before starting
-/// * `generators` - A Vec<String> that has all the mac addresses of the devices that will generate the stream
-/// * `verifiers` - A Vec<String> that has all the mac addresses of the devices that will verify the stream
-/// * `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
-/// * `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
-/// * `payload_length` - A u16 that represents the length of the payload that will be used in the stream
-/// * `seed` - A u32 that represents the seed that will be used to generate the payload
-/// * `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
-/// * `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
-/// * `time_to_live` - A u64 that represents the time to live that will be used for the stream
-/// * `transport_layer_protocol` - A u8 that represents the transport layer protocol that will be used for the stream (0 = TCP, 1 = UDP)
-/// * `flow_type` - A u8 that represents the flow type that will be used for the stream (0 = BtB, 1 = Bursts)
-/// * `check_content` - A bool that represents if the content of the packets will be checked
+#[doc = r"The StreamDetails struct is used to store the information about the stream that is sent to the device to start or queue the stream
+## Values
+* `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
+* `delay` - A u64 that represents the time in ms that the stream will wait before starting
+* `generators` - A Vec<String> that has all the mac addresses of the devices that will generate the stream
+* `verifiers` - A Vec<String> that has all the mac addresses of the devices that will verify the stream
+* `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
+* `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
+* `payload_length` - A u16 that represents the length of the payload that will be used in the stream
+* `seed` - A u32 that represents the seed that will be used to generate the payload
+* `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
+* `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
+* `time_to_live` - A u64 that represents the time to live that will be used for the stream
+* `transport_layer_protocol` - A u8 that represents the transport layer protocol that will be used for the stream (0 = TCP, 1 = UDP)
+* `flow_type` - A u8 that represents the flow type that will be used for the stream (0 = BtB, 1 = Bursts)
+* `check_content` - A bool that represents if the content of the packets will be checked"]
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 struct StreamDetails {
     stream_id: String,
@@ -174,13 +174,13 @@ struct StreamDetails {
     check_content: bool,
 }
 
-/// Implementation of the StreamEntry struct that contains all the information about the stream and the functions that are used to manipulate the stream
+#[doc = r"Implementation of the StreamEntry struct that contains all the information about the stream and the functions that are used to manipulate the stream"]
 impl StreamEntry {
-    /// The new function is used to create a new id for the stream
-    /// ## Arguments
-    /// * `STREAM_ID_COUNTER` - A reference to a Mutex<u32> that is used to generate the id of the stream
-    /// ## Returns
-    /// changes the stream_id of the stream to a new id
+    #[doc = r"The new function is used to create a new id for the stream
+## Arguments
+* `STREAM_ID_COUNTER` - A reference to a Mutex<u32> that is used to generate the id of the stream
+## Returns
+changes the stream_id of the stream to a new id"]
     pub fn generate_new_stream_id(&mut self, stream_id_counter: &Mutex<u32>) {
         let mut stream_id_counter = stream_id_counter.lock().unwrap();
         if (*stream_id_counter) > 46655 {
@@ -202,13 +202,13 @@ impl StreamEntry {
         self.stream_id = stream_id
     }
 
-    /// # Notify Stream Running
-    /// The notify_stream_running function is used to update the stream status to Running and update the devices that are notifying the server that they have started the stream
-    /// ## Arguments
-    /// * `device_ip` - A String that represents the ip of the device that has started the stream
-    /// * `device_list` - A reference to a Mutex<Vec<Device>> that contains all the devices that are connected to the server
-    /// ## Returns
-    /// changes the stream_status to Running and updates the device status to Running
+    #[doc = r"# Notify Stream Running
+The notify_stream_running function is used to update the stream status to Running and update the devices that are notifying the server that they have started the stream
+## Arguments
+* `device_ip` - A String that represents the ip of the device that has started the stream
+* `device_list` - A reference to a Mutex<Vec<Device>> that contains all the devices that are connected to the server
+## Returns
+changes the stream_status to Running and updates the device status to Running"]
     pub fn notify_stream_running(
         &mut self,
         device_address: String,
@@ -241,15 +241,15 @@ impl StreamEntry {
         }
     }
 
-    /// # Send Stream
-    /// The send_stream function is used to send the stream to the devices that will generate and verify the stream
-    /// ## Arguments
-    /// * `delayed` - A bool that represents if the stream will be delayed or not
-    /// * `DEVICE_LIST` - A reference to a Mutex<Vec<Device>> that contains all the devices that are connected to the server
-    /// ## Returns
-    /// * `Result<(), reqwest::Error>` - A Result that contains the response from the devices or an error if the request failed
-    /// ## Errors
-    /// * `reqwest::Error` - An error that is returned if the request failed
+    #[doc = r"# Send Stream
+The send_stream function is used to send the stream to the devices that will generate and verify the stream
+## Arguments
+* `delayed` - A bool that represents if the stream will be delayed or not
+* `DEVICE_LIST` - A reference to a Mutex<Vec<Device>> that contains all the devices that are connected to the server
+## Returns
+* `Result<(), reqwest::Error>` - A Result that contains the response from the devices or an error if the request failed
+## Errors
+* `reqwest::Error` - An error that is returned if the request failed"]
     pub async fn send_stream(
         &mut self,
         delayed: bool,
@@ -404,20 +404,20 @@ impl StreamEntry {
         Ok(())
     }
 
-    /// # Stop the stream
-    /// stops the stream on all the devices that are running it and Marks the process as Idle
-    /// if the request fails, the device status will be set to Offline
-    /// ## Arguments
-    /// * `DEVICE_LIST` - the list of devices
-    /// ## Returns
-    /// * `Result<(), reqwest::Error>` - the result of the request
-    /// ## Logs
-    /// * `Could not Stop Generator: {}, skipping` - if the generator is not found in the device list
-    /// * `Could not Stop Verifier: {}, skipping` - if the verifier is not found in the device list
-    /// * `Stopping stream {}...` - the stream id
-    /// * `generators error: {}` - if the request to the generator fails
-    /// * `verifiers error: {}` - if the request to the verifier fails
-    /// * `stream {} stopped` - the stream id
+    #[doc = r"# Stop the stream
+stops the stream on all the devices that are running it and Marks the process as Idle
+if the request fails, the device status will be set to Offline
+## Arguments
+* `DEVICE_LIST` - the list of devices
+## Returns
+* `Result<(), reqwest::Error>` - the result of the request
+## Logs
+* `Could not Stop Generator: {}, skipping` - if the generator is not found in the device list
+* `Could not Stop Verifier: {}, skipping` - if the verifier is not found in the device list
+* `Stopping stream {}...` - the stream id
+* `generators error: {}` - if the request to the generator fails
+* `verifiers error: {}` - if the request to the verifier fails
+* `stream {} stopped` - the stream id"]
     pub async fn stop_stream(
         &mut self,
         device_list: &Mutex<Vec<Device>>,
@@ -521,28 +521,28 @@ impl StreamEntry {
         Ok(())
     }
 
-    /// get the stream status
-    /// this is used to check if the stream is running or not
-    /// this is also used to check if the stream is queued or not
+    #[doc = r"get the stream status
+this is used to check if the stream is running or not
+this is also used to check if the stream is queued or not"]
     pub fn get_stream_status(&self) -> &StreamStatus {
         &self.stream_status
     }
 
-    /// get the stream id
-    /// this is used to identify the stream
+    #[doc = r"get the stream id
+this is used to identify the stream"]
     pub fn get_stream_id(&self) -> &String {
         &self.stream_id
     }
 
-    /// # Queue the stream
-    /// this will add the stream to the queue
-    /// ## Arguments
-    /// * `QUEUED_STREAMS` - the list of queued streams
-    /// * `DEVICE_LIST` - the list of devices
-    /// ## Panics
-    /// * `Error: Failed to lock the queued streams list for adding stream {} to the queue` - if the queued streams list is locked
-    /// ## Logs
-    /// * `Stream queued to start in {} seconds` - the delay in seconds before the stream starts (the delay is set by the user)
+    #[doc = r"# Queue the stream
+this will add the stream to the queue
+## Arguments
+* `QUEUED_STREAMS` - the list of queued streams
+* `DEVICE_LIST` - the list of devices
+## Panics
+* `Error: Failed to lock the queued streams list for adding stream {} to the queue` - if the queued streams list is locked
+## Logs
+* `Stream queued to start in {} seconds` - the delay in seconds before the stream starts (the delay is set by the user)"]
     pub async fn queue_stream(
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
@@ -564,16 +564,16 @@ impl StreamEntry {
             .push(self.get_stream_id().clone());
     }
 
-    /// # Remove the stream from the queue
-    /// this will remove the stream from the queue
-    /// ## Arguments
-    /// * `QUEUED_STREAMS` - the list of queued streams
-    /// * `DEVICE_LIST` - the list of devices
-    /// ## Panics
-    /// * `Error: Failed to lock the queued streams list for removing the stream from the queue {}` - if the queued streams list is locked
-    /// ## Logs
-    /// * `Error: {}` - if the stream fails to stop
-    /// * `Error: Could not find the stream {} in the queued streams list` - if the stream is not found in the queued streams list
+    #[doc = r"# Remove the stream from the queue
+this will remove the stream from the queue
+## Arguments
+* `QUEUED_STREAMS` - the list of queued streams
+* `DEVICE_LIST` - the list of devices
+## Panics
+* `Error: Failed to lock the queued streams list for removing the stream from the queue {}` - if the queued streams list is locked
+## Logs
+* `Error: {}` - if the stream fails to stop
+* `Error: Could not find the stream {} in the queued streams list` - if the stream is not found in the queued streams list"]
     pub async fn remove_stream_from_queue(
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
@@ -605,15 +605,15 @@ impl StreamEntry {
         }
     }
 
-    /// # Notify Stream Finished
-    /// this will update the stream status according to the devices that are still running
-    /// if there are no devices left, the stream status will be set to stopped
-    /// if there are devices left, the stream status will be set to finished
-    /// ## Arguments
-    /// * `device_address` - the device ip address that is finishing the stream
-    /// * `device_list` - the list of devices
-    /// ## Panics
-    /// * `Error: Failed to lock the device list` - if the device list is locked
+    #[doc = r"# Notify Stream Finished
+this will update the stream status according to the devices that are still running
+if there are no devices left, the stream status will be set to stopped
+if there are devices left, the stream status will be set to finished
+## Arguments
+* `device_address` - the device ip address that is finishing the stream
+* `device_list` - the list of devices
+## Panics
+* `Error: Failed to lock the device list` - if the device list is locked"]
     pub fn notify_stream_finished(
         &mut self,
         device_address: &String,
@@ -690,17 +690,17 @@ impl StreamEntry {
     }
 }
 
-/// # Stream Status
-/// this enum represents the status of the stream
-/// ## Variants
-/// * `Created` - the stream has been created
-/// * `Stopped` - the stream has been stopped
-/// * `Running` - the stream is running
-/// * `Finished` - the stream has finished
-/// * `Queued` - the stream is queued
-/// * `Error` - the stream has encountered an error
-/// ## Notes
-/// * the default variant is `Created`
+#[doc = r"# Stream Status
+this enum represents the status of the stream
+## Variants
+* `Created` - the stream has been created
+* `Stopped` - the stream has been stopped
+* `Running` - the stream is running
+* `Finished` - the stream has finished
+* `Queued` - the stream is queued
+* `Error` - the stream has encountered an error
+## Notes
+* the default variant is `Created`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
 #[serde(tag = "status")]
 pub enum StreamStatus {
@@ -719,13 +719,13 @@ pub enum StreamStatus {
     Error,
 }
 
-/// # Transport Layer Protocol Type
-/// this enum represents the transport layer protocol type
-/// ## Variants
-/// * `TCP` - the transport layer protocol is TCP
-/// * `UDP` - the transport layer protocol is UDP
-/// ## Notes
-/// * the default variant is `TCP`
+#[doc = r"# Transport Layer Protocol Type
+this enum represents the transport layer protocol type
+## Variants
+* `TCP` - the transport layer protocol is TCP
+* `UDP` - the transport layer protocol is UDP
+## Notes
+* the default variant is `TCP`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
 #[serde(tag = "protocol")]
 enum TransportLayerProtocol {
@@ -736,13 +736,13 @@ enum TransportLayerProtocol {
     UDP,
 }
 
-/// # Flow Type
-/// this enum represents the flow type
-/// ## Variants
-/// * `BtB` - the flow type is BtB
-/// * `Bursts` - the flow type is Bursts
-/// ## Notes
-/// * the default variant is `BtB`
+#[doc = r"# Flow Type
+this enum represents the flow type
+## Variants
+* `BtB` - the flow type is BtB
+* `Bursts` - the flow type is Bursts
+## Notes
+* the default variant is `BtB`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
 #[serde(tag = "flowtype")]
 enum FlowType {
