@@ -22,23 +22,41 @@ The Raspberry Pi is running Ubuntu 20.04 LTS.
 The API is hosted on port 8080.
 The API is hosted on the IP address
 
-## Stream State Machine
+## The E-Jam System
+
+The System has Three Components:
+
+- **Streams** A stream is a collection of devices and processes that are used to generate and verify packets in the network.
+- **Devices** A device is a device that is used to generate and verify packets in the network.
+- **Processes** A process is a process that is used to generate and verify packets in the network.
+
+## State Machines
+
+### Stream State Machine
 
 The stream state machine is as follows:
 
 ![Stream State Machine](./stream_state_machine.png)
 
-note: The stream state finished is only applied when all devices have finished sending and receiving packets.
+> NOTE: The stream state finished is only applied when all devices have finished sending and receiving packets.
+
+### Device State Machine
 
 The Device State Machine is as follows:
 
 ![Device State Machine](./device_state_machine.png)
 
+### Process State Machine
+
+The Process State Machine is as follows:
+
+![Process State Machine](./process_state_machine.png)
+
 ## API Documentation
 
-The API documentation is available at [http://localhost:8080/](http://localhost:8080/).
+The API Devices Table is available at [http://localhost:8080/](http://localhost:8080/).
 
-## Routes
+## Endpoints
 
 ### GET /streams
 
@@ -112,6 +130,14 @@ Deletes the device with the given device_ip.
 
 Updates the device with the given device_ip.
 
+### GET /devices/ping/all
+
+Pings all devices in the list of devices.
+
+### GET /devices/ping
+
+Pings the device with the given device_ip.
+
 ## Stream object
 
 The Key of the Stream object is the stream_id.
@@ -126,6 +152,33 @@ The structure of the Stream object as a table is as follows:
     <th>Min</th>
     <th>Max</th>
     <th>Validation</th>
+</tr>
+<tr>
+    <td>name</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td></td>
+    <td>1</td>
+    <td>50</td>
+    <td>stream name must be between 1 and 50 characters long</td>
+</tr>
+<tr>
+    <td>description</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td></td>
+    <td>1</td>
+    <td>255</td>
+    <td>stream description must be between 1 and 255 characters long</td>
+</tr>
+<tr>
+    <td>last_updated</td>
+    <td>DateTime Utc</td>
+    <td>No</td>
+    <td></td>
+    <td>0</td>
+    <td></td>
+    <td>chrono ts Seconds</td>
 </tr>
 <tr>
     <td>stream_id</td>
@@ -294,8 +347,35 @@ The structure of the Device object as a table is as follows:
     <td>Yes</td>
     <td>ip Variable</td>
     <td>1</td>
+    <td>50</td>
+    <td>name must be between 1 and 50 characters long</td>
+</tr>
+<tr>
+    <td>description</td>
+    <td>String</td>
+    <td>Yes</td>
     <td></td>
-    <td>name must be greater than 0</td>
+    <td>1</td>
+    <td>255</td>
+    <td>stream description must be between 1 and 255 characters long</td>
+</tr>
+<tr>
+    <td>location</td>
+    <td>String</td>
+    <td>Yes</td>
+    <td></td>
+    <td>1</td>
+    <td>255</td>
+    <td>stream location must be between 1 and 255 characters long</td>
+</tr>
+<tr>
+    <td>last_updated</td>
+    <td>DateTime Utc</td>
+    <td>No</td>
+    <td></td>
+    <td>0</td>
+    <td></td>
+    <td>chrono ts Seconds</td>
 </tr>
 <tr>
     <td>ip</td>

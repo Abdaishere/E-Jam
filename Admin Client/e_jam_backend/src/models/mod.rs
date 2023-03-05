@@ -1,6 +1,7 @@
 pub(crate) mod device;
 pub(crate) mod process;
 
+use chrono::{serde::ts_seconds, DateTime, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
 use reqwest::StatusCode;
@@ -59,6 +60,7 @@ The StreamEntry struct is used to store the information about the stream with it
 ## Values
 * `name` - A String that represents the name of the stream (used for clarification)
 * `description` - A String that represents the description of the stream (used for clarification)
+* `last_updated` - A DateTime<Utc> that represents the last time that the stream was updated (used for clarification)
 * `delay` - A u64 that represents the time in ms that the stream will wait before starting
 * `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
 * `generators_ids` - A Vec<String> that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
@@ -73,9 +75,10 @@ The StreamEntry struct is used to store the information about the stream with it
 * `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
 * `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts)
 * `check_content` - A bool that represents if the content of the packets will be checked
-* `running_generators` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status)
-* `running_verifiers` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a verifier and their status (mac address of the card used in testing, Process Status)
-* `stream_status` - A StreamStatus that represents the status of the stream."]
+* `running_generators` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status) (used for clarification)
+* `running_verifiers` - A HashMap<String, ProcessStatus> that represents the list of all the devices that are currently running the stream as a verifier and their status (mac address of the card used in testing, Process Status) (used for clarification)
+* `stream_status` - A StreamStatus that represents the status of the stream.
+"]
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct StreamEntry {
     #[validate(length(min = 1, message = "name must be given"))]
@@ -83,6 +86,9 @@ pub struct StreamEntry {
 
     #[validate(length(min = 1, message = "description must be given"))]
     description: String,
+
+    #[serde(with = "ts_seconds")]
+    last_updated: DateTime<Utc>,
 
     #[serde(default, rename = "delay")]
     #[validate(range(min = 0, message = "delay must be greater than or equal to 0"))]
@@ -454,7 +460,7 @@ The send_stream function is used to send the stream to the devices that will gen
                             // set the receiver status to offline (generic error)
                             Device::update_device_status(
                                 &receiver.0 .0,
-                                &ProcessStatus::Offline,
+                                &ProcessStatus::Failed,
                                 receiver.1,
                                 device_list,
                             );
@@ -557,18 +563,18 @@ if the request fails, the device status will be set to Offline
                                 &ProcessType::Generation,
                                 device_list,
                             );
-                            name.1 = &ProcessStatus::Paused;
+                            name.1 = &ProcessStatus::Stopped;
                         }
                         _ => {
                             println!("generators error: {}", _response.text().await.unwrap());
                             // set the receiver status to offline (generic error)
                             Device::update_device_status(
                                 &receiver.get_device_mac(),
-                                &ProcessStatus::Offline,
+                                &ProcessStatus::Failed,
                                 &ProcessType::Generation,
                                 device_list,
                             );
-                            name.1 = &ProcessStatus::Offline;
+                            name.1 = &ProcessStatus::Failed;
                         }
                     }
                 }
@@ -609,19 +615,19 @@ if the request fails, the device status will be set to Offline
                                 device_list,
                             );
 
-                            name.1 = &ProcessStatus::Paused;
+                            name.1 = &ProcessStatus::Stopped;
                         }
                         _ => {
                             println!("verifiers error: {}", _response.text().await.unwrap());
                             // set the receiver status to offline (generic error)
                             Device::update_device_status(
                                 &receiver.get_device_mac(),
-                                &ProcessStatus::Offline,
+                                &ProcessStatus::Failed,
                                 &ProcessType::Verification,
                                 device_list,
                             );
 
-                            name.1 = &ProcessStatus::Offline;
+                            name.1 = &ProcessStatus::Failed;
                         }
                     }
                 }
@@ -732,16 +738,16 @@ pub enum StreamStatus {
     #[default]
     #[serde(rename = "Created")]
     Created,
-    #[serde(rename = "Stopped")]
-    Stopped,
+    #[serde(rename = "Queued")]
+    Queued,
     #[serde(rename = "Running")]
     Running,
     #[serde(rename = "Finished")]
     Finished,
-    #[serde(rename = "Queued")]
-    Queued,
     #[serde(rename = "Error")]
     Error,
+    #[serde(rename = "Stopped")]
+    Stopped,
 }
 
 #[doc = r"# Transport Layer Protocol Type

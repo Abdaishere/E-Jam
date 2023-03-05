@@ -1,5 +1,6 @@
 use std::sync::Mutex;
 
+use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -12,8 +13,9 @@ use super::{
 A device is a computer that is connected to the system and can run a process either a verification process or a generation process or both
 ## Values
 * `name` - A string that represents the name of the device (used for identification and clarification) the name must be greater than 0 characters long if it is not provided the default value is the ip address of the device
-* `description` - A string that represents the description of the device (used for clarification) the description must be greater than 0 characters long if it is not provided the default value is the ip address of the device
-* `location` - A string that represents the location of the device (used for clarification) the location must be greater than 0 characters long if it is not provided the default value is the ip address of the device
+* `description` - A string that represents the description of the device (used for clarification)
+* `location` - A string that represents the location of the device (used for clarification)
+* `last_updated` - A DateTime that represents the last time the device status was updated (used for clarification)
 * `ip_address` - A string that represents the ip address of the device (used for Communication) IP_ADDRESS is a regex that is used to validate the ip address
 * `port` - A u16 that represents the port number of the device (used for Communication) the port number must be between 1 and 65535
 * `gen_processes` - A u16 that represents the number of generation processes that are running on the device
@@ -26,16 +28,31 @@ A device is a computer that is connected to the system and can run a process eit
 * `Running` - the device is running (connected to the system and running at least one process)"]
 #[derive(Serialize, Deserialize, Validate, Debug, Clone)]
 pub struct Device {
-    #[validate(length(min = 1, message = "name must be given"))]
+    #[validate(length(
+        min = 1,
+        max = 50,
+        message = "name must be between 1 and 50 characters long"
+    ))]
     #[serde(default, rename = "name")]
     name: String,
 
-    #[validate(length(min = 1, message = "description must be given"))]
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "description must be between 1 and 255 characters long"
+    ))]
     #[serde(default, rename = "description")]
     description: String,
 
-    #[validate(length(min = 1, message = "location of the device must be given"))]
+    #[validate(length(
+        min = 1,
+        max = 255,
+        message = "location must be between 1 and 255 characters long"
+    ))]
     location: String,
+
+    #[serde(with = "ts_seconds")]
+    last_updated: DateTime<Utc>,
 
     #[validate(
         regex(path = "IP_ADDRESS", message = "ip must be a valid ip address"),
@@ -121,20 +138,23 @@ this function is used to update the device status according to the status of the
         }
 
         // update the status of the device according to the number of processes that are running on the device
+        // The device is offline if the status of the process is failed (the process failed to start)
         if devices[index].gen_processes == 0 && devices[index].ver_processes == 0 {
-            if status == &ProcessStatus::Offline {
+            if status == &ProcessStatus::Failed {
                 devices[index].status = DeviceStatus::Offline;
             } else {
                 devices[index].status = DeviceStatus::Online;
             }
         } else if devices[index].gen_processes > 0 || devices[index].ver_processes > 0 {
-            if status == &ProcessStatus::Offline {
+            if status == &ProcessStatus::Failed {
                 devices[index].status = DeviceStatus::Offline;
             } else {
                 if status == &ProcessStatus::Running {
                     devices[index].status = DeviceStatus::Running;
                 } else if status == &ProcessStatus::Queued {
                     devices[index].status = DeviceStatus::Idle;
+                } else if status == &ProcessStatus::Completed {
+                    devices[index].status = DeviceStatus::Online;
                 }
             }
         } else {
@@ -217,6 +237,18 @@ this is used to get the device connection address
             self.get_port(),
             self.get_device_mac(),
         )
+    }
+
+    #[doc = r"Implment Is readchable for the device
+this is used to set the device to reachable or unreachable
+# Arguments
+* `reachable` - A Boolean the reachable status of the device"]
+    pub fn set_is_reachable(&mut self, reachable: bool) {
+        self.status = if reachable {
+            DeviceStatus::Online
+        } else {
+            DeviceStatus::Offline
+        };
     }
 }
 

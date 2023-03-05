@@ -85,14 +85,15 @@ async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> imp
 }
 
 #[doc = r"# Ping a device
-ping a device in the list of devices
+ping a device provided from the user this is used only to check if the device is reachable or not for the user
+and does not update the device in the list of devices
 if the device is not reachable, return a 404 Not Found
 if the device is reachable, return a 200 OK
 ## Arguments
 * `device` - the device to ping
 ## Returns
 * `HttpResponse` - the http response"]
-#[get("/devices/ping")]
+#[post("/devices/ping")]
 async fn ping_device(device: web::Json<Device>) -> impl Responder {
     let device = device.into_inner();
     let device_address = format!("http://{}:{}", device.get_ip_address(), device.get_port());
@@ -105,6 +106,45 @@ async fn ping_device(device: web::Json<Device>) -> impl Responder {
     match response {
         Ok(_response) => HttpResponse::Ok().finish(),
         Err(_error) => HttpResponse::NotFound().finish(),
+    }
+}
+
+#[doc = r"# Ping all devices
+ping all devices in the list of devices
+if the list is empty, return a 204 No Content
+if the list is not empty, return a 200 OK
+if the list is not found, return a 500 Internal Server Error
+## Arguments
+* `device_list` - the list of devices in the system to ping
+## Returns
+* `HttpResponse` - the http response"]
+#[post("/devices/ping/all")]
+async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
+    let mut devices = data
+        .device_list
+        .lock()
+        .expect("failed to lock device list in ping all devices");
+
+    match devices.len() {
+        0 => HttpResponse::NoContent().finish(),
+        _ => {
+            for device in devices.iter_mut() {
+                let device_address =
+                    format!("http://{}:{}", device.get_ip_address(), device.get_port());
+                // add the cards mac address to the body of the request to the device to ping (for now)
+                let response = reqwest::Client::new()
+                    .post(device_address)
+                    .body(device.get_device_mac())
+                    .send()
+                    .await;
+
+                match response {
+                    Ok(_response) => device.set_is_reachable(true),
+                    Err(_error) => device.set_is_reachable(false),
+                }
+            }
+            HttpResponse::Ok().finish()
+        }
     }
 }
 

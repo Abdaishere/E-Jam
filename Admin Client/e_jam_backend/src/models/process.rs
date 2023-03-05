@@ -27,25 +27,21 @@ each process has a name that is a string that represents both the name of the pr
 ## Variants
 * `Queued` (the process is idle and waiting to be started)
 * `Running` (the process is running) 
-* `Offline` (the process is offline)
-* `Paused` (the process is paused)
+* `Stopped` (the process is Stopped)
 * `Completed` (the process is successfully completed)
 * `Failed` (the process is failed)"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
 #[serde(tag = "processstatus")]
 pub enum ProcessStatus {
     #[default]
-    #[serde(rename = "Idle")]
+    #[serde(rename = "Queued")]
     Queued,
 
     #[serde(rename = "Running")]
     Running,
 
-    #[serde(rename = "Offline")]
-    Offline,
-
-    #[serde(rename = "Paused")]
-    Paused,
+    #[serde(rename = "Stopped")]
+    Stopped,
 
     #[serde(rename = "Completed")]
     Completed,
