@@ -4,14 +4,16 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use super::{
-    processes::{ProcessStatus, ProcessType},
+    process::{ProcessStatus, ProcessType},
     IP_ADDRESS, MAC_ADDRESS,
 };
 
 #[doc = r"Device Model
 A device is a computer that is connected to the system and can run a process either a verification process or a generation process or both
 ## Values
-* `name` - A string that represents the name of the device (used for identification) the name must be greater than 0 characters long if it is not provided the default value is the ip address of the device
+* `name` - A string that represents the name of the device (used for identification and clarification) the name must be greater than 0 characters long if it is not provided the default value is the ip address of the device
+* `description` - A string that represents the description of the device (used for clarification) the description must be greater than 0 characters long if it is not provided the default value is the ip address of the device
+* `location` - A string that represents the location of the device (used for clarification) the location must be greater than 0 characters long if it is not provided the default value is the ip address of the device
 * `ip_address` - A string that represents the ip address of the device (used for Communication) IP_ADDRESS is a regex that is used to validate the ip address
 * `port` - A u16 that represents the port number of the device (used for Communication) the port number must be between 1 and 65535
 * `gen_processes` - A u16 that represents the number of generation processes that are running on the device
@@ -24,9 +26,17 @@ A device is a computer that is connected to the system and can run a process eit
 * `Running` - the device is running (connected to the system and running at least one process)"]
 #[derive(Serialize, Deserialize, Validate, Debug, Clone)]
 pub struct Device {
-    #[validate(length(min = 1, message = "name must be greater than 0"))]
+    #[validate(length(min = 1, message = "name must be given"))]
     #[serde(default, rename = "name")]
-    pub name: String,
+    name: String,
+
+    #[validate(length(min = 1, message = "description must be given"))]
+    #[serde(default, rename = "description")]
+    description: String,
+
+    #[validate(length(min = 1, message = "location of the device must be given"))]
+    location: String,
+
     #[validate(
         regex(path = "IP_ADDRESS", message = "ip must be a valid ip address"),
         length(
@@ -36,13 +46,13 @@ pub struct Device {
         )
     )]
     #[serde(rename = "ip")]
-    pub ip_address: String,
+    ip_address: String,
     #[validate(range(
         min = 1,
         max = 65535,
         message = "port number must be between 1 and 65535"
     ))]
-    pub port: u16,
+    port: u16,
 
     #[validate(
         regex(
@@ -52,16 +62,16 @@ pub struct Device {
         length(equal = 17, message = "mac_address must be 17 characters long")
     )]
     #[serde(rename = "mac")]
-    pub mac_address: String,
+    mac_address: String,
 
     #[serde(default, skip_deserializing)]
-    pub gen_processes: u16,
+    gen_processes: u16,
 
     #[serde(default, skip_deserializing)]
-    pub ver_processes: u16,
+    ver_processes: u16,
 
     #[serde(rename = "status", skip_deserializing, default)]
-    pub status: DeviceStatus,
+    status: DeviceStatus,
 }
 
 #[doc = r"Device implementation"]
@@ -268,12 +278,12 @@ pub fn get_devices_table(device_list: &Mutex<Vec<Device>>) -> String {
             <td>{}</td>
             <td>{}</td>
         </tr>",
-            device.name,
-            device.ip_address,
-            device.mac_address,
-            device.status,
-            device.gen_processes,
-            device.ver_processes
+            &device.name,
+            &device.ip_address,
+            &device.mac_address,
+            &device.status,
+            &device.gen_processes,
+            &device.ver_processes
         );
         data.push_str(&row);
     }

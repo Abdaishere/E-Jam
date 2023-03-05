@@ -36,26 +36,20 @@ each process has a name that is a string that represents both the name of the pr
 pub enum ProcessStatus {
     #[default]
     #[serde(rename = "Idle")]
-    // the process is idle
     Queued,
 
     #[serde(rename = "Running")]
-    // the process is running
     Running,
 
     #[serde(rename = "Offline")]
-    // the process is offline
     Offline,
 
     #[serde(rename = "Paused")]
-    // the process is paused
     Paused,
 
     #[serde(rename = "Completed")]
-    // the process is successfully completed
     Completed,
 
     #[serde(rename = "Failed")]
-    // the process is failed
     Failed,
 }

@@ -1,10 +1,10 @@
-use crate::models::devices::get_devices_table;
 use super::models::{AppState, StreamEntry, StreamStatus};
+use crate::models::device::get_devices_table;
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 
-mod devices;
+mod device;
 
-use self::devices::{
+use self::device::{
     add_device, delete_device, get_device, get_devices, ping_device, stream_finished,
     stream_started, update_device,
 };
@@ -15,13 +15,15 @@ The index service for the api server
 * `String` - the index page html string"]
 #[get("/")]
 async fn index(data: web::Data<AppState>) -> String {
-    "
+    format!(
+        "
     Welcome to the E-Jam API!
     Read the documentation at README.md
     return the html table for all connected devices and their ip addresses and mac addresses    
-    "
-    .to_string()
-        + &get_devices_table(&data.device_list)
+    {}
+    ",
+        get_devices_table(&data.device_list)
+    )
 }
 
 #[doc = r"# Get all streams
@@ -152,10 +154,7 @@ async fn update_stream(
         Some(stream_entry) => {
             // if the stream is running, stop it
             if stream_entry.get_stream_status() == &StreamStatus::Running {
-                stream_entry
-                    .stop_stream(&data.device_list)
-                    .await
-                    .expect(format!("Failed to stop stream {}", stream_id).as_str());
+                stream_entry.stop_stream(&data.device_list).await;
             }
 
             // if the stream is queued, remove it from the queue
@@ -293,10 +292,7 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
                 println!("Stream {} is already stopped", stream_id);
                 HttpResponse::Conflict().finish()
             } else {
-                stream_entry
-                    .stop_stream(&data.device_list)
-                    .await
-                    .expect(format!("Failed to stop stream {}", stream_id).as_str());
+                stream_entry.stop_stream(&data.device_list).await;
                 println!("Stopped stream {}", stream_id);
                 HttpResponse::Ok().finish()
             }
@@ -362,13 +358,12 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
                 .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                 .await;
         } else if stream_entry.get_stream_status() == &StreamStatus::Running {
-            let result = stream_entry.stop_stream(&data.device_list).await;
+            stream_entry.stop_stream(&data.device_list).await;
 
-            match result {
-                Ok(_) => (),
-                Err(_) => {
-                    println!("Failed to stop stream");
-                }
+            if stream_entry.get_stream_status() == &StreamStatus::Stopped {
+                println!("Stopped stream {}", stream_entry.get_stream_id());
+            } else {
+                println!("Failed to stop stream {}", stream_entry.get_stream_id());
             }
         }
     }
@@ -418,9 +413,7 @@ async fn force_start_stream(
             // if the stream is queued, remove it from the queue
             if stream_entry.get_stream_status() == &StreamStatus::Running {
                 println!("Stream {} is already running", stream_id);
-                stream_entry.stop_stream(&data.device_list).await.expect(
-                    format!("Failed to stop stream {} when force starting", stream_id).as_str(),
-                );
+                stream_entry.stop_stream(&data.device_list).await;
             }
 
             if stream_entry.get_stream_status() == &StreamStatus::Queued {
@@ -431,10 +424,7 @@ async fn force_start_stream(
             }
 
             // start the stream
-            stream_entry
-                .send_stream(true, &data.device_list)
-                .await
-                .expect(format!("Failed to force start stream {}", stream_id).as_str());
+            stream_entry.send_stream(true, &data.device_list).await;
             println!("Stream {} force started", stream_id);
             HttpResponse::Ok().finish()
         }
@@ -474,14 +464,7 @@ async fn force_stop_stream(
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
     match stream_entry {
         Some(stream_entry) => {
-            let result = stream_entry.stop_stream(&data.device_list).await;
-
-            match result {
-                Ok(_) => (),
-                Err(_) => {
-                    println!("Failed to stop stream {}", stream_id);
-                }
-            }
+            stream_entry.stop_stream(&data.device_list).await;
 
             println!("Force Stopped stream {}", stream_id);
             HttpResponse::Ok().finish()

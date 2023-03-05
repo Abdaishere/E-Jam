@@ -114,6 +114,7 @@ Updates the device with the given device_ip.
 
 ## Stream object
 
+The Key of the Stream object is the stream_id.
 The structure of the Stream object as a table is as follows:
 
 <table>
@@ -274,6 +275,7 @@ The structure of the Stream object as a table is as follows:
 
 ## Device object
 
+The Key of the Device object is the MAC address of the device.
 The structure of the Device object as a table is as follows:
 
 <table>
@@ -342,7 +344,7 @@ The following endpoints are available for the system API:
     <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's (must be sent from the systemapi to the admin client)</td>
 </tr>
 <tr>
-    <td>/connect</td>
+    <td>/</td>
     <td>GET</td>
     <td>mac address of the card used in the testing process</td>
     <td>Success</td>
@@ -350,14 +352,14 @@ The following endpoints are available for the system API:
 </tr>
 <tr>
     <td>/start</td>
-    <td>GET</td>
+    <td>POST</td>
     <td>StreamDetails</td>
     <td>Success</td>
     <td>generate or verify the Provided Stream</td>
 </tr>
 <tr>
     <td>/stop</td>
-    <td>GET</td>
+    <td>POST</td>
     <td>stream_id</td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>

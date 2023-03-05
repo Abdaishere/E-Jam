@@ -1,5 +1,5 @@
 use super::AppState;
-use crate::models::devices::Device;
+use crate::models::device::Device;
 use actix_web::Responder;
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
 
@@ -31,22 +31,22 @@ get a device in the list of devices
 if the device is not found, return a 404 Not Found
 if the device is found, return a 200 OK
 ## Arguments
-* `device_ip` - the ip address of the device
+* `device_mac` - the device mac address
 ## Returns
 * `HttpResponse` - the http response
 ## Panics
-* `failed to lock device list in get device {device_ip}` - if the device list is not found in the mutex lock"]
-#[get("/devices/{device_ip}")]
-async fn get_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
-    let device_ip = device_ip.into_inner();
+* `failed to lock device list in get device {device_mac}` - if the device list is not found in the mutex lock"]
+#[get("/devices/{device_mac}")]
+async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    let device_mac = device_mac.into_inner();
     let devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in get device {}", device_ip).as_str())
+        .expect(format!("failed to lock device list in get device {}", device_mac).as_str())
         .clone();
     let device = devices
         .iter()
-        .find(|device| device.ip_address.to_string() == device_ip);
+        .find(|device| device.get_device_mac() == device_mac);
     match device {
         Some(device) => HttpResponse::Ok().json(device),
         None => HttpResponse::NotFound().finish(),
@@ -62,19 +62,19 @@ if the device is not in the list, add it and return a 201 Created
 ## Returns
 * `HttpResponse` - the http response
 ## Panics
-* `failed to lock device list in add device {device_ip}` - if the device list is not found in the mutex lock"]
+* `failed to lock device list in add device {device_mac}` - if the device list is not found in the mutex lock"]
 #[post("/devices")]
 async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
     let mut devices = data.device_list.lock().expect(
         format!(
             "failed to lock device list in add device {}",
-            device.ip_address
+            device.get_device_mac()
         )
         .as_str(),
     );
     let device_index = devices
         .iter()
-        .position(|device| device.ip_address.to_string() == device.ip_address.to_string());
+        .position(|device| device.get_device_mac() == device.get_device_mac());
     match device_index {
         Some(_device_index) => HttpResponse::Conflict().finish(),
         None => {
@@ -95,8 +95,13 @@ if the device is reachable, return a 200 OK
 #[get("/devices/ping")]
 async fn ping_device(device: web::Json<Device>) -> impl Responder {
     let device = device.into_inner();
-    let device_address = format!("{}:{}", device.ip_address, device.port);
-    let response = reqwest::get(device_address.as_str()).await;
+    let device_address = format!("http://{}:{}", device.get_ip_address(), device.get_port());
+    // add the cards mac address to the body of the request to the device to ping (for now)
+    let response = reqwest::Client::new()
+        .post(device_address)
+        .body(device.get_device_mac())
+        .send()
+        .await;
     match response {
         Ok(_response) => HttpResponse::Ok().finish(),
         Err(_error) => HttpResponse::NotFound().finish(),
@@ -108,26 +113,26 @@ update a device in the list of devices
 if the device is not found, return a 404 Not Found
 if the device is found, update it and return a 200 OK
 ## Arguments
-* `device_ip` - the ip address of the device
+* `device_mac` - the mac address of the device
 * `device` - the device data to update
 ## Returns
 * `HttpResponse` - the http response
 ## Panics
-* `failed to lock device list in update device {device_ip}` - if the device list is not found in the mutex lock"]
-#[put("/devices/{device_ip}")]
+* `failed to lock device list in update device {device_mac}` - if the device list is not found in the mutex lock"]
+#[put("/devices/{device_mac}")]
 async fn update_device(
-    device_ip: web::Path<String>,
+    device_mac: web::Path<String>,
     device: web::Json<Device>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let device_ip = device_ip.into_inner();
+    let device_mac = device_mac.into_inner();
     let mut devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in update device {}", device_ip).as_str());
+        .expect(format!("failed to lock device list in update device {}", device_mac).as_str());
     let device_index = devices
         .iter()
-        .position(|device| device.ip_address.to_string() == device_ip);
+        .position(|device| device.get_device_mac() == device_mac);
     match device_index {
         Some(device_index) => {
             devices[device_index] = device.into_inner();
@@ -142,21 +147,21 @@ delete a device in the list of devices
 if the device is not found, return a 404 Not Found
 if the device is found, delete it and return a 200 OK
 ## Arguments
-* `device_ip` - the ip address of the device
+* `device_mac` - the mac address of the device
 ## Returns
 * `HttpResponse` - the http response
 ## Panics
-* `failed to lock device list in delete device {device_ip}` - if the device list is not found in the mutex lock"]
-#[delete("/devices/{device_ip}")]
-async fn delete_device(device_ip: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
-    let device_ip = device_ip.into_inner();
+* `failed to lock device list in delete device {device_mac}` - if the device list is not found in the mutex lock"]
+#[delete("/devices/{device_mac}")]
+async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    let device_mac = device_mac.into_inner();
     let mut devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in delete device {}", device_ip).as_str());
+        .expect(format!("failed to lock device list in delete device {}", device_mac).as_str());
     let device_index = devices
         .iter()
-        .position(|device| device.ip_address.to_string() == device_ip);
+        .position(|device| device.get_device_mac() == device_mac);
     match device_index {
         Some(device_index) => {
             devices.remove(device_index);
