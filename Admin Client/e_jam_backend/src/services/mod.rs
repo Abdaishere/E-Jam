@@ -6,7 +6,7 @@ mod device;
 
 use self::device::{
     add_device, delete_device, get_device, get_devices, ping_device, stream_finished,
-    stream_started, update_device,
+    stream_started, update_device, ping_all_devices,
 };
 
 #[doc = r"# Index
@@ -556,5 +556,6 @@ pub fn init_routes(config: &mut web::ServiceConfig) {
         .service(update_device)
         .service(delete_device)
         .service(stream_finished)
-        .service(ping_device);
+        .service(ping_device)
+        .service(ping_all_devices);
 }

@@ -51,6 +51,7 @@ pub struct Device {
     ))]
     location: String,
 
+    // TODO: implement last_updated in all models and services
     #[serde(with = "ts_seconds")]
     last_updated: DateTime<Utc>,
 

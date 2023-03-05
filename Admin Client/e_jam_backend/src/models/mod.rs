@@ -87,6 +87,7 @@ pub struct StreamEntry {
     #[validate(length(min = 1, message = "description must be given"))]
     description: String,
 
+    // TODO: implement last_updated in all models and services
     #[serde(with = "ts_seconds")]
     last_updated: DateTime<Utc>,
 
