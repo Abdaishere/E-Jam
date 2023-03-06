@@ -19,9 +19,9 @@ class _IconsElementsSystemState extends State<IconsElementsSystem> {
         const Text(
           'System Elements',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
         ),
         const SizedBox(height: 10),
         Expanded(

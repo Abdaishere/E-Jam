@@ -17,6 +17,13 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
     return Consumer(
       builder: (context, ThemeModel theme, child) {
         return SfRadialGauge(
+          title: const GaugeTitle(
+            text: 'System Performance',
+            textStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           enableLoadingAnimation: true,
           animationDuration: 1500,
           axes: <RadialAxis>[

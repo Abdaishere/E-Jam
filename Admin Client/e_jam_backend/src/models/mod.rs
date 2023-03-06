@@ -82,13 +82,16 @@ The StreamEntry struct is used to store the information about the stream with it
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 pub struct StreamEntry {
     #[validate(length(min = 1, message = "name must be given"))]
+    #[serde(rename = "name")]
     name: String,
 
     #[validate(length(min = 1, message = "description must be given"))]
+    #[serde(rename = "description")]
     description: String,
 
     // TODO: implement last_updated in all models and services
     #[serde(with = "ts_seconds")]
+    #[serde(default, rename = "last_updated")]
     last_updated: DateTime<Utc>,
 
     #[serde(default, rename = "delay")]

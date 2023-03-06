@@ -21,7 +21,7 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Switchboard',
+          'Home',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -31,6 +31,22 @@ class _HomeViewState extends State<HomeView> {
           IconButton(
             icon: const Icon(
               FontAwesomeIcons.arrowsRotate,
+              size: 20,
+            ),
+            onPressed: () {},
+          ),
+          // settings icon for changing the settings of the system
+          IconButton(
+            icon: const Icon(
+              FontAwesomeIcons.gear,
+              size: 20,
+            ),
+            onPressed: () {},
+          ),
+          // question mark icon for help
+          IconButton(
+            icon: const Icon(
+              FontAwesomeIcons.circleQuestion,
               size: 20,
             ),
             onPressed: () {},

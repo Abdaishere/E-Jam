@@ -16,6 +16,13 @@ class _GaugeTotalProgressForSystemState
   @override
   Widget build(BuildContext context) {
     return SfRadialGauge(
+      title: const GaugeTitle(
+        text: 'System Progress',
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       enableLoadingAnimation: true,
       animationDuration: 1500,
       axes: [
