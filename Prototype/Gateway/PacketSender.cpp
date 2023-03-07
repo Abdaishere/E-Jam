@@ -3,7 +3,7 @@
 PacketSender::PacketSender(int genNum) {
     this->genNum = genNum;
     fd = new int[genNum];
-    payloads = new queue<ByteArray>[genNum];
+    payloads = std::vector<queue<ByteArray>>(genNum);
     //opening socket
     sock = socket(AF_PACKET, SOCK_RAW, protocol);
     if (sock == -1)
