@@ -12,7 +12,7 @@
 class PayloadGenerator
 {
 private:
-    static PayloadGenerator* instance;
+    static std::shared_ptr<PayloadGenerator> instance;
     ByteArray payload;
     void generateFirstAlphabet(); // a -- m
     void generateSecondAlphabet(); // n -- z
@@ -25,7 +25,7 @@ private:
 public:
     //must specify the length of the payload and its type
     ByteArray getPayload();
-    static PayloadGenerator* getInstance();
+    static std::shared_ptr<PayloadGenerator> getInstance();
     void regeneratePayload();
 };
 

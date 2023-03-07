@@ -1,15 +1,16 @@
 #include "ConfigurationManager.h"
-Configuration* ConfigurationManager::configuration = nullptr;
+std::shared_ptr<Configuration> ConfigurationManager::configuration = nullptr;
 
-Configuration* ConfigurationManager::getConfiguration(char* path)
+std::shared_ptr<Configuration> ConfigurationManager::getConfiguration(char* path)
 {
     if(configuration == nullptr)
-        configuration =  new Configuration();
-
+    {
+        configuration.reset(new Configuration());
+    }
     configuration->loadFromFile(path);
     return configuration;
 }
-Configuration* ConfigurationManager::getConfiguration()
+std::shared_ptr<Configuration> ConfigurationManager::getConfiguration()
 {
     return configuration;
 }

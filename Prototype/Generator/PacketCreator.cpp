@@ -21,14 +21,14 @@ void PacketCreator::createPacket(int rcvInd)
     ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
     ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
 
-    PayloadGenerator* payloadGenerator = PayloadGenerator::getInstance();
+    std::shared_ptr<PayloadGenerator> payloadGenerator = PayloadGenerator::getInstance();
     payloadGenerator->regeneratePayload();
     ByteArray payload = payloadGenerator->getPayload();
     ByteArray innerProtocol = ByteArray(2, '0');
     innerProtocol[0] = (unsigned char) 0x88;
     innerProtocol[1] = (unsigned char) 0xb5;
     ByteArray streamID = *ConfigurationManager::getConfiguration()->getStreamID();
-    FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
+    std::shared_ptr<FrameConstructor> frameConstructor = std::make_shared<EthernetConstructor>(sourceAddress, destinationAddress,
                                                                  payload,
                                                                  innerProtocol, 
                                                                  streamID);

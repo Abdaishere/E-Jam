@@ -24,7 +24,7 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
-    PacketSender* sender;
+    std::shared_ptr<PacketSender> sender;
 public:
     PacketCreator();
     static std::mutex mtx;

@@ -13,7 +13,7 @@
 //TODO standarize the units
 
 //thread function to send the packets
-void sendingFunction(PacketCreator* pc)
+void sendingFunction(std::shared_ptr<PacketCreator> pc)
 {
     while(true)
             pc->sendHead();
@@ -21,7 +21,7 @@ void sendingFunction(PacketCreator* pc)
 
 
 //sending for specific time 
-void sendingTimeBasedPackets(PacketCreator* pc, int seconds)
+void sendingTimeBasedPackets(std::shared_ptr<PacketCreator> pc, int seconds)
 {
     if(seconds <= 0) return;
     time_t beginTime = time(NULL);
@@ -34,7 +34,7 @@ void sendingTimeBasedPackets(PacketCreator* pc, int seconds)
 }
 
 //sending N packets
-void sendingNPackets(PacketCreator* pc, int packetsToSend)
+void sendingNPackets(std::shared_ptr<PacketCreator> pc, int packetsToSend)
 {
     if(packetsToSend <= 0) return; 
     while(packetsToSend--)
@@ -44,7 +44,7 @@ void sendingNPackets(PacketCreator* pc, int packetsToSend)
 }
 
 //thread function to send packets
-void creatingFunction(PacketCreator* pc)
+void creatingFunction(std::shared_ptr<PacketCreator> pc)
 {
     unsigned long long numberOfPackets = ConfigurationManager::getConfiguration()->getNumberOfPackets();
 
@@ -59,7 +59,7 @@ void creatingFunction(PacketCreator* pc)
 }
 
 //thread function to send the stats
-void sendStatsFunction(StatsManager* sm)
+void sendStatsFunction(std::shared_ptr<StatsManager> sm)
 {
     while (true)
         sm->sendStats();
@@ -80,10 +80,10 @@ int main(int argc, char** argv)
     }
     
     ConfigurationManager::getConfiguration(configPath);
-    StatsManager* sm = StatsManager::getInstance(genID, true);
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
-    PacketCreator* pc = new PacketCreator();
+    std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>();
     std::thread creator(creatingFunction,pc);
     std::thread sender(sendingFunction,pc);
     std::thread statWriter(sendStatsFunction, sm);

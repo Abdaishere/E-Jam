@@ -1,7 +1,7 @@
 
 #include "PayloadGenerator.h"
 
-PayloadGenerator* PayloadGenerator::instance = nullptr;
+std::shared_ptr<PayloadGenerator> PayloadGenerator::instance = nullptr;
 
 PayloadGenerator::PayloadGenerator()
 {
@@ -64,11 +64,11 @@ void PayloadGenerator::generateSecondAlphabet()
 }
 
 
-PayloadGenerator *PayloadGenerator::getInstance()
+std::shared_ptr<PayloadGenerator> PayloadGenerator::getInstance()
 {
     if(instance == nullptr)
     {
-        instance = new PayloadGenerator();
+        instance.reset(new PayloadGenerator());
     }
     return instance;
 }

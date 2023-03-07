@@ -28,7 +28,7 @@ public:
 
     void constructFrame();
 
-    ByteArray calculateCRC(ByteArray*);
+    ByteArray calculateCRC(std::shared_ptr<ByteArray>);
 
 }; 
 

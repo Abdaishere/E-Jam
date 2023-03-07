@@ -6,14 +6,14 @@
 #include <error.h>
 #include <iostream>
 
-PacketSender* PacketSender::instance = nullptr;
+std::shared_ptr<PacketSender> PacketSender::instance = nullptr;
 PacketSender::PacketSender() {}
 
-PacketSender* PacketSender::getInstance(int genID, std::string pipeDir, int pipePerm)
+std::shared_ptr<PacketSender> PacketSender::getInstance(int genID, std::string pipeDir, int pipePerm)
 {
     if(instance  == nullptr)
     {
-        instance = new PacketSender();
+        instance.reset(new PacketSender());
         instance->pipeDir = pipeDir;
         instance->permissions = pipePerm;
         instance->genID = genID;

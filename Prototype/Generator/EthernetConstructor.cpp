@@ -23,7 +23,7 @@ void EthernetConstructor::constructFrame() {
     frame.append(type, type.size());
     frame.append(streamID, STREAMID_LEN);
     frame.append(payload, payload.size());
-    CRC = calculateCRC(&payload);
+    CRC = calculateCRC(std::make_shared<ByteArray>(payload));
     frame.append(CRC, CRC_LENGTH);
 }
 static uint32_t CRCTable[256] = {
@@ -93,7 +93,7 @@ static uint32_t CRCTable[256] = {
         0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 };
 
-ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
+ByteArray EthernetConstructor::calculateCRC(std::shared_ptr<ByteArray> payload)
 {
     unsigned int crc32 = 0xFFFFFFFFu;
 
