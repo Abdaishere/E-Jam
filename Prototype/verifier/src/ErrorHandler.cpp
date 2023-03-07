@@ -6,14 +6,15 @@ ErrorHandler::ErrorHandler()
 }
 
 //initialize the pointer
-ErrorHandler* ErrorHandler::instance = nullptr;
+std::shared_ptr<ErrorHandler> ErrorHandler::instance = nullptr;
 
 //get instance function
-ErrorHandler* ErrorHandler::getInstance()
+std::shared_ptr<ErrorHandler> ErrorHandler::getInstance()
 {
     if(instance == nullptr)
     {
-        instance = new ErrorHandler();
+        //instance = std::make_shared<ErrorHandler>();
+        instance.reset(new ErrorHandler());
     }
     return instance;
 }

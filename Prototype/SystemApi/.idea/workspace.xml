@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fa77c0fc-15a5-478c-9845-2532760294a4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../Generator/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SystemApi.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SystemApi.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/InstanceControl/InstanceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/InstanceControl/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/InstanceControl/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/CMakeLists.txt" afterDir="false" />
-    </list>
+    <list default="true" id="fa77c0fc-15a5-478c-9845-2532760294a4" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -94,17 +86,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
@@ -120,6 +101,7 @@
       <option name="presentableId" value="Default" />
       <updated>1676494535914</updated>
       <workItem from="1676494537098" duration="322000" />
+      <workItem from="1677076160647" duration="595000" />
     </task>
     <servers />
   </component>
@@ -136,5 +118,6 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

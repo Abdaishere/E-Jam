@@ -8,17 +8,18 @@
 #include <queue>
 #include <mutex>
 #include "SeqChecker.h"
+#include <memory>
 #include "../commonHeaders/StatsManager.h"
 
 class PacketUnpacker
 {
 private:
     std::mutex mtx;
-    ByteArray* consumePacket();
-    PacketReceiver* packetReceiver;
+    std::shared_ptr<ByteArray> consumePacket();
+    std::shared_ptr<PacketReceiver> packetReceiver;
     SeqChecker seqChecker;
 public:
-    static std::queue<ByteArray*> packetQueue;
+    static std::queue<std::shared_ptr<ByteArray>> packetQueue;
     PacketUnpacker(int verID);
     void readPacket();
     void verifiyPacket();

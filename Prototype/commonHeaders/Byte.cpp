@@ -1,6 +1,3 @@
-//
-// Created by mohamedelhagry on 2/21/23.
-//
 #include "Byte.h"
 
 void print(ByteArray* ptr)

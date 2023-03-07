@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
@@ -13,6 +10,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <memory>
 
 //constants of configuration
 typedef unsigned long long ull;
@@ -35,7 +33,7 @@ class Configuration
 {
 private:
     //stream attributes
-    ByteArray* streamID;                //A 3 alphanumeric charaters defining a stream
+    std::shared_ptr<ByteArray> streamID;                //A 3 alphanumeric charaters defining a stream
     std::vector<ByteArray> senders;     //list of senders mac addresses
     std::vector<ByteArray> receivers;   //list of receivers mac addressess
     ByteArray myMacAddress;             //The mac address of this machine (Inferred)
@@ -299,14 +297,14 @@ public:
         myMacAddress = ByteArray(mac,6);
     }
 
-    ByteArray* getStreamID()
+    std::shared_ptr<ByteArray> getStreamID()
     {
         return streamID;
     }
 
     void setStreamID(const unsigned char* id)
     {
-        streamID = new ByteArray(id, STREAMID_LEN);
+        streamID = std::make_shared<ByteArray>(id, STREAMID_LEN);
     }
 
     ull getBcFramesNum()

@@ -1,19 +1,17 @@
-//
-// Created by khaled on 12/26/22.
-//
-
 #include <cstdio>
 #include "StatsManager.h"
 
 //initialize the unique instance
-StatsManager* StatsManager::instance;
+std::shared_ptr<StatsManager> StatsManager::instance;
 
 
 //handle unique instance
-StatsManager *StatsManager::getInstance(int verID, bool is_gen)
+std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen)
 {
     if (instance == nullptr)
-        instance = new StatsManager(verID, is_gen);
+    {
+        instance.reset(new StatsManager(verID, is_gen));
+    }
     return instance;
 }
 

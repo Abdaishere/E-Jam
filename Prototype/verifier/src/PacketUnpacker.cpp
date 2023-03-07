@@ -1,13 +1,13 @@
 #include "PacketUnpacker.h"
 #include "PacketReceiver.h"
 #include <iostream>
-std::queue<ByteArray*> PacketUnpacker::packetQueue;
+std::queue<std::shared_ptr<ByteArray>> PacketUnpacker::packetQueue;
 void PacketUnpacker::readPacket()
 {
 //    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
 //    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
-    ByteArray* packet = new ByteArray(1600, 'a');
+    std::shared_ptr<ByteArray> packet = std::make_shared<ByteArray>(1600, 'a');
     packetReceiver->receivePackets(packet);
 //    std::cerr << "packet received\n";
     std::cerr <<"packet in verification queue\n";
@@ -23,13 +23,13 @@ PacketUnpacker::PacketUnpacker(int verID)
     seqChecker = SeqChecker();
 }
 
-ByteArray* PacketUnpacker::consumePacket()
+std::shared_ptr<ByteArray> PacketUnpacker::consumePacket()
 {
     //return nullptr if queue is empty
     if(packetQueue.empty()) return nullptr;
     //take a packet from the queue and check if
     mtx.lock();
-    ByteArray* packet = packetQueue.front();
+    std::shared_ptr<ByteArray> packet = packetQueue.front();
     //remove it from queue
     packetQueue.pop();
     mtx.unlock();
@@ -39,10 +39,10 @@ ByteArray* PacketUnpacker::consumePacket()
 void PacketUnpacker::verifiyPacket()
 {
     //TODO make it adhere to the correct ethernet frame structure
-    ByteArray* packet = consumePacket();
+    std::shared_ptr<ByteArray> packet = consumePacket();
 
     //Signal a packet received
-    StatsManager* statsManager = StatsManager::getInstance();
+    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
 
     //nothing to do if no packet
     if(packet == nullptr) return;
@@ -56,16 +56,17 @@ void PacketUnpacker::verifiyPacket()
 
     //Check stream id
     ConfigurationManager::setCurrStreamID(tempBA);
-    Configuration* tempConfig = ConfigurationManager::getConfiguration();
+    std::cerr<<"reachedHere\n";
+    std::shared_ptr<Configuration> tempConfig = ConfigurationManager::getConfiguration();
 
     //Report stream id error
     if(tempConfig == nullptr)
     {
         std::cerr << "temp config null\n";
-        ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+        std::shared_ptr<ErrorInfo> errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
         if(errorInfo == nullptr)
         {
-            errorInfo = new ErrorInfo(packet);
+            errorInfo = std::make_shared<ErrorInfo>(packet);
         }
         errorInfo->addError(STREAM_ID);
         ErrorHandler::getInstance()->logError();
@@ -84,7 +85,7 @@ void PacketUnpacker::verifiyPacket()
     //check for frame errors
     //by matching receiver and sender mac addresses and checking the CRCs
     int startIndex = 0, endIndex = packet->length();
-    FrameVerifier* fv = FrameVerifier::getInstance();
+    std::shared_ptr<FrameVerifier> fv = FrameVerifier::getInstance();
     bool frameStatus = fv->verifiy(packet, startIndex, endIndex);
 
     //check for payload error
@@ -93,10 +94,9 @@ void PacketUnpacker::verifiyPacket()
     startIndex = streamID_startIndex+STREAMID_LEN;
     endIndex = startIndex+payloadLength-1;
 
-    PayloadVerifier* pv = PayloadVerifier::getInstance();
+    std::shared_ptr<PayloadVerifier> pv = PayloadVerifier::getInstance();
     bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
-    //must delete pointer holding onto packet to avoid memory leak
-    delete packet;
+    //must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
     if(!frameStatus)
         std::cerr << "frame corrupted\n";
     else

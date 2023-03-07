@@ -15,7 +15,7 @@ private:
     std::vector<long long> wait;
 
 public:
-    void receive(long long seqNum);
+    void receive(long long int seqNum);
     SeqChecker()
     {
         expectedNext = 0;

@@ -7,23 +7,23 @@
 
 #include <string>
 #include <string.h>
+#include <memory>
 #include "../commonHeaders/Byte.h"
 
 class PacketReceiver {
 private:
-    static PacketReceiver* instance;
+    static std::shared_ptr<PacketReceiver> instance;
     std::string pipeDir;
     int permissions;
     int fd;
     int verID;
     PacketReceiver();
-    ~PacketReceiver();
     int openFifo();
     void closePipe();
 public:
-
-    static PacketReceiver* getInstance(int genID = 0, std::string pipeDir="", int pipePerm = 0777);
-    void receivePackets(ByteArray* packet);
+    ~PacketReceiver();
+    static std::shared_ptr<PacketReceiver> getInstance(int genID = 0, std::string pipeDir="", int pipePerm = 0777);
+    void receivePackets(std::shared_ptr<ByteArray> packet);
 };
 
 

@@ -393,6 +393,30 @@ src/SegmentVerifier.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/verifier.dir/build.make CMakeFiles/verifier.dir/src/SegmentVerifier.cpp.s
 .PHONY : src/SegmentVerifier.cpp.s
 
+src/SeqChecker.o: src/SeqChecker.cpp.o
+.PHONY : src/SeqChecker.o
+
+# target to build an object file
+src/SeqChecker.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/verifier.dir/build.make CMakeFiles/verifier.dir/src/SeqChecker.cpp.o
+.PHONY : src/SeqChecker.cpp.o
+
+src/SeqChecker.i: src/SeqChecker.cpp.i
+.PHONY : src/SeqChecker.i
+
+# target to preprocess a source file
+src/SeqChecker.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/verifier.dir/build.make CMakeFiles/verifier.dir/src/SeqChecker.cpp.i
+.PHONY : src/SeqChecker.cpp.i
+
+src/SeqChecker.s: src/SeqChecker.cpp.s
+.PHONY : src/SeqChecker.s
+
+# target to generate assembly for a file
+src/SeqChecker.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/verifier.dir/build.make CMakeFiles/verifier.dir/src/SeqChecker.cpp.s
+.PHONY : src/SeqChecker.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -435,6 +459,9 @@ help:
 	@echo "... src/SegmentVerifier.o"
 	@echo "... src/SegmentVerifier.i"
 	@echo "... src/SegmentVerifier.s"
+	@echo "... src/SeqChecker.o"
+	@echo "... src/SeqChecker.i"
+	@echo "... src/SeqChecker.s"
 .PHONY : help
 
 

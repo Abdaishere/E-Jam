@@ -1,7 +1,3 @@
-//
-// Created by khaled on 12/26/22.
-//
-
 #ifndef VERIFIER_STATSMANAGER_H
 #define VERIFIER_STATSMANAGER_H
 
@@ -12,12 +8,14 @@
 
 #include <chrono>
 #include "Configuration.h"
+#include <memory>
+
 
 //Singleton class
 class StatsManager
 {
 private:
-    static StatsManager* instance; //singleton unique instance
+    static std::shared_ptr<StatsManager> instance; //singleton unique instance
     long numberOfPackets;
     long numberOfErrors;
     clock_t timer; 
@@ -28,7 +26,7 @@ private:
     int instanceID;
 
 public:
-    static StatsManager* getInstance(int instanceID = 0,bool is_gen = false);
+    static std::shared_ptr<StatsManager> getInstance(int instanceID = 0,bool is_gen = false);
     void sendStats();
     void increaseNumPackets(long val = 1);
     void increaseNumErrors(long val = 1);
