@@ -172,19 +172,28 @@ The structure of the Stream object as a table is as follows:
     <td>stream description must be between 1 and 255 characters long</td>
 </tr>
 <tr>
+    <td>first_started</td>
+    <td>DateTime Utc</td>
+    <td>No</td>
+    <td>None</td>
+    <td>0</td>
+    <td></td>
+    <td>chrono ts Seconds Time in Utc</td>
+</tr>
+<tr>
     <td>last_updated</td>
     <td>DateTime Utc</td>
     <td>No</td>
-    <td></td>
+    <td>Utc::now()</td>
     <td>0</td>
     <td></td>
-    <td>chrono ts Seconds</td>
+    <td>chrono ts Seconds Time in Utc</td>
 </tr>
 <tr>
     <td>stream_id</td>
     <td>String</td>
-    <td>Yes</td>
-    <td></td>
+    <td>No</td>
+    <td>Incremental</td>
     <td>3</td>
     <td>3</td>
     <td>stream_id must be 3 characters long alphanumeric</td>
@@ -200,7 +209,7 @@ The structure of the Stream object as a table is as follows:
 </tr>
 <tr>
     <td>generators</td>
-    <td>Vec of Devices</td>
+    <td>Vec of Strings</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
@@ -209,7 +218,7 @@ The structure of the Stream object as a table is as follows:
 </tr>
 <tr>
     <td>verifiers</td>
-    <td>Vec of Devices</td>
+    <td>Vec of Strings</td>
     <td>Yes</td>
     <td></td>
     <td>1</td>
@@ -247,7 +256,7 @@ The structure of the Stream object as a table is as follows:
     <td>seed</td>
     <td>u32</td>
     <td>NO</td>
-    <td></td>
+    <td>rand::Rng</td>
     <td>0</td>
     <td></td>
     <td>seed must be greater than 0</td>
@@ -302,18 +311,27 @@ The structure of the Stream object as a table is as follows:
     <td>bool</td>
     <td>No</td>
     <td>false</td>
-    <td>0</td>
-    <td>1</td>
+    <td></td>
+    <td></td>
     <td>check_content must be true or false</td>
 </tr>
 <tr>
-    <td>running_devices</td>
-    <td>Vec of IPs</td>
+    <td>running_generators</td>
+    <td>HashMap of String ProcessStatus Pairs</td>
     <td>No</td>
     <td>empty</td>
     <td>0</td>
     <td></td>
-    <td>must containe devices running courent stream only when running it</td>
+    <td>must containe Processes running courent stream as generators only when running it</td>
+</tr>
+<tr>
+    <td>running_verifiers</td>
+    <td>HashMap of String ProcessStatus Pairs</td>
+    <td>No</td>
+    <td>empty</td>
+    <td>0</td>
+    <td></td>
+    <td>must containe Processes running courent stream as verifiers only when running it</td>
 </tr>
 <tr>
     <td>stream_status</td>
@@ -372,7 +390,7 @@ The structure of the Device object as a table is as follows:
     <td>last_updated</td>
     <td>DateTime Utc</td>
     <td>No</td>
-    <td></td>
+    <td>0</td>
     <td>0</td>
     <td></td>
     <td>chrono ts Seconds</td>
@@ -405,20 +423,23 @@ The following endpoints are available for the system API:
 <tr>
     <th>Endpoint</th>
     <th>Method</th>
+    <th>Header</th>
     <th>Body</th>
     <th>Response</th>
     <th>Description</th>
 </tr>
 <tr>
-    <td>/streams/{stream_id}/{mac_address}/finished</td>
+    <td>/streams/{stream_id}/finished</td>
     <td>POST</td>
-    <td>the mac address of the card that finished the stream</td>
+    <td>mac_address = the mac address of the device that finished the stream</td>
+    <td></td>
     <td></td>
     <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side (must be sent from the systemapi to the admin client)</td>
 </tr>
 <tr>
-    <td>/streams/{stream_id}/{mac_address}/started</td>
+    <td>/streams/{stream_id}/started</td>
     <td>POST</td>
+    <td>mac_address = the mac address of the device that started the stream</td>
     <td></td>
     <td></td>
     <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's (must be sent from the systemapi to the admin client)</td>
@@ -426,13 +447,23 @@ The following endpoints are available for the system API:
 <tr>
     <td>/</td>
     <td>GET</td>
-    <td>mac address of the card used in the testing process</td>
-    <td>Success</td>
+    <td>mac_address = mac address of the card used in the testing process</td>
+    <td></td>
+    <td>Info with Success if mac_address is correct</td>
+    <td>will be called to Ping the system API</td>
+</tr>
+<tr>
+    <td>/connect</td>
+    <td>GET</td>
+    <td>mac_address = mac address of the card used in the testing process</td>
+    <td></td>
+    <td>Success if mac_address is correct</td>
     <td>will be called to Connect to the system API</td>
 </tr>
 <tr>
     <td>/start</td>
     <td>POST</td>
+    <td>stream_id = the id of the stream to start</td>
     <td>StreamDetails</td>
     <td>Success</td>
     <td>generate or verify the Provided Stream</td>
@@ -440,7 +471,8 @@ The following endpoints are available for the system API:
 <tr>
     <td>/stop</td>
     <td>POST</td>
-    <td>stream_id</td>
+    <td>stream_id = the id of the stream to stop</td>
+    <td></td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>
 </tr>
