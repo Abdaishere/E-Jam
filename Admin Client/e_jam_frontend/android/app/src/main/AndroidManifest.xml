@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.e_jam_frontend">
    <application
-        android:label="E Jam"
+        android:label="E-Jam"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
