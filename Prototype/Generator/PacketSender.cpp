@@ -2,9 +2,9 @@
 #include "PacketSender.h"
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <csignal>
-#include <error.h>
 #include <iostream>
+#include <queue>
+#include <unistd.h>
 
 PacketSender* PacketSender::instance = nullptr;
 PacketSender::PacketSender() {}

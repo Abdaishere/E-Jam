@@ -3,6 +3,7 @@ package com.example.systemapi.InstanceControl;
 import java.io.*;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URISyntaxException;
 import java.rmi.server.ExportException;
 import java.util.*;
 
@@ -207,13 +208,17 @@ public class InstanceController implements Runnable
         }
 
         // start the generators, verifiers and gateway
-        startStreams();
+//        startStreams();
 //        debugStreams(); //TODO
         // add stream to running streams
         StreamController.addStream(this);
 
         // notify Admin-client that the stream is finished
-        Communicator.started(stream.streamID);
+        try {
+            Communicator.started(stream.streamID);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             Thread.sleep(stream.lifeTime);
@@ -222,7 +227,7 @@ public class InstanceController implements Runnable
         }
 
         // kill the generators, verifiers and gateway
-        killStreams();
+//        killStreams();
 
         // notify Admin-client that the stream is finished
         Communicator.finished(stream.streamID);

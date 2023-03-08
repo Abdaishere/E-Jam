@@ -3,7 +3,7 @@ package com.example.systemapi.InstanceControl;
 import java.util.HashMap;
 
 public class StreamController {
-    private static HashMap<String, InstanceController> runningStreams;
+    private static HashMap<String, InstanceController> runningStreams = new HashMap<>();
 
     public StreamController() {
         runningStreams = new HashMap<>();

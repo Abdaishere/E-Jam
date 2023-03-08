@@ -1,12 +1,18 @@
 package com.example.systemapi.InstanceControl;
 
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
-
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
@@ -14,10 +20,17 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/")
 public class Communicator {
-
     /**
      * Get configuration from Admin GUI
      */
+    private final static String ADMIN_IP = "192.168.1.18";
+    private final static String MAC_ADDRESS = UTILs.getMyMacAddress();
+
+    @PostMapping("/")
+    public ResponseEntity index() {
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/connect")
     public ResponseEntity connect(@RequestBody Map<String, Object> jsonObj) {
         String macAddress = (String) jsonObj.get("mac_address");
@@ -29,11 +42,20 @@ public class Communicator {
     }
 
     @PostMapping("/start")
-    public ResponseEntity startStream(@RequestBody Map<String, Object> jsonObj) {
+    public ResponseEntity startStream(@RequestBody String stringObj) throws JSONException {
+        System.out.println(stringObj);
+        JSONObject jsonObj = new JSONObject(stringObj);
+        System.out.println(jsonObj);
         String streamID = (String) jsonObj.get("stream_id");
         long delay = Long.valueOf(jsonObj.get("delay").toString());
-        ArrayList<String> generators = (ArrayList<String>) jsonObj.get("generators");
-        ArrayList<String> verifiers = (ArrayList<String>) jsonObj.get("verifiers");
+        String generator = (String) jsonObj.get("generators");
+        String verifier = (String) jsonObj.get("verifiers");
+        ArrayList<String> generators = new ArrayList<>();
+        generators.add(generator);
+        ArrayList<String> verifiers = new ArrayList<>();
+        verifiers.add(verifier);
+//        ArrayList<String> generators = (ArrayList<String>) jsonObj.get("generators");
+//        ArrayList<String> verifiers = (ArrayList<String>) jsonObj.get("verifiers");
         PayloadType payloadType = PayloadType.values()[Integer.valueOf(jsonObj.get("payload_type").toString())];
         long numberOfPackets = Long.valueOf(jsonObj.get("number_of_packets").toString());
         long bcFramesNum = Long.valueOf(jsonObj.get("broadcast_frames").toString());
@@ -57,9 +79,7 @@ public class Communicator {
     }
 
     @PostMapping("/stop")
-    public ResponseEntity stopStream(@RequestBody Map<String, Object> jsonObj) {
-        String streamId = (String) jsonObj.get("stream_id");
-
+    public ResponseEntity stopStream(@RequestBody String streamId) {
         // stream is not running
         if (!StreamController.containsStream(streamId)) {
             return ResponseEntity.badRequest().build();
@@ -78,17 +98,21 @@ public class Communicator {
     }
 
     // notify admin-client that stream has started
-    public static void started(String streamId) {
-        String url = "http://localhost:8080/streams/" + streamId + "/started";
+    public static void started(String streamId) throws URISyntaxException {
+        URI uri = new URI("http://" + ADMIN_IP + ":8080/streams/" + streamId  + "/started");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject(url, null, String.class);
+        HttpEntity<String> body = new HttpEntity<>(MAC_ADDRESS);
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, body, String.class);
+        System.out.println(response);
     }
 
     // notify admin-client that stream has finished
     public static void finished(String streamId) {
-        String url = "http://localhost:8080/streams/" + streamId + "/finished";
+        String url = "http://" + ADMIN_IP + ":8080/streams/" + streamId + "/finished";
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject(url, null, String.class);
+        restTemplate.postForObject(url, MAC_ADDRESS, String.class);
     }
 
     public static void main(String[] args) {
