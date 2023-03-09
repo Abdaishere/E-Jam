@@ -22,11 +22,11 @@ The packets will consist of normal ethernet packets with the addition of some fi
 
 # **Stream Configuration Handling**
 
-Before the test, the configuration of all streams in the system is sent by the admin-client to the system-APIs of all the working nodes. The system API select the ones that the current node is involved in and stores it. 
+Before the test, the configuration of all streams in the system is sent by the admin-client to the system-APIs of all the working nodes. The system API selects the ones that the current node is involved in and stores it. 
 
 # **Packet Sequencing**
 Each generator sequences packets incrementally according to the the generator-streamID pair it belongs to.
 
 All the verifier instance on the pc are identical. This is because the verifier has the task of parsing which stream the received packet belongs to, and the rest of the parsing process depends on the configuration of the stream. 
 So it would not make sense to have multiple verifiers.
-The verifier will use an *in-memory database* which holds the configurations of all streams this node is involved in. This is to speed up the verification process as the .
+The verifier will use an *in-memory database* which holds the configurations of all streams this node is involved in. This is to speed up the verification process and save memory as not all verifiers have to load the configuration table locally to them.
