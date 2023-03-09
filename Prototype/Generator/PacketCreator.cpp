@@ -54,7 +54,6 @@ void PacketCreator::sendHead()
     productQueue.pop();
     mtx.unlock();
 
-    print(&packet);
     sender->transmitPackets(packet);
     std::cerr << ("Packet transmitted\n");
 }

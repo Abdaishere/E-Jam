@@ -16,15 +16,15 @@ EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& de
 void EthernetConstructor::constructFrame() {
     preamble = ByteArray(this->pre, 8);
     frame.clear();
-    frame.resize(source_address.size() + destination_address.size() + type.size() + STREAMID_LEN + SeqNum_LEN + payload.size() + CRC_LENGTH);
+//    frame.resize(source_address.size() + destination_address.size() + type.size() + STREAMID_LEN + SeqNum_LEN + payload.size() + CRC_LENGTH);
 //  frame.write(preamble);
-    frame.append(destination_address, destination_address.size());
-    frame.append(source_address, source_address.size());
-    frame.append(type, type.size());
-    frame.append(streamID, STREAMID_LEN);
-    frame.append(payload, payload.size());
+    frame.append(destination_address);
+    frame.append(source_address);
+    frame.append(type);
+    frame.append(streamID);
+    frame.append(payload);
     CRC = calculateCRC(std::make_shared<ByteArray>(payload));
-    frame.append(CRC, CRC_LENGTH);
+    frame.append(CRC);
 }
 static uint32_t CRCTable[256] = {
         0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
