@@ -432,7 +432,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/streams/{stream_id}/finished</td>
     <td>POST</td>
-    <td>mac_address = the mac address of the device that finished the stream</td>
+    <td>mac-address = the mac address of the device that finished the stream</td>
     <td></td>
     <td></td>
     <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side (must be sent from the systemapi to the admin client)</td>
@@ -440,7 +440,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/streams/{stream_id}/started</td>
     <td>POST</td>
-    <td>mac_address = the mac address of the device that started the stream</td>
+    <td>mac-address = the mac address of the device that started the stream</td>
     <td></td>
     <td></td>
     <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's (must be sent from the systemapi to the admin client)</td>
@@ -456,7 +456,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/connect</td>
     <td>POST</td>
-    <td>mac_address = mac address of the card used in the testing process</td>
+    <td>mac-address = mac address of the card used in the testing process</td>
     <td></td>
     <td>Success if mac_address is correct</td>
     <td>will be called to Connect to the system API</td>
@@ -464,7 +464,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/start</td>
     <td>POST</td>
-    <td>stream_id = the id of the stream to start, TODO mac_address = mac address of the card used in the testing process, ProcessType = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
+    <td>stream-id = the id of the stream to start, TODO mac-address = mac address of the card used in the testing process, process-type = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
     <td>StreamDetails</td>
     <td>Success</td>
     <td>generate or verify the Provided Stream</td>
@@ -472,7 +472,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/stop</td>
     <td>POST</td>
-    <td>stream_id = the id of the stream to start, TODO mac_address = mac address of the card used in the testing process, ProcessType = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
+    <td>stream-id = the id of the stream to start, TODO mac-address = mac address of the card used in the testing process, process-type = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
     <td></td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>

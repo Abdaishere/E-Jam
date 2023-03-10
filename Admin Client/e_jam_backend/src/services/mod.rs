@@ -5,12 +5,12 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 mod device;
 
 use self::device::{
-    add_device, delete_device, get_device, get_devices, ping_device, stream_finished,
-    stream_started, update_device, ping_all_devices,
+    add_device, delete_device, get_device, get_devices, ping_all_devices, ping_device,
+    stream_finished, stream_started, update_device,
 };
 
 #[doc = r"# Index
-The index service for the api server
+The index service for the api server that returns the index page html string for the api server with the table of all connected devices and their ip addresses and mac addresses
 ## Returns
 * `String` - the index page html string"]
 #[get("/")]
@@ -22,16 +22,16 @@ async fn index(data: web::Data<AppState>) -> String {
     return the html table for all connected devices and their ip addresses and mac addresses    
     {}
     ",
-        get_devices_table(&data.device_list)
+        get_devices_table(data.device_list.lock().unwrap().clone()),
     )
 }
 
-#[doc = r"# Get all streams
-gets all streams in the list of streams in the app state
+#[doc = r"# Get Streams
+Gets ALL streams in the list of streams in the app state
 if the list of streams is empty, return a 204 No Content
 if the list of streams is not empty, return a 200 OK
 ## Arguments
-* `data` - the app state data for the streams
+* `data` - the app state data for the app state
 ## Returns
 * `HttpResponse` - the http response
 ## Panics
@@ -43,14 +43,15 @@ async fn get_streams(data: web::Data<AppState>) -> impl Responder {
         .lock()
         .expect("Failed to lock streams_entries in get all streams")
         .clone();
+
     match streams_entries.is_empty() {
         true => HttpResponse::NoContent().finish(),
         false => HttpResponse::Ok().json(streams_entries),
     }
 }
 
-#[doc = r"# Get a stream
-gets a stream by its id in the list of streams in the app state
+#[doc = r"# Get Stream
+Gets a stream by its id in the list of streams in the app state
 if the stream is not found, return a 404 Not Found
 if the stream is found, return a 200 OK
 ## Arguments
@@ -66,19 +67,21 @@ async fn get_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> 
     let streams_entries = data
         .streams_entries
         .lock()
-        .expect(format!("Failed to lock streams_entries in get stream {}", stream_id).as_str())
-        .clone();
+        .expect(format!("Failed to lock streams_entries in get stream {}", stream_id).as_str());
+
     let stream_entry = streams_entries
         .iter()
         .find(|&stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => HttpResponse::Ok().json(stream_entry),
+
         None => HttpResponse::NotFound().finish(),
     }
 }
 
-#[doc = r"# Add a stream
-adds a stream to the list of streams in the app state if it is not already in the list of streams
+#[doc = r"# Add Stream
+Adds a stream to the list of streams in the app state if it is not already in the list of streams
 if the stream is already in the list of streams, return a 409 Conflict
 if the stream is not in the list of streams, add it and return a 201 Created
 if the stream id is empty, generate a new stream id and return it in the response
@@ -101,17 +104,20 @@ async fn post_stream(
         )
         .as_str(),
     );
+
     let stream_id = stream_entry.get_stream_id().to_string();
+
     let stream_entry_check = streams_entries
         .iter()
         .find(|&stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry_check {
         Some(_) => HttpResponse::Conflict().finish(),
         None => {
             let mut stream_entry = stream_entry.into_inner();
 
             if stream_entry.get_stream_id() == "" {
-                stream_entry.generate_new_stream_id(&data.stream_id_counter);
+                stream_entry.generate_new_stream_id(&data.stream_id_counter, &data.streams_entries);
             }
 
             streams_entries.push(stream_entry.clone());
@@ -122,8 +128,8 @@ async fn post_stream(
     }
 }
 
-#[doc = r"# Update a stream
-updates a stream in the list of streams in the app state by its id
+#[doc = r"# Update Stream
+Updates a stream in the list of streams in the app state by its id
 if the stream is not found, return a 404 Not Found
 if the stream is found, update it and return a 200 OK
 ## Arguments
@@ -140,6 +146,7 @@ async fn update_stream(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let stream_id = _stream_entry.get_stream_id();
+
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in update stream {}",
@@ -147,13 +154,20 @@ async fn update_stream(
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| stream_entry.get_stream_id() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => {
+            // this is to prevent the stream id from being changed in the update stream to ensure that the stream id is unique and the user did not make a mistake
+            if _stream_entry.get_stream_id() != stream_entry.get_stream_id() {
+                return HttpResponse::BadRequest().json("Stream id cannot be changed in updating a stream please delete and add the stream again with the new id if you want to change the id of the stream");
+            }
+
             // if the stream is running, stop it
-            if stream_entry.check_stream_status(StreamStatus::Running){
+            if stream_entry.check_stream_status(StreamStatus::Running) {
                 stream_entry.stop_stream(&data.device_list).await;
             }
 
@@ -166,15 +180,15 @@ async fn update_stream(
 
             // update the stream
             *stream_entry = _stream_entry.clone();
-
+            println!("Updated stream: {:#?}", stream_entry);
             HttpResponse::Created().json(_stream_entry)
         }
         None => HttpResponse::NotFound().finish(),
     }
 }
 
-#[doc = r"# Delete a stream
-deletes a stream in the list of streams in the app state by its id
+#[doc = r"# Delete Stream
+Deletes a stream in the list of streams in the app state by its id
 if the stream is not found, return a 404 Not Found
 if the stream is running, stop it
 if the stream is queued, remove it from the queue
@@ -189,6 +203,7 @@ if the stream is found, delete it and return a 200 OK
 #[delete("/streams/{stream_id}")]
 async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
+
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in delete stream {}",
@@ -196,20 +211,23 @@ async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) 
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter()
         .position(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => {
             streams_entries.remove(stream_entry);
+            println!("Deleted stream {}", stream_id);
             HttpResponse::Ok().finish()
         }
         None => HttpResponse::NotFound().finish(),
     }
 }
 
-#[doc = r"# Start a stream
-starts a stream in the list of streams in the app state by its id
+#[doc = r"# Start Stream
+Starts a stream in the list of streams in the app state by its id
 if the stream is not found, return a 404 Not Found
 if the stream is already running, return a 409 Conflict
 if the stream is queued, remove it from the queue
@@ -226,6 +244,7 @@ if the stream is found, start it and return a 200 OK
 #[post("/streams/{stream_id}/start")]
 async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
+
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in start stream {}",
@@ -233,14 +252,17 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => {
             if stream_entry.check_stream_status(StreamStatus::Running)
                 || stream_entry.check_stream_status(StreamStatus::Queued)
             {
+                println!("Stream {} is already running", stream_id);
                 HttpResponse::Conflict().finish()
             } else {
                 // queue the stream in a different thread
@@ -255,8 +277,8 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
     }
 }
 
-#[doc = r"# Stop a stream
-stops a stream in the list of streams in the app state by its id
+#[doc = r"# Stop Stream
+Stops a stream in the list of streams in the app state by its id
 if the stream is not found, return a 404 Not Found
 if the stream is stopped or finished, return a 409 Conflict
 if the stream is found, stop it and return a 200 OK
@@ -274,6 +296,7 @@ if the stream is found, stop it and return a 200 OK
 #[post("/streams/{stream_id}/stop")]
 async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
+
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in stop stream {}",
@@ -281,28 +304,30 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => {
-            if stream_entry.check_stream_status(StreamStatus::Stopped)
-                || stream_entry.check_stream_status(StreamStatus::Finished)
+            if stream_entry.check_stream_status(StreamStatus::Running)
+                || stream_entry.check_stream_status(StreamStatus::Queued)
             {
-                println!("Stream {} is already stopped", stream_id);
-                HttpResponse::Conflict().finish()
-            } else {
                 stream_entry.stop_stream(&data.device_list).await;
                 println!("Stopped stream {}", stream_id);
                 HttpResponse::Ok().finish()
+            } else {
+                println!("Stream {} is already stopped", stream_id);
+                HttpResponse::Conflict().finish()
             }
         }
         None => HttpResponse::NotFound().finish(),
     }
 }
 
-#[doc = r"# Start all streams
-start all streams in the list of streams in the app state
+#[doc = r"# Start All Streams
+Start all streams in the list of streams in the app state
 if the stream is already running or queued, do nothing
 if not running or queued, queue the stream
 ## Arguments
@@ -312,13 +337,14 @@ if not running or queued, queue the stream
 ## Panics
 * `Failed to lock streams_entries in start all streams` - if the streams_entries is not found in the mutex lock
 ## Logs
-* `Queued all streams to start` - if all streams are queued to start"]
+* `Queued all streams to start` - after all streams are queued to start"]
 #[post("/streams/start_all")]
 async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
     let mut streams_entries = data
         .streams_entries
         .lock()
         .expect("Failed to lock streams_entries in start all streams");
+
     for stream_entry in streams_entries.iter_mut() {
         if !(stream_entry.check_stream_status(StreamStatus::Running)
             || stream_entry.check_stream_status(StreamStatus::Queued))
@@ -328,12 +354,13 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
                 .await;
         }
     }
+
     println!("Queued all streams to start");
     HttpResponse::Ok().finish()
 }
 
-#[doc = r"# Stop all streams
-stosps all streams in the list of streams in the app state
+#[doc = r"# Stop All Streams
+Stops all streams in the list of streams in the app state
 if the stream is queued, remove it from the queue
 if the stream is running, stop it
 ## Arguments
@@ -343,14 +370,16 @@ if the stream is running, stop it
 ## Panics
 * `Failed to lock streams_entries in stop all streams` - if the streams_entries is not found in the mutex lock
 ## Logs
-* `Failed to stop stream` - if the stream failed to stop
-* `Stopped all streams` - if all streams are stopped"]
+* `Stopped stream {stream_id}` - if the stream is stopped
+* `Failed to stop stream {stream_id}` - if the stream failed to stop
+* `Stopped all streams` - after all streams are attempted to be stopped"]
 #[post("/streams/stop_all")]
 async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
     let mut streams_entries = data
         .streams_entries
         .lock()
         .expect("Failed to lock streams_entries in stop all streams");
+
     for stream_entry in streams_entries.iter_mut() {
         // if the stream is queued, remove it from the queue
         if stream_entry.check_stream_status(StreamStatus::Queued) {
@@ -367,11 +396,13 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             }
         }
     }
+
+    println!("Stopped all streams");
     HttpResponse::Ok().finish()
 }
 
-#[doc = r"# Force start a stream
-force start a stream in the list of streams in the app state by its id
+#[doc = r" # Force Start a Stream
+Force start a stream in the list of streams in the app state by its id
 if the stream is not found, return a 404 Not Found
 if the stream is running, stop it
 if the stream is queued, remove it from the queue
@@ -395,8 +426,8 @@ async fn force_start_stream(
     stream_id: web::Path<String>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    print!("Force Starting stream {}", stream_id);
     let stream_id = stream_id.into_inner();
+
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in force start stream {}",
@@ -404,9 +435,11 @@ async fn force_start_stream(
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => {
             // if the stream is running, stop it
@@ -425,6 +458,7 @@ async fn force_start_stream(
 
             // start the stream
             stream_entry.send_stream(true, &data.device_list).await;
+
             println!("Stream {} force started", stream_id);
             HttpResponse::Ok().finish()
         }
@@ -432,8 +466,8 @@ async fn force_start_stream(
     }
 }
 
-#[doc = r"# Force stop a stream
-forces stop a stream in the list of streams in the app state by its id
+#[doc = r" # Force Stop a Stream
+Forces stop a stream in the list of streams in the app state by its id
 if the stream is not found, return a 404 Not Found
 if the stream is found, stop it and return a 200 OK
 ## Arguments
@@ -452,6 +486,7 @@ async fn force_stop_stream(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
+
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in force stop stream, stream_id: {}",
@@ -459,9 +494,11 @@ async fn force_stop_stream(
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => {
             stream_entry.stop_stream(&data.device_list).await;
@@ -473,8 +510,8 @@ async fn force_stop_stream(
     }
 }
 
-#[doc = r"# Get the status of a stream
-get the status of a stream in the list of streams in the app state by its id
+#[doc = r" # Get The Status of a Stream
+Get the status of a stream in the list of streams in the app state by its id
 if the stream is found, return a 200 OK with the status
 if the stream is not found, return a 404 Not Found
 ## Arguments
@@ -490,6 +527,7 @@ async fn get_stream_status(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
+
     let streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in get stream status for {}",
@@ -497,17 +535,19 @@ async fn get_stream_status(
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter()
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+
     match stream_entry {
         Some(stream_entry) => HttpResponse::Ok().json(stream_entry.get_stream_status()),
         None => HttpResponse::NotFound().finish(),
     }
 }
 
-#[doc = r"# Get the status of all streams
-get the status of all streams in the list of streams in the app state
+#[doc = r" # Get The Status of All Streams
+Get the status of all streams in the list of streams in the app state
 if the stream is found, return a 200 OK with the status
 if the stream is not found, return a 404 Not Found
 ## Arguments
@@ -521,13 +561,16 @@ async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
         .lock()
         .expect("Failed to lock streams_entries in get all streams status")
         .clone();
+
     let mut streams_status: Vec<(&StreamStatus, String)> = Vec::new();
+
     for stream_entry in streams_entries.iter() {
         streams_status.push((
             stream_entry.get_stream_status(),
             stream_entry.get_stream_id().to_string(),
         ));
     }
+
     HttpResponse::Ok().json(streams_status)
 }
 

@@ -120,17 +120,25 @@ this function is used to update the device status according to the status of the
         // if the device is not found then panic
         let index = match index {
             Some(index) => index,
-            None => panic!("Error: Device not found {} to update device status", device_mac),
+            None => panic!(
+                "Error: Device not found {} to update device status",
+                device_mac
+            ),
         };
 
         // update the number of processes that are running on the device
-        if type_of_process == &ProcessType::Generation {
+        if type_of_process == &ProcessType::Generation
+            || type_of_process == &ProcessType::GenerationaAndVerification
+        {
             if status == &ProcessStatus::Queued {
                 devices[index].gen_processes += 1;
             } else if status == &ProcessStatus::Completed {
                 devices[index].gen_processes -= 1;
             }
-        } else {
+        }
+        if type_of_process == &ProcessType::Verification
+            || type_of_process == &ProcessType::GenerationaAndVerification
+        {
             if status == &ProcessStatus::Queued {
                 devices[index].ver_processes += 1;
             } else if status == &ProcessStatus::Completed {
@@ -217,8 +225,8 @@ this is used to get the device MAC address
 this is used to get the device IP address
 # Returns
 * `String` - the device IP address with Regex for IP address"]
-    pub fn get_ip_address(&self) -> String {
-        self.ip_address.clone()
+    pub fn get_ip_address(&self) -> &str {
+        &self.ip_address
     }
 
     #[doc = r"Get the device port
@@ -235,7 +243,7 @@ this is used to get the device connection address
 * `(String, u16, String)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
     pub fn get_device_info_tuple(&self) -> (String, u16, String) {
         (
-            self.get_ip_address(),
+            self.get_ip_address().to_string(),
             self.get_port(),
             self.get_device_mac().to_string(),
         )
@@ -286,11 +294,7 @@ pub enum DeviceStatus {
 This is used to get the devices html table in the form of a string that can be used to display in the web interface
 # Arguments
 * `DEVICE_LIST` - the list of devices that are added to the system"]
-pub fn get_devices_table(device_list: &Mutex<Vec<Device>>) -> String {
-    let device_list = device_list
-        .lock()
-        .expect("Error: Failed to lock the device list");
-
+pub fn get_devices_table(device_list: Vec<Device>) -> String {
     let mut data = String::from(
         "<table>
     <tr>

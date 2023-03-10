@@ -19,6 +19,16 @@ pub enum ProcessType {
     GenerationaAndVerification,
 }
 
+impl ToString for ProcessType {
+    fn to_string(&self) -> String {
+        match self {
+            ProcessType::Generation => "Generation".to_string(),
+            ProcessType::Verification => "Verification".to_string(),
+            ProcessType::GenerationaAndVerification => "GenerationaAndVerification".to_string(),
+        }
+    }
+}
+
 #[doc = r"process status
 a process has a status that represents the current state of the stream in the specific device
 each process has a type (Type: ProcessType) that can be one of the following
@@ -48,4 +58,16 @@ pub enum ProcessStatus {
 
     #[serde(rename = "Failed")]
     Failed,
+}
+
+impl ToString for ProcessStatus {
+    fn to_string(&self) -> String {
+        match self {
+            ProcessStatus::Queued => "Queued".to_string(),
+            ProcessStatus::Running => "Running".to_string(),
+            ProcessStatus::Stopped => "Stopped".to_string(),
+            ProcessStatus::Completed => "Completed".to_string(),
+            ProcessStatus::Failed => "Failed".to_string(),
+        }
+    }
 }

@@ -42,8 +42,8 @@ async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) ->
     let devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in get device {}", device_mac).as_str())
-        .clone();
+        .expect(format!("failed to lock device list in get device {}", device_mac).as_str());
+
     let device = devices
         .iter()
         .find(|device| device.get_device_mac() == device_mac);
@@ -96,11 +96,15 @@ if the device is reachable, return a 200 OK
 #[post("/devices/ping")]
 async fn ping_device(device: web::Json<Device>) -> impl Responder {
     let device = device.into_inner();
-    let device_address = format!("http://{}:{}", device.get_ip_address(), device.get_port());
+    let device_address = format!(
+        "http://{}:{}/connect",
+        device.get_ip_address(),
+        device.get_port()
+    );
     // add the cards mac address to the body of the request to the device to ping (for now)
     let response = reqwest::Client::new()
         .post(device_address)
-        .body(device.get_device_mac().to_string())
+        .header("mac-address", device.get_device_mac().to_string())
         .send()
         .await;
     match response {
@@ -120,17 +124,24 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[post("/devices/ping/all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
-    let mut devices = data. device_list.lock().expect("failed to lock device list in ping all devices");
+    let mut devices = data
+        .device_list
+        .lock()
+        .expect("failed to lock device list in ping all devices");
 
     match devices.len() {
         0 => HttpResponse::NoContent().finish(),
         _ => {
             for device in devices.iter_mut() {
-                let device_address = format!("http://{}:{}", device.get_ip_address(), device.get_port());
+                let device_address = format!(
+                    "http://{}:{}/connect",
+                    device.get_ip_address(),
+                    device.get_port()
+                );
                 // add the cards mac address to the body of the request to the device to ping (for now)
                 let response = reqwest::Client::new()
                     .post(device_address)
-                    .body(device.get_device_mac().to_string())
+                    .header("mac-address", device.get_device_mac().to_string())
                     .send()
                     .await;
                 match response {
@@ -153,7 +164,9 @@ if the device is found, update it and return a 200 OK
 ## Returns
 * `HttpResponse` - the http response
 ## Panics
-* `failed to lock device list in update device {device_mac}` - if the device list is not found in the mutex lock"]
+* `failed to lock device list in update device {device_mac}` - if the device list is not found in the mutex lock
+## Logs
+* `updating device {device}` - if the device is found and updated"]
 #[put("/devices/{device_mac}")]
 async fn update_device(
     device_mac: web::Path<String>,
@@ -161,16 +174,26 @@ async fn update_device(
     data: web::Data<AppState>,
 ) -> impl Responder {
     let device_mac = device_mac.into_inner();
+
     let mut devices = data
         .device_list
         .lock()
         .expect(format!("failed to lock device list in update device {}", device_mac).as_str());
-    let device_index = devices
-        .iter()
-        .position(|device| device.get_device_mac() == device_mac);
-    match device_index {
-        Some(device_index) => {
-            devices[device_index] = device.into_inner();
+
+    let device_entry = devices
+        .iter_mut()
+        .find(|device| device.get_device_mac() == device_mac);
+
+    match device_entry {
+        Some(device_entry) => {
+            // this is used to prevent the user from changing the mac address of the device in the update request without deleting and adding the device again to the list
+            // to ensure that the user is not changing the mac address of the device in the update request accidentally
+            if device_entry.get_device_mac() != device.get_device_mac() {
+                return HttpResponse::BadRequest().json("device mac address cannot be changed in updating device please delete and add the device again if you want to change the mac address of the device");
+            }
+
+            *device_entry = device.clone();
+            println!("updated device: {:#?}", device);
             HttpResponse::Ok().finish()
         }
         None => HttpResponse::NotFound().finish(),
@@ -220,14 +243,14 @@ if the stream is found, update its status and return a 200 OK
 * `Failed to lock streams_entries in stream finished {stream_id}` - if the streams_entries is not found in the mutex lock
 ## Logs
 * `stream finished {stream_id} by {ip}` - if the stream is found and updated"]
-#[post("/streams/{stream_id}/{mac_address}/finished")]
+#[post("/streams/{stream_id}/finished")]
 async fn stream_finished(
     stream_id: web::Path<String>,
-    mac_address: web::Path<String>,
     data: web::Data<AppState>,
     req: HttpRequest,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
+    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in stream finished {}",
@@ -245,7 +268,7 @@ async fn stream_finished(
                 // get the ip address of the client
                 let ip = val.ip().to_string();
 
-                stream_entry.notify_stream_finished(&mac_address, &data.device_list);
+                stream_entry.notify_process_completed(mac_address, &data.device_list);
                 println!("stream finished {} by {}", stream_id, ip);
             };
 
@@ -269,14 +292,14 @@ if the stream is found, update its status and return a 200 OK
 * `Failed to lock streams_entries in stream started {stream_id}` - if the streams entries are not found in the mutex lock
 ## Logs
 * `Address {ip} started the stream {stream_id}` - if the stream is found and updated"]
-#[post("/streams/{stream_id}/{mac_address}/started")]
+#[post("/streams/{stream_id}/started")]
 async fn stream_started(
     stream_id: web::Path<String>,
-    mac_address: web::Path<String>,
     data: web::Data<AppState>,
     req: HttpRequest,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
+    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in stream started {}",
@@ -291,8 +314,12 @@ async fn stream_started(
         Some(stream_entry) => {
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
-                stream_entry.notify_stream_running(&mac_address, &data.device_list);
-                println!("Address {} started the stream {}", val.ip(), stream_id);
+                stream_entry.notify_process_running(mac_address, &data.device_list);
+                println!(
+                    "Address {} notified of starting the stream {}",
+                    val.ip(),
+                    stream_id
+                );
             };
 
             HttpResponse::Ok().finish()

@@ -3,10 +3,10 @@ mod models;
 mod services;
 
 #[doc = r"This is the port that the server will listen on"]
-const PORT : u16 = 8080;
+const PORT: u16 = 8080;
 
 #[doc = r"This is the host that the server will listen on"]
-const HOST : &str = "localhost";
+const HOST: &str = "localhost";
 
 #[doc = r"This is the main function that starts the server
 It is the entry point of the application
