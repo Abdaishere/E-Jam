@@ -22,6 +22,6 @@ To install, clone the repository and run `flutter pub get` to install dependenci
 
 ![User Flow Diagram](UserFlowDiagram.jpg)
 
-Note: This is a work in progress and is not ready for use.
+> Note: This is a work in progress and is not ready for use.
 
-Note: Any Details View Can be accessed by clicking on the corresponding item in the list view and it will reveal a Graph View filtered by the Item Chosen.
+> Note: Any Details View Can be accessed by clicking on the corresponding item in the list view and it will reveal a Graph View filtered by the Item Chosen.

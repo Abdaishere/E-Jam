@@ -153,12 +153,12 @@ async fn update_stream(
     match stream_entry {
         Some(stream_entry) => {
             // if the stream is running, stop it
-            if stream_entry.get_stream_status() == &StreamStatus::Running {
+            if stream_entry.check_stream_status(StreamStatus::Running){
                 stream_entry.stop_stream(&data.device_list).await;
             }
 
             // if the stream is queued, remove it from the queue
-            if stream_entry.get_stream_status() == &StreamStatus::Queued {
+            if stream_entry.check_stream_status(StreamStatus::Queued) {
                 stream_entry
                     .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
@@ -238,8 +238,8 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
     match stream_entry {
         Some(stream_entry) => {
-            if stream_entry.get_stream_status() == &StreamStatus::Running
-                || stream_entry.get_stream_status() == &StreamStatus::Queued
+            if stream_entry.check_stream_status(StreamStatus::Running)
+                || stream_entry.check_stream_status(StreamStatus::Queued)
             {
                 HttpResponse::Conflict().finish()
             } else {
@@ -286,8 +286,8 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
     match stream_entry {
         Some(stream_entry) => {
-            if stream_entry.get_stream_status() == &StreamStatus::Stopped
-                || stream_entry.get_stream_status() == &StreamStatus::Finished
+            if stream_entry.check_stream_status(StreamStatus::Stopped)
+                || stream_entry.check_stream_status(StreamStatus::Finished)
             {
                 println!("Stream {} is already stopped", stream_id);
                 HttpResponse::Conflict().finish()
@@ -320,8 +320,8 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         .lock()
         .expect("Failed to lock streams_entries in start all streams");
     for stream_entry in streams_entries.iter_mut() {
-        if !(stream_entry.get_stream_status() == &StreamStatus::Running
-            || stream_entry.get_stream_status() == &StreamStatus::Queued)
+        if !(stream_entry.check_stream_status(StreamStatus::Running)
+            || stream_entry.check_stream_status(StreamStatus::Queued))
         {
             stream_entry
                 .queue_stream(&data.queued_streams, &data.device_list)
@@ -353,14 +353,14 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         .expect("Failed to lock streams_entries in stop all streams");
     for stream_entry in streams_entries.iter_mut() {
         // if the stream is queued, remove it from the queue
-        if stream_entry.get_stream_status() == &StreamStatus::Queued {
+        if stream_entry.check_stream_status(StreamStatus::Queued) {
             stream_entry
                 .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                 .await;
-        } else if stream_entry.get_stream_status() == &StreamStatus::Running {
+        } else if stream_entry.check_stream_status(StreamStatus::Running) {
             stream_entry.stop_stream(&data.device_list).await;
 
-            if stream_entry.get_stream_status() == &StreamStatus::Stopped {
+            if stream_entry.check_stream_status(StreamStatus::Stopped) {
                 println!("Stopped stream {}", stream_entry.get_stream_id());
             } else {
                 println!("Failed to stop stream {}", stream_entry.get_stream_id());
@@ -411,12 +411,12 @@ async fn force_start_stream(
         Some(stream_entry) => {
             // if the stream is running, stop it
             // if the stream is queued, remove it from the queue
-            if stream_entry.get_stream_status() == &StreamStatus::Running {
+            if stream_entry.check_stream_status(StreamStatus::Running) {
                 println!("Stream {} is already running", stream_id);
                 stream_entry.stop_stream(&data.device_list).await;
             }
 
-            if stream_entry.get_stream_status() == &StreamStatus::Queued {
+            if stream_entry.check_stream_status(StreamStatus::Queued) {
                 println!("Stream {} is aleardy queued", stream_id);
                 stream_entry
                     .remove_stream_from_queue(&data.queued_streams, &data.device_list)

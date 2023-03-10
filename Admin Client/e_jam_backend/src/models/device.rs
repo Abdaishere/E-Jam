@@ -105,7 +105,7 @@ this function is used to update the device status according to the status of the
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
     pub fn update_device_status(
-        device_mac: &String,
+        device_mac: &str,
         status: &ProcessStatus,
         type_of_process: &ProcessType,
         device_list: &Mutex<Vec<Device>>,
@@ -120,7 +120,7 @@ this function is used to update the device status according to the status of the
         // if the device is not found then panic
         let index = match index {
             Some(index) => index,
-            None => panic!("Error: Device not found {}", device_mac),
+            None => panic!("Error: Device not found {} to update device status", device_mac),
         };
 
         // update the number of processes that are running on the device
@@ -162,6 +162,7 @@ this function is used to update the device status according to the status of the
             // if for some reason the number of processes is less than 0 then set the status of the device to offline
             devices[index].status = DeviceStatus::Offline;
         }
+        devices[index].last_updated = Utc::now();
     }
 
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
@@ -208,8 +209,8 @@ this is also done to mimic the behaviour of another device by changing the name 
 this is used to get the device MAC address
 # Returns
 * `String` - the device MAC address with Regex for MAC address"]
-    pub fn get_device_mac(&self) -> String {
-        self.mac_address.clone()
+    pub fn get_device_mac(&self) -> &str {
+        self.mac_address.as_str()
     }
 
     #[doc = r"Get the device IP address
@@ -236,7 +237,7 @@ this is used to get the device connection address
         (
             self.get_ip_address(),
             self.get_port(),
-            self.get_device_mac(),
+            self.get_device_mac().to_string(),
         )
     }
 
@@ -250,6 +251,7 @@ this is used to set the device to reachable or unreachable
         } else {
             DeviceStatus::Offline
         };
+        self.last_updated = Utc::now();
     }
 }
 

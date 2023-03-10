@@ -417,6 +417,7 @@ The structure of the Device object as a table is as follows:
 
 ## System API endpoints
 
+The default port for the system API is 8000.
 The following endpoints are available for the system API:
 
 <table>
@@ -447,14 +448,14 @@ The following endpoints are available for the system API:
 <tr>
     <td>/</td>
     <td>GET</td>
-    <td>mac_address = mac address of the card used in the testing process</td>
+    <td>TODO</td>
     <td></td>
-    <td>Info with Success if mac_address is correct</td>
+    <td>TODO</td>
     <td>will be called to Ping the system API</td>
 </tr>
 <tr>
     <td>/connect</td>
-    <td>GET</td>
+    <td>POST</td>
     <td>mac_address = mac address of the card used in the testing process</td>
     <td></td>
     <td>Success if mac_address is correct</td>
@@ -463,7 +464,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/start</td>
     <td>POST</td>
-    <td>stream_id = the id of the stream to start</td>
+    <td>stream_id = the id of the stream to start, TODO mac_address = mac address of the card used in the testing process, ProcessType = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
     <td>StreamDetails</td>
     <td>Success</td>
     <td>generate or verify the Provided Stream</td>
@@ -471,7 +472,7 @@ The following endpoints are available for the system API:
 <tr>
     <td>/stop</td>
     <td>POST</td>
-    <td>stream_id = the id of the stream to stop</td>
+    <td>stream_id = the id of the stream to start, TODO mac_address = mac address of the card used in the testing process, ProcessType = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
     <td></td>
     <td>Success</td>
     <td>Stop a currently running Stream</td>

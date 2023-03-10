@@ -100,7 +100,7 @@ async fn ping_device(device: web::Json<Device>) -> impl Responder {
     // add the cards mac address to the body of the request to the device to ping (for now)
     let response = reqwest::Client::new()
         .post(device_address)
-        .body(device.get_device_mac())
+        .body(device.get_device_mac().to_string())
         .send()
         .await;
     match response {
@@ -120,24 +120,19 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[post("/devices/ping/all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
-    let mut devices = data
-        .device_list
-        .lock()
-        .expect("failed to lock device list in ping all devices");
+    let mut devices = data. device_list.lock().expect("failed to lock device list in ping all devices");
 
     match devices.len() {
         0 => HttpResponse::NoContent().finish(),
         _ => {
             for device in devices.iter_mut() {
-                let device_address =
-                    format!("http://{}:{}", device.get_ip_address(), device.get_port());
+                let device_address = format!("http://{}:{}", device.get_ip_address(), device.get_port());
                 // add the cards mac address to the body of the request to the device to ping (for now)
                 let response = reqwest::Client::new()
                     .post(device_address)
-                    .body(device.get_device_mac())
+                    .body(device.get_device_mac().to_string())
                     .send()
                     .await;
-
                 match response {
                     Ok(_response) => device.set_is_reachable(true),
                     Err(_error) => device.set_is_reachable(false),
