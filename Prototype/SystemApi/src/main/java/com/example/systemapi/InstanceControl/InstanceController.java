@@ -1,10 +1,7 @@
 package com.example.systemapi.InstanceControl;
 
 import java.io.*;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URISyntaxException;
-import java.rmi.server.ExportException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -208,28 +205,33 @@ public class InstanceController implements Runnable
         }
 
         // start the generators, verifiers and gateway
-//        startStreams();
-//        debugStreams(); //TODO
+        startStreams();
+        debugStreams(); //TODO
         // add stream to running streams
         StreamController.addStream(this);
 
         // notify Admin-client that the stream is finished
         try {
-            Communicator.started(stream.streamID);
+            Communicator.notify(stream.streamID, "started");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            Thread.sleep(stream.lifeTime);
+            Thread.sleep(stream.timeToLive);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
+
         // kill the generators, verifiers and gateway
-//        killStreams();
+        killStreams();
 
         // notify Admin-client that the stream is finished
-        Communicator.finished(stream.streamID);
+        try {
+            Communicator.notify(stream.streamID, "finished");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

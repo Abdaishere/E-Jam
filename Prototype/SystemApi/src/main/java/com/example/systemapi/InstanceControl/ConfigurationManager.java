@@ -39,7 +39,7 @@ public class ConfigurationManager
 
             FileWriter fileWriter = new FileWriter(fileName);
 
-            fileWriter.write(stream.streamID+'\n');
+            fileWriter.write(stream.streamID +'\n');
             fileWriter.write(Integer.toString(stream.generators.size())+'\n');
             for (String sender: stream.generators)
                 fileWriter.write(sender+'\n');
@@ -52,9 +52,9 @@ public class ConfigurationManager
             fileWriter.write(Long.toString(stream.numberOfPackets)+'\n');
             fileWriter.write(Integer.toString(stream.payloadLength)+'\n');
             fileWriter.write(Integer.toString(stream.seed)+'\n');
-            fileWriter.write(Long.toString(stream.bcFramesNum)+'\n');
+            fileWriter.write(Long.toString(stream.broadcastFrames)+'\n');
             fileWriter.write(Long.toString(stream.interFrameGap)+'\n');
-            fileWriter.write(Long.toString(stream.lifeTime)+'\n');
+            fileWriter.write(Long.toString(stream.timeToLive)+'\n');
             fileWriter.write(stream.transportProtocol.toString()+'\n');
             fileWriter.write(stream.flowType.toString()+'\n');
             int checkContent = stream.checkContent ? 1 : 0;

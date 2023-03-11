@@ -4,46 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="create endpoints to communicate with admin-client">
-      <change beforePath="$PROJECT_DIR$/../Executables/Gateway" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/Gateway" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Executables/Generator" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/Generator" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Executables/verifier" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/verifier" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/cmake-build-debug/Gateway" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/cmake-build-debug/Gateway" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/PacketSender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/PacketSender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/.ninja_deps" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/.ninja_deps" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/.ninja_log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeCache.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/CMakeOutput.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/clion-environment.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/clion-environment.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/clion-log.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/rules.ninja" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/CMakeFiles/rules.ninja" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/Generator" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/Generator" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Generator/cmake-build-debug/build.ninja" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/cmake-build-debug/build.ninja" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="make start endpoint receive string instead of json object">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/Communicator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/ConfigurationManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/FlowType.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/InstanceControlFacade.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/InstanceController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/PayloadType.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/Stream.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/TransportProtocol.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/InstanceControl/UTILs.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/NetworkUtilities/BroadcastUtil.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/NetworkUtilities/UdpUtil.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Communicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Communicator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/ConfigurationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/ConfigurationManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/StreamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/StreamController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Stream.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Stream.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/SystemApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/SystemApiApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/cmake-build-debug/verifier" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/cmake-build-debug/verifier" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,30 +55,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/mostafa/Desktop/E-Jam/Prototype/SystemApi",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "SDKs",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
-    "spring.configuration.checksum": "64d965383f6b496d7a6ea9c14eeeefe8",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/mostafa/Desktop/E-Jam/Prototype/SystemApi&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;SDKs&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;64d965383f6b496d7a6ea9c14eeeefe8&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RunManager" selected="Spring Boot.SystemApiApplication">
+}</component>
+  <component name="RunManager" selected="Application.Communicator">
     <configuration name="Communicator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.systemapi.InstanceControl.Communicator" />
       <module name="SystemApi" />
@@ -175,7 +143,10 @@
       <workItem from="1678286927124" duration="6544000" />
       <workItem from="1678293886957" duration="137000" />
       <workItem from="1678294051251" duration="28000" />
-      <workItem from="1678294113881" duration="2651000" />
+      <workItem from="1678294113881" duration="3196000" />
+      <workItem from="1678358074658" duration="3129000" />
+      <workItem from="1678452791964" duration="5190000" />
+      <workItem from="1678548369990" duration="6118000" />
     </task>
     <task id="LOCAL-00001" summary="create endpoints to communicate with admin-client">
       <created>1677019822321</created>
@@ -198,7 +169,14 @@
       <option name="project" value="LOCAL" />
       <updated>1677500690651</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="make start endpoint receive string instead of json object">
+      <created>1678297124293</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1678297124293</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,17 +196,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Create start endpoint" />
     <MESSAGE value="create endpoints to communicate with admin-client" />
-    <option name="LAST_COMMIT_MESSAGE" value="create endpoints to communicate with admin-client" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java</url>
-          <line>200</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="make start endpoint receive string instead of json object" />
+    <option name="LAST_COMMIT_MESSAGE" value="make start endpoint receive string instead of json object" />
   </component>
 </project>

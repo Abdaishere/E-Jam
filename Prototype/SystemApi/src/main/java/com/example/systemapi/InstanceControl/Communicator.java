@@ -1,6 +1,10 @@
 package com.example.systemapi.InstanceControl;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,8 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Map;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import java.util.Iterator;
 
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
@@ -23,49 +26,57 @@ public class Communicator {
     /**
      * Get configuration from Admin GUI
      */
-    private final static String ADMIN_IP = "192.168.1.18";
+    private final static String ADMIN_IP = "10.10.10.153";
+    private final static int ADMIN_PORT = 8080;
     private final static String MAC_ADDRESS = UTILs.getMyMacAddress();
 
-    @PostMapping("/")
+    @GetMapping("/")
     public ResponseEntity index() {
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/connect")
-    public ResponseEntity connect(@RequestBody Map<String, Object> jsonObj) {
-        String macAddress = (String) jsonObj.get("mac_address");
-        System.out.println("Received mac address: " + macAddress);
-        if (macAddress.equals(UTILs.getMyMacAddress())) {
+    public ResponseEntity connect(@RequestHeader("mac-address") String macAddress) {
+//        System.out.println("Received mac address: " + macAddress);
+        if (macAddress.equals(MAC_ADDRESS)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/start")
-    public ResponseEntity startStream(@RequestBody String stringObj) throws JSONException {
-        System.out.println(stringObj);
-        JSONObject jsonObj = new JSONObject(stringObj);
-        System.out.println(jsonObj);
-        String streamID = (String) jsonObj.get("stream_id");
-        long delay = Long.valueOf(jsonObj.get("delay").toString());
-        String generator = (String) jsonObj.get("generators");
-        String verifier = (String) jsonObj.get("verifiers");
+    public ResponseEntity startStream(@RequestBody String stringObj) throws JSONException, JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonObj = mapper.readTree(stringObj);
+        String streamID = jsonObj.get("streamID").asText();
+        long delay = jsonObj.get("delay").asLong();
+
         ArrayList<String> generators = new ArrayList<>();
-        generators.add(generator);
+        JsonNode generatorsNode = jsonObj.get("generators");
+        Iterator<JsonNode> generatorsIterator = generatorsNode.elements();
+        while (generatorsIterator.hasNext()) {
+            JsonNode generator = generatorsIterator.next();
+            generators.add(generator.asText());
+        }
+
         ArrayList<String> verifiers = new ArrayList<>();
-        verifiers.add(verifier);
-//        ArrayList<String> generators = (ArrayList<String>) jsonObj.get("generators");
-//        ArrayList<String> verifiers = (ArrayList<String>) jsonObj.get("verifiers");
-        PayloadType payloadType = PayloadType.values()[Integer.valueOf(jsonObj.get("payload_type").toString())];
-        long numberOfPackets = Long.valueOf(jsonObj.get("number_of_packets").toString());
-        long bcFramesNum = Long.valueOf(jsonObj.get("broadcast_frames").toString());
-        int payloadLength = Integer.valueOf(jsonObj.get("broadcast_frames").toString());
-        int seed = Integer.valueOf(jsonObj.get("seed").toString());
-        long interFrameGap = Long.valueOf(jsonObj.get("inter_frame_gap").toString());
-        long lifeTime = Long.valueOf(jsonObj.get("time_to_live").toString());
-        TransportProtocol transportProtocol = TransportProtocol.values()[Integer.valueOf(jsonObj.get("transport_layer_protocol").toString())];
-        FlowType flowType = FlowType.values()[Integer.valueOf(jsonObj.get("flow_type").toString())];
-        boolean checkContent = Boolean.valueOf(jsonObj.get("check_content").toString());
+        JsonNode verifiersNode = jsonObj.get("verifiers");
+        Iterator<JsonNode> verifiersIterator = verifiersNode.elements();
+        while (verifiersIterator.hasNext()) {
+            JsonNode verifier = verifiersIterator.next();
+            verifiers.add(verifier.asText());
+        }
+
+        PayloadType payloadType = PayloadType.values()[jsonObj.get("payloadType").asInt()];
+        long numberOfPackets = jsonObj.get("numberOfPackets").asLong();
+        long bcFramesNum = jsonObj.get("broadcastFrames").asLong();
+        int payloadLength = jsonObj.get("payloadLength").asInt();
+        int seed = jsonObj.get("seed").asInt();
+        long interFrameGap = jsonObj.get("interFrameGap").asLong();
+        long lifeTime = jsonObj.get("timeToLive").asLong();
+        TransportProtocol transportProtocol = TransportProtocol.values()[jsonObj.get("transportProtocol").asInt()];
+        FlowType flowType = FlowType.values()[jsonObj.get("flowType").asInt()];
+        boolean checkContent = jsonObj.get("checkContent").asBoolean();
 
         ArrayList<Stream> streams = new ArrayList<>();
         streams.add(new Stream(streamID, delay, generators, verifiers, payloadType,
@@ -97,26 +108,20 @@ public class Communicator {
         return ResponseEntity.ok().build();
     }
 
-    // notify admin-client that stream has started
-    public static void started(String streamId) throws URISyntaxException {
-        URI uri = new URI("http://" + ADMIN_IP + ":8080/streams/" + streamId  + "/started");
+    // notify admin-client that stream has started or finished
+    public static void notify(String streamId, String type) throws URISyntaxException {
+        URI uri = new URI(String.format("http://%s:%d/streams/%s/%s", ADMIN_IP, ADMIN_PORT, streamId, type));
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_PLAIN);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("mac-address", MAC_ADDRESS);
         RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<String> body = new HttpEntity<>(MAC_ADDRESS);
-        ResponseEntity<String> response = restTemplate.postForEntity(uri, body, String.class);
+        HttpEntity<String> request = new HttpEntity<>(null, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);
         System.out.println(response);
     }
 
-    // notify admin-client that stream has finished
-    public static void finished(String streamId) {
-        String url = "http://" + ADMIN_IP + ":8080/streams/" + streamId + "/finished";
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject(url, MAC_ADDRESS, String.class);
-    }
-
-    public static void main(String[] args) {
-//        Communicator.started("000");
-//        Communicator.finished("000");
+    public static void main(String[] args) throws URISyntaxException {
+        Communicator.notify("ABC", "started");
+//        Communicator.notify("ABC", "finished");
     }
 }

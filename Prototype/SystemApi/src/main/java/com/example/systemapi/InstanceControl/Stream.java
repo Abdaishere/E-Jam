@@ -16,10 +16,10 @@ public class Stream
     ArrayList<String> verifiers;    //receivers mac addresses
     PayloadType payloadType;        //The type of the payload
     long numberOfPackets;           //Number of packets flowing in the stream before it ends
-    long bcFramesNum;               //after x regular frame, send a broadcast frame
+    long broadcastFrames;           //after x regular frame, send a broadcast frame
     int payloadLength, seed;        //Payload length, and seed to use in RNGs
     long interFrameGap;             //Time to wait between each packet generation in the stream in ms
-    long lifeTime;                  //Time to live before ending execution in ms
+    long timeToLive;                  //Time to live before ending execution in ms
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
     boolean checkContent;                  //Whether to check content or not
@@ -44,9 +44,9 @@ public class Stream
         this.numberOfPackets = numberOfPackets;
         this.payloadLength = payloadLength;
         this.seed = seed;
-        this.bcFramesNum = bcFramesNum;
+        this.broadcastFrames = bcFramesNum;
         this.interFrameGap = interFrameGap;
-        this.lifeTime = lifeTime;
+        this.timeToLive = lifeTime;
         this.transportProtocol = transportProtocol;
         this.flowType = flowType;
         this.checkContent = checkContent;
