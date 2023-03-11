@@ -2,9 +2,7 @@ package com.example.systemapi.InstanceControl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -83,27 +81,47 @@ public class Communicator {
                 numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap,
                 lifeTime, transportProtocol, flowType, checkContent));
 
-        Thread thread = new Thread(new InstanceController(streams));
+        InstanceController instanceController = new InstanceController(streams);
+        Thread thread = new Thread(instanceController);
         thread.start();
+        ProcessController.addProcess(new StreamProcess(instanceController, thread));
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/stop")
-    public ResponseEntity stopStream(@RequestBody String streamId) {
+    public ResponseEntity stopStream(@RequestHeader("stream-id") String streamId) {
+        System.out.println("Received stream id: " + streamId);
         // stream is not running
-        if (!StreamController.containsStream(streamId)) {
+        if (!ProcessController.containsProcess(streamId)) {
             return ResponseEntity.badRequest().build();
         }
 
         // get stream from its id
-        InstanceController instanceController = StreamController.getStreamById(streamId);
+        StreamProcess process = ProcessController.getProcessByStreamId(streamId);
+        if (process.killed) {
+            System.out.println("stream is already killed");
+            return ResponseEntity.ok().build();
+        }
+        process.killed = true;
+
+        System.out.println("Finished step 1");
 
         // kill all processes of the stream
-        instanceController.killStreams();
+        process.instanceController.killStreams();
+
+        // kill the thread made by that stream
+        if (process.thread.isAlive()) {
+            System.out.println("Thread is alive");
+            process.thread.interrupt();
+        }
+
+        System.out.println("Finished step 2");
 
         // remove stream from running streams
-        StreamController.removeStream(streamId);
+        ProcessController.removeProcess(streamId);
+
+        System.out.println("Finished step 3");
 
         return ResponseEntity.ok().build();
     }

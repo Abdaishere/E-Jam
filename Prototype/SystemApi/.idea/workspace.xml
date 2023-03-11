@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="make start endpoint receive string instead of json object">
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Admin client can start streams">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Communicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Communicator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/ConfigurationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/ConfigurationManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Stream.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Stream.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/SystemApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/SystemApiApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/StreamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/ProcessController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +28,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/../.." value="control-test" />
+        <entry key="$PROJECT_DIR$/../.." value="Product_V1" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
@@ -78,13 +75,13 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Application.Communicator">
+  <component name="RunManager" selected="Spring Boot.SystemApiApplication">
     <configuration name="Communicator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.systemapi.InstanceControl.Communicator" />
       <module name="SystemApi" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.example.systemapi.InstanceControl.*" />
+          <option name="PATTERN" value="com.example.systemapi.InstanceControl.Process" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -147,6 +144,8 @@
       <workItem from="1678358074658" duration="3129000" />
       <workItem from="1678452791964" duration="5190000" />
       <workItem from="1678548369990" duration="6118000" />
+      <workItem from="1678555443146" duration="738000" />
+      <workItem from="1678556581471" duration="4097000" />
     </task>
     <task id="LOCAL-00001" summary="create endpoints to communicate with admin-client">
       <created>1677019822321</created>
@@ -176,7 +175,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678297124293</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Admin client can start streams">
+      <created>1678555612604</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1678555612604</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,6 +203,7 @@
     <MESSAGE value="Create start endpoint" />
     <MESSAGE value="create endpoints to communicate with admin-client" />
     <MESSAGE value="make start endpoint receive string instead of json object" />
-    <option name="LAST_COMMIT_MESSAGE" value="make start endpoint receive string instead of json object" />
+    <MESSAGE value="Admin client can start streams" />
+    <option name="LAST_COMMIT_MESSAGE" value="Admin client can start streams" />
   </component>
 </project>

@@ -118,8 +118,7 @@ public class InstanceController implements Runnable
         return verID;
     }
 
-    private void startGateway(int numGen, int numVer)
-    {
+    private void startGateway(int numGen, int numVer) {
         if(numGen > 0) {
             String command = "sudo";
             String[] genArgs = {"../Executables/Gateway","0", Integer.toString(numGen)};
@@ -208,7 +207,6 @@ public class InstanceController implements Runnable
         startStreams();
         debugStreams(); //TODO
         // add stream to running streams
-        StreamController.addStream(this);
 
         // notify Admin-client that the stream is finished
         try {
@@ -222,7 +220,6 @@ public class InstanceController implements Runnable
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
 
         // kill the generators, verifiers and gateway
         killStreams();
