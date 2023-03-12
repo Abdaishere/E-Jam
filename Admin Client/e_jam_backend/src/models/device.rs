@@ -28,6 +28,14 @@ A device is a computer that is connected to the system and can run a process eit
 * `Running` - the device is running (connected to the system and running at least one process)"]
 #[derive(Serialize, Deserialize, Validate, Debug, Clone)]
 pub struct Device {
+    #[doc = " ## Device Name
+    A string that represents the name of the device (used for identification and clarification)
+    ## Constraints
+    * The name must be greater than 0 characters long
+    * The name must be less than 50 characters long
+    ## Default Value
+    * The default value is the ip address of the device
+    "]
     #[validate(length(
         min = 1,
         max = 50,
@@ -36,6 +44,14 @@ pub struct Device {
     #[serde(default, rename = "name")]
     name: String,
 
+    #[doc = " ## Device Description
+    A string that represents the description of the device (used for clarification)
+    ## Constraints
+    * The description must be greater than 0 characters long
+    * The description must be less than 255 characters long
+    ## Default Value
+    * The default value is an empty string
+    "]
     #[validate(length(
         min = 1,
         max = 255,
@@ -44,17 +60,39 @@ pub struct Device {
     #[serde(default, rename = "description")]
     description: String,
 
+    #[doc = " ## Device Location
+    A string that represents the location of the device (used for clarification)
+    ## Constraints
+    * The location must be greater than 0 characters long
+    * The location must be less than 255 characters long
+    ## Default Value
+    * The default value is an empty string
+    "]
     #[validate(length(
         min = 1,
         max = 255,
         message = "location must be between 1 and 255 characters long"
     ))]
+    #[serde(default, rename = "location")]
     location: String,
 
-    // TODO: implement last_updated in all models and services
+    #[doc = " ## Device Last Updated
+    A DateTime that represents the last time the device status was updated (used for clarification)
+    ## Constraints
+    * The last_updated must be a valid DateTime
+    ## Default Value
+    * The default value is the current DateTime
+    "]
     #[serde(with = "ts_seconds")]
     last_updated: DateTime<Utc>,
 
+    #[doc = " ## Device IP Address
+    A string that represents the ip address of the device (used for Communication)
+    ## Constraints
+    * The ip_address must be a valid ip address
+    * The ip_address must be greater than 7 characters long
+    * The ip_address must be less than 15 characters long
+    "]
     #[validate(
         regex(path = "IP_ADDRESS", message = "ip must be a valid ip address"),
         length(
@@ -65,6 +103,12 @@ pub struct Device {
     )]
     #[serde(rename = "ip")]
     ip_address: String,
+
+    #[doc = " ## Device Port Number
+    A u16 that represents the port number of the device (used for Communication)
+    ## Constraints
+    * The port number must be between 1 and 65535
+    "]
     #[validate(range(
         min = 1,
         max = 65535,
@@ -72,6 +116,12 @@ pub struct Device {
     ))]
     port: u16,
 
+    #[doc = " ## Device MAC Address
+    A string that represents the mac address of the device (used for authentication)
+    ## Constraints
+    * The mac_address must be a valid mac address
+    * The mac_address must be 17 characters long
+    "]
     #[validate(
         regex(
             path = "MAC_ADDRESS",
@@ -82,17 +132,25 @@ pub struct Device {
     #[serde(rename = "mac")]
     mac_address: String,
 
+    #[doc = " ## Device Generation Processes Number
+    A u16 that represents the number of generation processes that are running on the device"]
     #[serde(default, skip_deserializing)]
     gen_processes: u16,
 
+    #[doc = " ## Device Verification Processes Number
+    A u16 that represents the number of verification processes that are running on the device"]
     #[serde(default, skip_deserializing)]
     ver_processes: u16,
 
+    #[doc = " ## Device Status
+    A DeviceStatus that represents the status of the device at any given time (Offline, Online, Idle, Running)
+    ## see also
+    The Device State Machine: ./docs/device_state_machine.png"]
     #[serde(rename = "status", skip_deserializing, default)]
     status: DeviceStatus,
 }
 
-#[doc = r"Device implementation"]
+#[doc = r" This is the implementation of the Device Model used to handle the device data and its functions"]
 impl Device {
     #[doc = r"update the device status
 this function is used to update the device status according to the status of the process that is running on the device
@@ -100,7 +158,7 @@ this function is used to update the device status according to the status of the
 * `ip` - A string that represents the ip address of the device
 * `status` - A ProcessStatus that represents the status of the process that is running on the device
 * `type_of_process` - A ProcessType that represents the type of the process that is running on the device
-* `DEVICE_LIST` - A Mutex<Vec<Device>> that represents the list of devices that are added to the system
+* `DEVICE_LIST` - A Mutex for a Vec of Devices that represents the list of devices that are added to the system
 ## Panics
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
@@ -110,7 +168,6 @@ this function is used to update the device status according to the status of the
         type_of_process: &ProcessType,
         device_list: &Mutex<Vec<Device>>,
     ) {
-        // TODO: Recheck the logic of this function
         let mut devices = device_list
             .lock()
             .expect("Error: Failed to Change the device status");
@@ -120,56 +177,68 @@ this function is used to update the device status according to the status of the
         // if the device is not found then panic
         let index = match index {
             Some(index) => index,
-            None => panic!(
-                "Error: Device not found {} to update device status",
-                device_mac
-            ),
+            None => {
+                println!(
+                    "Error: Device not found {} to update device status",
+                    device_mac
+                );
+                return;
+            }
         };
 
         // update the number of processes that are running on the device
-        if type_of_process == &ProcessType::Generation
-            || type_of_process == &ProcessType::GenerationaAndVerification
-        {
-            if status == &ProcessStatus::Queued {
-                devices[index].gen_processes += 1;
-            } else if status == &ProcessStatus::Completed {
-                devices[index].gen_processes -= 1;
-            }
-        }
-        if type_of_process == &ProcessType::Verification
-            || type_of_process == &ProcessType::GenerationaAndVerification
-        {
-            if status == &ProcessStatus::Queued {
-                devices[index].ver_processes += 1;
-            } else if status == &ProcessStatus::Completed {
-                devices[index].ver_processes -= 1;
-            }
+        match type_of_process {
+            ProcessType::Generation => match status {
+                ProcessStatus::Queued => devices[index].gen_processes += 1,
+                ProcessStatus::Completed => devices[index].gen_processes -= 1,
+                ProcessStatus::Stopped => devices[index].gen_processes -= 1,
+                _ => (),
+            },
+            ProcessType::Verification => match status {
+                ProcessStatus::Queued => devices[index].ver_processes += 1,
+                ProcessStatus::Completed => devices[index].ver_processes -= 1,
+                ProcessStatus::Stopped => devices[index].ver_processes -= 1,
+                _ => (),
+            },
+            ProcessType::GenerationaAndVerification => match status {
+                ProcessStatus::Queued => {
+                    devices[index].gen_processes += 1;
+                    devices[index].ver_processes += 1;
+                }
+                ProcessStatus::Completed => {
+                    devices[index].gen_processes -= 1;
+                    devices[index].ver_processes -= 1;
+                }
+                ProcessStatus::Stopped => {
+                    devices[index].gen_processes -= 1;
+                    devices[index].ver_processes -= 1;
+                }
+                _ => (),
+            },
         }
 
         // update the status of the device according to the number of processes that are running on the device
         // The device is offline if the status of the process is failed (the process failed to start)
-        if devices[index].gen_processes == 0 && devices[index].ver_processes == 0 {
-            if status == &ProcessStatus::Failed {
-                devices[index].status = DeviceStatus::Offline;
-            } else {
-                devices[index].status = DeviceStatus::Online;
-            }
-        } else if devices[index].gen_processes > 0 || devices[index].ver_processes > 0 {
-            if status == &ProcessStatus::Failed {
-                devices[index].status = DeviceStatus::Offline;
-            } else {
-                if status == &ProcessStatus::Running {
-                    devices[index].status = DeviceStatus::Running;
-                } else if status == &ProcessStatus::Queued {
-                    devices[index].status = DeviceStatus::Idle;
-                } else if status == &ProcessStatus::Completed {
-                    devices[index].status = DeviceStatus::Online;
+        match devices[index].gen_processes + devices[index].ver_processes {
+            0 => {
+                devices[index].status = if status == &ProcessStatus::Failed {
+                    DeviceStatus::Offline
+                } else {
+                    DeviceStatus::Online
                 }
             }
-        } else {
+            d if d > 0 => {
+                devices[index].status = match status {
+                    ProcessStatus::Running => DeviceStatus::Running,
+                    ProcessStatus::Queued => DeviceStatus::Idle,
+                    ProcessStatus::Failed => DeviceStatus::Offline,
+                    _ => devices[index].status.clone(),
+                }
+            }
             // if for some reason the number of processes is less than 0 then set the status of the device to offline
-            devices[index].status = DeviceStatus::Offline;
+            _ => devices[index].status = DeviceStatus::Offline,
         }
+
         devices[index].last_updated = Utc::now();
     }
 

@@ -39,7 +39,10 @@ each process has a name that is a string that represents both the name of the pr
 * `Running` (the process is running) 
 * `Stopped` (the process is Stopped)
 * `Completed` (the process is successfully completed)
-* `Failed` (the process is failed)"]
+* `Failed` (the process is failed)
+## See also
+The Process State Machine: ./docs/process_state_machine.png
+The Process State Machine is a state machine that represents the state of a process in the device and the possible transitions between states"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
 #[serde(tag = "processstatus")]
 pub enum ProcessStatus {

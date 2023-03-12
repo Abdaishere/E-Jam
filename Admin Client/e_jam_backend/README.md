@@ -1,6 +1,6 @@
 # E-Jam API
 
-<img src="E-Jam-api-logo.png" alt="E-Jam API" width="300"/>
+<img src="./docs/E-Jam-api-logo.png" alt="E-Jam API" width="300"/>
 
 ![Rust](https://img.shields.io/badge/rust-latest-blue)
 ![Actix](https://img.shields.io/badge/actix-4.3.0-blue)
@@ -36,7 +36,7 @@ The System has Three Components:
 
 The stream state machine is as follows:
 
-![Stream State Machine](./stream_state_machine.png)
+![Stream State Machine](./docs/stream_state_machine.png)
 
 > NOTE: The stream state finished is only applied when all devices have finished sending and receiving packets.
 
@@ -44,13 +44,13 @@ The stream state machine is as follows:
 
 The Device State Machine is as follows:
 
-![Device State Machine](./device_state_machine.png)
+![Device State Machine](./docs/device_state_machine.png)
 
 ### Process State Machine
 
 The Process State Machine is as follows:
 
-![Process State Machine](./process_state_machine.png)
+![Process State Machine](./docs/process_state_machine.png)
 
 ## API Documentation
 
