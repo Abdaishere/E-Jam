@@ -7,14 +7,19 @@
 *.cbp
 *.cmake
 *.marks
-*/cmake-build-debug/
-*/clion-environment.txt
-*/clion-log.txt
+Prototype/Gateway/cmake-build-debug/**
+Prototype/Generator/cmake-build-debug/**
+Prototype/verifier/cmake-build-debug/**
+**/clion-environment.txt
+**/clion-log.txt
 *clion*
 *CMake*
-/Prototype/verifier/cmake-build-debug/
-/Prototype/Generator/cmake-build-debug/
-/Prototype/Gateway/cmake-build-debug/
+**/*.txt
+**/*.log
+**/*.bin
+**/*.ninja
+**/*.xml
+
 
 # Compiled Object files
 *.slo
@@ -40,6 +45,13 @@
 *.la
 *.a
 *.lib
+
+
+#Java class files
+*/out/production/*
+*.class
+*.idea/*
+
 
 # Executables
 *.exe
