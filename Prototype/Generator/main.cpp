@@ -4,11 +4,12 @@
 #include <thread>
 #include <string>
 #include <time.h>
+#include <chrono>
 #include "StatsManager.h"
 
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
-
+typedef unsigned long long ull;
 //TODO naming style and coding style 
 //TODO standarize the units
 
@@ -19,42 +20,117 @@ void sendingFunction(std::shared_ptr<PacketCreator> pc)
             pc->sendHead();
 }
 
+///Different modes of sending are:
+/// time based, burst
+/// time based back-to-back
+/// content based burst
+/// content based back-to-back
 
-//sending for specific time 
-void sendingTimeBasedPackets(std::shared_ptr<PacketCreator> pc, int seconds)
+
+/// \param duration time of sending in milliseconds (10^-3) seconds
+/// \details send a packets back to back for a certain duration
+void sendTimeBasedB2B(std::shared_ptr<PacketCreator>& pc, ull duration, ull IFG = 0)
 {
-    if(seconds <= 0) return;
+    if(duration <= 0) return;
     time_t beginTime = time(NULL);
     time_t endTime = time(NULL);
-    while ((endTime - beginTime) <= seconds)
+    while ((endTime - beginTime) <= duration)
     {
         pc->sendHead();
+        endTime = time(NULL);
+        std::this_thread::sleep_for(std::chrono::milliseconds(IFG));
+    }
+}
+
+/// \param duration time of sending in milliseconds (10^-3) seconds
+/// \param delay time between bursts in milliseconds (10^-3) seconds
+/// \param burstSize number of packets per burst
+/// \details bursts of length burstSize with inter-burst gap delay for a certain duration
+void sendTimeBasedBurst(std::shared_ptr<PacketCreator>& pc, ull duration, ull delay, int burstSize, ull IFG = 0)
+{
+    if(duration <= 0) return;
+    time_t beginTime = time(NULL);
+    time_t endTime = time(NULL);
+
+    while ((endTime - beginTime) <= duration)
+    {
+        int remaining = burstSize;
+        while(remaining--)
+        {
+            pc->sendHead();
+            std::this_thread::sleep_for(std::chrono::milliseconds(IFG));
+        }
+
+        //duration between bursts
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         endTime = time(NULL);
     }
 }
 
-//sending N packets
-void sendingNPackets(std::shared_ptr<PacketCreator> pc, int packetsToSend)
+/// \details send a specified number of packets back to back
+void sendB2B(std::shared_ptr<PacketCreator>& pc, int packetsToSend, ull IFG = 0)
 {
     if(packetsToSend <= 0) return; 
     while(packetsToSend--)
     {
         pc->sendHead();
+        std::this_thread::sleep_for(std::chrono::milliseconds(IFG));
     }
 }
 
-//thread function to send packets
-void creatingFunction(std::shared_ptr<PacketCreator> pc)
-{
-    unsigned long long numberOfPackets = ConfigurationManager::getConfiguration()->getNumberOfPackets();
 
-    while(numberOfPackets--)
+/// \param delay in milliseconds
+/// \details send a specified number of packets in bursts of size burst
+void sendBurst(std::shared_ptr<PacketCreator>& pc, ull delay, int packetsToSend, int burst, ull IFG = 0)
+{
+    if(packetsToSend <= 0) return;
+
+    while(packetsToSend > 0)
+    {
+        int rem = std::min(burst, packetsToSend);
+        packetsToSend -= rem;
+        while(rem--)
+        {
+            pc->sendHead();
+            std::this_thread::sleep_for(std::chrono::milliseconds(IFG));
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    }
+}
+
+
+/// \param number of packets to create
+/// \param gap in milliseconds is the gap between individual packets
+/// \details create packets with delay so that memory doesn't get too full when rate of consumption is low
+//thread function to send packets
+void createNumBased(std::shared_ptr<PacketCreator> pc, ull number,  ull gap = 0)
+{
+    while(number--)
     {
         int lenRcv = ConfigurationManager::getConfiguration()->getReceivers().size();
         for(int rcvInd=0; rcvInd < lenRcv; rcvInd++)
         {
             pc->createPacket(rcvInd);
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(gap));
+    }
+}
+
+/// \param duration time of sending in milliseconds (10^-3) seconds
+void createTimeBased (std::shared_ptr<PacketCreator> pc, ull duration,  ull gap = 0)
+{
+    time_t beginTime = time(NULL);
+    time_t endTime = time(NULL);
+
+    int lenRcv = ConfigurationManager::getConfiguration()->getReceivers().size();
+    while(endTime - beginTime > duration)
+    {
+        for(int rcvInd=0; rcvInd < lenRcv; rcvInd++)
+            pc->createPacket(rcvInd);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(gap));
+        endTime = time(NULL);
     }
 }
 
@@ -80,11 +156,16 @@ int main(int argc, char** argv)
     }
     
     ConfigurationManager::getConfiguration(configPath);
+    std::shared_ptr<Configuration> currConfig = ConfigurationManager::getConfiguration();
     std::shared_ptr<StatsManager> sm = StatsManager::getInstance(genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
+
     std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>();
-    std::thread creator(creatingFunction,pc);
+
+    /// TODO configure main appropriately to run one of the above threads based on configuration parameters
+    /// Flowtype and a new configuration parameter which tells me whether to send time based or flow based
+    std::thread creator(createNumBased,pc,(ull)500,(ull)0);
     std::thread sender(sendingFunction,pc);
     std::thread statWriter(sendStatsFunction, sm);
 
