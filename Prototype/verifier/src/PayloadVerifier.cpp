@@ -17,7 +17,7 @@ std::shared_ptr<PayloadVerifier> PayloadVerifier::getInstance()
     return instance;
 }
 
-bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray> packet, int startIndex, int endIndex)
+bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray>& packet, int startIndex, int endIndex)
 {
     bool status = true;
     switch(ConfigurationManager::getConfiguration()->getPayloadType())

@@ -55,9 +55,9 @@ void PacketUnpacker::verifiyPacket()
 
     //Check stream id
     ConfigurationManager::setCurrStreamID(tempBA);
-    for(int i=0; i<packet->size(); i++)
-        std::cout << packet->at(i);
-    std::cerr << "\n";
+//    for(int i=0; i<packet->size(); i++)
+//        std::cerr << (int) packet->at(i) << " ";
+//    std::cerr << "\n";
 
     std::shared_ptr<Configuration> tempConfig = ConfigurationManager::getConfiguration();
 
@@ -76,10 +76,10 @@ void PacketUnpacker::verifiyPacket()
     }
 
     //unpack sequence number
-    long long seqNum = 0;
+    unsigned long long seqNum = 0;
     int seqNumStartIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN+STREAMID_LEN;
     for(int i=0; i<8; i++)
-        seqNum |= ((long long )packet->at(seqNumStartIndex+i) << (i*8));
+        seqNum |= ((unsigned long long )packet->at(seqNumStartIndex+i) << (i*8));
     seqChecker.receive(seqNum);
     std::cerr << seqNum << "\n";
 
@@ -93,7 +93,7 @@ void PacketUnpacker::verifiyPacket()
     //check for payload error
     //by matching payloads
     int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
-    startIndex = streamID_startIndex+STREAMID_LEN;
+    startIndex = streamID_startIndex+STREAMID_LEN+SeqNum_LEN;
     endIndex = startIndex+payloadLength-1;
 
     std::shared_ptr<PayloadVerifier> pv = PayloadVerifier::getInstance();

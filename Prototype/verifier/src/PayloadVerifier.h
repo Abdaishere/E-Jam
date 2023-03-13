@@ -13,7 +13,7 @@ class PayloadVerifier
 {
     public:
         //parameters pointer to byteArray, start index, end index of payload
-        bool verifiy(std::shared_ptr<ByteArray>, int, int);
+        bool verifiy(std::shared_ptr<ByteArray>&, int, int);
         static std::shared_ptr<PayloadVerifier> getInstance();
     private:
         static std::shared_ptr<PayloadVerifier> instance;
