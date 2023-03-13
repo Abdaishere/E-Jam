@@ -114,10 +114,6 @@ void PacketReceiver::receiveFromSwitch()
     }
 
     std::cerr << cnt << " packets received\n";
-//        for (int i = 0; i < BUFF_LEN; i++)
-//            std::cout << buff[i];
-//        std::cout << "\n";
-
 }
 
 //send payload to single verifier used in checkBuffer to send to all verifiers

@@ -9,7 +9,6 @@ void PacketUnpacker::readPacket()
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
     std::shared_ptr<ByteArray> packet = std::make_shared<ByteArray>(1600, 'a');
     packetReceiver->receivePackets(packet);
-//    std::cerr << "packet received\n";
     std::cerr <<"packet in verification queue\n";
     mtx.lock();
     packetQueue.push(packet);
@@ -51,12 +50,15 @@ void PacketUnpacker::verifiyPacket()
     std::cerr << "verifying packet\n";
     //Extract Stream ID
     int streamID_startIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN;
-    ByteArray tempBA (5, 'a');
+    ByteArray tempBA;
     tempBA.append(*packet, streamID_startIndex, STREAMID_LEN);
 
     //Check stream id
     ConfigurationManager::setCurrStreamID(tempBA);
-    std::cerr<<"reachedHere\n";
+    for(int i=0; i<packet->size(); i++)
+        std::cout << packet->at(i);
+    std::cerr << "\n";
+
     std::shared_ptr<Configuration> tempConfig = ConfigurationManager::getConfiguration();
 
     //Report stream id error

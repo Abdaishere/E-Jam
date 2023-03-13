@@ -23,7 +23,7 @@ private:
 public:
     ~PacketReceiver();
     static std::shared_ptr<PacketReceiver> getInstance(int genID = 0, std::string pipeDir="", int pipePerm = 0777);
-    void receivePackets(std::shared_ptr<ByteArray> packet);
+    void receivePackets(std::shared_ptr<ByteArray>& packet);
 };
 
 

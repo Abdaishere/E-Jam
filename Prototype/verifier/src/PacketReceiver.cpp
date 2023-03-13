@@ -51,22 +51,19 @@ void PacketReceiver::closePipe() {
     close(fd);
 }
 
-void PacketReceiver::receivePackets(std::shared_ptr<ByteArray> packet)
+//fix:must make the smart pointer passed by reference as it is lost when only copied
+void PacketReceiver::receivePackets(std::shared_ptr<ByteArray>& packet)
 {
     int packetSize; read(fd, &packetSize,4);
     unsigned char* cstr = new unsigned char[packetSize]; //why we do not delete it ??
     int received = read(fd, cstr, packetSize);
     packet = std::make_shared<ByteArray>(packetSize, 'a');
     for(int i=0;i<packetSize;i++)
-    {
         packet->at(i) = cstr[i];
-    }
-    //memcpy(packet, cstr, sizeof(cstr));
+
+//    memcpy(packet, cstr, sizeof(cstr));
     std::cerr << "packet reached receiver " << received << " \n";
     delete[] cstr;
-//    for(int i=0; i<packet->length; i++)
-//        std::cerr<<(int)packet->at(i) << " ";
-//    std::cerr << "\n";
 }
 
 PacketReceiver::~PacketReceiver() {
