@@ -5,6 +5,7 @@
 #include "Configuration.h"
 
 #include "FrameConstructor.h"
+#include "Utils.h"
 #include "Byte.h"
 class EthernetConstructor : public FrameConstructor
 {

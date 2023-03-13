@@ -22,6 +22,7 @@ void EthernetConstructor::constructFrame() {
     frame.append(source_address);
     frame.append(type);
     frame.append(streamID);
+    frame.append(convertLLToStr(seqNum++));
     frame.append(payload);
     CRC = calculateCRC(std::make_shared<ByteArray>(payload));
     frame.append(CRC);
