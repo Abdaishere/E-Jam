@@ -31,8 +31,8 @@ final colorlight = [
 
 final colordark = [
   const Color.fromARGB(255, 0, 21, 48),
-  const Color(0xFF001B3D),
-  const Color(0xFF003062),
+  const Color.fromARGB(255, 0, 27, 61),
+  const Color.fromARGB(255, 0, 48, 98),
 ];
 
 const lightColorScheme = ColorScheme(

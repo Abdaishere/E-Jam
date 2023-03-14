@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Charts/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/login_screen.dart';
@@ -88,49 +91,66 @@ class _HomeState extends State<Home> {
       builder: (context, ThemeModel theme, child) {
         return Stack(
           children: [
-            Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: theme.isDark ? colordark : colorlight,
-                  transform: const GradientRotation(0.5),
-                ),
-                backgroundBlendMode: BlendMode.darken,
-              ),
-              child: Scaffold(
-                backgroundColor: Colors.transparent,
-                bottomNavigationBar: BottomAppBar(
-                  elevation: 0,
-                  padding: const EdgeInsets.only(left: 200),
-                  height: MediaQuery.of(context).size.height * 0.14,
-                  child: const BottomLineChart(),
-                ),
-              ),
+            gradientBackground(theme, context),
+            BouncingBall(color: (theme.isDark ? colordark : colorlight)),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
+              child: Container(color: Colors.transparent),
             ),
-            ZoomDrawer(
-              menuScreen: MenuScreen(
-                setIndex: (index) {
-                  setState(() {
-                    currentIndex = index;
-                  });
-                },
-              ),
-              mainScreen: mainscreen(),
-              androidCloseOnBackTap: true,
-              showShadow: true,
-              mainScreenTapClose: true,
-              shadowLayer1Color: const Color.fromARGB(183, 255, 197, 117),
-              angle: 0.0,
-              slideWidth: 250.0,
-              openCurve: Curves.easeIn,
-              closeCurve: Curves.easeOut,
-            ),
+            bottomLineChartScaffold(context),
+            frontBody(),
           ],
         );
       },
+    );
+  }
+
+  ZoomDrawer frontBody() {
+    return ZoomDrawer(
+      menuScreen: MenuScreen(
+        setIndex: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+      ),
+      mainScreen: mainscreen(),
+      androidCloseOnBackTap: true,
+      showShadow: true,
+      mainScreenTapClose: true,
+      shadowLayer1Color: const Color.fromARGB(183, 255, 197, 117),
+      angle: 0.0,
+      slideWidth: 250.0,
+      openCurve: Curves.easeIn,
+      closeCurve: Curves.easeOut,
+    );
+  }
+
+  Scaffold bottomLineChartScaffold(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        padding: const EdgeInsets.only(left: 200),
+        height: MediaQuery.of(context).size.height * 0.14,
+        child: const BottomLineChart(),
+      ),
+    );
+  }
+
+  Container gradientBackground(ThemeModel theme, BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: theme.isDark ? colordark : colorlight,
+          transform: const GradientRotation(0.5),
+        ),
+        backgroundBlendMode: BlendMode.darken,
+      ),
     );
   }
 }

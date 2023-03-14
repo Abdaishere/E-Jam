@@ -185,6 +185,9 @@ pub struct StreamEntry {
 
     #[doc = r" ## Payload Type
     This is the type of payload that will be used during the stream
+    0 - alphabitic from a to z four times
+    1 - ....  
+    2 - random bytes with seed and length
     ## Constraints
     * Must be 0, 1 or 2
     "]
@@ -225,17 +228,19 @@ pub struct StreamEntry {
 
     #[doc = r" ## Broadcast Frames
     This is the number of broadcast frames that will be sent during the stream
+    send broadcast frames every broadcast_frames packets
     ## Constraints
-    * Must be greater than or equal to 0
+    * Must be greater than or equal to 50
     "]
     #[validate(range(
-        min = 0,
-        message = "broadcast_frames must be greater than or equal to 0"
+        min = 50,
+        message = "broadcast_frames must be greater than or equal to 50"
     ))]
     broadcast_frames: u32,
 
     #[doc = r" ## Inter Frame Gap
     This is the inter frame gap between packets in the stream
+    Inter frame gap in milliseconds
     ## Constraints
     * Must be greater than or equal to 0
     "]
@@ -247,6 +252,7 @@ pub struct StreamEntry {
 
     #[doc = r" ## Time to Live
     This is the time the stream will live for in the device
+    time to live in milliseconds
     ## Constraints
     * Must be greater than or equal to 0
     "]
@@ -271,6 +277,7 @@ pub struct StreamEntry {
 
     #[doc = r" ## Check Content
     This is the check content that will be used in the stream
+    check the content of the payload or not
     ## Constraints
     * Must be boolean
     "]
@@ -993,7 +1000,7 @@ enum TransportLayerProtocol {
 #[doc = r"# Flow Type
 this enum represents the flow type
 ## Variants
-* `BtB` - the flow type is BtB
+* `BtB` - the flow type is BtB (back to back)
 * `Bursts` - the flow type is Bursts
 ## Notes
 * the default variant is `BtB`"]
