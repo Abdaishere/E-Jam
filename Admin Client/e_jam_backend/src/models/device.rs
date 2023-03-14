@@ -1,4 +1,4 @@
-use std::{sync::Mutex};
+use std::sync::Mutex;
 
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -6,7 +6,8 @@ use validator::Validate;
 
 use super::{
     process::{ProcessStatus, ProcessType},
-    IP_ADDRESS, MAC_ADDRESS, stream_details::StreamDetails
+    stream_details::StreamDetails,
+    IP_ADDRESS, MAC_ADDRESS,
 };
 
 #[doc = r"Device Model
@@ -159,12 +160,7 @@ this function is used to update the device status according to the status of the
 ## Panics
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
-    pub fn update_device_status(
-        &mut self,
-        status: &ProcessStatus,
-        type_of_process: &ProcessType,
-    ) {
-
+    pub fn update_device_status(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
         // update the number of processes that are running on the device
         match type_of_process {
             ProcessType::Generation => match status {
@@ -297,35 +293,58 @@ this is used to get the device connection address
         )
     }
 
-    pub async fn  send_stream(&self, stream_details: &StreamDetails, stream_id: &String, process_type: &ProcessType) -> Result<reqwest::Response, reqwest::Error> {
+    pub async fn send_stream(
+        &self,
+        stream_details: &StreamDetails,
+        stream_id: &String,
+        process_type: &ProcessType,
+    ) -> Result<reqwest::Response, reqwest::Error> {
         reqwest::Client::new()
-                .post(&format!("http://{}:{}/start", self.clone_ip_address(), self.get_port()))
-                // send the stream details as a json
-                .body(
-                    serde_json::to_string(&stream_details)
-                        .expect("Failed to serialize stream details"),
-                )
-                .header("mac-address", self.clone_device_mac())
-                .header("stream-id", stream_id)
-                .header("process-type", serde_json::to_string(&process_type).unwrap())
-                .send()
-                .await
+            .post(&format!(
+                "http://{}:{}/start",
+                self.clone_ip_address(),
+                self.get_port()
+            ))
+            // send the stream details as a json
+            .body(
+                serde_json::to_string(&stream_details).expect("Failed to serialize stream details"),
+            )
+            .header("mac-address", self.clone_device_mac())
+            .header("stream-id", stream_id)
+            .header(
+                "process-type",
+                serde_json::to_string(&process_type).unwrap(),
+            )
+            .send()
+            .await
     }
 
-    pub async fn stop_stream(&self, stream_id: &String, process_type: &ProcessType) -> Result<reqwest::Response, reqwest::Error> {
+    pub async fn stop_stream(
+        &self,
+        stream_id: &String,
+        process_type: &ProcessType,
+    ) -> Result<reqwest::Response, reqwest::Error> {
         reqwest::Client::new()
-                .post(&format!("http://{}:{}/stop", self.clone_ip_address(), self.get_port()))
-                .header("mac-address", self.clone_device_mac())
-                .header("stream-id", stream_id)
-                .header("process-type", serde_json::to_string(&process_type).unwrap())
-                .send()
-                .await
+            .post(&format!(
+                "http://{}:{}/stop",
+                self.clone_ip_address(),
+                self.get_port()
+            ))
+            .header("mac-address", self.clone_device_mac())
+            .header("stream-id", stream_id)
+            .header(
+                "process-type",
+                serde_json::to_string(&process_type).unwrap(),
+            )
+            .send()
+            .await
     }
 
     #[doc = r"Implment Is readchable for the device
-this is used to set the device to reachable or unreachable
-# Arguments
-* `reachable` - A Boolean the reachable status of the device"]
+this is used to set the device to reachable or unreachable and update the last updated time
+# Returns
+* `bool` - true if the device is reachable else false
+"]
     pub fn is_reachable(&mut self) -> bool {
         let reachable = self.ping_device();
         self.status = if reachable {
@@ -336,7 +355,7 @@ this is used to set the device to reachable or unreachable
         self.last_updated = Utc::now();
         return reachable;
     }
-
+    
     pub fn ping_device(&self) -> bool {
         let (ip, port, _) = self.get_device_info_tuple();
         let mut socket = match std::net::TcpStream::connect((ip.as_str(), port)) {
