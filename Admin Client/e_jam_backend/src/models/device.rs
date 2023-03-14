@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{sync::Mutex};
 
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -6,7 +6,7 @@ use validator::Validate;
 
 use super::{
     process::{ProcessStatus, ProcessType},
-    IP_ADDRESS, MAC_ADDRESS,
+    IP_ADDRESS, MAC_ADDRESS, stream_details::StreamDetails
 };
 
 #[doc = r"Device Model
@@ -26,7 +26,8 @@ A device is a computer that is connected to the system and can run a process eit
 * `Offline` - the device is offline (not connected to the system)
 * `Idle` - the device is idle (connected to the system but not running any process)
 * `Running` - the device is running (connected to the system and running at least one process)"]
-#[derive(Serialize, Deserialize, Validate, Debug, Clone)]
+#[derive(Serialize, Deserialize, Validate, Debug, Clone, PartialEq, Hash, Eq)]
+#[serde(rename_all = "camelCase")]
 pub struct Device {
     #[doc = " ## Device Name
     A string that represents the name of the device (used for identification and clarification)
@@ -41,7 +42,6 @@ pub struct Device {
         max = 50,
         message = "name must be between 1 and 50 characters long"
     ))]
-    #[serde(default, rename = "name")]
     name: String,
 
     #[doc = " ## Device Description
@@ -57,7 +57,6 @@ pub struct Device {
         max = 255,
         message = "description must be between 1 and 255 characters long"
     ))]
-    #[serde(default, rename = "description")]
     description: String,
 
     #[doc = " ## Device Location
@@ -73,7 +72,6 @@ pub struct Device {
         max = 255,
         message = "location must be between 1 and 255 characters long"
     ))]
-    #[serde(default, rename = "location")]
     location: String,
 
     #[doc = " ## Device Last Updated
@@ -83,7 +81,7 @@ pub struct Device {
     ## Default Value
     * The default value is the current DateTime
     "]
-    #[serde(with = "ts_seconds")]
+    #[serde(with = "ts_seconds", default, skip_serializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = " ## Device IP Address
@@ -92,16 +90,16 @@ pub struct Device {
     * The ip_address must be a valid ip address
     * The ip_address must be greater than 7 characters long
     * The ip_address must be less than 15 characters long
+    * check the IP_ADDRESS regex for more information
     "]
     #[validate(
         regex(path = "IP_ADDRESS", message = "ip must be a valid ip address"),
         length(
             min = 7,
             max = 15,
-            message = "ip must be between 7 and 15 characters long"
+            message = "Device IP Address be between 7 and 15 characters long"
         )
     )]
-    #[serde(rename = "ip")]
     ip_address: String,
 
     #[doc = " ## Device Port Number
@@ -112,7 +110,7 @@ pub struct Device {
     #[validate(range(
         min = 1,
         max = 65535,
-        message = "port number must be between 1 and 65535"
+        message = "Device Port Number must be between 1 and 65535"
     ))]
     port: u16,
 
@@ -127,26 +125,25 @@ pub struct Device {
             path = "MAC_ADDRESS",
             message = "mac_address must be a valid mac address"
         ),
-        length(equal = 17, message = "mac_address must be 17 characters long")
+        length(equal = 17, message = "Device MAC Address must be 17 characters long")
     )]
-    #[serde(rename = "mac")]
     mac_address: String,
 
     #[doc = " ## Device Generation Processes Number
     A u16 that represents the number of generation processes that are running on the device"]
-    #[serde(default, skip_deserializing)]
+    #[serde(default, skip_serializing)]
     gen_processes: u16,
 
     #[doc = " ## Device Verification Processes Number
     A u16 that represents the number of verification processes that are running on the device"]
-    #[serde(default, skip_deserializing)]
+    #[serde(default, skip_serializing)]
     ver_processes: u16,
 
     #[doc = " ## Device Status
     A DeviceStatus that represents the status of the device at any given time (Offline, Online, Idle, Running)
     ## see also
     The Device State Machine: ./docs/device_state_machine.png"]
-    #[serde(rename = "status", skip_deserializing, default)]
+    #[serde(default, skip_serializing)]
     status: DeviceStatus,
 }
 
@@ -163,55 +160,37 @@ this function is used to update the device status according to the status of the
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
     pub fn update_device_status(
-        device_mac: &str,
+        &mut self,
         status: &ProcessStatus,
         type_of_process: &ProcessType,
-        device_list: &Mutex<Vec<Device>>,
     ) {
-        let mut devices = device_list
-            .lock()
-            .expect("Error: Failed to Change the device status");
-
-        let index = devices.iter().position(|x| &x.mac_address == device_mac);
-
-        // if the device is not found then panic
-        let index = match index {
-            Some(index) => index,
-            None => {
-                println!(
-                    "Error: Device not found {} to update device status",
-                    device_mac
-                );
-                return;
-            }
-        };
 
         // update the number of processes that are running on the device
         match type_of_process {
             ProcessType::Generation => match status {
-                ProcessStatus::Queued => devices[index].gen_processes += 1,
-                ProcessStatus::Completed => devices[index].gen_processes -= 1,
-                ProcessStatus::Stopped => devices[index].gen_processes -= 1,
+                ProcessStatus::Queued => self.gen_processes += 1,
+                ProcessStatus::Completed => self.gen_processes -= 1,
+                ProcessStatus::Stopped => self.gen_processes -= 1,
                 _ => (),
             },
             ProcessType::Verification => match status {
-                ProcessStatus::Queued => devices[index].ver_processes += 1,
-                ProcessStatus::Completed => devices[index].ver_processes -= 1,
-                ProcessStatus::Stopped => devices[index].ver_processes -= 1,
+                ProcessStatus::Queued => self.ver_processes += 1,
+                ProcessStatus::Completed => self.ver_processes -= 1,
+                ProcessStatus::Stopped => self.ver_processes -= 1,
                 _ => (),
             },
             ProcessType::GenerationaAndVerification => match status {
                 ProcessStatus::Queued => {
-                    devices[index].gen_processes += 1;
-                    devices[index].ver_processes += 1;
+                    self.gen_processes += 1;
+                    self.ver_processes += 1;
                 }
                 ProcessStatus::Completed => {
-                    devices[index].gen_processes -= 1;
-                    devices[index].ver_processes -= 1;
+                    self.gen_processes -= 1;
+                    self.ver_processes -= 1;
                 }
                 ProcessStatus::Stopped => {
-                    devices[index].gen_processes -= 1;
-                    devices[index].ver_processes -= 1;
+                    self.gen_processes -= 1;
+                    self.ver_processes -= 1;
                 }
                 _ => (),
             },
@@ -219,27 +198,27 @@ this function is used to update the device status according to the status of the
 
         // update the status of the device according to the number of processes that are running on the device
         // The device is offline if the status of the process is failed (the process failed to start)
-        match devices[index].gen_processes + devices[index].ver_processes {
+        match self.gen_processes + self.ver_processes {
             0 => {
-                devices[index].status = if status == &ProcessStatus::Failed {
+                self.status = if status == &ProcessStatus::Failed {
                     DeviceStatus::Offline
                 } else {
                     DeviceStatus::Online
                 }
             }
             d if d > 0 => {
-                devices[index].status = match status {
+                self.status = match status {
                     ProcessStatus::Running => DeviceStatus::Running,
                     ProcessStatus::Queued => DeviceStatus::Idle,
                     ProcessStatus::Failed => DeviceStatus::Offline,
-                    _ => devices[index].status.clone(),
+                    _ => self.status.clone(),
                 }
             }
             // if for some reason the number of processes is less than 0 then set the status of the device to offline
-            _ => devices[index].status = DeviceStatus::Offline,
+            _ => self.status = DeviceStatus::Offline,
         }
 
-        devices[index].last_updated = Utc::now();
+        self.last_updated = Utc::now();
     }
 
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
@@ -250,32 +229,32 @@ this is also done to mimic the behaviour of another device by changing the name 
 * `name` - the name of the device
 * `device_list` - the list of devices that are added to the system
 # Returns
-* `Option<Device>` - the device if found else None
+* `Option of Device` - the device if found else None
 # Panics
 * `Error: Failed to find the device` - if the device list is locked"]
-    pub fn find_device(name: &str, device_list: &Mutex<Vec<Device>>) -> Option<Device> {
+    pub fn find_device(name: &str, device_list: &Mutex<Vec<Device>>) -> Option<usize> {
         let device_list = device_list
             .lock()
             .expect("Error: Failed to find the device");
 
         // find in all mac addresses
-        for device in device_list.iter() {
+        for (index, device) in device_list.iter().enumerate() {
             if device.mac_address == name {
-                return Some(device.clone());
+                return Some(index);
             }
         }
 
         // find in all ip addresses
-        for device in device_list.iter() {
+        for (index, device) in device_list.iter().enumerate() {
             if device.ip_address == name {
-                return Some(device.clone());
+                return Some(index);
             }
         }
 
         // find in all names
-        for device in device_list.iter() {
+        for (index, device) in device_list.iter().enumerate() {
             if device.name == name {
-                return Some(device.clone());
+                return Some(index);
             }
         }
 
@@ -286,16 +265,16 @@ this is also done to mimic the behaviour of another device by changing the name 
 this is used to get the device MAC address
 # Returns
 * `String` - the device MAC address with Regex for MAC address"]
-    pub fn get_device_mac(&self) -> &str {
-        self.mac_address.as_str()
+    pub fn clone_device_mac(&self) -> String {
+        self.mac_address.clone()
     }
 
     #[doc = r"Get the device IP address
 this is used to get the device IP address
 # Returns
 * `String` - the device IP address with Regex for IP address"]
-    pub fn get_ip_address(&self) -> &str {
-        &self.ip_address
+    pub fn clone_ip_address(&self) -> String {
+        self.ip_address.clone()
     }
 
     #[doc = r"Get the device port
@@ -312,23 +291,64 @@ this is used to get the device connection address
 * `(String, u16, String)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
     pub fn get_device_info_tuple(&self) -> (String, u16, String) {
         (
-            self.get_ip_address().to_string(),
+            self.clone_ip_address().to_string(),
             self.get_port(),
-            self.get_device_mac().to_string(),
+            self.clone_device_mac().to_string(),
         )
+    }
+
+    pub async fn  send_stream(&self, stream_details: &StreamDetails, stream_id: &String, process_type: &ProcessType) -> Result<reqwest::Response, reqwest::Error> {
+        reqwest::Client::new()
+                .post(&format!("http://{}:{}/start", self.clone_ip_address(), self.get_port()))
+                // send the stream details as a json
+                .body(
+                    serde_json::to_string(&stream_details)
+                        .expect("Failed to serialize stream details"),
+                )
+                .header("mac-address", self.clone_device_mac())
+                .header("stream-id", stream_id)
+                .header("process-type", serde_json::to_string(&process_type).unwrap())
+                .send()
+                .await
+    }
+
+    pub async fn stop_stream(&self, stream_id: &String, process_type: &ProcessType) -> Result<reqwest::Response, reqwest::Error> {
+        reqwest::Client::new()
+                .post(&format!("http://{}:{}/stop", self.clone_ip_address(), self.get_port()))
+                .header("mac-address", self.clone_device_mac())
+                .header("stream-id", stream_id)
+                .header("process-type", serde_json::to_string(&process_type).unwrap())
+                .send()
+                .await
     }
 
     #[doc = r"Implment Is readchable for the device
 this is used to set the device to reachable or unreachable
 # Arguments
 * `reachable` - A Boolean the reachable status of the device"]
-    pub fn set_is_reachable(&mut self, reachable: bool) {
+    pub fn is_reachable(&mut self) -> bool {
+        let reachable = self.ping_device();
         self.status = if reachable {
             DeviceStatus::Online
         } else {
             DeviceStatus::Offline
         };
         self.last_updated = Utc::now();
+        return reachable;
+    }
+
+    pub fn ping_device(&self) -> bool {
+        let (ip, port, _) = self.get_device_info_tuple();
+        let mut socket = match std::net::TcpStream::connect((ip.as_str(), port)) {
+            Ok(socket) => socket,
+            Err(_) => return false,
+        };
+
+        let mut buffer = [0; 1024];
+        match std::io::Read::read(&mut socket, &mut buffer) {
+            Ok(_) => true,
+            Err(_) => false,
+        }
     }
 }
 
@@ -345,17 +365,13 @@ This is used to represent the status of the device
 * `Running` is used when the device is running a process
 * `Idle` is used when the device is idle and not running any process
 * `Offline` is used when the device is offline and unreachable"]
-#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(tag = "devicestatus")]
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
+#[serde(rename_all = "PascalCase", untagged)]
 pub enum DeviceStatus {
-    #[serde(rename = "Online")]
-    Online,
     #[default]
-    #[serde(rename = "Offline")]
     Offline,
-    #[serde(rename = "Running")]
+    Online,
     Running,
-    #[serde(rename = "Idle")]
     Idle,
 }
 

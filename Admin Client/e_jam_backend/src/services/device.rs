@@ -46,7 +46,7 @@ async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) ->
 
     let device = devices
         .iter()
-        .find(|device| device.get_device_mac() == device_mac);
+        .find(|device| device.clone_device_mac() == device_mac);
     match device {
         Some(device) => HttpResponse::Ok().json(device),
         None => HttpResponse::NotFound().finish(),
@@ -68,13 +68,13 @@ async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> imp
     let mut devices = data.device_list.lock().expect(
         format!(
             "failed to lock device list in add device {}",
-            device.get_device_mac()
+            device.clone_device_mac()
         )
         .as_str(),
     );
     let device_index = devices
         .iter()
-        .position(|device| device.get_device_mac() == device.get_device_mac());
+        .position(|device| device.clone_device_mac() == device.clone_device_mac());
     match device_index {
         Some(_device_index) => HttpResponse::Conflict().finish(),
         None => {
@@ -95,21 +95,12 @@ if the device is reachable, return a 200 OK
 * `HttpResponse` - the http response"]
 #[post("/devices/ping")]
 async fn ping_device(device: web::Json<Device>) -> impl Responder {
-    let device = device.into_inner();
-    let device_address = format!(
-        "http://{}:{}/connect",
-        device.get_ip_address(),
-        device.get_port()
-    );
-    // add the cards mac address to the body of the request to the device to ping (for now)
-    let response = reqwest::Client::new()
-        .post(device_address)
-        .header("mac-address", device.get_device_mac().to_string())
-        .send()
-        .await;
+    let mut device = device.into_inner();
+    let response= device.is_reachable();
+    
     match response {
-        Ok(_response) => HttpResponse::Ok().finish(),
-        Err(_error) => HttpResponse::NotFound().finish(),
+        true => HttpResponse::Ok().finish(),
+        false => HttpResponse::NotFound().finish(),
     }
 }
 
@@ -133,21 +124,7 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
         0 => HttpResponse::NoContent().finish(),
         _ => {
             for device in devices.iter_mut() {
-                let device_address = format!(
-                    "http://{}:{}/connect",
-                    device.get_ip_address(),
-                    device.get_port()
-                );
-                // add the cards mac address to the body of the request to the device to ping (for now)
-                let response = reqwest::Client::new()
-                    .post(device_address)
-                    .header("mac-address", device.get_device_mac().to_string())
-                    .send()
-                    .await;
-                match response {
-                    Ok(_response) => device.set_is_reachable(true),
-                    Err(_error) => device.set_is_reachable(false),
-                }
+                device.is_reachable();
             }
             HttpResponse::Ok().finish()
         }
@@ -182,13 +159,13 @@ async fn update_device(
 
     let device_entry = devices
         .iter_mut()
-        .find(|device| device.get_device_mac() == device_mac);
+        .find(|device| device.clone_device_mac() == device_mac);
 
     match device_entry {
         Some(device_entry) => {
             // this is used to prevent the user from changing the mac address of the device in the update request without deleting and adding the device again to the list
             // to ensure that the user is not changing the mac address of the device in the update request accidentally
-            if device_entry.get_device_mac() != device.get_device_mac() {
+            if device_entry.clone_device_mac() != device.clone_device_mac() {
                 return HttpResponse::BadRequest().json("device mac address cannot be changed in updating device please delete and add the device again if you want to change the mac address of the device");
             }
 
@@ -219,7 +196,7 @@ async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>)
         .expect(format!("failed to lock device list in delete device {}", device_mac).as_str());
     let device_index = devices
         .iter()
-        .position(|device| device.get_device_mac() == device_mac);
+        .position(|device| device.clone_device_mac() == device_mac);
     match device_index {
         Some(device_index) => {
             devices.remove(device_index);

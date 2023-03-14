@@ -1,6 +1,6 @@
 # E-Jam API
 
-<img src="./docs/E-Jam-api-logo.png" alt="E-Jam API" width="300"/>
+<img src="./E-Jam-api-logo.png" alt="E-Jam API" width="300"/>
 
 ![Rust](https://img.shields.io/badge/rust-latest-blue)
 ![Actix](https://img.shields.io/badge/actix-4.3.0-blue)

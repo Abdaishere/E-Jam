@@ -11,22 +11,9 @@ each process has a name that is a string that represents both the name of the pr
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "processtype")]
 pub enum ProcessType {
-    #[serde(rename = "Generation")]
     Generation,
-    #[serde(rename = "Verification")]
     Verification,
-    #[serde(rename = "GenerationAndVerification")]
     GenerationaAndVerification,
-}
-
-impl ToString for ProcessType {
-    fn to_string(&self) -> String {
-        match self {
-            ProcessType::Generation => "Generation".to_string(),
-            ProcessType::Verification => "Verification".to_string(),
-            ProcessType::GenerationaAndVerification => "GenerationaAndVerification".to_string(),
-        }
-    }
 }
 
 #[doc = r"process status
@@ -44,33 +31,13 @@ each process has a name that is a string that represents both the name of the pr
 The Process State Machine: ./docs/process_state_machine.png
 The Process State Machine is a state machine that represents the state of a process in the device and the possible transitions between states"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(tag = "processstatus")]
+#[serde(rename_all = "PascalCase", untagged)]
 pub enum ProcessStatus {
     #[default]
-    #[serde(rename = "Queued")]
     Queued,
-
-    #[serde(rename = "Running")]
     Running,
-
-    #[serde(rename = "Stopped")]
     Stopped,
-
-    #[serde(rename = "Completed")]
     Completed,
-
-    #[serde(rename = "Failed")]
     Failed,
 }
 
-impl ToString for ProcessStatus {
-    fn to_string(&self) -> String {
-        match self {
-            ProcessStatus::Queued => "Queued".to_string(),
-            ProcessStatus::Running => "Running".to_string(),
-            ProcessStatus::Stopped => "Stopped".to_string(),
-            ProcessStatus::Completed => "Completed".to_string(),
-            ProcessStatus::Failed => "Failed".to_string(),
-        }
-    }
-}

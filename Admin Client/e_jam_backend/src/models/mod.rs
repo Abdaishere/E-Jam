@@ -1,5 +1,6 @@
 pub(crate) mod device;
 pub(crate) mod process;
+pub(crate) mod stream_details;
 
 use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
@@ -11,6 +12,7 @@ use validator::Validate;
 
 use self::device::Device;
 use self::process::{ProcessStatus, ProcessType};
+use self::stream_details::StreamDetails;
 
 lazy_static! {
     #[doc = r"Regex for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 characters
@@ -88,6 +90,7 @@ The StreamEntry struct is used to store the information about the stream with it
 * `stream_status` - A StreamStatus that represents the status of the stream.
 "]
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct StreamEntry {
     #[doc = r" ## Name
     Name of the stream (used for clarification)
@@ -98,23 +101,21 @@ pub struct StreamEntry {
     #[validate(length(
         min = 1,
         max = 50,
-        message = "name must be between 1 and 50 characters long"
+        message = "Name must be between 1 and 50 characters long"
     ))]
-    #[serde(default, rename = "name")]
     name: String,
 
     #[doc = r" ## Description
     Description of the stream (used for clarification)
     ## Constraints
-    * The description must be greater than 0 characters long
+    * The description must be greater than 1 characters long
     * The description must be less than 255 characters long
     "]
     #[validate(length(
         min = 1,
         max = 255,
-        message = "description must be between 1 and 255 characters long"
+        message = "Description must be between 1 and 255 characters long"
     ))]
-    #[serde(default, rename = "description")]
     description: String,
 
     #[doc = r" ## Last Updated
@@ -122,14 +123,14 @@ pub struct StreamEntry {
     this is updated when the stream Status is updated by the server
     "]
     #[serde(with = "ts_seconds")]
-    #[serde(default, rename = "last_updated")]
+    #[serde(skip_serializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = r" ## Start Time
     This is updated when the stream is started with the time the first device starts the stream
     This is an optional field and can be left empty and will be updated automatically when the stream is first started
     "]
-    #[serde(default, rename = "start_time")]
+    #[serde(skip_serializing)]
     #[serde(with = "ts_seconds_option")]
     start_time: Option<DateTime<Utc>>,
 
@@ -137,7 +138,7 @@ pub struct StreamEntry {
     This is updated when the stream is finished with the time the last device finishes the stream
     This is an optional field and can be left empty and will be updated automatically when the stream is last finished
     "]
-    #[serde(default, rename = "end_time")]
+    #[serde(skip_serializing)]
     #[serde(with = "ts_seconds_option")]
     end_time: Option<DateTime<Utc>>,
 
@@ -147,8 +148,8 @@ pub struct StreamEntry {
     ## Constraints
     * Must be greater than or equal to 0
     "]
-    #[serde(default, rename = "delay")]
-    #[validate(range(min = 0, message = "delay must be greater than or equal to 0"))]
+    #[serde(default)]
+    #[validate(range(min = 0, message = "Delay must be greater than or equal to 0"))]
     delay: u64,
 
     #[doc = r" ## Stream ID
@@ -159,8 +160,11 @@ pub struct StreamEntry {
     * Must be alphanumeric (a-z (only by user), A-Z, 0-9)
     * check the regex `STREAM_ID` for more details
     "]
-    #[validate(regex(path = "STREAM_ID", message = "stream_id must be alphanumeric"))]
-    #[serde(rename = "id")]
+    #[validate(regex(
+        path = "STREAM_ID",
+        message = "Stream ID must be alphanumeric and 3 characters long"
+    ))]
+    #[serde(default)]
     stream_id: String,
 
     #[doc = r" ## Generators IDs
@@ -169,8 +173,7 @@ pub struct StreamEntry {
     ## Constraints
     * Must be given (min length is 1)
     "]
-    #[validate(length(min = 1, message = "number_of_senders must be greater than 0"))]
-    #[serde(rename = "generators")]
+    #[validate(length(min = 1, message = "number of Generators must be greater than 0"))]
     generators_ids: Vec<String>,
 
     #[doc = r" ## Verifiers IDs
@@ -179,8 +182,7 @@ pub struct StreamEntry {
     ## Constraints
     * Must be given (min length is 1)
     "]
-    #[validate(length(min = 1, message = "number_of_receivers must be greater than 0"))]
-    #[serde(rename = "verifiers")]
+    #[validate(length(min = 1, message = "number of Verifiers must be greater than 0"))]
     verifiers_ids: Vec<String>,
 
     #[doc = r" ## Payload Type
@@ -191,7 +193,8 @@ pub struct StreamEntry {
     ## Constraints
     * Must be 0, 1 or 2
     "]
-    #[validate(range(min = 0, max = 2, message = "payload_type must be 0, 1 or 2"))]
+    #[validate(range(min = 0, max = 2, message = "Payload Type must be 0, 1 or 2"))]
+    #[serde(default)]
     payload_type: u8,
 
     #[doc = r" ## Number of Packets
@@ -201,8 +204,9 @@ pub struct StreamEntry {
     "]
     #[validate(range(
         min = 0,
-        message = "number_of_packets must be greater than or equal to 0"
+        message = "Number of Packets must be greater than or equal to 0"
     ))]
+    #[serde(default)]
     number_of_packets: u32,
 
     #[doc = r" ## Payload Length
@@ -213,8 +217,9 @@ pub struct StreamEntry {
     #[validate(range(
         min = 0,
         max = 1500,
-        message = "payload_length must be between 0 and 1500"
+        message = "Payload Length must be between 0 and 1500"
     ))]
+    #[serde(default)]
     payload_length: u16,
 
     #[doc = r" ## Seed
@@ -222,7 +227,7 @@ pub struct StreamEntry {
     ## Constraints
     * Must be greater than or equal to 0
     "]
-    #[validate(range(min = 0, message = "seed must be greater than or equal to 0"))]
+    #[validate(range(min = 0, message = "Seed must be greater than or equal to 0"))]
     #[serde(default)]
     seed: u32,
 
@@ -230,12 +235,13 @@ pub struct StreamEntry {
     This is the number of broadcast frames that will be sent during the stream
     send broadcast frames every broadcast_frames packets
     ## Constraints
-    * Must be greater than or equal to 50
+    * Must be greater than or equal to 0
     "]
     #[validate(range(
-        min = 50,
-        message = "broadcast_frames must be greater than or equal to 50"
+        min = 0,
+        message = "Broadcast Frames must be greater than or equal to 0"
     ))]
+    #[serde(default)]
     broadcast_frames: u32,
 
     #[doc = r" ## Inter Frame Gap
@@ -246,8 +252,9 @@ pub struct StreamEntry {
     "]
     #[validate(range(
         min = 0,
-        message = "inter_frame_gap must be greater than or equal to 0"
+        message = "Inter Frame Gap must be greater than or equal to 0"
     ))]
+    #[serde(default)]
     inter_frame_gap: u32,
 
     #[doc = r" ## Time to Live
@@ -256,7 +263,7 @@ pub struct StreamEntry {
     ## Constraints
     * Must be greater than or equal to 0
     "]
-    #[validate(range(min = 0, message = "time_to_live must be greater than or equal to 0"))]
+    #[validate(range(min = 0, message = "Time to Live must be greater than or equal to 0"))]
     time_to_live: u64,
 
     #[doc = r" ## Transport Layer Protocol
@@ -287,56 +294,21 @@ pub struct StreamEntry {
     #[doc = r" ## Running Generators
     This is the list of all the Process that are generating the stream (mac_address of the device, process status)
     "]
-    #[serde(default, rename = "running_generators")]
+    #[serde(default)]
     running_generators: HashMap<String, ProcessStatus>,
 
     #[doc = r" ## Running Verifiers
     This is the list of all the Process that are verifying the stream (mac_address of the device, process status)
     "]
-    #[serde(default, rename = "running_verifiers")]
+    #[serde(default)]
     running_verifiers: HashMap<String, ProcessStatus>,
 
     #[doc = r" ## Stream Status
     This is the state that the stream is in at any given time in the system (see the state machine below)
     ## see also
     The stream state machine: ./docs/stream_state_machine.png"]
-    #[serde(default, rename = "status")]
+    #[serde(default, skip_serializing)]
     stream_status: StreamStatus,
-}
-
-#[doc = r" # Stream Details
-The StreamDetails struct is used to store the information about the stream that is sent to the device to start or queue the stream
-## Values
-* `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
-* `delay` - A u64 that represents the time in ms that the stream will wait before starting
-* `generators` - A Vec of String that has all the mac addresses of the devices that will generate the stream
-* `verifiers` - A Vec of String that has all the mac addresses of the devices that will verify the stream
-* `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
-* `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
-* `payload_length` - A u16 that represents the length of the payload that will be used in the stream
-* `seed` - A u32 that represents the seed that will be used to generate the payload
-* `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
-* `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
-* `time_to_live` - A u64 that represents the time to live that will be used for the stream
-* `transport_layer_protocol` - A u8 that represents the transport layer protocol that will be used for the stream (0 = TCP, 1 = UDP)
-* `flow_type` - A u8 that represents the flow type that will be used for the stream (0 = BtB, 1 = Bursts)
-* `check_content` - A bool that represents if the content of the packets will be checked"]
-#[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
-struct StreamDetails {
-    stream_id: String,
-    delay: u64,
-    generators: Vec<String>,
-    verifiers: Vec<String>,
-    payload_type: u8,
-    number_of_packets: u32,
-    payload_length: u16,
-    seed: u32,
-    broadcast_frames: u32,
-    inter_frame_gap: u32,
-    time_to_live: u64,
-    transport_layer_protocol: u8,
-    flow_type: u8,
-    check_content: bool,
 }
 
 #[doc = r" # Implementation of the StreamEntry struct that contains all the information about the stream and the functions that are used to manipulate the stream"]
@@ -405,42 +377,54 @@ changes the stream_status to Running and updates the device status to Running"]
         check if the device is a generator
         if it is, mark the generator as Running
         */
-        let process = self.running_generators.get(card_mac);
-        if process.is_some() {
-            self.running_generators
-                .get_mut(card_mac)
-                .unwrap()
-                .clone_from(&ProcessStatus::Running);
+        let device = Device::find_device(card_mac, device_list);
+        match device {
+            Some(device) => {
+                let process = self.running_generators.get(card_mac);
+                if process.is_some() {
+                    self.running_generators
+                        .get_mut(card_mac)
+                        .unwrap()
+                        .clone_from(&ProcessStatus::Running);
 
-            // then update the device status to Running
-            Device::update_device_status(
-                card_mac,
-                &ProcessStatus::Running,
-                &ProcessType::Generation,
-                device_list,
-            );
+                    // then update the device status to Running
+                    device_list
+                        .lock()
+                        .unwrap()
+                        .get_mut(device)
+                        .unwrap()
+                        .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
+                } else {
+                    println!("Generator not found")
+                }
+
+                // check if the device is a verifier
+                // if it is, mark the verifier as Running
+                let process = self.running_verifiers.get(card_mac);
+                if process.is_some() {
+                    self.running_verifiers
+                        .get_mut(card_mac)
+                        .unwrap()
+                        .clone_from(&ProcessStatus::Running);
+
+                    // then update the device status to Running
+                    device_list
+                        .lock()
+                        .unwrap()
+                        .get_mut(device)
+                        .unwrap()
+                        .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
+                } else {
+                    println!("Verifier not found")
+                }
+
+                // update the stream status to Running
+                self.update_stream_status(StreamStatus::Running);
+            }
+            None => {
+                println!("Device not found");
+            }
         }
-
-        // check if the device is a verifier
-        // if it is, mark the verifier as Running
-        let process = self.running_verifiers.get(card_mac);
-        if process.is_some() {
-            self.running_verifiers
-                .get_mut(card_mac)
-                .unwrap()
-                .clone_from(&ProcessStatus::Running);
-
-            // then update the device status to Running
-            Device::update_device_status(
-                card_mac,
-                &ProcessStatus::Running,
-                &ProcessType::Verification,
-                device_list,
-            );
-        }
-
-        // update the stream status to Running
-        self.update_stream_status(StreamStatus::Running);
     }
 
     #[doc = r" ## Notify Process Completed
@@ -461,42 +445,60 @@ if there are devices left, the stream status will be set to finished
         check if the device is a generator
         if it is, mark the generator as completed
         */
-        let process = self.running_generators.get(card_mac);
-        if process.is_some() {
-            self.running_generators
-                .get_mut(card_mac)
-                .unwrap()
-                .clone_from(&ProcessStatus::Completed);
 
-            // then check if there are any other process running in the device
-            // if there are no other generators running, set the DeviceStatus to Idle
-            Device::update_device_status(
-                card_mac,
-                &ProcessStatus::Completed,
-                &ProcessType::Generation,
-                device_list,
-            );
+        let device = Device::find_device(card_mac, device_list);
+
+        match device {
+            Some(device) => {
+                let process = self.running_generators.get(card_mac);
+                if process.is_some() {
+                    self.running_generators
+                        .get_mut(card_mac)
+                        .unwrap()
+                        .clone_from(&ProcessStatus::Completed);
+
+                    // then check if there are any other process running in the device
+                    // if there are no other generators running, set the DeviceStatus to Idle
+                    device_list
+                        .lock()
+                        .unwrap()
+                        .get_mut(device)
+                        .unwrap()
+                        .update_device_status(&ProcessStatus::Completed, &ProcessType::Generation);
+                } else {
+                    println!("Generator not found");
+                }
+
+                // check if the device is a verifier
+                // if it is, mark the verifier as completed
+                let process = self.running_verifiers.get(card_mac);
+                if process.is_some() {
+                    self.running_verifiers
+                        .get_mut(card_mac)
+                        .unwrap()
+                        .clone_from(&ProcessStatus::Completed);
+
+                    // then check if there are any other process running in the device
+                    // if there are no other generators running, set the DeviceStatus to Idle
+                    device_list
+                        .lock()
+                        .unwrap()
+                        .get_mut(device)
+                        .unwrap()
+                        .update_device_status(
+                            &ProcessStatus::Completed,
+                            &ProcessType::Verification,
+                        );
+                } else {
+                    println!("Verifier not found");
+                }
+
+                self.sync_stream_status();
+            }
+            None => {
+                println!("Device not found");
+            }
         }
-
-        // check if the device is a verifier
-        // if it is, mark the verifier as completed
-        let process = self.running_verifiers.get(card_mac);
-        if process.is_some() {
-            self.running_verifiers
-                .get_mut(card_mac)
-                .unwrap()
-                .clone_from(&ProcessStatus::Completed);
-
-            // then check if there are any other process running in the device
-            // if there are no other generators running, set the DeviceStatus to Idle
-            Device::update_device_status(
-                card_mac,
-                &ProcessStatus::Completed,
-                &ProcessType::Verification,
-                device_list,
-            );
-        }
-        self.sync_stream_status();
     }
 
     #[doc = r" ## Sync Stream Status
@@ -550,7 +552,7 @@ The send_stream function is used to send the stream to the devices that will gen
             if the request fails, set the device status to offline
             NOTE: if the device has multiple cards, the request will be sent to all the cards in the device and the device will be added to the running devices list
         */
-        let mut devices_recived: HashMap<(String, u16, String), ProcessType> = HashMap::new(); // Ip address, port, mac address of the device that will receive the stream and the type of process that will be run on the device
+        let mut devices_recived: HashMap<String, (usize, ProcessType)> = HashMap::new();
 
         let mut verifiers_macs: Vec<String> = Vec::new();
         for name in &self.verifiers_ids {
@@ -560,9 +562,19 @@ The send_stream function is used to send the stream to the devices that will gen
                 continue;
             }
             let receiver = receiver.unwrap();
-            verifiers_macs.push(receiver.get_device_mac().to_string());
 
-            devices_recived.insert(receiver.get_device_info_tuple(), ProcessType::Verification);
+            let ip_address = device_list
+                .lock()
+                .unwrap()
+                .get(receiver)
+                .unwrap()
+                .clone_ip_address();
+
+            verifiers_macs.push(ip_address.to_string());
+
+            if devices_recived.contains_key(&ip_address) {
+                devices_recived.insert(ip_address, (receiver, ProcessType::Verification));
+            }
         }
 
         let mut genorators_macs: Vec<String> = Vec::new();
@@ -574,17 +586,23 @@ The send_stream function is used to send the stream to the devices that will gen
             }
 
             let receiver = receiver.unwrap();
-            genorators_macs.push(receiver.get_device_mac().to_string());
+
+            let ip_address = device_list
+                .lock()
+                .unwrap()
+                .get(receiver)
+                .unwrap()
+                .clone_ip_address();
+
+            genorators_macs.push(ip_address.to_string());
 
             // add the device to the list of devices that need to recive the request if it already exists, it will be overwritten
-            devices_recived.insert(
-                receiver.get_device_info_tuple(),
-                if devices_recived.contains_key(&receiver.get_device_info_tuple()) {
-                    ProcessType::GenerationaAndVerification
-                } else {
-                    ProcessType::Generation
-                },
-            );
+            if !devices_recived.contains_key(&ip_address) {
+                devices_recived.insert(ip_address, (receiver, ProcessType::Generation));
+            } else {
+                devices_recived.get_mut(&ip_address).unwrap().1 =
+                    ProcessType::GenerationaAndVerification;
+            }
         }
 
         let stream_details = StreamDetails {
@@ -604,73 +622,80 @@ The send_stream function is used to send the stream to the devices that will gen
             check_content: self.check_content,
         };
 
-        for receiver in &mut devices_recived {
-            let response = reqwest::Client::new()
-                .post(&format!("http://{}:{}/start", receiver.0 .0, receiver.0 .1))
-                // send the stream details as a json
-                .body(
-                    serde_json::to_string(&stream_details)
-                        .expect("Failed to serialize stream details"),
-                )
-                .header("mac-address", receiver.0 .2.as_str())
-                .header("stream-id", self.get_stream_id().as_str())
-                .header("process-type", receiver.1.to_string())
-                .send()
-                .await;
+        for receiver in devices_recived {
+            let process_type = receiver.1 .1;
+            let device_index = receiver.1 .0;
 
-            let card_mac = receiver.0 .2.as_str();
+            let response = device_list
+                .lock()
+                .unwrap()
+                .get_mut(device_index)
+                .unwrap()
+                .send_stream(&stream_details, self.get_stream_id(), &process_type)
+                .await;
             // check if the request was successful
             match response {
                 Ok(_response) => {
+                    let mut list = device_list.lock().unwrap();
+                    let device = list.get_mut(device_index).unwrap();
+
                     match _response.status() {
                         StatusCode::OK => {
                             // set the receiver status to running
-                            Device::update_device_status(
-                                card_mac,
-                                &ProcessStatus::Queued,
-                                receiver.1,
-                                device_list,
+                            device.update_device_status(&ProcessStatus::Queued, &process_type);
+
+                            match process_type {
+                                ProcessType::Generation => {
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Queued);
+                                }
+                                ProcessType::Verification => {
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Queued);
+                                }
+                                ProcessType::GenerationaAndVerification => {
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Queued);
+
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Queued);
+                                }
+                            }
+
+                            println!(
+                                "Stream sent to device: {}, process type: {:?}",
+                                device.clone_device_mac(),
+                                process_type
                             );
-
-                            // add the device to the running devices list with a Queued status (the device will change it to running when it starts)
-                            if (receiver.1 == &ProcessType::GenerationaAndVerification)
-                                || (receiver.1 == &ProcessType::Generation)
-                            {
-                                self.running_generators
-                                    .insert(card_mac.to_string(), ProcessStatus::Queued);
-                            }
-
-                            if (receiver.1 == &ProcessType::GenerationaAndVerification)
-                                || (receiver.1 == &ProcessType::Verification)
-                            {
-                                self.running_verifiers
-                                    .insert(card_mac.to_string(), ProcessStatus::Queued);
-                            }
                         }
                         _ => {
-                            println!("Error: {}", _response.text().await.unwrap());
-
                             // set the receiver status to offline (generic error)
-                            Device::update_device_status(
-                                card_mac,
-                                &ProcessStatus::Failed,
-                                receiver.1,
-                                device_list,
-                            );
+                            device.update_device_status(&ProcessStatus::Failed, &process_type);
 
                             // add the device to the running devices list with a failed status
-                            if (receiver.1 == &ProcessType::GenerationaAndVerification)
-                                || (receiver.1 == &ProcessType::Generation)
-                            {
-                                self.running_generators
-                                    .insert(card_mac.to_string(), ProcessStatus::Failed);
+                            match process_type {
+                                ProcessType::Generation => {
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Failed);
+                                }
+                                ProcessType::Verification => {
+                                    self.running_verifiers
+                                        .insert(device.clone_device_mac(), ProcessStatus::Failed);
+                                }
+                                ProcessType::GenerationaAndVerification => {
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Failed);
+
+                                    self.running_generators
+                                        .insert(device.clone_device_mac(), ProcessStatus::Failed);
+                                }
                             }
-                            if (receiver.1 == &ProcessType::GenerationaAndVerification)
-                                || (receiver.1 == &ProcessType::Verification)
-                            {
-                                self.running_verifiers
-                                    .insert(card_mac.to_string(), ProcessStatus::Failed);
-                            }
+                            println!(
+                                "Error: Stream not sent to device: {} process type: {:?}",
+                                device.clone_device_mac(),
+                                process_type
+                            );
+                            println!("Error: {}", _response.text().await.unwrap());
                         }
                     }
                 }
@@ -723,112 +748,119 @@ if the request fails, the device status will be set to Offline
         if the request fails, set the device status to offline
         */
         print!("Stopping stream {}...", self.get_stream_id());
+        let mut target_devices: HashMap<String, (usize, ProcessType)> = HashMap::new();
 
-        let id = self.get_stream_id();
         // stop the generators
-        for mut name in &self.running_generators {
-            // find the device in the device list
-            let receiver = Device::find_device(name.0, device_list);
-            if receiver.is_none() {
-                println!("Could not Stop Generator: {} (Not found), skipping", name.0);
+        for target_process in &self.running_generators {
+            let index = Device::find_device(target_process.0, device_list);
+            if index.is_none() {
+                println!(
+                    "Could not Stop Generator: {} (Not found), skipping",
+                    target_process.0
+                );
+                continue;
+            }
+            target_devices.insert(
+                target_process.0.to_string(),
+                (index.unwrap(), ProcessType::Generation),
+            );
+        }
+
+        for target_process in &self.running_verifiers {
+            let index = Device::find_device(target_process.0, device_list);
+            if index.is_none() {
+                println!(
+                    "Could not Stop Verifier: {} (Not found), skipping",
+                    target_process.0
+                );
                 continue;
             }
 
+            if target_devices.contains_key(target_process.0) {
+                target_devices.insert(
+                    target_process.0.to_string(),
+                    (index.unwrap(), ProcessType::GenerationaAndVerification),
+                );
+            } else {
+                target_devices.insert(
+                    target_process.0.to_string(),
+                    (index.unwrap(), ProcessType::Verification),
+                );
+            }
+        }
+
+        for device in target_devices {
+            let mut list = device_list.lock().unwrap();
             // send the stop request
-            let receiver = receiver.unwrap();
-            let response = reqwest::Client::new()
-                .post(&format!(
-                    "http://{}:{}/stop",
-                    receiver.get_ip_address(),
-                    receiver.get_port()
-                ))
-                .header("mac-address", receiver.get_device_mac())
-                .header("stream-id", id)
-                .header("process-type", ProcessType::Generation.to_string())
-                .send()
+            let receiver = list.get_mut(device.1 .0).unwrap();
+            let response = receiver
+                .stop_stream(self.get_stream_id(), &device.1 .1)
                 .await;
 
-            let card_mac = receiver.get_device_mac();
             // set the device status according to the response status
             match response {
                 Ok(_response) => {
                     match _response.status() {
                         StatusCode::OK => {
-                            Device::update_device_status(
-                                card_mac,
-                                &ProcessStatus::Stopped,
-                                &ProcessType::Generation,
-                                device_list,
+                            receiver.update_device_status(&ProcessStatus::Stopped, &device.1 .1);
+
+                            match device.1 .1 {
+                                ProcessType::Generation => {
+                                    self.running_generators.insert(
+                                        receiver.clone_device_mac(),
+                                        ProcessStatus::Stopped,
+                                    );
+                                }
+                                ProcessType::Verification => {
+                                    self.running_verifiers.insert(
+                                        receiver.clone_device_mac(),
+                                        ProcessStatus::Stopped,
+                                    );
+                                }
+                                ProcessType::GenerationaAndVerification => {
+                                    self.running_generators.insert(
+                                        receiver.clone_device_mac(),
+                                        ProcessStatus::Stopped,
+                                    );
+
+                                    self.running_generators.insert(
+                                        receiver.clone_device_mac(),
+                                        ProcessStatus::Stopped,
+                                    );
+                                }
+                            }
+
+                            println!(
+                                "device {} stopped stream {} successfully",
+                                receiver.clone_device_mac(),
+                                self.get_stream_id()
                             );
-                            name.1 = &ProcessStatus::Stopped;
                         }
                         _ => {
                             println!("generators error: {}", _response.text().await.unwrap());
                             // set the receiver status to offline (generic error)
-                            Device::update_device_status(
-                                card_mac,
+                            receiver.update_device_status(
                                 &ProcessStatus::Failed,
                                 &ProcessType::Generation,
-                                device_list,
-                            );
-                            name.1 = &ProcessStatus::Failed;
-                        }
-                    }
-                }
-                Err(_error) => println!("generators error: {}", _error),
-            }
-        }
-
-        let id = self.get_stream_id();
-        // stop the verifiers
-        for mut name in &self.running_verifiers {
-            // find the device in the device list
-            let receiver = Device::find_device(name.0, device_list);
-            if receiver.is_none() {
-                println!("Could not Stop Verifier: {}, skipping", name.0);
-                continue;
-            }
-
-            // send the stop request
-            let receiver = receiver.unwrap();
-            let response = reqwest::Client::new()
-                .post(&format!(
-                    "http://{}:{}/stop",
-                    receiver.get_ip_address(),
-                    receiver.get_port()
-                ))
-                .header("mac-address", receiver.get_device_mac())
-                .header("stream-id", id)
-                .header("process-type", ProcessType::Verification.to_string())
-                .send()
-                .await;
-
-            let card_mac = receiver.get_device_mac();
-            // set the device status according to the response status
-            match response {
-                Ok(_response) => {
-                    match _response.status() {
-                        StatusCode::OK => {
-                            Device::update_device_status(
-                                card_mac,
-                                &ProcessStatus::Stopped,
-                                &ProcessType::Verification,
-                                device_list,
                             );
 
-                            name.1 = &ProcessStatus::Stopped;
-                        }
-                        _ => {
-                            println!("verifiers error: {}", _response.text().await.unwrap());
-                            // set the receiver status to offline (generic error)
-                            Device::update_device_status(
-                                card_mac,
-                                &ProcessStatus::Failed,
-                                &ProcessType::Verification,
-                                device_list,
-                            );
+                            match device.1 .1 {
+                                ProcessType::Generation => {
+                                    self.running_generators
+                                        .insert(receiver.clone_device_mac(), ProcessStatus::Failed);
+                                }
+                                ProcessType::Verification => {
+                                    self.running_verifiers
+                                        .insert(receiver.clone_device_mac(), ProcessStatus::Failed);
+                                }
+                                ProcessType::GenerationaAndVerification => {
+                                    self.running_generators
+                                        .insert(receiver.clone_device_mac(), ProcessStatus::Failed);
 
-                            name.1 = &ProcessStatus::Failed;
+                                    self.running_generators
+                                        .insert(receiver.clone_device_mac(), ProcessStatus::Failed);
+                                }
+                            }
                         }
                     }
                 }
@@ -904,11 +936,6 @@ this will remove the stream from the queue
         let index = queue.iter().position(|x| x == self.get_stream_id());
         if index.is_some() {
             queue.remove(index.unwrap());
-        } else {
-            print!(
-                "Error: Could not find the stream {} in the queued streams list",
-                self.get_stream_id()
-            );
         }
     }
 
@@ -963,20 +990,14 @@ this enum represents the status of the stream
 ## Notes
 * the default variant is `Created`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(tag = "status")]
+#[serde(rename_all = "PascalCase", untagged)]
 pub enum StreamStatus {
     #[default]
-    #[serde(rename = "Created")]
     Created,
-    #[serde(rename = "Queued")]
     Queued,
-    #[serde(rename = "Running")]
     Running,
-    #[serde(rename = "Finished")]
     Finished,
-    #[serde(rename = "Error")]
     Error,
-    #[serde(rename = "Stopped")]
     Stopped,
 }
 
@@ -988,12 +1009,10 @@ this enum represents the transport layer protocol type
 ## Notes
 * the default variant is `TCP`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
-#[serde(tag = "protocol")]
+#[serde(rename_all = "PascalCase", untagged)]
 enum TransportLayerProtocol {
     #[default]
-    #[serde(rename = "TCP")]
     TCP,
-    #[serde(rename = "UDP")]
     UDP,
 }
 
@@ -1005,11 +1024,9 @@ this enum represents the flow type
 ## Notes
 * the default variant is `BtB`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
-#[serde(tag = "flowtype")]
+#[serde(rename_all = "PascalCase", untagged)]
 enum FlowType {
     #[default]
-    #[serde(rename = "BtB")]
-    BtB,
-    #[serde(rename = "Bursts")]
+    BackToBack,
     Bursts,
 }
