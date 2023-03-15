@@ -23,13 +23,13 @@ const deviceRunningOrOnlineColor = Color(0xFF3dcc77); // online
 const deviceIdleColor = Colors.orangeAccent; // idle
 const deviceOfflineOrErrorColor = Color(0xFFe34845); // offline or error
 
-final colorlight = [
+final gradientColorLight = [
   const Color.fromARGB(255, 253, 209, 146),
   const Color.fromARGB(255, 255, 197, 117),
   const Color.fromARGB(255, 255, 117, 117),
 ];
 
-final colordark = [
+final gradientColorDark = [
   const Color.fromARGB(255, 0, 21, 48),
   const Color.fromARGB(255, 0, 27, 61),
   const Color.fromARGB(255, 0, 48, 98),
@@ -105,7 +105,7 @@ const darkColorScheme = ColorScheme(
 
 class ThemeModel extends ChangeNotifier {
   bool _isDark = false;
-  ThemePrefrences themePrefrences = ThemePrefrences();
+  ThemePreferences themePreferences = ThemePreferences();
 
   bool get isDark => _isDark;
   ThemeMode get themeMode => _isDark ? ThemeMode.dark : ThemeMode.light;
@@ -117,19 +117,19 @@ class ThemeModel extends ChangeNotifier {
   }
 
   getTheme() async {
-    _isDark = await themePrefrences.isDarkMode();
+    _isDark = await themePreferences.isDarkMode();
     notifyListeners();
   }
 
   toggleTheme() {
     _isDark = !_isDark;
-    themePrefrences.setDarkMode(_isDark);
+    themePreferences.setDarkMode(_isDark);
     notifyListeners();
   }
 
   set isDark(bool value) {
     _isDark = value;
-    themePrefrences.setDarkMode(value);
+    themePreferences.setDarkMode(value);
     notifyListeners();
   }
 }

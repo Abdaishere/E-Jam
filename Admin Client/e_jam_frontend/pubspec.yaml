@@ -45,6 +45,9 @@ dependencies:
   syncfusion_flutter_gauges: ^20.4.51
   rename: ^2.1.1
   syncfusion_flutter_treemap: ^20.4.52-beta
+  http: ^0.13.5
+  loading_animation_widget: ^1.2.0+4
+  awesome_snackbar_content: ^0.1.2
   
 
 dev_dependencies:

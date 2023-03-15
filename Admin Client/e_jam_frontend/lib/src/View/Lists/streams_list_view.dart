@@ -1,62 +1,129 @@
 import 'dart:math';
 
 import 'package:e_jam/main.dart';
+import 'package:e_jam/src/Model/stream_entry.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
+import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
-class StreamsListView extends StatelessWidget {
+class StreamsListView extends StatefulWidget {
   const StreamsListView({super.key});
+
+  @override
+  State<StreamsListView> createState() => _StreamsListViewState();
+}
+
+class _StreamsListViewState extends State<StreamsListView> {
+  List<StreamEntry>? streams;
+  bool isStreamListLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadStreams();
+  }
+
+  void loadStreams() async {
+    isStreamListLoading = true;
+    setState(() {});
+    StreamServices.getStreams().then((value) {
+      streams = value;
+      isStreamListLoading = false;
+      streams = null;
+      // show error snackbar if streams is null
+      if (streams == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: AwesomeSnackbarContent(
+              title: 'Error',
+              message: 'Unable to load streams',
+              contentType: ContentType.failure,
+            ),
+            elevation: 0.0,
+            dismissDirection: DismissDirection.horizontal,
+            backgroundColor: Colors.transparent,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Streams',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: const DrawerWidget(),
-        actions: <Widget>[
-          // refresh icon for refreshing the streams list view
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
-            onPressed: () {},
-          ),
-          // gear icon for settings and preferences related to the streams list view (sort by, filter by, etc.)
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.gear, size: 20.0),
-            onPressed: () {},
-          ),
-          // Explaination icon for details about how the stream card works and what the icons mean and what the colors mean
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
-            onPressed: () {},
-          ),
-        ],
-      ),
+      appBar: streamListViewAppBar(),
       body: Stack(
         children: [
-          GridView.builder(
-            padding: const EdgeInsets.all(8.0),
-            shrinkWrap: true,
-            itemCount: 10,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount:
-                  max(MediaQuery.of(context).copyWith().size.width ~/ 342.0, 1),
-              childAspectRatio: 3 / 2,
-              mainAxisSpacing: 5.0,
-              crossAxisSpacing: 3.0,
+          Visibility(
+            visible: !isStreamListLoading,
+            replacement: Center(
+              child: LoadingAnimationWidget.threeArchedCircle(
+                color: Colors.grey,
+                size: 70.0,
+              ),
             ),
-            itemBuilder: (BuildContext context, int index) {
-              return StreamCard(index: index);
-            },
+            child: Visibility(
+              visible: streams?.isNotEmpty ?? false,
+              replacement: Visibility(
+                visible: streams != null,
+                replacement: Stack(
+                  children: const [
+                    Center(
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.redAccent,
+                        size: 100.0,
+                      ),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      FaIcon(
+                        FontAwesomeIcons.barsStaggered,
+                        size: 100.0,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(height: 10.0),
+                      Text(
+                        'No streams found',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              child: GridView.builder(
+                padding: const EdgeInsets.all(8.0),
+                shrinkWrap: true,
+                itemCount: streams?.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: max(
+                      MediaQuery.of(context).copyWith().size.width ~/ 342.0, 1),
+                  childAspectRatio: 3 / 2,
+                  mainAxisSpacing: 5.0,
+                  crossAxisSpacing: 3.0,
+                ),
+                itemBuilder: (BuildContext context, int index) {
+                  return StreamCard(index: index);
+                },
+              ),
+            ),
           ),
           SafeArea(
             child: Container(
@@ -67,6 +134,34 @@ class StreamsListView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  AppBar streamListViewAppBar() {
+    return AppBar(
+      title: const Text(
+        'Streams',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      centerTitle: true,
+      leading: const DrawerWidget(),
+      actions: <Widget>[
+        // refresh icon for refreshing the streams list view
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
+          onPressed: () {},
+        ),
+        // gear icon for settings and preferences related to the streams list view (sort by, filter by, etc.)
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.gear, size: 20.0),
+          onPressed: () {},
+        ),
+        // Explanation icon for details about how the stream card works and what the icons mean and what the colors mean
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
+          onPressed: () {},
+        ),
+      ],
     );
   }
 }

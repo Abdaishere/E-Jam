@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
-class ThemePrefrences {
+class ThemePreferences {
   static const String _themeMode = 'themeMode';
 
   Future<ThemeMode> getThemeMode() async {
-    final prefs = await SharedPreferences.getInstance();
-    final themeMode = prefs.getString(_themeMode);
+    final pref = await SharedPreferences.getInstance();
+    final themeMode = pref.getString(_themeMode);
     if (themeMode == null) {
       return ThemeMode.system;
     }
@@ -14,8 +15,8 @@ class ThemePrefrences {
   }
 
   Future<void> setThemeMode(ThemeMode themeMode) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_themeMode, themeMode.toString());
+    final pref = await SharedPreferences.getInstance();
+    await pref.setString(_themeMode, themeMode.toString());
   }
 
   Future<bool> isDarkMode() async {
@@ -38,4 +39,9 @@ class ThemePrefrences {
       await setThemeMode(ThemeMode.light);
     }
   }
+}
+
+class NetworkController {
+  static const backendhostaddress = 'http://localhost:8080';
+  static var client = http.Client();
 }

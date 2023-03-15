@@ -82,7 +82,7 @@ pub struct Device {
     ## Default Value
     * The default value is the current DateTime
     "]
-    #[serde(with = "ts_seconds", default, skip_serializing)]
+    #[serde(with = "ts_seconds", default, skip_deserializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = " ## Device IP Address
@@ -132,23 +132,23 @@ pub struct Device {
 
     #[doc = " ## Device Generation Processes Number
     A u16 that represents the number of generation processes that are running on the device"]
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_deserializing)]
     gen_processes: u16,
 
     #[doc = " ## Device Verification Processes Number
     A u16 that represents the number of verification processes that are running on the device"]
-    #[serde(default, skip_serializing)]
+    #[serde(default)]
     ver_processes: u16,
 
     #[doc = " ## Device Status
     A DeviceStatus that represents the status of the device at any given time (Offline, Online, Idle, Running)
     ## see also
     The Device State Machine: ./docs/device_state_machine.png"]
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_deserializing)]
     status: DeviceStatus,
 }
 
-#[doc = r" This is the implementation of the Device Model used to handle the device data and its functions"]
+#[doc = r" This is the implementation of the Device Model used to handle the device data and its functions and services"]
 impl Device {
     #[doc = r"update the device status
 this function is used to update the device status according to the status of the process that is running on the device
@@ -355,7 +355,7 @@ this is used to set the device to reachable or unreachable and update the last u
         self.last_updated = Utc::now();
         return reachable;
     }
-    
+
     pub fn ping_device(&self) -> bool {
         let (ip, port, _) = self.get_device_info_tuple();
         let mut socket = match std::net::TcpStream::connect((ip.as_str(), port)) {
@@ -385,7 +385,7 @@ This is used to represent the status of the device
 * `Idle` is used when the device is idle and not running any process
 * `Offline` is used when the device is offline and unreachable"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
-#[serde(rename_all = "PascalCase", untagged)]
+#[serde(rename_all = "PascalCase")]
 pub enum DeviceStatus {
     #[default]
     Offline,

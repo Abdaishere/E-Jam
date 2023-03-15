@@ -123,14 +123,14 @@ pub struct StreamEntry {
     this is updated when the stream Status is updated by the server
     "]
     #[serde(with = "ts_seconds")]
-    #[serde(skip_serializing)]
+    #[serde(default, skip_deserializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = r" ## Start Time
     This is updated when the stream is started with the time the first device starts the stream
     This is an optional field and can be left empty and will be updated automatically when the stream is first started
     "]
-    #[serde(skip_serializing)]
+    #[serde(default, skip_deserializing)]
     #[serde(with = "ts_seconds_option")]
     start_time: Option<DateTime<Utc>>,
 
@@ -138,7 +138,7 @@ pub struct StreamEntry {
     This is updated when the stream is finished with the time the last device finishes the stream
     This is an optional field and can be left empty and will be updated automatically when the stream is last finished
     "]
-    #[serde(skip_serializing)]
+    #[serde(default, skip_deserializing)]
     #[serde(with = "ts_seconds_option")]
     end_time: Option<DateTime<Utc>>,
 
@@ -307,7 +307,7 @@ pub struct StreamEntry {
     This is the state that the stream is in at any given time in the system (see the state machine below)
     ## see also
     The stream state machine: ./docs/stream_state_machine.png"]
-    #[serde(default, skip_serializing)]
+    #[serde(default, skip_deserializing)]
     stream_status: StreamStatus,
 }
 
@@ -990,7 +990,7 @@ this enum represents the status of the stream
 ## Notes
 * the default variant is `Created`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(rename_all = "PascalCase", untagged)]
+#[serde(rename_all = "PascalCase")]
 pub enum StreamStatus {
     #[default]
     Created,
@@ -1009,10 +1009,12 @@ this enum represents the transport layer protocol type
 ## Notes
 * the default variant is `TCP`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
-#[serde(rename_all = "PascalCase", untagged)]
+#[serde(rename_all = "PascalCase")]
 enum TransportLayerProtocol {
     #[default]
+    #[serde(rename = "TCP")]
     TCP,
+    #[serde(rename = "UDP")]
     UDP,
 }
 
@@ -1024,7 +1026,7 @@ this enum represents the flow type
 ## Notes
 * the default variant is `BtB`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
-#[serde(rename_all = "PascalCase", untagged)]
+#[serde(rename_all = "PascalCase")]
 enum FlowType {
     #[default]
     BackToBack,

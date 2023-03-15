@@ -31,7 +31,7 @@ each process has a name that is a string that represents both the name of the pr
 The Process State Machine: ./docs/process_state_machine.png
 The Process State Machine is a state machine that represents the state of a process in the device and the possible transitions between states"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]
-#[serde(rename_all = "PascalCase", untagged)]
+#[serde(rename_all = "PascalCase")]
 pub enum ProcessStatus {
     #[default]
     Queued,

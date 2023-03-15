@@ -50,7 +50,6 @@ class MyApp extends StatelessWidget {
             themeMode: theme.themeMode,
             home: const Home(),
             // TODO: Add routes
-            // TODO: Add splash screen
           );
         },
       ),
@@ -68,7 +67,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int currentIndex = 0;
 
-  Widget mainscreen() {
+  Widget mainScreen() {
     switch (currentIndex) {
       case 0:
         return const HomeView();
@@ -92,7 +91,8 @@ class _HomeState extends State<Home> {
         return Stack(
           children: [
             gradientBackground(theme, context),
-            BouncingBall(color: (theme.isDark ? colordark : colorlight)),
+            BouncingBall(
+                color: (theme.isDark ? gradientColorDark : gradientColorLight)),
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
               child: Container(color: Colors.transparent),
@@ -114,7 +114,7 @@ class _HomeState extends State<Home> {
           });
         },
       ),
-      mainScreen: mainscreen(),
+      mainScreen: mainScreen(),
       androidCloseOnBackTap: true,
       showShadow: true,
       mainScreenTapClose: true,
@@ -146,7 +146,7 @@ class _HomeState extends State<Home> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: theme.isDark ? colordark : colorlight,
+          colors: theme.isDark ? gradientColorDark : gradientColorLight,
           transform: const GradientRotation(0.5),
         ),
         backgroundBlendMode: BlendMode.darken,
@@ -186,7 +186,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-              // TODO: controll panel with icons start and camera icon and save icon
+              // TODO: control panel with icons start and camera icon and save icon
               Container(
                 margin: const EdgeInsets.only(left: 5),
                 decoration: BoxDecoration(
