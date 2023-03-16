@@ -1,18 +1,17 @@
 import 'dart:math';
 
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/Model/stream_entry.dart';
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
-import 'package:e_jam/src/services/stream_services.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class StreamsListView extends StatefulWidget {
   const StreamsListView({super.key});
@@ -22,40 +21,29 @@ class StreamsListView extends StatefulWidget {
 }
 
 class _StreamsListViewState extends State<StreamsListView> {
+  get scaffoldMessenger => ScaffoldMessenger.of(context);
+  get controllerStreams => StreamsController.streams;
+  get controllerIsStreamListLoading => StreamsController.isStreamListLoading;
+
   List<StreamEntry>? streams;
   bool isStreamListLoading = true;
+  void loadStreamView() async {
+    // change the state of the widget
+    StreamsController.loadStreams(scaffoldMessenger).then(
+      (value) => {
+        if (mounted)
+          setState(() {
+            streams = controllerStreams;
+            isStreamListLoading = controllerIsStreamListLoading;
+          })
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    loadStreams();
-  }
-
-  void loadStreams() async {
-    isStreamListLoading = true;
-    setState(() {});
-    StreamServices.getStreams().then((value) {
-      streams = value;
-      isStreamListLoading = false;
-      streams = null;
-      // show error snackbar if streams is null
-      if (streams == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: AwesomeSnackbarContent(
-              title: 'Error',
-              message: 'Unable to load streams',
-              contentType: ContentType.failure,
-            ),
-            elevation: 0.0,
-            dismissDirection: DismissDirection.horizontal,
-            backgroundColor: Colors.transparent,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-      setState(() {});
-    });
+    Future.delayed(Duration.zero, () => loadStreamView());
   }
 
   @override
@@ -441,7 +429,7 @@ class _StreamCardState extends State<StreamCard> {
                   child: LinearProgressIndicator(
                     value: 0.5,
                     valueColor:
-                        // hormonize the color with the color and status of the stream (blue (running), red (error, stopped), orange (queued), green (finished, ready))
+                        // harmonize the color with the color and status of the stream (blue (running), red (error, stopped), orange (queued), green (finished, ready))
                         AlwaysStoppedAnimation<Color>(Colors.greenAccent),
                   ),
                 )

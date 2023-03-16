@@ -175,7 +175,7 @@ this function is used to update the device status according to the status of the
                 ProcessStatus::Stopped => self.ver_processes -= 1,
                 _ => (),
             },
-            ProcessType::GenerationaAndVerification => match status {
+            ProcessType::GeneratingAndVerification => match status {
                 ProcessStatus::Queued => {
                     self.gen_processes += 1;
                     self.ver_processes += 1;
@@ -220,7 +220,7 @@ this function is used to update the device status according to the status of the
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
 this is used to find the device by ip first then by mac address and then by name if the ip address or mac address is not known
 this is done to make sure that the device is found even if the user enters the wrong ip address or mac address OR if the user can find the device by name if you want to add name refrence to the device
-this is also done to mimic the behaviour of another device by changing the name of the device to the ip address of the other device if the device does not exist in the list of devices
+this is also done to mimic the behavior of another device by changing the name of the device to the ip address of the other device if the device does not exist in the list of devices
 # Arguments
 * `name` - the name of the device
 * `device_list` - the list of devices that are added to the system
@@ -261,8 +261,8 @@ this is also done to mimic the behaviour of another device by changing the name 
 this is used to get the device MAC address
 # Returns
 * `String` - the device MAC address with Regex for MAC address"]
-    pub fn clone_device_mac(&self) -> String {
-        self.mac_address.clone()
+    pub fn get_device_mac(&self) -> &String {
+        &self.mac_address
     }
 
     #[doc = r"Get the device IP address
@@ -289,7 +289,7 @@ this is used to get the device connection address
         (
             self.clone_ip_address().to_string(),
             self.get_port(),
-            self.clone_device_mac().to_string(),
+            self.get_device_mac().to_string(),
         )
     }
 
@@ -309,7 +309,7 @@ this is used to get the device connection address
             .body(
                 serde_json::to_string(&stream_details).expect("Failed to serialize stream details"),
             )
-            .header("mac-address", self.clone_device_mac())
+            .header("mac-address", self.get_device_mac())
             .header("stream-id", stream_id)
             .header(
                 "process-type",
@@ -330,7 +330,7 @@ this is used to get the device connection address
                 self.clone_ip_address(),
                 self.get_port()
             ))
-            .header("mac-address", self.clone_device_mac())
+            .header("mac-address", self.get_device_mac())
             .header("stream-id", stream_id)
             .header(
                 "process-type",
@@ -340,7 +340,7 @@ this is used to get the device connection address
             .await
     }
 
-    #[doc = r"Implment Is readchable for the device
+    #[doc = r"Implement Is reachable for the device
 this is used to set the device to reachable or unreachable and update the last updated time
 # Returns
 * `bool` - true if the device is reachable else false

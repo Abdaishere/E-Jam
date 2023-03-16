@@ -1,4 +1,4 @@
-import 'package:e_jam/src/Model/fake_chart_data.dart';
+import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:e_jam/src/View/Charts/line_chart_stream.dart';

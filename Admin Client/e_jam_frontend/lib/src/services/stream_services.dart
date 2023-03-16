@@ -1,6 +1,10 @@
 import 'dart:convert';
-import 'package:e_jam/src/Model/shared_preferences.dart';
-import 'package:e_jam/src/Model/stream_entry.dart';
+import 'dart:io';
+import 'package:e_jam/src/Model/Classes/stream_card.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/View/Dialogues/snacks_bar.dart';
+import 'package:flutter/material.dart';
 
 class StreamServices {
   static get backendhostaddress => NetworkController.backendhostaddress;
@@ -8,258 +12,361 @@ class StreamServices {
 
   static get client => NetworkController.client;
 
-  static Future<List<StreamEntry>?> getStreams() async {
+  static Future<List<StreamEntry>?> getStreams(
+      ScaffoldMessengerState scaffoldMessenger) async {
     try {
       final response = await client.get(uri);
       if (200 == response.statusCode) {
-        Iterable l = json.decode(response.body);
-        final List<StreamEntry> streams =
-            List<StreamEntry>.from(l.map((data) => StreamEntry.fromJson(data)));
-        return streams;
+        return (json.decode(response.body) as List)
+            .map((e) => StreamEntry.fromJson(e))
+            .toList();
       } else if (204 == response.statusCode) {
+        SnacksBar.showWarningSnack(
+            scaffoldMessenger, response.body.toString(), 'No Streams Found');
         return [];
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return null;
       }
     } catch (e) {
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }
 
-  Future<StreamEntry?> getStream(String id) async {
+  Future<StreamEntry?> getStream(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.get(Uri.parse('$uri/$id'));
-
+      final response = await client.get(Uri.parse('$uri/$streamId'));
       if (200 == response.statusCode) {
-        final StreamEntry stream = StreamEntry.fromRawJson(response.body);
-        return stream;
+        return StreamEntry.fromJson(json.decode(response.body));
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return null;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return null;
       }
     } catch (e) {
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }
 
-  Future<bool> addStream(StreamEntry stream) async {
+  Future<StreamEntry?> createStream(
+      ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
     try {
       final response = await client.post(
         uri,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
         },
-        body: stream.toJson(),
+        body: json.encode(stream.toJson()),
       );
-
       if (201 == response.statusCode) {
-        isOffline = false;
-        return true;
+        final StreamEntry stream =
+            StreamEntry.fromJson(json.decode(response.body));
+
+        SnacksBar.showSuccessSnack(
+            scaffoldMessenger,
+            "Stream ${stream.streamId} created successfully",
+            'Created Successfully');
+
+        return stream;
+      } else if (409 == response.statusCode) {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            'Stream Already Exists');
+        return null;
       } else {
-        return false;
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
+        return null;
       }
     } catch (e) {
-      isOffline = true;
-      return false;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
+      return null;
     }
   }
 
-  Future<bool> deleteStream(String id) async {
-    try {
-      final response = await client.delete(Uri.parse('$uri/$id'));
-
-      if (200 == response.statusCode) {
-        isOffline = false;
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      isOffline = true;
-      return false;
-    }
-  }
-
-  Future<bool> updateStream(StreamEntry stream) async {
+  Future<StreamEntry?> updateStream(
+      ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
     try {
       final response = await client.put(
         Uri.parse('$uri/${stream.streamId}'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
+        headers: {
+          HttpHeaders.contentTypeHeader: 'application/json',
         },
-        body: stream.toJson(),
+        body: json.encode(stream.toJson()),
       );
-
       if (200 == response.statusCode) {
-        isOffline = false;
-        return true;
+        final StreamEntry stream =
+            StreamEntry.fromJson(json.decode(response.body));
+
+        SnacksBar.showSuccessSnack(scaffoldMessenger,
+            "Updated ${stream.streamId} successfully", 'Updated Successfully');
+
+        return stream;
+      } else if (400 == response.statusCode) {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            'Cannot Update Stream');
+        return null;
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return null;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
+        return null;
+      }
+    } catch (e) {
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
+      return null;
+    }
+  }
+
+  Future<bool> deleteStream(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
+    try {
+      final response = await client.delete(Uri.parse('$uri/$streamId'));
+      if (200 == response.statusCode) {
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
+            'Deleted Successfully');
+        return true;
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return false;
+      } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> startStream(String id) async {
+  Future<bool> startStream(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.post(
-        Uri.parse('$uri/$id/start'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final response = await client.post(Uri.parse('$uri/$streamId/start'));
       if (200 == response.statusCode) {
-        isOffline = false;
+        SnacksBar.showSuccessSnack(
+            scaffoldMessenger, response.body.toString(), 'Queued Successfully');
         return true;
+      } else if (409 == response.statusCode) {
+        SnacksBar.showWarningSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Queue Stream');
+        return false;
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return false;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> forceStartStream(String id) async {
+  // stop a stream by id
+  Future<bool> stopStream(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.post(
-        Uri.parse('$uri/$id/force_start'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final response = await client.post(Uri.parse('$uri/$streamId/stop'));
       if (200 == response.statusCode) {
-        isOffline = false;
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
+            'Stopped Successfully');
         return true;
+      } else if (409 == response.statusCode) {
+        SnacksBar.showWarningSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Stop Stream');
+        return false;
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return false;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> startAllStreams(String id) async {
+  Future<bool> startAllStreams(ScaffoldMessengerState scaffoldMessenger) async {
     try {
-      final response = await client.post(
-        Uri.parse('$uri/start_all'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final response = await client.post(Uri.parse('$uri/start_all'));
       if (200 == response.statusCode) {
-        isOffline = false;
+        SnacksBar.showSuccessSnack(
+            scaffoldMessenger, response.body.toString(), 'Queued Successfully');
         return true;
+      } else if (204 == response.statusCode) {
+        SnacksBar.showWarningSnack(
+            scaffoldMessenger, response.body.toString(), 'No Streams to Queue');
+        return false;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> stopStream(String id) async {
+  Future<bool> stopAllStreams(ScaffoldMessengerState scaffoldMessenger) async {
     try {
-      final response = await client.post(
-        Uri.parse('$uri/$id/stop'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final response = await client.post(Uri.parse('$uri/stop_all'));
       if (200 == response.statusCode) {
-        isOffline = false;
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
+            'Stopped Successfully');
+
         return true;
+      } else if (204 == response.statusCode) {
+        SnacksBar.showWarningSnack(
+            scaffoldMessenger, response.body.toString(), 'No Streams to Stop');
+        return false;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> forceStopStream(String id) async {
+  Future<bool> forceStartStream(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.post(
-        Uri.parse('$uri/$id/force_stop'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final response = await client.post(Uri.parse('$uri/$streamId/start'));
       if (200 == response.statusCode) {
-        isOffline = false;
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
+            'Started Successfully');
+
         return true;
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+
+        return false;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
+
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> stopAllStreams(String id) async {
+  Future<bool> forceStopStream(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.post(
-        Uri.parse('$uri/stop_all'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
+      final response = await client.post(Uri.parse('$uri/$streamId/stop'));
       if (200 == response.statusCode) {
-        isOffline = false;
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
+            'Stopped Successfully');
         return true;
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return false;
       } else {
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      isOffline = true;
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  // get the status of a stream
-  // TODO: parse the response body to its streamEntry object
-  Future<String> getStreamStatus(String id) async {
+  Future<StreamStatusDetails?> getStreamStatus(
+      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.get(Uri.parse('$uri/$id/status'));
-
+      final response = await client.get(Uri.parse('$uri/$streamId/status'));
       if (200 == response.statusCode) {
-        isOffline = false;
-        return response.body;
+        return StreamStatusDetails.fromJson(jsonDecode(response.body));
+      } else if (404 == response.statusCode) {
+        SnacksBar.showFailureSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
+        return null;
       } else {
-        return '';
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
+        return null;
       }
     } catch (e) {
-      isOffline = true;
-      return '';
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
+      return null;
     }
   }
 
-  // get the status of all streams
-  // TODO: parse the response body to its streamEntry object
-  Future<List<dynamic>> getAllStreamStatus() async {
+  Future<List<StreamStatusDetails>?> getAllStreamStatus(
+      ScaffoldMessengerState scaffoldMessenger) async {
     try {
       final response = await client.get(Uri.parse('$uri/status'));
-
       if (200 == response.statusCode) {
-        isOffline = false;
-        return response.body;
+        return (jsonDecode(response.body) as List)
+            .map((e) => StreamStatusDetails.fromJson(e))
+            .toList();
+      } else if (409 == response.statusCode) {
+        SnacksBar.showWarningSnack(
+            scaffoldMessenger, response.body.toString(), 'Cannot Stop Stream');
+        return null;
       } else {
-        return [];
+        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
+            response.statusCode.toString());
+        return null;
       }
     } catch (e) {
-      isOffline = true;
-      return [];
+      e.toString();
+      SnacksBar.showFailureSnack(scaffoldMessenger,
+          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
+      return null;
     }
   }
 }

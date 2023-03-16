@@ -1,4 +1,8 @@
 import 'dart:convert';
+import 'dart:ffi';
+
+import 'package:e_jam/src/Model/Enums/processes.dart';
+import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 
 class StreamEntry {
   StreamEntry({
@@ -28,26 +32,26 @@ class StreamEntry {
 
   final String name;
   final String description;
-  final int lastUpdated;
-  final dynamic startTime;
-  final dynamic endTime;
-  final int delay;
+  final DateTime lastUpdated;
+  final DateTime startTime;
+  final DateTime endTime;
+  final UnsignedLong delay;
   final String streamId;
   final List<String> generatorsIds;
   final List<String> verifiersIds;
-  final int payloadType;
-  final int numberOfPackets;
-  final int payloadLength;
-  final int seed;
-  final int broadcastFrames;
-  final int interFrameGap;
-  final int timeToLive;
-  final String transportLayerProtocol;
-  final String flowType;
+  final UnsignedShort payloadType;
+  final UnsignedLong numberOfPackets;
+  final UnsignedShort payloadLength;
+  final UnsignedLong seed;
+  final UnsignedLong broadcastFrames;
+  final UnsignedLong interFrameGap;
+  final UnsignedLong timeToLive;
+  final TransportLayerProtocol transportLayerProtocol;
+  final FlowType flowType;
   final bool checkContent;
-  final Running runningGenerators;
-  final Running runningVerifiers;
-  final String streamStatus;
+  final Process runningGenerators;
+  final Process runningVerifiers;
+  final StreamStatus streamStatus;
 
   factory StreamEntry.fromRawJson(String str) =>
       StreamEntry.fromJson(json.decode(str));
@@ -57,9 +61,12 @@ class StreamEntry {
   factory StreamEntry.fromJson(Map<String, dynamic> json) => StreamEntry(
         name: json["name"],
         description: json["description"],
-        lastUpdated: json["lastUpdated"],
-        startTime: json["startTime"],
-        endTime: json["endTime"],
+        lastUpdated: DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"],
+            isUtc: true),
+        startTime:
+            DateTime.fromMillisecondsSinceEpoch(json["startTime"], isUtc: true),
+        endTime:
+            DateTime.fromMillisecondsSinceEpoch(json["endTime"], isUtc: true),
         delay: json["delay"],
         streamId: json["streamId"],
         generatorsIds: List<String>.from(json["generatorsIds"].map((x) => x)),
@@ -71,12 +78,13 @@ class StreamEntry {
         broadcastFrames: json["broadcastFrames"],
         interFrameGap: json["interFrameGap"],
         timeToLive: json["timeToLive"],
-        transportLayerProtocol: json["transportLayerProtocol"],
-        flowType: json["flowType"],
+        transportLayerProtocol:
+            transportLayerProtocolFromString(json["transportLayerProtocol"]),
+        flowType: flowTypeFromString(json["flowType"]),
         checkContent: json["checkContent"],
-        runningGenerators: Running.fromJson(json["runningGenerators"]),
-        runningVerifiers: Running.fromJson(json["runningVerifiers"]),
-        streamStatus: json["streamStatus"],
+        runningGenerators: Process.fromJson(json["runningGenerators"]),
+        runningVerifiers: Process.fromJson(json["runningVerifiers"]),
+        streamStatus: streamStatusFromString(json["streamStatus"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -87,8 +95,8 @@ class StreamEntry {
         "endTime": endTime,
         "delay": delay,
         "streamId": streamId,
-        "generatorsIds": List<dynamic>.from(generatorsIds.map((x) => x)),
-        "verifiersIds": List<dynamic>.from(verifiersIds.map((x) => x)),
+        "generatorsIds": List<String>.from(generatorsIds.map((x) => x)),
+        "verifiersIds": List<String>.from(verifiersIds.map((x) => x)),
         "payloadType": payloadType,
         "numberOfPackets": numberOfPackets,
         "payloadLength": payloadLength,
@@ -96,8 +104,9 @@ class StreamEntry {
         "broadcastFrames": broadcastFrames,
         "interFrameGap": interFrameGap,
         "timeToLive": timeToLive,
-        "transportLayerProtocol": transportLayerProtocol,
-        "flowType": flowType,
+        "transportLayerProtocol":
+            transportLayerProtocolToString(transportLayerProtocol),
+        "flowType": flowTypeToString(flowType),
         "checkContent": checkContent,
         "runningGenerators": runningGenerators.toJson(),
         "runningVerifiers": runningVerifiers.toJson(),
@@ -105,14 +114,22 @@ class StreamEntry {
       };
 }
 
-class Running {
-  Running();
+class Process {
+  Process({
+    required this.processes,
+  });
 
-  factory Running.fromRawJson(String str) => Running.fromJson(json.decode(str));
+  late Map<String, ProcessStatus> processes;
+
+  factory Process.fromRawJson(String str) => Process.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory Running.fromJson(Map<String, dynamic> json) => Running();
+  factory Process.fromJson(Map<String, ProcessStatus> json) => Process(
+        processes: Map.from(json).map((k, v) =>
+            MapEntry<String, ProcessStatus>(k, processStatusFromString(v))),
+      );
 
-  Map<String, dynamic> toJson() => {};
+  Map<String, dynamic> toJson() => Map.from(processes)
+      .map((k, v) => MapEntry<String, dynamic>(k, processStatusToString(v)));
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 class Device {
   Device({
@@ -17,13 +18,13 @@ class Device {
   final String name;
   final String description;
   final String location;
-  final int lastUpdated;
+  final DateTime lastUpdated;
   final String ipAddress;
-  final int port;
+  final UnsignedInt port;
   final String macAddress;
-  final int genProcesses;
-  final int verProcesses;
-  final String status;
+  final UnsignedInt genProcesses;
+  final UnsignedInt verProcesses;
+  final DeviceStatus status;
 
   factory Device.fromRawJson(String str) => Device.fromJson(json.decode(str));
 
@@ -33,13 +34,14 @@ class Device {
         name: json["name"],
         description: json["description"],
         location: json["location"],
-        lastUpdated: json["lastUpdated"],
+        lastUpdated: DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"],
+            isUtc: true),
         ipAddress: json["ipAddress"],
         port: json["port"],
         macAddress: json["macAddress"],
         genProcesses: json["genProcesses"],
         verProcesses: json["verProcesses"],
-        status: json["status"],
+        status: deviceStatusFromString(json["status"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,6 +54,43 @@ class Device {
         "macAddress": macAddress,
         "genProcesses": genProcesses,
         "verProcesses": verProcesses,
-        "status": status,
+        "status": deviceStatusToString(status),
       };
+}
+
+enum DeviceStatus {
+  offline,
+  online,
+  running,
+  idle,
+}
+
+DeviceStatus deviceStatusFromString(String status) {
+  switch (status) {
+    case 'Offline':
+      return DeviceStatus.offline;
+    case 'Online':
+      return DeviceStatus.online;
+    case 'Running':
+      return DeviceStatus.running;
+    case 'Idle':
+      return DeviceStatus.idle;
+    default:
+      return DeviceStatus.online;
+  }
+}
+
+String deviceStatusToString(DeviceStatus status) {
+  switch (status) {
+    case DeviceStatus.offline:
+      return 'Offline';
+    case DeviceStatus.online:
+      return 'Online';
+    case DeviceStatus.running:
+      return 'Running';
+    case DeviceStatus.idle:
+      return 'Idle';
+    default:
+      return 'Online';
+  }
 }

@@ -9,11 +9,11 @@ each process has a name that is a string that represents both the name of the pr
 * `Verification` (the process is a verification process)
 * `GenerationAndVerification` (the process is a generation and verification process)"]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-#[serde(tag = "processtype")]
+#[serde(rename_all = "PascalCase")]
 pub enum ProcessType {
     Generation,
     Verification,
-    GenerationaAndVerification,
+    GeneratingAndVerification,
 }
 
 #[doc = r"process status

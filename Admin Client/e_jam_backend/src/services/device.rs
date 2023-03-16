@@ -21,7 +21,8 @@ async fn get_devices(data: web::Data<AppState>) -> impl Responder {
         .clone();
 
     match devices.len() {
-        0 => HttpResponse::NoContent().finish(),
+        0 => HttpResponse::NoContent()
+            .body("No devices in system, please add some devices to use them in the system"),
         _ => HttpResponse::Ok().json(devices),
     }
 }
@@ -46,14 +47,17 @@ async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) ->
 
     let device = devices
         .iter()
-        .find(|device| device.clone_device_mac() == device_mac);
+        .find(|device| device.get_device_mac() == &device_mac);
     match device {
         Some(device) => HttpResponse::Ok().json(device),
-        None => HttpResponse::NotFound().finish(),
+        None => HttpResponse::NotFound().body(format!(
+            "Device {} not found, please check the device mac address and try again",
+            device_mac
+        )),
     }
 }
 
-#[doc = r"# Delete a device
+#[doc = r"# add a device
 add a device to the list of devices
 if the device is already in the list, return a 409 Conflict
 if the device is not in the list, add it and return a 201 Created
@@ -68,23 +72,53 @@ async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> imp
     let mut devices = data.device_list.lock().expect(
         format!(
             "failed to lock device list in add device {}",
-            device.clone_device_mac()
+            device.get_device_mac()
         )
         .as_str(),
     );
     let device_index = devices
         .iter()
-        .position(|device| device.clone_device_mac() == device.clone_device_mac());
+        .position(|device| device.get_device_mac() == device.get_device_mac());
     match device_index {
-        Some(_device_index) => HttpResponse::Conflict().finish(),
+        Some(_device_index) => HttpResponse::Conflict().body(format!("Device {} already exists in the system, please change the device mac address and try again", device.get_device_mac())),
         None => {
+            let mac = device.get_device_mac().clone();
             devices.push(device.into_inner());
-            HttpResponse::Created().finish()
+            HttpResponse::Created().body(format!("Device {} added successfully", mac))
         }
     }
 }
 
-#[doc = r"# Ping a device
+// TODO: document this function
+#[get("/devices/{device_mac}/ping")]
+async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
+    let device_mac = device_mac.into_inner();
+    let mut devices = data
+        .device_list
+        .lock()
+        .expect(format!("failed to lock device list in ping device {}", device_mac).as_str());
+
+    let device_index = devices
+        .iter()
+        .position(|device| device.get_device_mac() == &device_mac);
+
+    match device_index {
+        Some(device_index) => {
+            let response = devices[device_index].is_reachable();
+            match response {
+                true => HttpResponse::Ok().body("Device is reachable and online in the network"),
+                false => HttpResponse::InternalServerError()
+                    .body("Could not reach the device, please check the device and try again"),
+            }
+        }
+        None => HttpResponse::NotFound().body(format!(
+            "Device {} not found, please check the device mac address and try again",
+            device_mac
+        )),
+    }
+}
+
+#[doc = r"# Check a new device
 ping a device provided from the user this is used only to check if the device is reachable or not for the user
 and does not update the device in the list of devices
 if the device is not reachable, return a 404 Not Found
@@ -94,13 +128,15 @@ if the device is reachable, return a 200 OK
 ## Returns
 * `HttpResponse` - the http response"]
 #[post("/devices/ping")]
-async fn ping_device(device: web::Json<Device>) -> impl Responder {
+async fn check_new_device(device: web::Json<Device>) -> impl Responder {
     let mut device = device.into_inner();
-    let response= device.is_reachable();
-    
+    let response = device.is_reachable();
+
     match response {
-        true => HttpResponse::Ok().finish(),
-        false => HttpResponse::NotFound().finish(),
+        true => HttpResponse::Ok()
+            .body("Device is reachable and online in the network and can be added to the system"),
+        false => HttpResponse::InternalServerError()
+            .body("Could not reach the device, please check the data and try again"),
     }
 }
 
@@ -113,7 +149,7 @@ if the list is not found, return a 500 Internal Server Error
 * `device_list` - the list of devices in the system to ping
 ## Returns
 * `HttpResponse` - the http response"]
-#[post("/devices/ping/all")]
+#[get("/devices/ping_all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
     let mut devices = data
         .device_list
@@ -121,12 +157,20 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
         .expect("failed to lock device list in ping all devices");
 
     match devices.len() {
-        0 => HttpResponse::NoContent().finish(),
+        0 => HttpResponse::NoContent().body("No devices in the system, please add some devices and try again"),
         _ => {
+            let mut counter = 0;
             for device in devices.iter_mut() {
-                device.is_reachable();
+                counter += device.is_reachable() as usize;
             }
-            HttpResponse::Ok().finish()
+            match counter {
+                0 => HttpResponse::InternalServerError().body("Could not reach any device, please check the devices and try again"),
+                _ => HttpResponse::Ok().body(format!(
+                    "Ping all devices completed, {} devices are reachable and online in the network",
+                    counter
+                ))
+                
+            }
         }
     }
 }
@@ -159,21 +203,24 @@ async fn update_device(
 
     let device_entry = devices
         .iter_mut()
-        .find(|device| device.clone_device_mac() == device_mac);
+        .find(|device| device.get_device_mac() == &device_mac);
 
     match device_entry {
         Some(device_entry) => {
             // this is used to prevent the user from changing the mac address of the device in the update request without deleting and adding the device again to the list
             // to ensure that the user is not changing the mac address of the device in the update request accidentally
-            if device_entry.clone_device_mac() != device.clone_device_mac() {
-                return HttpResponse::BadRequest().json("device mac address cannot be changed in updating device please delete and add the device again if you want to change the mac address of the device");
+            if device_entry.get_device_mac() != device.get_device_mac() {
+                return HttpResponse::BadRequest().body("The mac address of the device cannot be changed in the update request, please delete the device and add it again with the new mac address");
             }
 
             *device_entry = device.clone();
             println!("updated device: {:#?}", device);
-            HttpResponse::Ok().finish()
+            HttpResponse::Ok().body(format!("Device {} updated successfully", device_mac))
         }
-        None => HttpResponse::NotFound().finish(),
+        None => HttpResponse::NotFound().body(format!(
+            "Device {} not found, please check the device mac address and try again",
+            device_mac
+        )),
     }
 }
 
@@ -196,13 +243,16 @@ async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>)
         .expect(format!("failed to lock device list in delete device {}", device_mac).as_str());
     let device_index = devices
         .iter()
-        .position(|device| device.clone_device_mac() == device_mac);
+        .position(|device| device.get_device_mac() == &device_mac);
     match device_index {
         Some(device_index) => {
             devices.remove(device_index);
-            HttpResponse::Ok().finish()
+            HttpResponse::Ok().body(format!("Device {} deleted successfully and will not be reachable in the system", device_mac))
         }
-        None => HttpResponse::NotFound().finish(),
+        None => HttpResponse::NotFound().body(format!(
+            "Device {} not found, please check the device mac address and try again",
+            device_mac
+        )),
     }
 }
 

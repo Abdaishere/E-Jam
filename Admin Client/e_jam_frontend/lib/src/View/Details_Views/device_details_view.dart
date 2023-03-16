@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:e_jam/src/Model/fake_chart_data.dart';
+import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';

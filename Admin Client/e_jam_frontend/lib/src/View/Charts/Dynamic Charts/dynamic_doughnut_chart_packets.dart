@@ -1,4 +1,4 @@
-import 'package:e_jam/src/Model/fake_chart_data.dart';
+import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -7,10 +7,12 @@ class DynamicDoughnutChartPackets extends StatefulWidget {
 
   final List<PacketsState> packetsState;
   @override
-  State<DynamicDoughnutChartPackets> createState() => _DynamicDoughnutChartPacketsState();
+  State<DynamicDoughnutChartPackets> createState() =>
+      _DynamicDoughnutChartPacketsState();
 }
 
-class _DynamicDoughnutChartPacketsState extends State<DynamicDoughnutChartPackets> {
+class _DynamicDoughnutChartPacketsState
+    extends State<DynamicDoughnutChartPackets> {
   get packetsState => widget.packetsState;
   @override
   Widget build(BuildContext context) {
