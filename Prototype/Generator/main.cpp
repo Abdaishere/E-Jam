@@ -181,7 +181,7 @@ int main(int argc, char** argv)
     if(currConfig->getBcFramesNum() > 0)
     {
         int packetNumber = currConfig->getNumberOfPackets();
-        creator = std::thread(createNumBased, pc, packetNumber,0);
+        creator = std::thread(createNumBased, pc, packetNumber,15);
         //TODO add burst delay and burst size from stream configuration
         if(flowType == BURSTY)
             sender = std::thread(sendBurst, pc, packetNumber, (ull)20, 30,gap);

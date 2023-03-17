@@ -3,8 +3,6 @@
 
 long long EthernetConstructor::seqNum = 1;
 
-//TODO Get values from Configuration manager
-long long EthernetConstructor::seqNum = 0;
 
 EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
                                          ByteArray& payload,

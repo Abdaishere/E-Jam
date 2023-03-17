@@ -34,14 +34,14 @@ public class Communicator
         stream1.senders.add("8CB87EB05FEA");
         stream1.receivers.add("00D861A86FDA");
         stream1.payloadType = PayloadType.FIRST;
-        stream1.numberOfPackets = 0;
+        stream1.numberOfPackets = 100;
         stream1.payloadLength = 13;
         stream1.seed = 0;
         stream1.flowType = FlowType.BACK_TO_BACK;
         stream1.streamID = "abc";
         stream1.bcFramesNum = 100;
-        stream1.interFrameGap = 10;
-        stream1.lifeTime = 2000;
+        stream1.interFrameGap = 60;
+        stream1.lifeTime = 100;
         stream1.transportProtocol = TransportProtocol.TCP;
         stream1.checkContent = false;
 

@@ -18,7 +18,6 @@ private:
     ByteArray streamID;
     ByteArray payload;
     ByteArray CRC;
-    ByteArray streamID;
     static long long seqNum;
     //may need to insert 12-byte inter-packet gap, not sure
 
