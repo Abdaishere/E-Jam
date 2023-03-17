@@ -20,7 +20,9 @@ public class Stream
     long interFrameGap;             //Time to wait between each packet generation in the stream in ms
     long lifeTime;                  //Time to live before ending execution in ms
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
-    FlowType flowType;                  //The production pattern that the packets uses
+    FlowType flowType;              //The production pattern that the packets uses
+    long burstLen;				    //Number of packets in a burst
+    long burstDelay;				//Delay between bursts in milliseconds
     boolean checkContent;                  //Whether to check content or not
 
 

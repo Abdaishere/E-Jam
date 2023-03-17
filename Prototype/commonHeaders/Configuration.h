@@ -46,6 +46,8 @@ private:
     ull lifeTime = 1000;                //Time to live before ending execution in ms
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
+	ull burstLen;						//Number of packets in a burst
+	ull burstDelay;						//Delay between bursts in milliseconds
     bool checkContent;                  //Whether to check content or not
 
 
@@ -166,12 +168,17 @@ public:
                 flowType = BURSTY;
         }
 
-        //Read check content
-        char cInput;
-        std::cin>>cInput;
-        cInput-='0'; //convert to int
-        checkContent = cInput;
+		//Read burst length
+		std::cin>>burstLen;
 
+		//Read burstDelay
+		std::cin>>burstDelay;
+
+		//Read check content
+		char cInput;
+		std::cin>>cInput;
+		cInput-='0'; //convert to int
+		checkContent = cInput;
 
         //handle macaddres
         myMacAddress = discoverMyMac();
