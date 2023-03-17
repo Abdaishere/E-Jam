@@ -15,6 +15,7 @@ private:
     ByteArray preamble;
     //type of network layer protocol or capacity of data
     ByteArray type;
+    ByteArray streamID;
     ByteArray payload;
     ByteArray CRC;
     ByteArray streamID;
@@ -26,6 +27,7 @@ public:
                         ByteArray& payload,
                         ByteArray& innerProtocol,
                         ByteArray& streamID) ;
+
 
     void constructFrame();
 

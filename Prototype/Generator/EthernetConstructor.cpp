@@ -1,6 +1,8 @@
 
 #include "EthernetConstructor.h"
 
+long long EthernetConstructor::seqNum = 1;
+
 //TODO Get values from Configuration manager
 long long EthernetConstructor::seqNum = 0;
 
@@ -14,10 +16,9 @@ EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& de
 }
 
 void EthernetConstructor::constructFrame() {
+
     preamble = ByteArray(this->pre, 8);
     frame.clear();
-//    frame.resize(source_address.size() + destination_address.size() + type.size() + STREAMID_LEN + SeqNum_LEN + payload.size() + CRC_LENGTH);
-//  frame.write(preamble);
     frame.append(destination_address);
     frame.append(source_address);
     frame.append(type);

@@ -11,12 +11,17 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <StatsManager.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
 std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket(int rcvInd)
 {
+    //Signal a packet created
+    StatsManager* statsManager = StatsManager::getInstance();
+    statsManager->increaseNumPackets();
+
     //TODO move ByteArray creating inside each constructor class
     ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
     ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
@@ -24,6 +29,7 @@ void PacketCreator::createPacket(int rcvInd)
     std::shared_ptr<PayloadGenerator> payloadGenerator = PayloadGenerator::getInstance();
     payloadGenerator->regeneratePayload();
     ByteArray payload = payloadGenerator->getPayload();
+
     ByteArray innerProtocol = ByteArray(2, '0');
     innerProtocol[0] = (unsigned char) 0x88;
     innerProtocol[1] = (unsigned char) 0xb5;
@@ -34,6 +40,7 @@ void PacketCreator::createPacket(int rcvInd)
                                                                  streamID);
     frameConstructor->constructFrame();
     //TODO delete the values inside created ByteArray*
+    //lock the mutex and push to queue then unlock it
     mtx.lock();
     productQueue.push(frameConstructor->getFrame());
     mtx.unlock();

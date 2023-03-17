@@ -16,6 +16,7 @@
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
 #define STREAMID_LEN 3
+#define SeqNum_Len 8
 #define FRAME_TYPE_LEN 2
 #define CRC_LENGTH 4
 #define PREMBLE_LENGTH 8

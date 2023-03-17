@@ -18,6 +18,7 @@ std::shared_ptr<PacketSender> PacketSender::getInstance(int genID, std::string p
         instance->permissions = pipePerm;
         instance->genID = genID;
         instance->openFifo();
+        return instance;
     }
     return instance;
 }
@@ -43,6 +44,7 @@ void PacketSender::openFifo()
 
 void PacketSender::transmitPackets(const ByteArray& packet) const
 {
+
     int len = packet.size();
     write(fd, &len,4);
     write(fd, packet.c_str(), len);

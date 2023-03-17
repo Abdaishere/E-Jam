@@ -8,6 +8,7 @@ std::shared_ptr<Configuration> ConfigurationManager::getConfiguration(char* path
         configuration.reset(new Configuration());
     }
     configuration->loadFromFile(path);
+
     return configuration;
 }
 std::shared_ptr<Configuration> ConfigurationManager::getConfiguration()
