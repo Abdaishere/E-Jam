@@ -1,6 +1,3 @@
-//
-// Created by mohamedelhagry on 12/14/22.
-//
 
 #ifndef VERIFIER_USERNAMEGETTER_H
 #define VERIFIER_USERNAMEGETTER_H

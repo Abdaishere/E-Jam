@@ -5,16 +5,18 @@
 #include "../commonHeaders/Byte.h"
 #include "ConfigurationManager.h"
 #include "ErrorHandler.h"
+#include <memory>
+
 
 //singleton
 class PayloadVerifier
 {
     public:
         //parameters pointer to byteArray, start index, end index of payload
-        bool verifiy(ByteArray*, int, int);
-        static PayloadVerifier* getInstance();
+        bool verifiy(std::shared_ptr<ByteArray>&, int, int);
+        static std::shared_ptr<PayloadVerifier> getInstance();
     private:
-        static PayloadVerifier* instance;
+        static std::shared_ptr<PayloadVerifier> instance;
         //singleton class
         PayloadVerifier();
         PayloadType payloadType;

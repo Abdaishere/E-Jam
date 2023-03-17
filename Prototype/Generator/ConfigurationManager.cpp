@@ -1,20 +1,17 @@
-//
-// Created by khaled on 12/3/22.
-//
-
 #include "ConfigurationManager.h"
-Configuration* ConfigurationManager::configuration = nullptr;
+std::shared_ptr<Configuration> ConfigurationManager::configuration = nullptr;
 
-Configuration* ConfigurationManager::getConfiguration(char* path)
+std::shared_ptr<Configuration> ConfigurationManager::getConfiguration(char* path)
 {
     if(configuration == nullptr)
-        configuration =  new Configuration();
-
+    {
+        configuration.reset(new Configuration());
+    }
     configuration->loadFromFile(path);
-//    configuration->Mac12toMac6();
+
     return configuration;
 }
-Configuration* ConfigurationManager::getConfiguration()
+std::shared_ptr<Configuration> ConfigurationManager::getConfiguration()
 {
     return configuration;
 }
@@ -26,12 +23,18 @@ void ConfigurationManager::run()
         printf("Configuration not set!\n");
         return;
     }
-    for(auto& e:configuration->getSenders())
+    std::vector<ByteArray>& currSenders = configuration->getSenders();
+    for(int i=0;i<currSenders.size();i++)
     {
-        e.print();
-    }
-    for(auto& e:configuration->getReceivers())
+        print(&currSenders[i]);
+    }/*
+    for(ByteArray& e:configuration->getSenders())
     {
-        e.print();
+        print(&e);
+    }*/
+    std::vector<ByteArray>& currRecvs = configuration->getReceivers();
+    for(int i=0;i<currRecvs.size();i++)
+    {
+        print(&currRecvs[i]);
     }
 }

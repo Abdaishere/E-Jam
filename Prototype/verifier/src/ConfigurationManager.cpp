@@ -1,12 +1,12 @@
 #include "ConfigurationManager.h"
 
 
-std::map<int, Configuration*> ConfigurationManager::configurations; //map stream id to configuration
+std::map<int, std::shared_ptr<Configuration>> ConfigurationManager::configurations; //map stream id to configuration
 char* ConfigurationManager::currentStreamID;
 std::string ConfigurationManager::CONFIG_FOLDER;
 
 //get configuration related to stream id
-Configuration *ConfigurationManager::getConfiguration()
+std::shared_ptr<Configuration> ConfigurationManager::getConfiguration()
 {
     char* streamID = ConfigurationManager::currentStreamID;
     int key = convertStreamID(streamID);
@@ -20,10 +20,10 @@ Configuration *ConfigurationManager::getConfiguration()
 
 void ConfigurationManager::addConfiguration(const char * dir)
 {
-    Configuration* val = new Configuration();
+    std::shared_ptr<Configuration> val = std::make_shared<Configuration>();
     val->loadFromFile((char *)dir);
 
-    int key = convertStreamID((char*) val->getStreamID()->bytes);
+    int key = convertStreamID((char*) val->getStreamID()->c_str());
     configurations[key] = val;
 }
 
@@ -82,10 +82,10 @@ std::vector<std::string> ConfigurationManager::splitString(const std::string& s,
 
 void ConfigurationManager::setCurrStreamID(ByteArray& streamID)
 {
-    currentStreamID = (char*)streamID.bytes;
+    currentStreamID = (char*) streamID.c_str();
 }
 
-char *ConfigurationManager::getCurrStreamID()
+char* ConfigurationManager::getCurrStreamID()
 {
     return currentStreamID;
 }

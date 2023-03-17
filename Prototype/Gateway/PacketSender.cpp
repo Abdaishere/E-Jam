@@ -3,7 +3,7 @@
 PacketSender::PacketSender(int genNum) {
     this->genNum = genNum;
     fd = new int[genNum];
-    payloads = new queue<ByteArray>[genNum];
+    payloads = std::vector<queue<ByteArray>>(genNum);
     //opening socket
     sock = socket(AF_PACKET, SOCK_RAW, protocol);
     if (sock == -1)
@@ -65,7 +65,7 @@ void PacketSender::checkPipes()
         int bytesRead = read(fd[i], buffer, len);
         while (bytesRead != 0)
         {
-            payloads[i].push(ByteArray((char*)buffer, bytesRead, 0));
+            payloads[i].push(ByteArray(buffer, bytesRead));
             read(fd[i], &len, 4);
             bytesRead = read(fd[i], buffer, len);
         }
@@ -90,14 +90,14 @@ void PacketSender::roundRobin()
 
 bool PacketSender::sendToSwitch(ByteArray payload)
 {
-    std::cerr << payload.length << "\n";
-    for(int i=0; i<payload.length;i++)
-        cerr << (int)payload.at(i)<< " ";
-    cerr <<"\n";
+    std::cerr << payload.size() << "\n";
+//    for(int i=0; i<payload.size();i++)
+//        cerr << (int)payload.at(i)<< " ";
+//    cerr <<"\n";
     // send the request
     // ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
     //                const struct sockaddr *dest_addr, socklen_t addrlen);
-    if (sendto(sock, payload.bytes, payload.length, 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+    if (sendto(sock, payload.c_str(), payload.size(), 0, (struct sockaddr*)&addr, sizeof(addr)) == -1)
     {
         cerr << "couldn't send frame " << errno << "\n";
         return false;

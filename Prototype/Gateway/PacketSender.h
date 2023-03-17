@@ -30,7 +30,7 @@ const int BUFFER_SIZE = 1600;
 class PacketSender {
 private:
     int genNum;
-    queue<ByteArray>* payloads;
+    std::vector<queue<ByteArray>> payloads;
     int* fd;
     unsigned char buffer[BUFFER_SIZE];
     int sock;

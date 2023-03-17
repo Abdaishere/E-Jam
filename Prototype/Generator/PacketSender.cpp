@@ -1,30 +1,27 @@
-//
-// Created by khaled on 11/29/22.
-//
 
 #include "PacketSender.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <csignal>
 #include <error.h>
-PacketSender* PacketSender::instance = nullptr;
+#include <iostream>
+
+std::shared_ptr<PacketSender> PacketSender::instance = nullptr;
 PacketSender::PacketSender() {}
 
-PacketSender* PacketSender::getInstance(int genID, std::string pipeDir, int pipePerm)
+std::shared_ptr<PacketSender> PacketSender::getInstance(int genID, std::string pipeDir, int pipePerm)
 {
     if(instance  == nullptr)
     {
-        instance = new PacketSender();
+        instance.reset(new PacketSender());
         instance->pipeDir = pipeDir;
         instance->permissions = pipePerm;
         instance->genID = genID;
         instance->openFifo();
         return instance;
     }
-    else
-        return instance;
+    return instance;
 }
-#include <iostream>
 
 void PacketSender::openFifo()
 {
@@ -47,7 +44,8 @@ void PacketSender::openFifo()
 
 void PacketSender::transmitPackets(const ByteArray& packet) const
 {
-    int len = packet.length;
-    write(fd, &len, 4);
-    write(fd, packet.bytes,packet.length);
+
+    int len = packet.size();
+    write(fd, &len,4);
+    write(fd, packet.c_str(), len);
 }

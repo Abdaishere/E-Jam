@@ -1,7 +1,3 @@
-//
-// Created by khaled on 12/3/22.
-//
-
 #ifndef GENERATOR_CONFIGURATIONMANAGER_H
 #define GENERATOR_CONFIGURATIONMANAGER_H
 
@@ -13,10 +9,10 @@ class ConfigurationManager
 {
 private:
     //singleton instance from configuration
-    static Configuration *configuration;
+    static std::shared_ptr<Configuration> configuration;
 public:
-    static Configuration* getConfiguration(char*);
-    static Configuration* getConfiguration();
+    static std::shared_ptr<Configuration> getConfiguration(char*);
+    static std::shared_ptr<Configuration> getConfiguration();
     static void run();
 };
 

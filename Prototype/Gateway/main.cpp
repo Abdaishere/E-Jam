@@ -2,27 +2,28 @@
 #include "PacketReceiver.h"
 #include <iostream>
 #include <thread>
+#include <memory>
 using namespace std;
 // functions used in the sender part of the gateway
-void checkingThread(PacketSender* packetSender)
+void checkingThread(std::shared_ptr<PacketSender> packetSender)
 {
     while (true)
         packetSender->checkPipes(); //check the buffe to read payloads 
 }
 
-void sendingThread(PacketSender* packetSender)
+void sendingThread(std::shared_ptr<PacketSender> packetSender)
 {
     while (true)
         packetSender->roundRobin(); //round robin technique to send to switch
 }
 
 //functions used in receiving part of the gateway
-void receivingThread(PacketReceiver* packetReceiver)
+void receivingThread(std::shared_ptr<PacketReceiver> packetReceiver)
 {
     packetReceiver->receiveFromSwitch();
 }
 
-void checkingThreadV(PacketReceiver* packetReceiver)
+void checkingThreadV(std::shared_ptr<PacketReceiver> packetReceiver)
 {
     packetReceiver->checkBuffer(); //checking the buffer then send to verifiers
 }
@@ -42,7 +43,7 @@ int main(int argc, char ** argv)
     //generator
     if(mode == 0)
     {
-        auto* packetSender = new PacketSender(num);
+        std::shared_ptr<PacketSender> packetSender = std::make_shared<PacketSender>(num);
         packetSender->openPipes();
 
         thread checker(checkingThread, packetSender);
@@ -57,7 +58,7 @@ int main(int argc, char ** argv)
     //verifier
     else
     {
-        PacketReceiver* packetReceiver = new PacketReceiver(num);
+        std::shared_ptr<PacketReceiver> packetReceiver = std::make_shared<PacketReceiver>(num);
 
         while(true)
         {

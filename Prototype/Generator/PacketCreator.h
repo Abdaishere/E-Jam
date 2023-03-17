@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H
@@ -27,7 +24,7 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
-    PacketSender* sender;
+    std::shared_ptr<PacketSender> sender;
 public:
     PacketCreator();
     static std::mutex mtx;

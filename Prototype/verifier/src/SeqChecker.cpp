@@ -5,7 +5,7 @@
 #include <cassert>
 #include "SeqChecker.h"
 
-void SeqChecker::receive(long long int seqNum) {
+void SeqChecker::receive(unsigned long long int seqNum) {
     if(seqNum == expectedNext)
     {
         expectedNext++;

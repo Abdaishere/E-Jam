@@ -1,12 +1,11 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #include "EthernetConstructor.h"
 
 long long EthernetConstructor::seqNum = 1;
 
 //TODO Get values from Configuration manager
+long long EthernetConstructor::seqNum = 0;
+
 EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
                                          ByteArray& payload,
                                          ByteArray& innerProtocol,
@@ -17,22 +16,17 @@ EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& de
 }
 
 void EthernetConstructor::constructFrame() {
-    char* pre = new char[8];
-    pre[0] = pre[1] = pre[2] = pre[3] = pre[4] = pre[5] = pre[6] = 0xAA;
-    pre [7] = 0xAB;
-    preamble = ByteArray(pre, 8);
 
-    frame.reset(source_address.capacity + destination_address.capacity + type.capacity + STREAMID_LEN + SeqNum_Len + payload.capacity + CRC_LENGTH);
-//    frame.write(preamble);
-    frame.write(destination_address);
-    frame.write(source_address);
-    frame.write(type);
-    frame.write(streamID);
-    frame.write(seqNum++);
-    frame.write(payload);
-
-    CRC = calculateCRC(&payload);
-    frame.write(CRC);
+    preamble = ByteArray(this->pre, 8);
+    frame.clear();
+    frame.append(destination_address);
+    frame.append(source_address);
+    frame.append(type);
+    frame.append(streamID);
+    frame.append(convertLLToStr(seqNum++));
+    frame.append(payload);
+    CRC = calculateCRC(std::make_shared<ByteArray>(payload));
+    frame.append(CRC);
 }
 static uint32_t CRCTable[256] = {
         0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
@@ -101,12 +95,12 @@ static uint32_t CRCTable[256] = {
         0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 };
 
-ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
+ByteArray EthernetConstructor::calculateCRC(std::shared_ptr<ByteArray> payload)
 {
     unsigned int crc32 = 0xFFFFFFFFu;
 
-    for (size_t i = 0; i < payload->length; i++) {
-        const uint32_t lookupIndex = (crc32 ^ payload->bytes[i]) & 0xff;
+    for (size_t i = 0; i < payload->size(); i++) {
+        const uint32_t lookupIndex = (crc32 ^ payload->at(i)) & 0xff;
         crc32 = (crc32 >> 8) ^ CRCTable[lookupIndex];  // CRCTable is an array of 256 32-bit constants
     }
 
@@ -115,5 +109,5 @@ ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
     //bug, can't cast to char array
 //    char* crcChar = (char*) crc32;
 //    return ByteArray(crcChar, 4,0);
-    return ByteArray("4444",4,0);
+    return ByteArray(4, '4');
 }

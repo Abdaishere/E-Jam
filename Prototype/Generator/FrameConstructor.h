@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #ifndef GENERATOR_FRAMECONSTRUCTOR_H
 #define GENERATOR_FRAMECONSTRUCTOR_H

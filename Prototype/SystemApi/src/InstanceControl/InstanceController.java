@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.rmi.server.ExportException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -20,7 +21,7 @@ public class InstanceController
     
     public InstanceController (ArrayList<Stream> streams)
     {
-        getExecutables(); 
+        getExecutables();
         getMyMacAddress();
         int genNum = startGenerators(streams); //start executable generators instances
         int verNum = startVerifiers(streams); //start executable verifiers instances
@@ -35,13 +36,28 @@ public class InstanceController
         for(Long pid:pids)
             System.out.println("PID : " + pid);
         debugStreams();
-        //kill the current running executables
+
+        //kill the current running executables if they exist
         for(Long pid:pids)
         {
-            String[] args = {"-9", Long.toString(pid)};
-            executeCommand("kill",true , args);
+            String[] args = {"kill", Long.toString(pid)};
+            executeCommand("sudo",true , args);
         }
 
+    }
+
+    private boolean exists(long pid)
+    {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command("ps", "cax", "|", "grep", Long.toString(pid), ">", "/dev/null");
+
+        try {
+            Process process = processBuilder.start();
+            process.waitFor();
+            return process.exitValue() == 0;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //reading the console outputs of the executables,
@@ -168,7 +184,7 @@ public class InstanceController
             if(waitFor) {
                 int exitVal = process.waitFor();
                 if (exitVal != 0) {
-                    throw new Exception("Could not execute command: " + command);
+                    throw new Exception("Could not execute command: " + command + Arrays.toString(args));
                 }
                 System.out.println(command + " " + pid + " exited");
             }

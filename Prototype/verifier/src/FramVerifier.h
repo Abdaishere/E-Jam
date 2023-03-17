@@ -3,22 +3,23 @@
 
 #include "ConfigurationManager.h"
 #include "ErrorHandler.h"
+#include <memory>
 //singleton
 class FrameVerifier
 {
     public:
         //parameters pointer to byteArray, start index, end index of payload
-        bool verifiy(ByteArray*, int, int);
-        static FrameVerifier* getInstance();
+        bool verifiy(std::shared_ptr<ByteArray>, int, int);
+        static std::shared_ptr<FrameVerifier> getInstance();
     private:
-        static FrameVerifier* instance;
+        static std::shared_ptr<FrameVerifier> instance;
         //singleton class
         FrameVerifier();
         //define accepted macAddr and senders
-        std::vector<ByteArray>* acceptedSenders;
+        std::shared_ptr<std::vector<ByteArray>> acceptedSenders;
         #define acceptedRecv ConfigurationManager::getConfiguration()->getMyMacAddress()
         void updateAcceptedSenders();
-        ByteArray* calculateCRC(ByteArray*,int,int);
+        std::shared_ptr<ByteArray> calculateCRC(std::shared_ptr<ByteArray>,int,int);
 };
 
 #endif // FRAMVERIFIER_H

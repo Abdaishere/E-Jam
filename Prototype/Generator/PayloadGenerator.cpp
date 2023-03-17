@@ -1,10 +1,7 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #include "PayloadGenerator.h"
 
-PayloadGenerator* PayloadGenerator::instance = nullptr;
+std::shared_ptr<PayloadGenerator> PayloadGenerator::instance = nullptr;
 
 PayloadGenerator::PayloadGenerator()
 {
@@ -13,18 +10,16 @@ PayloadGenerator::PayloadGenerator()
     this->rng.setSeed(seed);
 
     int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
-    payload = ByteArray(payloadLength,0);
+    payload = ByteArray(payloadLength, 'a');
 }
 
 void PayloadGenerator::generateRandomCharacters()
 {
-    payload.length=0;
-    for(int i=0; i<payload.capacity; i++)
+    for(int i=0; i<payload.size(); i++)
     {
         unsigned char c = rng.gen();
         payload.at(i) = c;
         // so copy constructor works correctly
-        payload.length++;
     }
 }
 
@@ -47,7 +42,8 @@ void PayloadGenerator::regeneratePayload()
 
 void PayloadGenerator::generateAlphabet()
 {
-    payload = ByteArray("abcdefghijklmnopqrstuvwxyz",26);
+    std::string tmp = "abcdefghijklmnopqrstuvwxyz";
+    payload = ByteArray(tmp.begin(), tmp.end());
 }
 
 ByteArray PayloadGenerator::getPayload()
@@ -57,28 +53,30 @@ ByteArray PayloadGenerator::getPayload()
 
 void PayloadGenerator::generateFirstAlphabet()
 {
-    payload = ByteArray("abcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklm"
-                        "abcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklm",104,0);
+    std::string tmp = "abcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklmabcdefghijklm";
+    payload = ByteArray(tmp.begin(), tmp.end());
 }
 
 void PayloadGenerator::generateSecondAlphabet()
 {
-    payload = ByteArray("nopqrstuvwxyz",13);
+    std::string tmp = "nopqrstuvwxyz";
+    payload = ByteArray(tmp.begin(), tmp.end());
 }
 
 
-PayloadGenerator *PayloadGenerator::getInstance()
+std::shared_ptr<PayloadGenerator> PayloadGenerator::getInstance()
 {
     if(instance == nullptr)
     {
-        instance = new PayloadGenerator();
+        instance.reset(new PayloadGenerator());
     }
     return instance;
 }
 
 void PayloadGenerator::addStreamId()
 {
-    payload = ByteArray("abcdefghijklm",13);
+    std::string tmp = "abcdefghijklm";
+    payload = ByteArray(tmp.begin(), tmp.end());
 }
 
 

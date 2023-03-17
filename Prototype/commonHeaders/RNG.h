@@ -1,7 +1,3 @@
-//
-// Created by mohamedelhagry on 12/5/22.
-//
-
 #ifndef GENERATOR_RNG_H
 #define GENERATOR_RNG_H
 #include <random>

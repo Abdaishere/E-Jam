@@ -1,7 +1,3 @@
-//
-// Created by mohamedelhagry on 12/14/22.
-//
-
 #include "UsernameGetter.h"
 //get the username from cmd
 std::string UsernameGetter::exec() {
