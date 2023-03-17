@@ -37,7 +37,7 @@ std::shared_ptr<ByteArray> PacketUnpacker::consumePacket()
 
 void PacketUnpacker::verifiyPacket()
 {
-    //TODO make it adhere to the correct ethernet frame structure
+    bool pcktVerified = true;
     std::shared_ptr<ByteArray> packet = consumePacket();
 
     //Signal a packet received
@@ -45,7 +45,6 @@ void PacketUnpacker::verifiyPacket()
 
     //nothing to do if no packet
     if(packet == nullptr) return;
-    statsManager->increaseNumPackets(1);
 
     std::cerr << "verifying packet\n";
     //Extract Stream ID
@@ -89,6 +88,7 @@ void PacketUnpacker::verifiyPacket()
     int startIndex = 0, endIndex = packet->length();
     std::shared_ptr<FrameVerifier> fv = FrameVerifier::getInstance();
     bool frameStatus = fv->verifiy(packet, startIndex, endIndex);
+	pcktVerified &=frameStatus;
 
     //check for payload error
     //by matching payloads
@@ -96,17 +96,29 @@ void PacketUnpacker::verifiyPacket()
     startIndex = streamID_startIndex+STREAMID_LEN+SeqNum_LEN;
     endIndex = startIndex+payloadLength-1;
 
-    std::shared_ptr<PayloadVerifier> pv = PayloadVerifier::getInstance();
-    bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
-    //must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
-    if(!frameStatus)
-        std::cerr << "frame corrupted\n";
-    else
-        std::cerr << "frame correct\n";
-    if(!payloadStatus)
-        std::cerr << "payload corrupted\n";
-    else
-        std::cerr << "payload correct\n";
+	if(ConfigurationManager::getConfiguration()->getCheckContent())
+	{
+		std::shared_ptr<PayloadVerifier> pv = PayloadVerifier::getInstance();
+		bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
+		pcktVerified &=payloadStatus;
+		//must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
+		if(!frameStatus)
+			std::cerr << "frame corrupted\n";
+		else
+			std::cerr << "frame correct\n";
+		if(!payloadStatus)
+			std::cerr << "payload corrupted\n";
+		else
+			std::cerr << "payload correct\n";
+	}
+	if(pcktVerified)
+	{
+		statsManager->increaseReceivedCorrectPckts(1);
+	}
+	else
+	{
+		statsManager->increaseReceivedWrongPckts(1);
+	}
 }
 
 

@@ -10,26 +10,39 @@
 #include "Configuration.h"
 #include <memory>
 
-
+typedef unsigned long long ull;
 //Singleton class
 class StatsManager
 {
 private:
     static std::shared_ptr<StatsManager> instance; //singleton unique instance
-    long numberOfPackets;
-    long numberOfErrors;
-    clock_t timer; 
+	ull receivedCorrectPckts;
+	ull receivedWrongPckts;
+	ull receivedOutOfOrderPckts;
+	ull droppedPckts;
+
+	ull sentPckts;
+	ull sentErrorPckts;
+
+    clock_t timer;
     StatsManager(int, bool);
-    void resetStats(bool);
+    void resetStats();
     void writeStatFile();
-    bool is_gen;
+
+
+	bool is_gen;
     int instanceID;
 
 public:
     static std::shared_ptr<StatsManager> getInstance(int instanceID = 0,bool is_gen = false);
     void sendStats();
-    void increaseNumPackets(long val = 1);
-    void increaseNumErrors(long val = 1);
+	void increaseReceivedCorrectPckts(int);
+	void increaseReceivedWrongPckts(int);
+	void increaseReceivedOutOfOrderPckts(int);
+	void increaseDroppedPckts(int);
+
+	void increaseSentPckts(int);
+	void increaseSentErrorPckts(int);
 };
 
 

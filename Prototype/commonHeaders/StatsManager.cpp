@@ -20,13 +20,19 @@ StatsManager::StatsManager(int id, bool is_gen1)
 {
     is_gen = is_gen1;
     instanceID = id;
-    resetStats(false);
+    resetStats();
 }
 
-void StatsManager::resetStats(bool send)
+void StatsManager::resetStats()
 {
-    numberOfPackets = 0;
-    numberOfErrors = 0;
+	receivedCorrectPckts = 0;
+	receivedWrongPckts = 0;
+	receivedOutOfOrderPckts = 0;
+	droppedPckts = 0;
+
+	sentPckts = 0;
+	sentErrorPckts = 0;
+
     timer = clock(); //start time of stats 
 }
 
@@ -37,23 +43,56 @@ void StatsManager::sendStats()
     if((double) delta_t > SEND_DELAY )
     {
         writeStatFile();
-        resetStats(false); //to reset variables
+        resetStats(); //to reset variables
     }
 }
 
 
-void StatsManager::increaseNumPackets(long val)
+void StatsManager::increaseReceivedCorrectPckts(int val = 1)
 {
-    numberOfPackets += val;
+	receivedCorrectPckts+=val;
+}
+void StatsManager::increaseReceivedWrongPckts(int val = 1)
+{
+	receivedWrongPckts+=val;
+}
+void StatsManager::increaseReceivedOutOfOrderPckts(int val = 1)
+{
+	//TODO when to call?
+	receivedOutOfOrderPckts+=val;
+}
+void StatsManager::increaseDroppedPckts(int val = 1)
+{
+	//TODO when to call?
+	droppedPckts+=val;
 }
 
-void StatsManager::increaseNumErrors(long val)
+void StatsManager::increaseSentPckts(int val = 1)
 {
-    numberOfErrors += val;
+	sentPckts+=val;
+}
+void StatsManager::increaseSentErrorPckts(int val = 1)
+{
+	sentErrorPckts+=val;
 }
 
 void StatsManager::writeStatFile()
 {
+	//TODO write in memory
+
+	/*
+	 if(isGen)
+	 {
+	 	write(targetMac (WHAT)?)
+	 	write(configManager.getConfig.streamID)
+	 	write(sentpackets)
+	 	write(sentWrongpackets)
+	 }
+
+	 */
+
+
+	/*
     std::string dir = STAT_DIR;
     if(is_gen)
         dir += "/Gen_";
@@ -65,5 +104,5 @@ void StatsManager::writeStatFile()
     FILE* file = fopen(dir.c_str(),"w");
     std::string line = std::to_string(numberOfPackets) + '\n' + std::to_string(numberOfErrors) + '\n';
     fwrite(line.c_str(), sizeof(char), line.length()*sizeof(char), file);
-    fclose(file);
+    fclose(file); */
 }
