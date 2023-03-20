@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class StreamProgressBar extends StatefulWidget {
-  const StreamProgressBar(this.index, {super.key});
-  final int index;
+  const StreamProgressBar(this.id, {super.key});
+  final String id;
   @override
   State<StreamProgressBar> createState() => _StreamProgressBarState();
 }
 
 class _StreamProgressBarState extends State<StreamProgressBar> {
-  get index => widget.index;
+  get index => widget.id;
   @override
   Widget build(BuildContext context) {
     return SfLinearGauge(

@@ -7,15 +7,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 
 // TODO: Make the AddStreamView a CardView
-class AddStreamView extends StatefulWidget {
-  const AddStreamView({super.key, this.id = ' '});
+class EditStreamView extends StatefulWidget {
+  const EditStreamView(
+      {super.key, required this.id, required void Function() refresh});
 
   final String id;
   @override
-  State<AddStreamView> createState() => _AddStreamViewState();
+  State<EditStreamView> createState() => _EditStreamViewState();
 }
 
-class _AddStreamViewState extends State<AddStreamView>
+class _EditStreamViewState extends State<EditStreamView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 

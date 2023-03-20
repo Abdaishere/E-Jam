@@ -61,12 +61,15 @@ class StreamEntry {
   factory StreamEntry.fromJson(Map<String, dynamic> json) => StreamEntry(
         name: json["name"],
         description: json["description"],
-        lastUpdated: DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"],
-            isUtc: true),
+        lastUpdated:
+            DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"] * 1000)
+                .toLocal(),
         startTime:
-            DateTime.fromMillisecondsSinceEpoch(json["startTime"], isUtc: true),
+            DateTime.fromMillisecondsSinceEpoch((json["startTime"] ?? 0) * 1000)
+                .toLocal(),
         endTime:
-            DateTime.fromMillisecondsSinceEpoch(json["endTime"], isUtc: true),
+            DateTime.fromMillisecondsSinceEpoch((json["endTime"] ?? 0) * 1000)
+                .toLocal(),
         delay: json["delay"],
         streamId: json["streamId"],
         generatorsIds: List<String>.from(json["generatorsIds"].map((x) => x)),

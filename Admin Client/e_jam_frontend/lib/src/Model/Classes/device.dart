@@ -34,8 +34,9 @@ class Device {
         name: json["name"],
         description: json["description"],
         location: json["location"],
-        lastUpdated: DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"],
-            isUtc: true),
+        lastUpdated:
+            DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"] * 1000)
+                .toLocal(),
         ipAddress: json["ipAddress"],
         port: json["port"],
         macAddress: json["macAddress"],

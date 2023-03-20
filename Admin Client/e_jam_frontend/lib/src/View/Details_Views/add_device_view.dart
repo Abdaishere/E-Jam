@@ -18,8 +18,14 @@ class _AddDeviceViewState extends State<AddDeviceView> {
       createRectTween: (begin, end) =>
           CustomRectTween(begin: begin!, end: end!),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.8,
-        width: MediaQuery.of(context).size.width * 0.4,
+        height: MediaQuery.of(context).size.height *
+            (MediaQuery.of(context).orientation == Orientation.portrait
+                ? 1
+                : 0.8),
+        width: MediaQuery.of(context).size.width *
+            (MediaQuery.of(context).orientation == Orientation.portrait
+                ? 1
+                : 0.4),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Scaffold(

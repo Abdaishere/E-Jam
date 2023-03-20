@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LineChartStream extends StatefulWidget {
-  const LineChartStream(this.index, {super.key});
+  const LineChartStream(this.id, {super.key});
 
-  final int index;
+  final String id;
   @override
   State<LineChartStream> createState() => _LineChartStreamState();
 }
 
 class _LineChartStreamState extends State<LineChartStream> {
-  get index => widget.index;
+  get id => widget.id;
   @override
   Widget build(BuildContext context) {
     return SfCartesianChart(

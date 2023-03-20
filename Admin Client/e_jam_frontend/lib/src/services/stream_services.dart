@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:e_jam/src/Model/Classes/stream_card.dart';
+import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/View/Dialogues/snacks_bar.dart';
@@ -12,7 +12,7 @@ class StreamServices {
 
   static get client => NetworkController.client;
 
-  static Future<List<StreamEntry>?> getStreams(
+  Future<List<StreamEntry>?> getStreams(
       ScaffoldMessengerState scaffoldMessenger) async {
     try {
       final response = await client.get(uri);
@@ -272,7 +272,8 @@ class StreamServices {
   Future<bool> forceStartStream(
       ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.post(Uri.parse('$uri/$streamId/start'));
+      final response =
+          await client.post(Uri.parse('$uri/$streamId/force_start'));
       if (200 == response.statusCode) {
         SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
             'Started Successfully');
@@ -300,7 +301,8 @@ class StreamServices {
   Future<bool> forceStopStream(
       ScaffoldMessengerState scaffoldMessenger, String streamId) async {
     try {
-      final response = await client.post(Uri.parse('$uri/$streamId/stop'));
+      final response =
+          await client.post(Uri.parse('$uri/$streamId/force_stop'));
       if (200 == response.statusCode) {
         SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
             'Stopped Successfully');
@@ -348,15 +350,15 @@ class StreamServices {
   Future<List<StreamStatusDetails>?> getAllStreamStatus(
       ScaffoldMessengerState scaffoldMessenger) async {
     try {
-      final response = await client.get(Uri.parse('$uri/status'));
+      final response = await client.get(Uri.parse('${uri}_status'));
       if (200 == response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => StreamStatusDetails.fromJson(e))
             .toList();
-      } else if (409 == response.statusCode) {
+      } else if (204 == response.statusCode) {
         SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Cannot Stop Stream');
-        return null;
+            scaffoldMessenger, response.body.toString(), 'No Streams Found');
+        return [];
       } else {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             response.statusCode.toString());

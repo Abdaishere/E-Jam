@@ -48,6 +48,7 @@ dependencies:
   http: ^0.13.5
   loading_animation_widget: ^1.2.0+4
   awesome_snackbar_content: ^0.1.2
+  timeago: ^3.3.0
   
 
 dev_dependencies:

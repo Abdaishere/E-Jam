@@ -1,17 +1,19 @@
 import 'dart:math';
-
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
+import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
+import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class StreamsListView extends StatefulWidget {
   const StreamsListView({super.key});
@@ -22,18 +24,24 @@ class StreamsListView extends StatefulWidget {
 
 class _StreamsListViewState extends State<StreamsListView> {
   get scaffoldMessenger => ScaffoldMessenger.of(context);
-  get controllerStreams => StreamsController.streams;
-  get controllerIsStreamListLoading => StreamsController.isStreamListLoading;
+  get controllerStreamsStatusDetails => StreamsController.streamsStatusDetails;
+  get controllerIsStreamListLoading => StreamsController.isLoading;
 
-  List<StreamEntry>? streams;
+  List<StreamStatusDetails>? streams;
   bool isStreamListLoading = true;
+
+  // load the status of all streams from the server and update the UI with the list of streams status accordingly
   void loadStreamView() async {
-    // change the state of the widget
-    StreamsController.loadStreams(scaffoldMessenger).then(
+    setState(() {
+      streams = null;
+      isStreamListLoading = true;
+    });
+
+    StreamsController.loadAllStreamStatus(scaffoldMessenger).then(
       (value) => {
         if (mounted)
           setState(() {
-            streams = controllerStreams;
+            streams = controllerStreamsStatusDetails;
             isStreamListLoading = controllerIsStreamListLoading;
           })
       },
@@ -61,9 +69,9 @@ class _StreamsListViewState extends State<StreamsListView> {
               ),
             ),
             child: Visibility(
-              visible: streams?.isNotEmpty ?? false,
+              visible: streams != null && streams!.isNotEmpty,
               replacement: Visibility(
-                visible: streams != null,
+                visible: streams != null && streams!.isEmpty,
                 replacement: Stack(
                   children: const [
                     Center(
@@ -108,7 +116,11 @@ class _StreamsListViewState extends State<StreamsListView> {
                   crossAxisSpacing: 3.0,
                 ),
                 itemBuilder: (BuildContext context, int index) {
-                  return StreamCard(index: index);
+                  return StreamCard(
+                      stream: streams![index],
+                      refresh: () {
+                        loadStreamView();
+                      });
                 },
               ),
             ),
@@ -137,17 +149,23 @@ class _StreamsListViewState extends State<StreamsListView> {
         // refresh icon for refreshing the streams list view
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
-          onPressed: () {},
+          onPressed: () {
+            loadStreamView();
+          },
         ),
         // gear icon for settings and preferences related to the streams list view (sort by, filter by, etc.)
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.gear, size: 20.0),
-          onPressed: () {},
+          onPressed: () {
+            // TODO: go to the settings page or add a dialog with the settings and preferences for the streams list view only
+          },
         ),
         // Explanation icon for details about how the stream card works and what the icons mean and what the colors mean
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
-          onPressed: () {},
+          onPressed: () {
+            // TODO: add a dialog with the explanation
+          },
         ),
       ],
     );
@@ -179,265 +197,464 @@ class AddStreamButton extends StatelessWidget {
 }
 
 class StreamCard extends StatefulWidget {
-  const StreamCard({super.key, required this.index});
+  const StreamCard({super.key, required this.stream, required this.refresh});
 
-  final int index;
+  final StreamStatusDetails stream;
+  final Function() refresh;
 
   @override
   State<StreamCard> createState() => _StreamCardState();
 }
 
 class _StreamCardState extends State<StreamCard> {
-  get index => widget.index;
+  StreamStatusDetails? updatedStream;
+
+  void reload() {
+    StreamsController.loadStreamStatusDetails(
+            ScaffoldMessenger.of(context), widget.stream.id)
+        .then(
+      (value) => {
+        setState(() {
+          updatedStream = value;
+        })
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    StreamStatusDetails stream = updatedStream ?? widget.stream;
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
           HeroDialogRoute(
             builder: (BuildContext context) =>
-                Center(child: StreamDetailsView(index)),
+                Center(child: StreamDetailsView(id: stream.id)),
             settings: const RouteSettings(name: 'StreamDetailsView'),
           ),
         );
       },
       child: Hero(
-        tag: 'stream$index',
+        tag: 'stream${stream.id}',
         createRectTween: (begin, end) =>
             CustomRectTween(begin: begin!, end: end!),
         child: Card(
           child: Padding(
             padding: const EdgeInsets.only(
-                top: 15.0, left: 8.0, right: 8.0, bottom: 5.0),
+                top: 8.0, left: 8.0, right: 8.0, bottom: 5.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // new icon for new streams (not yet started)
-                    IconButton(
-                      tooltip: 'New Stream',
-                      icon: const FaIcon(
-                        Icons.new_releases,
-                        color: Colors.blueAccent,
-                        size: 20.0,
-                      ),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text('This stream is new!'),
-                            content: const Text(
-                                'This stream is new and has not been started yet. Would you like to start it now?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text('Start'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                    // status icon according to stream status
+                    StatusIconButton(
+                        status: stream.status,
+                        id: stream.id,
+                        lastUpdated: stream.lastUpdated,
+                        refresh: () {
+                          reload();
+                        }),
                     // stream ID
-                    Text(
-                      'Stream $index',
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    // menu icon for more options and details (delete, edit, details, etc.) for the stream card (should be in a popup menu button)
-                    // on click should show a card with the details of the stream with edit and delete options for the stream and the graphs of the stream
-                    // see if you need to add a new icon for a task for quick access to the stream task
-                    PopupMenuButton(
-                      tooltip: 'More Options',
-                      icon: const FaIcon(
-                        Icons.more_vert,
-                        size: 20.0,
-                      ),
-                      onSelected: (dynamic value) {
-                        if (value == 'Details') {
-                          Navigator.of(context).push(
-                            HeroDialogRoute(
-                              builder: (BuildContext context) =>
-                                  Center(child: StreamDetailsView(index)),
-                              settings: const RouteSettings(
-                                  name: 'StreamDetailsView'),
-                            ),
-                          );
-                        } else if (value == 'Delete') {
-                          // delete the stream
-                          showDialog<void>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Delete Stream'),
-                              content: Text(
-                                  'Are you sure you want to delete stream $index?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Delete'),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else if (value == 'Edit') {
-                          // edit the stream
-                          // Navigator.of(context).push(
-                          //   HeroDialogRoute(
-                          //     builder: (BuildContext context) =>
-                          //         EditStreamView(index), TODO: add edit stream view
-                          //     settings:
-                          //         const RouteSettings(name: 'EditStreamView'),
-                          //   ),
-                          // );
-                        }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return <PopupMenuEntry>[
-                          PopupMenuItem(
-                            value: 'View',
-                            child: Row(
-                              children: const [
-                                Icon(MaterialCommunityIcons.view_quilt,
-                                    color: Colors.blueAccent),
-                                SizedBox(width: 10.0),
-                                Text('View'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'Edit',
-                            child: Row(
-                              children: const [
-                                Icon(MaterialCommunityIcons.pencil,
-                                    color: Colors.green),
-                                SizedBox(width: 10.0),
-                                Text('Edit'),
-                              ],
-                            ),
-                          ),
-                          PopupMenuItem(
-                            value: 'Delete',
-                            child: Row(
-                              children: const [
-                                FaIcon(MaterialCommunityIcons.trash_can,
-                                    color: Colors.red),
-                                SizedBox(width: 10.0),
-                                Text('Delete'),
-                              ],
-                            ),
-                          ),
-                        ];
-                      },
-                    ),
+                    _nameIdLabel(stream),
+                    // menu icon for more options and details
+                    _popupMenuList(context, stream),
                   ],
                 ),
                 // upload and download speed
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Expanded(
-                      child: Column(
-                        children: const <Widget>[
-                          FaIcon(FontAwesomeIcons.caretUp,
-                              color: uploadColor, size: 35.0),
-                          SizedBox(
-                            child: Text(
-                              '987654321MB/s',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                height: 1.5,
-                                letterSpacing: 1.0,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const VerticalDivider(),
-                    Expanded(
-                      child: Column(
-                        children: const <Widget>[
-                          FaIcon(FontAwesomeIcons.caretDown,
-                              color: downloadColor, size: 35.0),
-                          SizedBox(
-                            child: Text(
-                              '987654321MB/s',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                height: 1.5,
-                                letterSpacing: 1.0,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                SpeedMonitor(stream.id),
+
                 // delay, start, stop, delete, edit, progress bar
                 // status icons should be the status of the stream (running, error, stopped, queued, finished, ready) and stream name (Alphanumeric 3 letters long names) and menu icon for more options and details
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    IconButton(
-                      icon: const FaIcon(FontAwesomeIcons.play),
-                      tooltip: "Start",
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const FaIcon(FontAwesomeIcons.hourglassStart),
-                      tooltip: "Delay",
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const FaIcon(FontAwesomeIcons.stop),
-                      tooltip: "Stop",
-                      onPressed: () {},
-                    ),
-                  ],
+                _streamActionsBar(
+                  stream.status,
+                  stream.id,
                 ),
-                const ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  child: LinearProgressIndicator(
-                    value: 0.5,
-                    valueColor:
-                        // harmonize the color with the color and status of the stream (blue (running), red (error, stopped), orange (queued), green (finished, ready))
-                        AlwaysStoppedAnimation<Color>(Colors.greenAccent),
-                  ),
-                )
+
+                // progress bar for the stream (if the stream is running) otherwise show the color of the status
+                MiniProgressBar(
+                  status: stream.status,
+                  startTime: stream.startTime,
+                  endTime: stream.endTime,
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Expanded _nameIdLabel(StreamStatusDetails stream) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            stream.name,
+            style: const TextStyle(
+              overflow: TextOverflow.ellipsis,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            stream.id,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  PopupMenuButton<dynamic> _popupMenuList(
+      BuildContext context, StreamStatusDetails stream) {
+    return PopupMenuButton(
+      tooltip: 'More Options',
+      icon: const FaIcon(
+        Icons.more_vert,
+        size: 20.0,
+      ),
+      onSelected: (dynamic value) {
+        if (value == 'View') {
+          Navigator.of(context).push(
+            HeroDialogRoute(
+              builder: (BuildContext context) =>
+                  Center(child: StreamDetailsView(id: stream.id)),
+              settings: const RouteSettings(name: 'StreamDetailsView'),
+            ),
+          );
+        } else if (value == 'Delete') {
+          showDialog<void>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Delete Stream'),
+              content:
+                  Text('Are you sure you want to delete stream ${stream.id}?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    StreamsController.deleteStream(
+                            ScaffoldMessenger.of(context), stream.id)
+                        .then((success) => {if (success) widget.refresh()});
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+        } else if (value == 'Edit') {
+          Navigator.of(context).push(
+            HeroDialogRoute(
+              builder: (BuildContext context) =>
+                  Center(child: EditStreamView(id: stream.id, refresh: reload)),
+              settings: const RouteSettings(name: 'EditStreamView'),
+            ),
+          );
+        }
+      },
+      itemBuilder: (BuildContext context) {
+        return <PopupMenuEntry>[
+          PopupMenuItem(
+            value: 'View',
+            child: Row(
+              children: const [
+                Icon(MaterialCommunityIcons.view_quilt,
+                    color: Colors.blueAccent),
+                SizedBox(width: 10.0),
+                Text('View'),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'Edit',
+            child: Row(
+              children: const [
+                Icon(MaterialCommunityIcons.pencil, color: Colors.green),
+                SizedBox(width: 10.0),
+                Text('Edit'),
+              ],
+            ),
+          ),
+          PopupMenuItem(
+            value: 'Delete',
+            child: Row(
+              children: const [
+                FaIcon(MaterialCommunityIcons.trash_can, color: Colors.red),
+                SizedBox(width: 10.0),
+                Text('Delete'),
+              ],
+            ),
+          ),
+        ];
+      },
+    );
+  }
+
+  Row _streamActionsBar(StreamStatus status, String id) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        IconButton(
+          icon: FaIcon(status == StreamStatus.running
+              ? FontAwesomeIcons.pause
+              : FontAwesomeIcons.play),
+          color: status == StreamStatus.running ? streamRunningColor : null,
+          tooltip: "Start",
+          onPressed: () {
+            StreamsController.startStream(ScaffoldMessenger.of(context), id)
+                .then((success) {
+              if (success) {
+                reload();
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.hourglassStart),
+          color: status == StreamStatus.queued ? streamQueuedColor : null,
+          tooltip: "Delay",
+          onPressed: () {
+            StreamsController.queueStream(ScaffoldMessenger.of(context), id)
+                .then((success) {
+              if (success) {
+                reload();
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.stop),
+          color: status == StreamStatus.stopped ? streamStoppedColor : null,
+          tooltip: "Stop",
+          onPressed: () {
+            StreamsController.stopStream(ScaffoldMessenger.of(context), id)
+                .then((success) {
+              if (success) {
+                reload();
+              }
+            });
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class MiniProgressBar extends StatelessWidget {
+  const MiniProgressBar({
+    super.key,
+    required this.status,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  final StreamStatus status;
+  final DateTime startTime;
+  final DateTime endTime;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10.0),
+      child: LinearProgressIndicator(
+        minHeight: 5.0,
+        value: getStreamProgress(),
+        backgroundColor: streamColor(status).withAlpha(100),
+        valueColor: AlwaysStoppedAnimation<Color>(streamColor(status)),
+      ),
+    );
+  }
+
+  double getStreamProgress() {
+    if (status == StreamStatus.running) {
+      final Duration duration = endTime.difference(startTime);
+      final Duration elapsed = DateTime.now().difference(startTime);
+      return elapsed.inSeconds / duration.inSeconds;
+    } else {
+      return 0.0;
+    }
+  }
+}
+
+class StatusIconButton extends StatefulWidget {
+  const StatusIconButton(
+      {super.key,
+      required this.status,
+      required this.id,
+      required this.lastUpdated,
+      required this.refresh});
+
+  final StreamStatus status;
+  final String id;
+  final DateTime lastUpdated;
+  final Function refresh;
+  @override
+  State<StatusIconButton> createState() => _StatusIconButtonState();
+}
+
+class _StatusIconButtonState extends State<StatusIconButton> {
+  get status => widget.status;
+  @override
+  Widget build(BuildContext context) {
+    if (status == StreamStatus.created) {
+      return IconButton(
+        tooltip: 'New Stream',
+        icon: FaIcon(
+          Icons.new_releases,
+          color: streamColor(status),
+          size: 20.0,
+        ),
+        onPressed: () {
+          _newStreamDialog(context);
+        },
+      );
+    } else {
+      return IconButton(
+        tooltip:
+            '${streamStatusToString(status)}: ${timeago.format(widget.lastUpdated)}',
+        icon: FaIcon(
+          getIcon(status),
+          color: streamColor(status),
+          size: 20.0,
+        ),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: Text(streamStatusToString(status)),
+              content: Text('Last updated: ${widget.lastUpdated}'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Future<dynamic> _newStreamDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('This stream is new!'),
+        content: const Text(
+            'This stream is new and has not been started yet. Would you like to start it now?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              StreamsController.startStream(
+                      ScaffoldMessenger.of(context), widget.id)
+                  .then((success) {
+                if (success) {
+                  widget.refresh();
+                }
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text('Start'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData getIcon(StreamStatus status) {
+    switch (status) {
+      case StreamStatus.running:
+        return MaterialCommunityIcons.star_four_points;
+      case StreamStatus.stopped:
+        return MaterialCommunityIcons.stop_circle_outline;
+      case StreamStatus.queued:
+        return MaterialCommunityIcons.timer_sand;
+      case StreamStatus.finished:
+        return MaterialCommunityIcons.check_bold;
+      case StreamStatus.error:
+        return MaterialCommunityIcons.alert_circle;
+      default:
+        return Icons.new_releases;
+    }
+  }
+}
+
+// TODO: Bind this to kafka Consumer and update the UI
+class SpeedMonitor extends StatelessWidget {
+  const SpeedMonitor(
+    String id, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            children: const <Widget>[
+              FaIcon(FontAwesomeIcons.caretUp, color: uploadColor, size: 35.0),
+              SizedBox(
+                child: Text(
+                  '987654321MB/s',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    height: 1.5,
+                    letterSpacing: 1.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          child: Column(
+            children: const <Widget>[
+              FaIcon(FontAwesomeIcons.caretDown,
+                  color: downloadColor, size: 35.0),
+              SizedBox(
+                child: Text(
+                  '987654321MB/s',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    height: 1.5,
+                    letterSpacing: 1.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
@@ -14,9 +15,28 @@ const packetErrorColor =
 const streamCreatedColor = Colors.blueGrey; // or no color (transparent)
 const streamQueuedColor = Colors.orangeAccent; // hourglass button pressed
 const streamRunningColor = Colors.greenAccent; // start button pressed
-const streamStoppedColor = Colors.grey; // stop button pressed
-const streamErrorColor = Colors.redAccent; // any error
+const streamStoppedColor = Colors.redAccent; // stop button pressed
+const streamErrorColor = Colors.red; // any error
 const streamFinishedColor = Colors.blueAccent; // finished successfully
+
+Color streamColor(StreamStatus status) {
+  switch (status) {
+    case StreamStatus.created:
+      return streamCreatedColor;
+    case StreamStatus.queued:
+      return streamQueuedColor;
+    case StreamStatus.running:
+      return streamRunningColor;
+    case StreamStatus.stopped:
+      return streamStoppedColor;
+    case StreamStatus.error:
+      return streamErrorColor;
+    case StreamStatus.finished:
+      return streamFinishedColor;
+    default:
+      return streamCreatedColor;
+  }
+}
 
 // Device Colors
 const deviceRunningOrOnlineColor = Color(0xFF3dcc77); // online

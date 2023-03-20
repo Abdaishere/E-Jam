@@ -506,7 +506,7 @@ async fn force_start_stream(
                 body += "removed from queue ";
             }
 
-            body += "and force started";
+            body += ", force started";
             // start the stream
             stream_entry.send_stream(true, &data.device_list).await;
 
@@ -614,7 +614,7 @@ if the stream is not found, return a 404 Not Found
 * `data` - the app state data for the streams
 ## Returns
 * `HttpResponse` - the http response with a list of tuples of the stream status and the stream id"]
-#[get("streams/status")]
+#[get("streams_status")]
 async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
     let streams_entries = data
         .streams_entries
