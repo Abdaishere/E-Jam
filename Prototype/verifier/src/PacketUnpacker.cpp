@@ -4,8 +4,6 @@
 std::queue<std::shared_ptr<ByteArray>> PacketUnpacker::packetQueue;
 void PacketUnpacker::readPacket()
 {
-//    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
-//    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
     std::shared_ptr<ByteArray> packet = std::make_shared<ByteArray>(1600, 'a');
     packetReceiver->receivePackets(packet);

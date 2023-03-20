@@ -39,11 +39,21 @@ void sendStats(std::shared_ptr<StatsManager> sm)
 int main(int argc, char** argv)
 {
     int verID = 0;
-    if (argc > 1)
+    char *configPath;
+    if (argc > 2)
     {
         verID = std::stoi(argv[1]);
+        configPath = argv[2];
         printf("%d\n", verID);
     }
+    else
+    {
+        printf("Missing Arguments\n");
+        return 0;
+    }
+
+//    ConfigurationManager::getConfiguration(configPath);
+    std::shared_ptr<Configuration> currConfig = ConfigurationManager::getConfiguration();
     std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID);
     ConfigurationManager::initConfigurations();
 

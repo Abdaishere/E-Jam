@@ -159,7 +159,7 @@ int main(int argc, char** argv)
         configPath = argv[2];
     }else
     {
-        std::cout<<"No ARGS ARE PASSED\n";
+        std::cout<<"Missing Arguments\n";
         return 0;
     }
 
@@ -178,9 +178,9 @@ int main(int argc, char** argv)
     std::thread statWriter(sendStatsFunction, sm);
     ull gap = currConfig->getInterFrameGap();
     FlowType flowType = currConfig->getFlowType();
-    if(currConfig->getBcFramesNum() > 0)
+    int packetNumber = currConfig->getNumberOfPackets();
+    if(packetNumber > 0)
     {
-        int packetNumber = currConfig->getNumberOfPackets();
         creator = std::thread(createNumBased, pc, packetNumber,15);
         //TODO add burst delay and burst size from stream configuration
         if(flowType == BURSTY)
