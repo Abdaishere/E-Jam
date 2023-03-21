@@ -17,10 +17,12 @@ void EthernetConstructor::constructFrame() {
 
     preamble = ByteArray(this->pre, 8);
     frame.clear();
+    // DST MAC | SRC MAC | TYPE | SteamID | SeqNum | PAYLOAD | CRC
     frame.append(destination_address);
     frame.append(source_address);
     frame.append(type);
     frame.append(streamID);
+    // this incrementing only works when there is one generator per node/stream pair
     frame.append(convertLLToStr(seqNum++));
     frame.append(payload);
     CRC = calculateCRC(std::make_shared<ByteArray>(payload));

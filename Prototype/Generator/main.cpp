@@ -6,6 +6,7 @@
 #include <time.h>
 #include <chrono>
 #include "StatsManager.h"
+#include "ConfigurationManager.h"
 
 //#define FIFO_FILE "/home/mohamedelhagry/Desktop/ahmed"
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
@@ -110,12 +111,12 @@ void sendBurst(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull delay, 
 /// \param gap in milliseconds is the gap between individual packets
 /// \details create packets with delay so that memory doesn't get too full when rate of consumption is low
 //thread function to send packets
-void createNumBased(std::shared_ptr<PacketCreator> pc, ull number,  ull gap = 0)
+void createNumBased(std::shared_ptr<PacketCreator> pc, ull number, Configuration currConfig,  ull gap = 0)
 {
     using namespace std::chrono;
     while(number--)
     {
-        int lenRcv = ConfigurationManager::getConfiguration()->getReceivers().size();
+        int lenRcv = currConfig.getReceivers().size();
         for(int rcvInd=0; rcvInd < lenRcv; rcvInd++)
             pc->createPacket(rcvInd);
 
@@ -125,13 +126,13 @@ void createNumBased(std::shared_ptr<PacketCreator> pc, ull number,  ull gap = 0)
 }
 
 /// \param duration time of sending in milliseconds (10^-3) seconds
-void createTimeBased (std::shared_ptr<PacketCreator> pc, ull duration,  ull gap = 0)
+void createTimeBased (std::shared_ptr<PacketCreator> pc, ull duration, Configuration currConfig,  ull gap = 0)
 {
     using namespace std::chrono;
     time_point<steady_clock> beginTime = steady_clock::now();
     time_point<steady_clock> endTime = steady_clock::now();
 
-    int lengthReceived = ConfigurationManager::getConfiguration()->getReceivers().size();
+    int lengthReceived = currConfig.getReceivers().size();
     while (duration_cast<milliseconds>(endTime- beginTime).count() <= duration)
     {
         for(int receiveIndex=0; receiveIndex < lengthReceived; receiveIndex++)
@@ -163,12 +164,10 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    ConfigurationManager::getConfiguration(configPath);
-    std::shared_ptr<Configuration> currConfig = ConfigurationManager::getConfiguration();
+    Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
     std::shared_ptr<StatsManager> sm = StatsManager::getInstance(genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
-
-    std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>();
+    std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>(currConfig);
     /// TODO configure main appropriately to run one of the above threads based on configuration parameters
     /// send according to one of the above threads using flowtype and sending mode
     /// sending mode is inferred from the numOfPackets and flowTime parameters in the stream configuration
@@ -176,12 +175,12 @@ int main(int argc, char** argv)
 
     std::thread creator, sender;
     std::thread statWriter(sendStatsFunction, sm);
-    ull gap = currConfig->getInterFrameGap();
-    FlowType flowType = currConfig->getFlowType();
-    int packetNumber = currConfig->getNumberOfPackets();
+    ull gap = currConfig.getInterFrameGap();
+    FlowType flowType = currConfig.getFlowType();
+    int packetNumber = currConfig.getNumberOfPackets();
     if(packetNumber > 0)
     {
-        creator = std::thread(createNumBased, pc, packetNumber,15);
+        creator = std::thread(createNumBased, pc, packetNumber, currConfig,15);
         //TODO add burst delay and burst size from stream configuration
         if(flowType == BURSTY)
             sender = std::thread(sendBurst, pc, packetNumber, (ull)20, 30,gap);
@@ -190,14 +189,13 @@ int main(int argc, char** argv)
     }
     else
     {
-        ull sendTime = currConfig->getLifeTime();
-        creator = std::thread(createTimeBased, pc, sendTime,10);
+        ull sendTime = currConfig.getLifeTime();
+        creator = std::thread(createTimeBased, pc, sendTime, currConfig,10);
         //TODO add burst delay and burst size from stream configuration
         if(flowType == BURSTY)
             sender = std::thread(sendTimeBasedBurst, pc, sendTime, (ull)20,30,gap);
         else
             sender = std::thread(sendTimeBasedB2B, pc, sendTime, gap);
-
     }
     creator.join();
     sender.join();

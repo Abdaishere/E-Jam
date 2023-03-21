@@ -47,7 +47,7 @@ private:
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
     bool checkContent;                  //Whether to check content or not
-
+    char* filePath;
 
     //convert int to corresponding hexa character
     unsigned char hexSwitcher(int x)
@@ -95,9 +95,21 @@ private:
         return ByteArray(mac_address, MAC_ADD_LEN);
     }
 public:
+    Configuration()
+    {
+        filePath = nullptr;
+    }
+
+    bool isSet()
+    {
+        return filePath != nullptr;
+    }
+
     //Read configuration from a file of the correct format
     void loadFromFile(char* path)
     {
+        //copying pointers, not actual contents of the char array
+        filePath = path;
         freopen(path,"r",stdin);
 
         //Set stream ID, must be of leangth 3 (STREAMID_LEN)

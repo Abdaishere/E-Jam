@@ -1,5 +1,3 @@
-
-
 #include "PacketCreator.h"
 #include "ConfigurationManager.h"
 #include <iostream>
@@ -23,17 +21,16 @@ void PacketCreator::createPacket(int rcvInd)
     statsManager->increaseNumPackets();
 
     //TODO move ByteArray creating inside each constructor class
-    ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
-    ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
+    ByteArray sourceAddress = configuration.getMyMacAddress();
+    ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
 
-    std::shared_ptr<PayloadGenerator> payloadGenerator = PayloadGenerator::getInstance();
-    payloadGenerator->regeneratePayload();
-    ByteArray payload = payloadGenerator->getPayload();
+    payloadGenerator.regeneratePayload();
+    ByteArray payload = payloadGenerator.getPayload();
 
     ByteArray innerProtocol = ByteArray(2, '0');
     innerProtocol[0] = (unsigned char) 0x88;
     innerProtocol[1] = (unsigned char) 0xb5;
-    ByteArray streamID = *ConfigurationManager::getConfiguration()->getStreamID();
+    ByteArray streamID = *(configuration.getStreamID());
     std::shared_ptr<FrameConstructor> frameConstructor = std::make_shared<EthernetConstructor>(sourceAddress, destinationAddress,
                                                                  payload,
                                                                  innerProtocol, 
@@ -46,10 +43,11 @@ void PacketCreator::createPacket(int rcvInd)
     mtx.unlock();
 }
 
-PacketCreator::PacketCreator() {
+PacketCreator::PacketCreator(Configuration configuration): payloadGenerator(configuration){
     sender = PacketSender::getInstance();
+    this->configuration = configuration;
 }
-#include <iostream>
+
 void PacketCreator::sendHead()
 {
     if(productQueue.size()<1)

@@ -1,16 +1,14 @@
 
 #include "PayloadGenerator.h"
 
-std::shared_ptr<PayloadGenerator> PayloadGenerator::instance = nullptr;
-
-PayloadGenerator::PayloadGenerator()
+PayloadGenerator::PayloadGenerator(Configuration configuration)
 {
-    //TODO add stream id before actual Payload
-    int seed = ConfigurationManager::getConfiguration()->getSeed();
+    int seed = configuration.getSeed();
     this->rng.setSeed(seed);
 
-    int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
+    int payloadLength = configuration.getPayloadLength();
     payload = ByteArray(payloadLength, 'a');
+    payloadType = configuration.getPayloadType();
 }
 
 void PayloadGenerator::generateRandomCharacters()
@@ -25,8 +23,7 @@ void PayloadGenerator::generateRandomCharacters()
 
 void PayloadGenerator::regeneratePayload()
 {
-    PayloadType payloadType = ConfigurationManager::getConfiguration()->getPayloadType();
-    //heuristic for payload type 
+    //heuristic for payload type
     switch (payloadType)
     {
         case FIRST:
@@ -61,16 +58,6 @@ void PayloadGenerator::generateSecondAlphabet()
 {
     std::string tmp = "nopqrstuvwxyz";
     payload = ByteArray(tmp.begin(), tmp.end());
-}
-
-
-std::shared_ptr<PayloadGenerator> PayloadGenerator::getInstance()
-{
-    if(instance == nullptr)
-    {
-        instance.reset(new PayloadGenerator());
-    }
-    return instance;
 }
 
 void PayloadGenerator::addStreamId()
