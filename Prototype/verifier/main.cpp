@@ -44,7 +44,7 @@ int main(int argc, char** argv)
         verID = std::stoi(argv[1]);
         printf("%d\n", verID);
     }
-    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID);
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID); //TODO we need the pointer to configuration because it will be always nullptr
     ConfigurationManager::initConfigurations();
 
     std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID);

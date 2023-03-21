@@ -120,7 +120,7 @@ void PacketReceiver::receiveFromSwitch()
 void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
 {
     //converting int to char
-    write(fd[verID], &len,4);
+    write(fd[verID], &len, sizeof(int));
     //assuming the pipe speed is faster than the  network speed
     write(fd[verID], payload, len);
 }

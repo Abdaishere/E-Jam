@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 
     ConfigurationManager::getConfiguration(configPath);
     std::shared_ptr<Configuration> currConfig = ConfigurationManager::getConfiguration();
-    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(genID, true, currConfig); //TODO fix me ! (shared_ptr to normal pointer)
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(genID, true, currConfig); 
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
 
     std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>();

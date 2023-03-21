@@ -27,11 +27,12 @@ private:
     clock_t timer;
     StatsManager(int, bool, Configuration*);
     void resetStats();
+	void buildMsg(std::string);
     void writeStatFile();
-
 	bool is_gen;
     int instanceID;
-	Configuration* configuration;
+	std::shared_ptr<Configuration> configuration;
+	int fd; //file descriptor to write sgen_id files
 
 public:
     static std::shared_ptr<StatsManager> getInstance(int instanceID = 0,bool is_gen = false, Configuration* conf = nullptr);
@@ -40,7 +41,6 @@ public:
 	void increaseReceivedWrongPckts(int);
 	void increaseReceivedOutOfOrderPckts(int);
 	void increaseDroppedPckts(int);
-
 	void increaseSentPckts(int);
 	void increaseSentErrorPckts(int);
 };

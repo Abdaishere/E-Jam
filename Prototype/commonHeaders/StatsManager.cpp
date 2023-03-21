@@ -6,7 +6,7 @@ std::shared_ptr<StatsManager> StatsManager::instance;
 
 
 //handle unique instance
-std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen, Configuration* conf)
+std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen, std::shared_ptr<Configuration>& conf)
 {
     if (instance == nullptr)
     {
@@ -16,7 +16,7 @@ std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen, 
 }
 
 
-StatsManager::StatsManager(int id, bool is_gen1, Configuration* conf)
+StatsManager::StatsManager(int id, bool is_gen1, std::shared_ptr<Configuration>& conf)
 {
     is_gen = is_gen1;
     instanceID = id;
@@ -77,11 +77,9 @@ void StatsManager::increaseSentErrorPckts(int val = 1)
 	sentErrorPckts+=val;
 }
 
-void StatsManager::writeStatFile()
+void StatsManager::buildMsg(std::string& msg)
 {
 	char delimiter = ' ';
-	std::string msg = "";
-
 	if (is_gen) //Working as a generator
 	{
 		//Process type ( 0 for generator , 1 for verifier )
@@ -110,8 +108,7 @@ void StatsManager::writeStatFile()
 
 		//sent errored packets
 		msg += std::to_string(sentErrorPckts);
-	}
-	else	//Working as a verifier
+	}else	//Working as a verifier
 	{
 		//Process type ( 0 for generator , 1 for verifier )
 		msg += "1";
@@ -121,11 +118,11 @@ void StatsManager::writeStatFile()
 		//Stream ID
 		if (!configuration)
 		{
+			//fallback to identifity I can't reach the gen_id
 			msg += "00000000";
 			msg += delimiter;
-			msg += "xxx";
-		}
-		else
+			msg += "xxx"; 
+		}else
 		{
 			msg += byteArray_to_string(configuration->getMyMacAddress());
 			msg += delimiter;
@@ -148,6 +145,28 @@ void StatsManager::writeStatFile()
 		//Packets received out of order
 		msg += std::to_string(receivedWrongPckts);
 	}
-
-	//TODO prepare a named pipe and write msg
 }
+
+void StatsManager::writeStatFile()
+{
+	//build the msg
+	std::string msg;
+	buildMsg(msg);
+
+	//open pipe
+	mkfifo(("sgen_"+std::to_string(gen_id)).c_str(), S_IFIFO | 0640);
+    fd = open(("sgen_" + std::to_string(gen_id)).c_str(), O_RDWR);
+	if(fd == -1)
+	{
+        if (errno != EEXIST) //if the error was more than the file already existing
+        {
+            printf("Error in creating the FIFO file sgen_id\n");
+			return;
+        } else {
+            printf("File already exists sgen_id, skipping creation...\n");
+        }
+    }
+
+	write(fd, msg, sizeof(char)*msg.size());	
+}
+
