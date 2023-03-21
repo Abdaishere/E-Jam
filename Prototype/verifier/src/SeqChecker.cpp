@@ -5,29 +5,42 @@
 #include <cassert>
 #include "SeqChecker.h"
 
-void SeqChecker::receive(unsigned long long int seqNum) {
-    if(seqNum == expectedNext)
-    {
-        expectedNext++;
-        OOO += std::lower_bound(wait.begin(), wait.end(), seqNum) - wait.begin();
-        return;
-    }
 
-    if(seqNum > expectedNext)
+void SeqChecker::receive(ull seqNum) {
+    //packet in order
+    if(seqNum >= expectedNext)
     {
-        for(long long i=expectedNext; i<seqNum; i++)
+        if(seqNum > expectedNext)
         {
-            wait.push_back(i++);
-            missing++;
+            ull discontinuity = seqNum - expectedNext;
+            missing += discontinuity;
         }
-        expectedNext = seqNum++;
+        expectedNext = seqNum+1;
+        // add packet to received packets
+        {
+            recSeqNums.push_back(seqNum);
+            if (recSeqNums.size() > MaxBuffSize)
+                recSeqNums.pop_front();
+        }
         return;
     }
-
-    if(seqNum < expectedNext)
+    //packet reordered
+    ++reordered;
+    --missing;
+    //finding first index i such that seqNum[i] > currSeqNum
+    int i = 0;
+    for(auto e:recSeqNums)
     {
-        assert(std::lower_bound(wait.begin(), wait.end(), seqNum) != wait.end());
-        wait.erase(std::lower_bound(wait.begin(), wait.end(),seqNum));
-        missing--;
+        if(e > seqNum)
+            break;
+        ++i;
     }
+
+    reorderingExtents.push_back(recSeqNums.size() - i);
+    if(reorderingExtents.size() > MaxReordering)
+        reorderingExtents.pop_front();
+
+    recSeqNums.push_back(seqNum);
+    if (recSeqNums.size() > MaxBuffSize)
+        recSeqNums.pop_front();
 }

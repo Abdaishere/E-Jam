@@ -4,8 +4,6 @@
 std::queue<std::shared_ptr<ByteArray>> PacketUnpacker::packetQueue;
 void PacketUnpacker::readPacket()
 {
-//    int senderAddr = 6, destinationAddr = 6, payloadAddr = 13, crc = 6;
-//    ByteArray* packet = new ByteArray("AABBCCFFFFFF00xyZabcdefghijklm123456", senderAddr+destinationAddr+payloadAddr+crc, 0);
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
     std::shared_ptr<ByteArray> packet = std::make_shared<ByteArray>(1600, 'a');
     packetReceiver->receivePackets(packet);
@@ -15,10 +13,11 @@ void PacketUnpacker::readPacket()
     mtx.unlock();
 }
 
-PacketUnpacker::PacketUnpacker(int verID)
+PacketUnpacker::PacketUnpacker(int verID, Configuration configuration): payloadVerifier(configuration), frameVerifier(configuration)
 {
     std::string path = "/tmp/fifo_pipe_ver" + std::to_string(verID);
     packetReceiver = PacketReceiver::getInstance(verID, path);
+    this->configuration = configuration;
     seqChecker = SeqChecker();
 }
 
@@ -52,13 +51,12 @@ void PacketUnpacker::verifiyPacket()
     ByteArray tempBA;
     tempBA.append(*packet, streamID_startIndex, STREAMID_LEN);
 
+    /*
     //Check stream id
-    ConfigurationManager::setCurrStreamID(tempBA);
+    configuration.setCurrStreamID(tempBA);
 //    for(int i=0; i<packet->size(); i++)
 //        std::cerr << (int) packet->at(i) << " ";
 //    std::cerr << "\n";
-
-    std::shared_ptr<Configuration> tempConfig = ConfigurationManager::getConfiguration();
 
     //Report stream id error
     if(tempConfig == nullptr)
@@ -73,6 +71,7 @@ void PacketUnpacker::verifiyPacket()
         ErrorHandler::getInstance()->logError();
         return;
     }
+     */
 
     //unpack sequence number
     unsigned long long seqNum = 0;
@@ -86,17 +85,15 @@ void PacketUnpacker::verifiyPacket()
     //check for frame errors
     //by matching receiver and sender mac addresses and checking the CRCs
     int startIndex = 0, endIndex = packet->length();
-    std::shared_ptr<FrameVerifier> fv = FrameVerifier::getInstance();
-    bool frameStatus = fv->verifiy(packet, startIndex, endIndex);
-	pcktVerified &=frameStatus;
+    bool frameStatus = frameVerifier.verifiy(packet, startIndex, endIndex);
 
     //check for payload error
     //by matching payloads
-    int payloadLength = ConfigurationManager::getConfiguration()->getPayloadLength();
+    int payloadLength = configuration.getPayloadLength();
     startIndex = streamID_startIndex+STREAMID_LEN+SeqNum_LEN;
     endIndex = startIndex+payloadLength-1;
 
-	if(ConfigurationManager::getConfiguration()->getCheckContent())
+	if(configuration.getCheckContent())
 	{
 		std::shared_ptr<PayloadVerifier> pv = PayloadVerifier::getInstance();
 		bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);

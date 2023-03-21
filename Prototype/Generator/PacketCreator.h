@@ -25,8 +25,10 @@ class PacketCreator
 {
 private:
     std::shared_ptr<PacketSender> sender;
+    PayloadGenerator payloadGenerator;
+    Configuration configuration;
 public:
-    PacketCreator();
+    PacketCreator(Configuration);
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
     void createPacket(int);

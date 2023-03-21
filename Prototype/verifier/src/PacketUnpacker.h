@@ -17,10 +17,13 @@ private:
     std::mutex mtx;
     std::shared_ptr<ByteArray> consumePacket();
     std::shared_ptr<PacketReceiver> packetReceiver;
+    FrameVerifier frameVerifier;
+    PayloadVerifier payloadVerifier;
+    Configuration configuration;
     SeqChecker seqChecker;
 public:
     static std::queue<std::shared_ptr<ByteArray>> packetQueue;
-    PacketUnpacker(int verID);
+    PacketUnpacker(int verID, Configuration configuration);
     void readPacket();
     void verifiyPacket();
 };

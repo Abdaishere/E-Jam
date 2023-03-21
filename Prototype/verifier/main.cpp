@@ -2,9 +2,9 @@
 #include <queue>
 #include <thread>
 #include "src/PacketUnpacker.h"
-#include "src/ConfigurationManager.h"
+#include "src/streamsManager.h"
 #include "../commonHeaders/StatsManager.h"
-
+#include "ConfigurationManager.h"
 using namespace std;
 
 //thread function for receiving packets
@@ -39,15 +39,22 @@ void sendStats(std::shared_ptr<StatsManager> sm)
 int main(int argc, char** argv)
 {
     int verID = 0;
-    if (argc > 1)
+    char *configPath;
+    if (argc > 2)
     {
         verID = std::stoi(argv[1]);
+        configPath = argv[2];
         printf("%d\n", verID);
     }
-    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID); //TODO we need the pointer to configuration because it will be always nullptr
-    ConfigurationManager::initConfigurations();
+    else
+    {
+        printf("Missing Arguments\n");
+        return 0;
+    }
 
-    std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID);
+    Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID);
+    std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID, currConfig);
 
     std::thread reader(receive, pu);
     std::thread verifier(verify, pu);

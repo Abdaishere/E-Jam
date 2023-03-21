@@ -12,20 +12,18 @@
 class PayloadGenerator
 {
 private:
-    static std::shared_ptr<PayloadGenerator> instance;
     ByteArray payload;
     void generateFirstAlphabet(); // a -- m
     void generateSecondAlphabet(); // n -- z
     void generateRandomCharacters();
     void addStreamId();
-
     RNG rng;
+    PayloadType payloadType;
     void generateAlphabet();
-    explicit PayloadGenerator();
 public:
     //must specify the length of the payload and its type
+    PayloadGenerator(Configuration);
     ByteArray getPayload();
-    static std::shared_ptr<PayloadGenerator> getInstance();
     void regeneratePayload();
 };
 
