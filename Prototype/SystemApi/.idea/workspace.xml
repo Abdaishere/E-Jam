@@ -4,11 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Admin client can start streams">
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Admin client can force stop streams">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/GeneratorStats.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaListeners.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaProducerConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaTopicConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/StatsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/StatsMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/VerifierStats.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Communicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Communicator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/StreamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/ProcessController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,6 +152,10 @@
       <workItem from="1678548369990" duration="6118000" />
       <workItem from="1678555443146" duration="738000" />
       <workItem from="1678556581471" duration="4097000" />
+      <workItem from="1679243786783" duration="881000" />
+      <workItem from="1679268525948" duration="673000" />
+      <workItem from="1679318582740" duration="4239000" />
+      <workItem from="1679399684648" duration="3766000" />
     </task>
     <task id="LOCAL-00001" summary="create endpoints to communicate with admin-client">
       <created>1677019822321</created>
