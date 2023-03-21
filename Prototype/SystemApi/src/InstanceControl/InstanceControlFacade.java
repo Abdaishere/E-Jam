@@ -1,5 +1,7 @@
 package InstanceControl;
 
+import StatsManagement.StatsManager;
+
 import java.util.ArrayList;
 
 public class InstanceControlFacade //facade class to hide dependencies and the order of creation 
@@ -11,5 +13,9 @@ public class InstanceControlFacade //facade class to hide dependencies and the o
 
         ConfigurationManager configurationManager = new ConfigurationManager(configuration);
         InstanceController instanceController = new InstanceController(configuration);
+
+        StatsManager statsManager = StatsManager.getInstance(/* add ip here*/);
+        statsManager.setSendFrequency(1.0f);
+        statsManager.runTasks();
     }
 }

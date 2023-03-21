@@ -1,11 +1,17 @@
 package StatsManagement;
 
+import java.util.ArrayList;
+
 /**
  * Special implementation of the statsContainer tailored for generators
  * @author Khaled Waleed
  */
 public class GeneratorStatsContainer extends StatsContainer
 {
+    public String targetMac;
+    public String streamId;
+    public long sentPckts;
+    public long sentErrorPckts;
 
     GeneratorStatsContainer(String s)
     {
@@ -19,6 +25,11 @@ public class GeneratorStatsContainer extends StatsContainer
     @Override
     void rebuild_from_string(String string)
     {
-        //TODO parse and fill class's parameters from the string
+        String[] values = string.split(String.valueOf(rawDataDelimiter));
+
+        targetMac = values[0];
+        streamId = values[1];
+        sentPckts = Long.parseLong(values[2]);
+        sentErrorPckts = Long.parseLong(values[3]);
     }
 }

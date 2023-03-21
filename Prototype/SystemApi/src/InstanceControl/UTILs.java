@@ -1,7 +1,11 @@
 package InstanceControl;
 
 import java.io.*;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UTILs {
     public String username;
@@ -41,5 +45,34 @@ public class UTILs {
     UTILs()
     {
         username = getUserString();
+    }
+
+    public static Set<String> listFiles(String dir)
+    {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+    }
+
+    public static ArrayList<String> getLines(String fileName)
+    {
+        String WORD_FILE = fileName;
+        ArrayList<String> lines = new ArrayList<>();
+        try
+        {
+            File file = new File(WORD_FILE);
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine())
+            {
+                String line = scanner.nextLine();
+                if(line.length() > 0) lines.add(line);
+            }
+            scanner.close();
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("ERROR: File not found.");
+        }
+        return lines;
     }
 }
