@@ -6,20 +6,21 @@ std::shared_ptr<StatsManager> StatsManager::instance;
 
 
 //handle unique instance
-std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen)
+std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen, Configuration* conf)
 {
     if (instance == nullptr)
     {
-        instance.reset(new StatsManager(verID, is_gen));
+        instance.reset(new StatsManager(verID, is_gen, conf));
     }
     return instance;
 }
 
 
-StatsManager::StatsManager(int id, bool is_gen1)
+StatsManager::StatsManager(int id, bool is_gen1, Configuration* conf)
 {
     is_gen = is_gen1;
     instanceID = id;
+	configuration = conf;
     resetStats();
 }
 
@@ -78,31 +79,75 @@ void StatsManager::increaseSentErrorPckts(int val = 1)
 
 void StatsManager::writeStatFile()
 {
-	//TODO write in memory
+	char delimiter = ' ';
+	std::string msg = "";
 
-	/*
-	 if(isGen)
-	 {
-	 	write(targetMac (WHAT)?)
-	 	write(configManager.getConfig.streamID)
-	 	write(sentpackets)
-	 	write(sentWrongpackets)
-	 }
+	if (is_gen) //Working as a generator
+	{
+		//Process type ( 0 for generator , 1 for verifier )
+		msg += "0";
+		msg += delimiter;
 
-	 */
+		//Target mac
+		//Stream ID
+		if (!configuration)
+		{
+			msg += "00000000";
+			msg += delimiter;
+			msg += "xxx";
+		}
+		else
+		{
+			msg += byteArray_to_string(configuration->getReceivers()[0]);
+			msg += delimiter;
+			msg += byteArray_to_string(*configuration->getStreamID());
+		}
+		msg += delimiter;
 
+		//sent Packets
+		msg += std::to_string(sentPckts);
+		msg += delimiter;
 
-	/*
-    std::string dir = STAT_DIR;
-    if(is_gen)
-        dir += "/Gen_";
-    else
-        dir += "/Ver_";
-    dir += std::to_string(instanceID);
-    dir += ".txt";
+		//sent errored packets
+		msg += std::to_string(sentErrorPckts);
+	}
+	else	//Working as a verifier
+	{
+		//Process type ( 0 for generator , 1 for verifier )
+		msg += "1";
+		msg += delimiter;
 
-    FILE* file = fopen(dir.c_str(),"w");
-    std::string line = std::to_string(numberOfPackets) + '\n' + std::to_string(numberOfErrors) + '\n';
-    fwrite(line.c_str(), sizeof(char), line.length()*sizeof(char), file);
-    fclose(file); */
+		//Source mac
+		//Stream ID
+		if (!configuration)
+		{
+			msg += "00000000";
+			msg += delimiter;
+			msg += "xxx";
+		}
+		else
+		{
+			msg += byteArray_to_string(configuration->getMyMacAddress());
+			msg += delimiter;
+			msg += byteArray_to_string(*configuration->getStreamID());
+		}
+		msg += delimiter;
+
+		//Correctly Received Packets
+		msg += std::to_string(receivedCorrectPckts);
+		msg += delimiter;
+
+		//Errornos packets
+		msg += std::to_string(receivedWrongPckts);
+		msg += delimiter;
+
+		//Packets dropped
+		msg += std::to_string(droppedPckts);
+		msg += delimiter;
+
+		//Packets received out of order
+		msg += std::to_string(receivedWrongPckts);
+	}
+
+	//TODO prepare a named pipe and write msg
 }

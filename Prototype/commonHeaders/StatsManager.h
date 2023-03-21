@@ -25,16 +25,16 @@ private:
 	ull sentErrorPckts;
 
     clock_t timer;
-    StatsManager(int, bool);
+    StatsManager(int, bool, Configuration*);
     void resetStats();
     void writeStatFile();
 
-
 	bool is_gen;
     int instanceID;
+	Configuration* configuration;
 
 public:
-    static std::shared_ptr<StatsManager> getInstance(int instanceID = 0,bool is_gen = false);
+    static std::shared_ptr<StatsManager> getInstance(int instanceID = 0,bool is_gen = false, Configuration* conf = nullptr);
     void sendStats();
 	void increaseReceivedCorrectPckts(int);
 	void increaseReceivedWrongPckts(int);
