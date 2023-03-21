@@ -9,6 +9,10 @@
 #include <chrono>
 #include "Configuration.h"
 #include <memory>
+#include "unistd.h"
+#include "sys/stat.h"
+#include <fcntl.h>
+
 
 typedef unsigned long long ull;
 //Singleton class
@@ -25,9 +29,9 @@ private:
 	ull sentErrorPckts;
 
     clock_t timer;
-    StatsManager(int, bool, Configuration*);
+    StatsManager( std::shared_ptr<Configuration>&, int, bool);
     void resetStats();
-	void buildMsg(std::string);
+	void buildMsg(std::string&);
     void writeStatFile();
 	bool is_gen;
     int instanceID;
@@ -35,7 +39,7 @@ private:
 	int fd; //file descriptor to write sgen_id files
 
 public:
-    static std::shared_ptr<StatsManager> getInstance(int instanceID = 0,bool is_gen = false, Configuration* conf = nullptr);
+    static std::shared_ptr<StatsManager> getInstance(std::shared_ptr<Configuration>& conf, int instanceID = 0, bool is_gen = false);
     void sendStats();
 	void increaseReceivedCorrectPckts(int);
 	void increaseReceivedWrongPckts(int);

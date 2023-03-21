@@ -12,7 +12,7 @@ private:
     static std::shared_ptr<Configuration> configuration;
 public:
     static std::shared_ptr<Configuration> getConfiguration(char*);
-    static std::shared_ptr<Configuration> getConfiguration();
+    static std::shared_ptr<Configuration>& getConfiguration();
     static void run();
 };
 

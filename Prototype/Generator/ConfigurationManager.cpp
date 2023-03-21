@@ -11,7 +11,7 @@ std::shared_ptr<Configuration> ConfigurationManager::getConfiguration(char* path
 
     return configuration;
 }
-std::shared_ptr<Configuration> ConfigurationManager::getConfiguration()
+std::shared_ptr<Configuration>& ConfigurationManager::getConfiguration()
 {
     return configuration;
 }

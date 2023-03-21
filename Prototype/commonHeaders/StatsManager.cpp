@@ -6,17 +6,17 @@ std::shared_ptr<StatsManager> StatsManager::instance;
 
 
 //handle unique instance
-std::shared_ptr<StatsManager> StatsManager::getInstance(int verID, bool is_gen, std::shared_ptr<Configuration>& conf)
+std::shared_ptr<StatsManager> StatsManager::getInstance(std::shared_ptr<Configuration>& conf, int verID, bool is_gen)
 {
     if (instance == nullptr)
     {
-        instance.reset(new StatsManager(verID, is_gen, conf));
+        instance.reset(new StatsManager(conf, verID, is_gen));
     }
     return instance;
 }
 
 
-StatsManager::StatsManager(int id, bool is_gen1, std::shared_ptr<Configuration>& conf)
+StatsManager::StatsManager( std::shared_ptr<Configuration>& conf, int id, bool is_gen1)
 {
     is_gen = is_gen1;
     instanceID = id;
@@ -108,7 +108,8 @@ void StatsManager::buildMsg(std::string& msg)
 
 		//sent errored packets
 		msg += std::to_string(sentErrorPckts);
-	}else	//Working as a verifier
+	}
+	else	//Working as a verifier
 	{
 		//Process type ( 0 for generator , 1 for verifier )
 		msg += "1";
@@ -154,8 +155,8 @@ void StatsManager::writeStatFile()
 	buildMsg(msg);
 
 	//open pipe
-	mkfifo(("sgen_"+std::to_string(gen_id)).c_str(), S_IFIFO | 0640);
-    fd = open(("sgen_" + std::to_string(gen_id)).c_str(), O_RDWR);
+	mkfifo(("sgen_"+std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
+    fd = open(("sgen_" + std::to_string(instanceID)).c_str(), O_RDWR);
 	if(fd == -1)
 	{
         if (errno != EEXIST) //if the error was more than the file already existing
@@ -167,6 +168,7 @@ void StatsManager::writeStatFile()
         }
     }
 
-	write(fd, msg, sizeof(char)*msg.size());	
+	//Write on pipe
+	write(fd, msg.c_str(), sizeof(char)*msg.size());
 }
 

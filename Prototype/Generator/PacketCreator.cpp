@@ -19,7 +19,7 @@ std::mutex PacketCreator::mtx;
 void PacketCreator::createPacket(int rcvInd)
 {
     //Signal a packet created
-    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
+    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(	ConfigurationManager::getConfiguration());
     statsManager->increaseSentPckts(1);
 
     //TODO move ByteArray creating inside each constructor class
@@ -62,7 +62,7 @@ void PacketCreator::sendHead()
     mtx.unlock();
 
     sender->transmitPackets(packet);
-	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
+	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(ConfigurationManager::getConfiguration());
 	statsManager->increaseSentPckts(1);
 	std::cerr << ("Packet transmitted\n");
 }
