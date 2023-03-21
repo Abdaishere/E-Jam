@@ -2,9 +2,9 @@
 #include <queue>
 #include <thread>
 #include "src/PacketUnpacker.h"
-#include "src/ConfigurationManager.h"
+#include "src/streamsManager.h"
 #include "../commonHeaders/StatsManager.h"
-
+#include "ConfigurationManager.h"
 using namespace std;
 
 //thread function for receiving packets
@@ -52,12 +52,9 @@ int main(int argc, char** argv)
         return 0;
     }
 
-//    ConfigurationManager::getConfiguration(configPath);
-    std::shared_ptr<Configuration> currConfig = ConfigurationManager::getConfiguration();
+    Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
     std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID);
-    ConfigurationManager::initConfigurations();
-
-    std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID);
+    std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID, currConfig);
 
     std::thread reader(receive, pu);
     std::thread verifier(verify, pu);

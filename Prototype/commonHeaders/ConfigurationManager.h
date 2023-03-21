@@ -4,7 +4,7 @@
 
 #include "Configuration.h"
 #include "Byte.h"
-
+#include "Utils.h"
 class ConfigurationManager
 {
 public:

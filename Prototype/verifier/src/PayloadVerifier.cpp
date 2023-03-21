@@ -1,26 +1,14 @@
 #include "PayloadVerifier.h"
 
-std::shared_ptr<PayloadVerifier> PayloadVerifier::instance = nullptr;
-
-PayloadVerifier::PayloadVerifier()
+PayloadVerifier::PayloadVerifier(Configuration configuration)
 {
-
-}
-
-//handle singleton instance
-std::shared_ptr<PayloadVerifier> PayloadVerifier::getInstance()
-{
-    if(instance == nullptr)
-    {
-        instance.reset(new PayloadVerifier());
-    }
-    return instance;
+    this->configuration = configuration;
 }
 
 bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray>& packet, int startIndex, int endIndex)
 {
     bool status = true;
-    switch(ConfigurationManager::getConfiguration()->getPayloadType())
+    switch(configuration.getPayloadType())
     {
         case FIRST: //verify first half of alphabet a--m
         {

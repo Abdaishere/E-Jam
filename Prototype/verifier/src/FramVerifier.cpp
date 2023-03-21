@@ -1,21 +1,8 @@
 #include "FramVerifier.h"
 
-//initialize the static instance
-std::shared_ptr<FrameVerifier> FrameVerifier::instance = nullptr;
-
-FrameVerifier::FrameVerifier()
+FrameVerifier::FrameVerifier(Configuration configuration)
 {
-
-}
-
-//handle singleton instance
-std::shared_ptr<FrameVerifier> FrameVerifier::getInstance()
-{
-    if(instance == nullptr)
-    {
-        instance.reset(new FrameVerifier());
-    }
-    return instance;
+    this->configuration = configuration;
 }
 
 bool FrameVerifier::verifiy(std::shared_ptr<ByteArray> packet, int startIndex, int endIndex)
@@ -32,7 +19,7 @@ bool FrameVerifier::verifiy(std::shared_ptr<ByteArray> packet, int startIndex, i
     bool correctReceiver = true;
     for(int i=0;i<MAC_ADD_LEN;i++)
     {
-        if(acceptedRecv[i] != packet->at(i + startIndex))
+        if(configuration.getMyMacAddress()[i] != packet->at(i + startIndex))
         {
             correctReceiver = false;
             break;
@@ -80,7 +67,7 @@ bool FrameVerifier::verifiy(std::shared_ptr<ByteArray> packet, int startIndex, i
 
     //Extract payload
     int payloadStart = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN + STREAMID_LEN ;
-    int payloadEnd = payloadStart + ConfigurationManager::getConfiguration()->getPayloadLength();
+    int payloadEnd = payloadStart + configuration.getPayloadLength();
 
     //Extract CRC
     //Calculate the correct CRC
@@ -107,7 +94,7 @@ bool FrameVerifier::verifiy(std::shared_ptr<ByteArray> packet, int startIndex, i
 
 void FrameVerifier::updateAcceptedSenders()
 {
-    std::vector<ByteArray>& senders = ConfigurationManager::getConfiguration()->getSenders();
+    std::vector<ByteArray>& senders = configuration.getSenders();
     acceptedSenders = std::make_shared<std::vector<ByteArray>>(senders);
 }
 
