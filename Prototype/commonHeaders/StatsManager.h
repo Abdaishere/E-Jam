@@ -29,17 +29,17 @@ private:
 	ull sentErrorPckts;
 
     clock_t timer;
-    StatsManager( std::shared_ptr<Configuration>&, int, bool);
+    StatsManager(const Configuration& config, int, bool);
     void resetStats();
 	void buildMsg(std::string&);
     void writeStatFile();
 	bool is_gen;
     int instanceID;
-	std::shared_ptr<Configuration> configuration;
+	Configuration configuration;
 	int fd; //file descriptor to write sgen_id files
 
 public:
-    static std::shared_ptr<StatsManager> getInstance(std::shared_ptr<Configuration>& conf, int instanceID = 0, bool is_gen = false);
+    static std::shared_ptr<StatsManager> getInstance(const Configuration& config, int instanceID = 0, bool is_gen = false);
     void sendStats();
 	void increaseReceivedCorrectPckts(int);
 	void increaseReceivedWrongPckts(int);

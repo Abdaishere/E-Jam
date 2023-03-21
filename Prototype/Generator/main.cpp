@@ -165,7 +165,7 @@ int main(int argc, char** argv)
     }
 
     Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
-    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(genID, true);
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(currConfig, genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
     std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>(currConfig);
     /// TODO configure main appropriately to run one of the above threads based on configuration parameters

@@ -6,21 +6,21 @@ std::shared_ptr<StatsManager> StatsManager::instance;
 
 
 //handle unique instance
-std::shared_ptr<StatsManager> StatsManager::getInstance(std::shared_ptr<Configuration>& conf, int verID, bool is_gen)
+std::shared_ptr<StatsManager> StatsManager::getInstance(const Configuration& config, int verID, bool is_gen)
 {
     if (instance == nullptr)
     {
-        instance.reset(new StatsManager(conf, verID, is_gen));
+        instance.reset(new StatsManager(config, verID, is_gen));
     }
     return instance;
 }
 
 
-StatsManager::StatsManager( std::shared_ptr<Configuration>& conf, int id, bool is_gen1)
+StatsManager::StatsManager(const Configuration& config, int id, bool is_gen1)
 {
     is_gen = is_gen1;
     instanceID = id;
-	configuration = conf;
+	configuration = config;
     resetStats();
 }
 
@@ -84,7 +84,7 @@ void StatsManager::buildMsg(std::string& msg)
 	{
 		//Target mac
 		//Stream ID
-		if (!configuration)
+		if (configuration.isSet())
 		{
 			msg += "00000000";
 			msg += delimiter;
@@ -92,9 +92,9 @@ void StatsManager::buildMsg(std::string& msg)
 		}
 		else
 		{
-			msg += byteArray_to_string(configuration->getReceivers()[0]);
+			msg += byteArray_to_string(configuration.getReceivers()[0]);
 			msg += delimiter;
-			msg += byteArray_to_string(*configuration->getStreamID());
+			msg += byteArray_to_string(*configuration.getStreamID());
 		}
 		msg += delimiter;
 
@@ -109,7 +109,7 @@ void StatsManager::buildMsg(std::string& msg)
 	{
 		//Source mac
 		//Stream ID
-		if (!configuration)
+		if (configuration.isSet())
 		{
 			//fallback to identifity I can't reach the gen_id
 			msg += "00000000";
@@ -117,9 +117,9 @@ void StatsManager::buildMsg(std::string& msg)
 			msg += "xxx"; 
 		}else
 		{
-			msg += byteArray_to_string(configuration->getMyMacAddress());
+			msg += byteArray_to_string(configuration.getMyMacAddress());
 			msg += delimiter;
-			msg += byteArray_to_string(*configuration->getStreamID());
+			msg += byteArray_to_string(*configuration.getStreamID());
 		}
 		msg += delimiter;
 
