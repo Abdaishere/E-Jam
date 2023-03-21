@@ -82,10 +82,6 @@ void StatsManager::buildMsg(std::string& msg)
 	char delimiter = ' ';
 	if (is_gen) //Working as a generator
 	{
-		//Process type ( 0 for generator , 1 for verifier )
-		msg += "0";
-		msg += delimiter;
-
 		//Target mac
 		//Stream ID
 		if (!configuration)
@@ -111,10 +107,6 @@ void StatsManager::buildMsg(std::string& msg)
 	}
 	else	//Working as a verifier
 	{
-		//Process type ( 0 for generator , 1 for verifier )
-		msg += "1";
-		msg += delimiter;
-
 		//Source mac
 		//Stream ID
 		if (!configuration)
@@ -144,7 +136,7 @@ void StatsManager::buildMsg(std::string& msg)
 		msg += delimiter;
 
 		//Packets received out of order
-		msg += std::to_string(receivedWrongPckts);
+		msg += std::to_string(receivedOutOfOrderPckts);
 	}
 }
 
@@ -155,8 +147,17 @@ void StatsManager::writeStatFile()
 	buildMsg(msg);
 
 	//open pipe
-	mkfifo(("sgen_"+std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
-    fd = open(("sgen_" + std::to_string(instanceID)).c_str(), O_RDWR);
+	std::string dir;
+	if(is_gen)
+	{
+		dir = "./genStats/sgen_";
+	}
+	else
+	{
+		dir = "./verStats/sver_";
+	}
+	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
+    fd = open((dir+ std::to_string(instanceID)).c_str(), O_RDWR);
 	if(fd == -1)
 	{
         if (errno != EEXIST) //if the error was more than the file already existing
