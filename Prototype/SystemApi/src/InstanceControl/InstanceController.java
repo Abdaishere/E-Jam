@@ -128,7 +128,8 @@ public class InstanceController
                 if(Objects.equals(receiver, myMacAddress))
                 {
                     String command = "../Executables/verifier";
-                    String []args = {Integer.toString(verID++)};
+                    String path = configDir + "/config_" + stream.streamID + ".txt";
+                    String []args = {Integer.toString(verID++), path};
                     executeCommand(command, false, args);
                 }
             }
