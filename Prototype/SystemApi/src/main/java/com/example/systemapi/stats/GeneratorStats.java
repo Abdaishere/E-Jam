@@ -1,4 +1,4 @@
-package com.example.systemapi.InstanceControl.stats;
+package com.example.systemapi.stats;
 
 public class GeneratorStats {
     public String key;

@@ -1,4 +1,4 @@
-package com.example.systemapi.InstanceControl.stats;
+package com.example.systemapi.stats;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;

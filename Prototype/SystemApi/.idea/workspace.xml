@@ -4,17 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Admin client can force stop streams">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/GeneratorStats.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaListeners.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaProducerConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaTopicConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/StatsController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/StatsMessage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/VerifierStats.java" afterDir="false" />
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="make publish function">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/GeneratorStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/GeneratorStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaProducerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/KafkaProducerConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaTopicConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/KafkaTopicConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/StatsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/StatsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/VerifierStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/VerifierStats.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,7 +188,14 @@
       <option name="project" value="LOCAL" />
       <updated>1678555612604</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="make publish function">
+      <created>1679693818764</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1679693818764</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,6 +217,7 @@
     <MESSAGE value="create endpoints to communicate with admin-client" />
     <MESSAGE value="make start endpoint receive string instead of json object" />
     <MESSAGE value="Admin client can start streams" />
-    <option name="LAST_COMMIT_MESSAGE" value="Admin client can start streams" />
+    <MESSAGE value="make publish function" />
+    <option name="LAST_COMMIT_MESSAGE" value="make publish function" />
   </component>
 </project>
