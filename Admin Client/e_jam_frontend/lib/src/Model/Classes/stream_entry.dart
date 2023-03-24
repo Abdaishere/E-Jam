@@ -16,6 +16,8 @@ class StreamEntry {
     required this.generatorsIds,
     required this.verifiersIds,
     required this.payloadType,
+    required this.burstLength,
+    required this.burstDelay,
     required this.numberOfPackets,
     required this.payloadLength,
     required this.seed,
@@ -30,16 +32,18 @@ class StreamEntry {
     required this.streamStatus,
   });
 
-  final String name;
-  final String description;
+  late final String name;
+  late final String description;
   final DateTime lastUpdated;
   final DateTime startTime;
   final DateTime endTime;
-  final UnsignedLong delay;
-  final String streamId;
+  late final UnsignedLong delay;
+  late final String streamId;
   final List<String> generatorsIds;
   final List<String> verifiersIds;
   final UnsignedShort payloadType;
+  final UnsignedLong burstLength;
+  final UnsignedLong burstDelay;
   final UnsignedLong numberOfPackets;
   final UnsignedShort payloadLength;
   final UnsignedLong seed;
@@ -75,6 +79,8 @@ class StreamEntry {
         generatorsIds: List<String>.from(json["generatorsIds"].map((x) => x)),
         verifiersIds: List<String>.from(json["verifiersIds"].map((x) => x)),
         payloadType: json["payloadType"],
+        burstLength: json["burstLength"],
+        burstDelay: json["burstDelay"],
         numberOfPackets: json["numberOfPackets"],
         payloadLength: json["payloadLength"],
         seed: json["seed"],
@@ -101,6 +107,8 @@ class StreamEntry {
         "generatorsIds": List<String>.from(generatorsIds.map((x) => x)),
         "verifiersIds": List<String>.from(verifiersIds.map((x) => x)),
         "payloadType": payloadType,
+        "burstLength": burstLength,
+        "burstDelay": burstDelay,
         "numberOfPackets": numberOfPackets,
         "payloadLength": payloadLength,
         "seed": seed,

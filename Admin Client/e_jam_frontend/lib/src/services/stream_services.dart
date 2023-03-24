@@ -27,7 +27,7 @@ class StreamServices {
       } else {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             response.statusCode.toString());
-        return null;
+        return [];
       }
     } catch (e) {
       e.toString();
@@ -60,7 +60,7 @@ class StreamServices {
     }
   }
 
-  Future<StreamEntry?> createStream(
+  Future<bool?> createStream(
       ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
     try {
       final response = await client.post(
@@ -71,23 +71,18 @@ class StreamServices {
         body: json.encode(stream.toJson()),
       );
       if (201 == response.statusCode) {
-        final StreamEntry stream =
-            StreamEntry.fromJson(json.decode(response.body));
-
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger,
-            "Stream ${stream.streamId} created successfully",
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
             'Created Successfully');
 
-        return stream;
+        return true;
       } else if (409 == response.statusCode) {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             'Stream Already Exists');
-        return null;
+        return false;
       } else {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             response.statusCode.toString());
-        return null;
+        return false;
       }
     } catch (e) {
       e.toString();
@@ -97,7 +92,7 @@ class StreamServices {
     }
   }
 
-  Future<StreamEntry?> updateStream(
+  Future<bool?> updateStream(
       ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
     try {
       final response = await client.put(
@@ -108,25 +103,22 @@ class StreamServices {
         body: json.encode(stream.toJson()),
       );
       if (200 == response.statusCode) {
-        final StreamEntry stream =
-            StreamEntry.fromJson(json.decode(response.body));
+        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
+            'Updated Successfully');
 
-        SnacksBar.showSuccessSnack(scaffoldMessenger,
-            "Updated ${stream.streamId} successfully", 'Updated Successfully');
-
-        return stream;
+        return true;
       } else if (400 == response.statusCode) {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             'Cannot Update Stream');
-        return null;
+        return false;
       } else if (404 == response.statusCode) {
         SnacksBar.showFailureSnack(
             scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
-        return null;
+        return false;
       } else {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             response.statusCode.toString());
-        return null;
+        return false;
       }
     } catch (e) {
       e.toString();
@@ -362,7 +354,7 @@ class StreamServices {
       } else {
         SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
             response.statusCode.toString());
-        return null;
+        return [];
       }
     } catch (e) {
       e.toString();

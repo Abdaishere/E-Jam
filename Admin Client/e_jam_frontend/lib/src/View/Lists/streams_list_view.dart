@@ -33,7 +33,6 @@ class _StreamsListViewState extends State<StreamsListView> {
   // load the status of all streams from the server and update the UI with the list of streams status accordingly
   void loadStreamView() async {
     setState(() {
-      streams = null;
       isStreamListLoading = true;
     });
 
@@ -185,8 +184,9 @@ class AddStreamButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).push(
           HeroDialogRoute(
-            builder: (BuildContext context) =>
-                const Center(child: AddStreamView()),
+            builder: (BuildContext context) => const Center(
+              child: AddStreamView(),
+            ),
             settings: const RouteSettings(name: 'AddStreamView'),
           ),
         );

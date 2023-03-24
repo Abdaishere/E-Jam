@@ -13,6 +13,8 @@ The StreamDetails struct is used to store the information about the stream that 
 * `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
 * `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
 * `payload_length` - A u16 that represents the length of the payload that will be used in the stream
+* `burst_length` - A u64 that represents the number of packets that will be sent in a burst
+* `burst_delay` - A u64 that represents the time in ms that will be waited between each burst
 * `seed` - A u32 that represents the seed that will be used to generate the payload
 * `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
 * `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
@@ -30,6 +32,8 @@ pub struct StreamDetails {
     pub payload_type: u8,
     pub number_of_packets: u32,
     pub payload_length: u16,
+    pub burst_length: u64,
+    pub burst_delay: u64, 
     pub seed: u32,
     pub broadcast_frames: u32,
     pub inter_frame_gap: u32,

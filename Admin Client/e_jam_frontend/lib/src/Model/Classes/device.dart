@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:ffi';
 
+import 'package:flutter/widgets.dart';
+
+@immutable
 class Device {
-  Device({
+  const Device({
     required this.name,
     required this.description,
     required this.location,

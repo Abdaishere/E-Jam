@@ -131,7 +131,10 @@ async fn post_stream(
             streams_entries.push(stream_entry.clone());
 
             // send the stream back to the client with the default values for all the fields
-            HttpResponse::Created().json(stream_entry)
+            HttpResponse::Created().body(format!(
+                "Stream with id {} added to the list of streams",
+                stream_entry.get_stream_id()
+            ))
         }
     }
 }
@@ -189,7 +192,10 @@ async fn update_stream(
             // update the stream
             *stream_entry = _stream_entry.clone();
             println!("Updated stream: {:#?}", stream_entry);
-            HttpResponse::Ok().json(_stream_entry)
+            HttpResponse::Ok().body(format!(
+                "Stream with id {} updated in the list of streams",
+                stream_entry.get_stream_id()
+            ))
         }
         None => HttpResponse::NotFound().body(format!(
             "Stream with id {} not found, please try again with a the correct stream id",

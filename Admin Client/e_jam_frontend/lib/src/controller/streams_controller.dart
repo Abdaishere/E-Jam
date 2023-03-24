@@ -27,7 +27,7 @@ class StreamsController {
     });
   }
 
-  static Future<StreamEntry?> createNewStream(
+  static Future<bool?> createNewStream(
       ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
     isLoading = true;
     return streamServices.createStream(scaffoldMessenger, stream).then((value) {
@@ -36,7 +36,7 @@ class StreamsController {
     });
   }
 
-  static Future<StreamEntry?> updateStream(
+  static Future<bool?> updateStream(
       ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
     isLoading = true;
     return streamServices.updateStream(scaffoldMessenger, stream).then((value) {
@@ -121,9 +121,7 @@ class StreamsController {
       ScaffoldMessengerState scaffoldMessenger) async {
     isLoading = true;
     return streamServices.getAllStreamStatus(scaffoldMessenger).then((value) {
-      if (value != null) {
-        streamsStatusDetails = value;
-      }
+      streamsStatusDetails = value;
       isLoading = false;
     });
   }

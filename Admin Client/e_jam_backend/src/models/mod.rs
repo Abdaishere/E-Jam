@@ -76,6 +76,8 @@ The StreamEntry struct is used to store the information about the stream with it
 * `generators_ids` - A Vec of Strings that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
 * `verifiers_ids` - A Vec of Strings that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
 * `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
+* `burst_length` - A u64 that represents the length of the burst that will be used in the stream
+* `burst_delay` - A u64 that represents the delay between each burst that will be used in the stream
 * `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
 * `payload_length` - A u16 that represents the length of the payload that will be used in the stream
 * `seed` - A u32 that represents the seed that will be used to generate the payload
@@ -196,6 +198,30 @@ pub struct StreamEntry {
     #[validate(range(min = 0, max = 2, message = "Payload Type must be 0, 1 or 2"))]
     #[serde(default)]
     payload_type: u8,
+
+    #[doc = r" ## Burst Length
+    This is the length of the burst that will be generated in the stream (in ms)
+    ## Constraints
+    * Must be greater than or equal to 0
+    "]
+    #[validate(range(
+        min = 0,
+        message = "Burst Length must be greater than or equal to 0"
+    ))]
+    #[serde(default)]
+    burst_length: u64,
+
+    #[doc = r" ## Burst Delay
+    This is the delay between bursts that will be generated in the stream (in ms)
+    ## Constraints
+    * Must be greater than or equal to 0
+    "]
+    #[validate(range(
+        min = 0,
+        message = "Burst Delay must be greater than or equal to 0"
+    ))]
+    #[serde(default)]
+    burst_delay: u64, 
 
     #[doc = r" ## Number of Packets
     This is the number of packets that will be sent in the stream
@@ -986,6 +1012,8 @@ this is used to check if the stream status is the same as the status passed
             payload_type: self.payload_type,
             number_of_packets: self.number_of_packets,
             payload_length: self.payload_length,
+            burst_delay: self.burst_delay,
+            burst_length: self.burst_length,
             seed: self.seed,
             broadcast_frames: self.broadcast_frames,
             inter_frame_gap: self.inter_frame_gap,
