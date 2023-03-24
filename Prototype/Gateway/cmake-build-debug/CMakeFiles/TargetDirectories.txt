@@ -1,3 +1,0 @@
-/home/mostafa/Desktop/E-Jam/Prototype/Gateway/cmake-build-debug/CMakeFiles/Gateway.dir
-/home/mostafa/Desktop/E-Jam/Prototype/Gateway/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/mostafa/Desktop/E-Jam/Prototype/Gateway/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,5 +1,3 @@
-
-
 #include "PacketCreator.h"
 #include "ConfigurationManager.h"
 #include <iostream>
@@ -11,41 +9,45 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <StatsManager.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
 std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket(int rcvInd)
 {
-    //TODO move ByteArray creating inside each constructor class
-    ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
-    ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
+    //Signal a packet created
+    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
+    statsManager->increaseSentPckts(1);
 
-    PayloadGenerator* payloadGenerator = PayloadGenerator::getInstance();
-    payloadGenerator->regeneratePayload();
-    ByteArray payload = payloadGenerator->getPayload();
+    //TODO move ByteArray creating inside each constructor class
+    ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
+
+    payloadGenerator.regeneratePayload();
+    ByteArray payload = payloadGenerator.getPayload();
+
     ByteArray innerProtocol = ByteArray(2, '0');
     innerProtocol[0] = (unsigned char) 0x88;
     innerProtocol[1] = (unsigned char) 0xb5;
-    ByteArray streamID = *ConfigurationManager::getConfiguration()->getStreamID();
-    FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
-                                                                 payload,
-                                                                 innerProtocol, 
-                                                                 streamID);
-    frameConstructor->constructFrame();
+    ethernetConstructor.setType(innerProtocol);
+    ethernetConstructor.setDestinationAddress(destinationAddress);
+    ethernetConstructor.setPayload(payload);
+    ethernetConstructor.constructFrame();
     //TODO delete the values inside created ByteArray*
+    //lock the mutex and push to queue then unlock it
     mtx.lock();
-    productQueue.push(frameConstructor->getFrame());
+    productQueue.push(ethernetConstructor.getFrame());
     mtx.unlock();
 }
 
-PacketCreator::PacketCreator() {
+PacketCreator::PacketCreator(Configuration configuration): payloadGenerator(configuration), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
     sender = PacketSender::getInstance();
+    this->configuration = configuration;
 }
-#include <iostream>
+
 void PacketCreator::sendHead()
 {
-    if(productQueue.size()<1)
+    if(productQueue.empty())
     {
         return;
     }
@@ -54,7 +56,8 @@ void PacketCreator::sendHead()
     productQueue.pop();
     mtx.unlock();
 
-    print(&packet);
     sender->transmitPackets(packet);
-    std::cerr << ("Packet transmitted\n");
+	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
+	statsManager->increaseSentPckts(1);
+	std::cerr << ("Packet transmitted\n");
 }

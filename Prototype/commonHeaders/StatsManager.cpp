@@ -1,34 +1,42 @@
-//
-// Created by khaled on 12/26/22.
-//
-
 #include <cstdio>
 #include "StatsManager.h"
 
 //initialize the unique instance
-StatsManager* StatsManager::instance;
+std::shared_ptr<StatsManager> StatsManager::instance;
 
 
 //handle unique instance
-StatsManager *StatsManager::getInstance(int verID, bool is_gen)
+std::shared_ptr<StatsManager> StatsManager::getInstance(const Configuration& config, int verID, bool is_gen)
 {
     if (instance == nullptr)
-        instance = new StatsManager(verID, is_gen);
+    {
+        instance.reset(new StatsManager(config, verID, is_gen));
+    }
     return instance;
 }
+std::shared_ptr<StatsManager> StatsManager::getInstance()
+{
+	return instance;
+}
 
-
-StatsManager::StatsManager(int id, bool is_gen1)
+StatsManager::StatsManager(const Configuration& config, int id, bool is_gen1)
 {
     is_gen = is_gen1;
     instanceID = id;
-    resetStats(false);
+	configuration = config;
+    resetStats();
 }
 
-void StatsManager::resetStats(bool send)
+void StatsManager::resetStats()
 {
-    numberOfPackets = 0;
-    numberOfErrors = 0;
+	receivedCorrectPckts = 0;
+	receivedWrongPckts = 0;
+	receivedOutOfOrderPckts = 0;
+	droppedPckts = 0;
+
+	sentPckts = 0;
+	sentErrorPckts = 0;
+
     timer = clock(); //start time of stats 
 }
 
@@ -39,33 +47,132 @@ void StatsManager::sendStats()
     if((double) delta_t > SEND_DELAY )
     {
         writeStatFile();
-        resetStats(false); //to reset variables
+        resetStats(); //to reset variables
     }
 }
 
 
-void StatsManager::increaseNumPackets(long val)
+void StatsManager::increaseReceivedCorrectPckts(int val = 1)
 {
-    numberOfPackets += val;
+	receivedCorrectPckts+=val;
+}
+void StatsManager::increaseReceivedWrongPckts(int val = 1)
+{
+	receivedWrongPckts+=val;
+}
+void StatsManager::increaseReceivedOutOfOrderPckts(int val = 1)
+{
+	//TODO when to call?
+	receivedOutOfOrderPckts+=val;
+}
+void StatsManager::increaseDroppedPckts(int val = 1)
+{
+	//TODO when to call?
+	droppedPckts+=val;
 }
 
-void StatsManager::increaseNumErrors(long val)
+void StatsManager::increaseSentPckts(int val = 1)
 {
-    numberOfErrors += val;
+	sentPckts+=val;
+}
+void StatsManager::increaseSentErrorPckts(int val = 1)
+{
+	sentErrorPckts+=val;
+}
+
+void StatsManager::buildMsg(std::string& msg)
+{
+	char delimiter = ' ';
+	if (is_gen) //Working as a generator
+	{
+		//Target mac
+		//Stream ID
+		if (configuration.isSet())
+		{
+			msg += "00000000";
+			msg += delimiter;
+			msg += "xxx";
+		}
+		else
+		{
+			msg += byteArray_to_string(configuration.getReceivers()[0]);
+			msg += delimiter;
+			msg += byteArray_to_string(*configuration.getStreamID());
+		}
+		msg += delimiter;
+
+		//sent Packets
+		msg += std::to_string(sentPckts);
+		msg += delimiter;
+
+		//sent errored packets
+		msg += std::to_string(sentErrorPckts);
+	}
+	else	//Working as a verifier
+	{
+		//Source mac
+		//Stream ID
+		if (configuration.isSet())
+		{
+			//fallback to identifity I can't reach the gen_id
+			msg += "00000000";
+			msg += delimiter;
+			msg += "xxx"; 
+		}else
+		{
+			msg += byteArray_to_string(configuration.getMyMacAddress());
+			msg += delimiter;
+			msg += byteArray_to_string(*configuration.getStreamID());
+		}
+		msg += delimiter;
+
+		//Correctly Received Packets
+		msg += std::to_string(receivedCorrectPckts);
+		msg += delimiter;
+
+		//Errornos packets
+		msg += std::to_string(receivedWrongPckts);
+		msg += delimiter;
+
+		//Packets dropped
+		msg += std::to_string(droppedPckts);
+		msg += delimiter;
+
+		//Packets received out of order
+		msg += std::to_string(receivedOutOfOrderPckts);
+	}
 }
 
 void StatsManager::writeStatFile()
 {
-    std::string dir = STAT_DIR;
-    if(is_gen)
-        dir += "/Gen_";
-    else
-        dir += "/Ver_";
-    dir += std::to_string(instanceID);
-    dir += ".txt";
+	//build the msg
+	std::string msg;
+	buildMsg(msg);
 
-    FILE* file = fopen(dir.c_str(),"w");
-    std::string line = std::to_string(numberOfPackets) + '\n' + std::to_string(numberOfErrors) + '\n';
-    fwrite(line.c_str(), sizeof(char), line.length()*sizeof(char), file);
-    fclose(file);
+	//open pipe
+	std::string dir;
+	if(is_gen)
+	{
+		dir = "./genStats/sgen_";
+	}
+	else
+	{
+		dir = "./verStats/sver_";
+	}
+	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
+    fd = open((dir+ std::to_string(instanceID)).c_str(), O_RDWR);
+	if(fd == -1)
+	{
+        if (errno != EEXIST) //if the error was more than the file already existing
+        {
+            printf("Error in creating the FIFO file sgen_id\n");
+			return;
+        } else {
+            printf("File already exists sgen_id, skipping creation...\n");
+        }
+    }
+
+	//Write on pipe
+	write(fd, msg.c_str(), sizeof(char)*msg.size());
 }
+

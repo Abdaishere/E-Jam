@@ -24,9 +24,12 @@ struct segmentConstructorInfo{
 class PacketCreator
 {
 private:
-    PacketSender* sender;
+    std::shared_ptr<PacketSender> sender;
+    PayloadGenerator payloadGenerator;
+    Configuration configuration;
+    EthernetConstructor ethernetConstructor;
 public:
-    PacketCreator();
+    PacketCreator(Configuration);
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
     void createPacket(int);

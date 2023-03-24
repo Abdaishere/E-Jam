@@ -1,30 +1,29 @@
 
 #include "EthernetConstructor.h"
 
-//TODO Get values from Configuration manager
-long long EthernetConstructor::seqNum = 0;
+long long EthernetConstructor::seqNum = 1;
 
-EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
-                                         ByteArray& payload,
-                                         ByteArray& innerProtocol,
-                                         ByteArray& streamID) : FrameConstructor(sourceAddress, destinationAddress){
-    this->payload = payload;
-    type=innerProtocol;
+
+EthernetConstructor::EthernetConstructor(ByteArray sourceAddress,
+                                         ByteArray streamID) : FrameConstructor(sourceAddress){
     this->streamID = streamID;
+    seqNum = 1;
 }
 
 void EthernetConstructor::constructFrame() {
+
     preamble = ByteArray(this->pre, 8);
     frame.clear();
-    frame.resize(source_address.size() + destination_address.size() + type.size() + STREAMID_LEN + SeqNum_LEN + payload.size() + CRC_LENGTH);
-//  frame.write(preamble);
-    frame.append(destination_address, destination_address.size());
-    frame.append(source_address, source_address.size());
-    frame.append(type, type.size());
-    frame.append(streamID, STREAMID_LEN);
-    frame.append(payload, payload.size());
-    CRC = calculateCRC(&payload);
-    frame.append(CRC, CRC_LENGTH);
+    // DST MAC | SRC MAC | TYPE | SteamID | SeqNum | PAYLOAD | CRC
+    frame.append(destination_address);
+    frame.append(source_address);
+    frame.append(type);
+    frame.append(streamID);
+    // this incrementing only works when there is one generator per node/stream pair
+    frame.append(convertLLToStr(seqNum++));
+    frame.append(payload);
+    CRC = calculateCRC(std::make_shared<ByteArray>(payload));
+    frame.append(CRC);
 }
 static uint32_t CRCTable[256] = {
         0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
@@ -93,7 +92,7 @@ static uint32_t CRCTable[256] = {
         0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4,
 };
 
-ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
+ByteArray EthernetConstructor::calculateCRC(std::shared_ptr<ByteArray> payload)
 {
     unsigned int crc32 = 0xFFFFFFFFu;
 
@@ -109,3 +108,12 @@ ByteArray EthernetConstructor::calculateCRC(ByteArray* payload)
 //    return ByteArray(crcChar, 4,0);
     return ByteArray(4, '4');
 }
+
+void EthernetConstructor::setType(const ByteArray &type) {
+    EthernetConstructor::type = type;
+}
+
+void EthernetConstructor::setPayload(const ByteArray &payload) {
+    EthernetConstructor::payload = payload;
+}
+

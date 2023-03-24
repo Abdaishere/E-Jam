@@ -8,18 +8,26 @@
 #include <queue>
 #include <mutex>
 #include "SeqChecker.h"
+#include <memory>
 #include "../commonHeaders/StatsManager.h"
+#include <algorithm>
 
+// we dedicate frameVerifiers and payloadVerifiers and seqCheckers for each generator in the stream
 class PacketUnpacker
 {
 private:
     std::mutex mtx;
-    ByteArray* consumePacket();
-    PacketReceiver* packetReceiver;
-    SeqChecker seqChecker;
+    std::shared_ptr<ByteArray> consumePacket();
+    std::shared_ptr<PacketReceiver> packetReceiver;
+    Configuration configuration;
+    std::vector<ByteArray> srcMacAddresses;
+    std::vector<FrameVerifier> frameVerifier;
+    std::vector<PayloadVerifier> payloadVerifier;
+	std::shared_ptr<StatsManager> statsManager;
+    std::vector<SeqChecker> seqChecker;
 public:
-    static std::queue<ByteArray*> packetQueue;
-    PacketUnpacker(int verID);
+    static std::queue<std::shared_ptr<ByteArray>> packetQueue;
+    PacketUnpacker(int verID, Configuration configuration);
     void readPacket();
     void verifiyPacket();
 };

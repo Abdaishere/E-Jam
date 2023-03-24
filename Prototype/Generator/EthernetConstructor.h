@@ -5,30 +5,31 @@
 #include "Configuration.h"
 
 #include "FrameConstructor.h"
+#include "Utils.h"
 #include "Byte.h"
 class EthernetConstructor : public FrameConstructor
 {
 private:
-    const unsigned char pre[8] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAB};
+    unsigned char pre[8] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAB};
     const static int headerSize = 8 + 6 + 6 + 2 + 4;
     ByteArray preamble;
     //type of network layer protocol or capacity of data
     ByteArray type;
+    ByteArray streamID;
     ByteArray payload;
     ByteArray CRC;
-    ByteArray streamID;
     static long long seqNum;
     //may need to insert 12-byte inter-packet gap, not sure
 
 public:
-    EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
-                        ByteArray& payload,
-                        ByteArray& innerProtocol,
-                        ByteArray& streamID) ;
+    EthernetConstructor(ByteArray sourceAddress,
+                        ByteArray streamID) ;
 
+    void setType(const ByteArray &type);
+    void setPayload(const ByteArray &payload);
     void constructFrame();
 
-    ByteArray calculateCRC(ByteArray*);
+    ByteArray calculateCRC(std::shared_ptr<ByteArray>);
 
 }; 
 

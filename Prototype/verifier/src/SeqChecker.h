@@ -5,24 +5,39 @@
 #ifndef VERIFIER_SEQCHECKER_H
 #define VERIFIER_SEQCHECKER_H
 #include <vector>
+#include <deque>
+#include "Configuration.h"
+
+const int MaxBuffSize = 300;
+const int MaxReordering = 1000;
+///out of order packets are packets with s < expNext, so
+///reordering metrics supported are reordered packet ratio and reordering extent
 
 class SeqChecker {
 private:
-    long long expectedNext;
-    long long missing;
-    long long OOO; //out of order frames
+    ull expectedNext;
+    ull missing;
+    //out of order frames, type-P-reordered
+    ull reordered;
     //frames that have not yet arrived which have a lower sequence number than frames that have arrived
-    std::vector<long long> wait;
-
+    std::deque<ull>  reorderingExtents, recSeqNums;
 public:
-    void receive(long long seqNum);
+    void receive(ull seqNum);
     SeqChecker()
     {
-        expectedNext = 0;
+        expectedNext = 1;
         missing = 0;
-        OOO = 0;
-        wait = std::vector<long long>();
+        reordered = 0;
+        reorderingExtents = std::deque<ull>();
+        recSeqNums = std::deque<ull>();
     }
+    ull getExpectedNext() const;
+
+    ull getMissing() const;
+
+    ull getReordered() const;
+
+    const std::deque<ull> &getRecSeqNums() const;
 };
 
 

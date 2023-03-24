@@ -114,17 +114,13 @@ void PacketReceiver::receiveFromSwitch()
     }
 
     std::cerr << cnt << " packets received\n";
-//        for (int i = 0; i < BUFF_LEN; i++)
-//            std::cout << buff[i];
-//        std::cout << "\n";
-
 }
 
 //send payload to single verifier used in checkBuffer to send to all verifiers
 void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
 {
     //converting int to char
-    write(fd[verID], &len,4);
+    write(fd[verID], &len, sizeof(int));
     //assuming the pipe speed is faster than the  network speed
     write(fd[verID], payload, len);
 }

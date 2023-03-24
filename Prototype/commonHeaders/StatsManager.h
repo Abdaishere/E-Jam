@@ -1,7 +1,3 @@
-//
-// Created by khaled on 12/26/22.
-//
-
 #ifndef VERIFIER_STATSMANAGER_H
 #define VERIFIER_STATSMANAGER_H
 
@@ -12,26 +8,46 @@
 
 #include <chrono>
 #include "Configuration.h"
+#include <memory>
+#include "unistd.h"
+#include "sys/stat.h"
+#include <fcntl.h>
 
+
+typedef unsigned long long ull;
 //Singleton class
 class StatsManager
 {
 private:
-    static StatsManager* instance; //singleton unique instance
-    long numberOfPackets;
-    long numberOfErrors;
-    clock_t timer; 
-    StatsManager(int, bool);
-    void resetStats(bool);
+    static std::shared_ptr<StatsManager> instance; //singleton unique instance
+	ull receivedCorrectPckts;
+	ull receivedWrongPckts;
+	ull receivedOutOfOrderPckts;
+	ull droppedPckts;
+
+	ull sentPckts;
+	ull sentErrorPckts;
+
+    clock_t timer;
+    StatsManager(const Configuration& config, int, bool);
+    void resetStats();
+	void buildMsg(std::string&);
     void writeStatFile();
-    bool is_gen;
+	bool is_gen;
     int instanceID;
+	Configuration configuration;
+	int fd; //file descriptor to write sgen_id files
 
 public:
-    static StatsManager* getInstance(int instanceID = 0,bool is_gen = false);
+    static std::shared_ptr<StatsManager> getInstance(const Configuration& config, int instanceID = 0, bool is_gen = false);
+    static std::shared_ptr<StatsManager> getInstance();
     void sendStats();
-    void increaseNumPackets(long val = 1);
-    void increaseNumErrors(long val = 1);
+	void increaseReceivedCorrectPckts(int);
+	void increaseReceivedWrongPckts(int);
+	void increaseReceivedOutOfOrderPckts(int);
+	void increaseDroppedPckts(int);
+	void increaseSentPckts(int);
+	void increaseSentErrorPckts(int);
 };
 
 

@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
@@ -13,11 +10,13 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <memory>
 
 //constants of configuration
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
 #define STREAMID_LEN 3
+#define SeqNum_Len 8
 #define FRAME_TYPE_LEN 2
 #define CRC_LENGTH 4
 #define PREMBLE_LENGTH 8
@@ -35,7 +34,7 @@ class Configuration
 {
 private:
     //stream attributes
-    ByteArray* streamID;                //A 3 alphanumeric charaters defining a stream
+    std::shared_ptr<ByteArray> streamID;                //A 3 alphanumeric charaters defining a stream
     std::vector<ByteArray> senders;     //list of senders mac addresses
     std::vector<ByteArray> receivers;   //list of receivers mac addressess
     ByteArray myMacAddress;             //The mac address of this machine (Inferred)
@@ -47,8 +46,10 @@ private:
     ull lifeTime = 1000;                //Time to live before ending execution in ms
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
+	ull burstLen;						//Number of packets in a burst
+	ull burstDelay;						//Delay between bursts in milliseconds
     bool checkContent;                  //Whether to check content or not
-
+    char* filePath;
 
     //convert int to corresponding hexa character
     unsigned char hexSwitcher(int x)
@@ -96,9 +97,21 @@ private:
         return ByteArray(mac_address, MAC_ADD_LEN);
     }
 public:
+    Configuration()
+    {
+        filePath = nullptr;
+    }
+
+    bool isSet()
+    {
+        return filePath != nullptr;
+    }
+
     //Read configuration from a file of the correct format
     void loadFromFile(char* path)
     {
+        //copying pointers, not actual contents of the char array
+        filePath = path;
         freopen(path,"r",stdin);
 
         //Set stream ID, must be of leangth 3 (STREAMID_LEN)
@@ -167,12 +180,17 @@ public:
                 flowType = BURSTY;
         }
 
-        //Read check content
-        char cInput;
-        std::cin>>cInput;
-        cInput-='0'; //convert to int
-        checkContent = cInput;
+		//Read burst length
+		std::cin>>burstLen;
 
+		//Read burstDelay
+		std::cin>>burstDelay;
+
+		//Read check content
+		char cInput;
+		std::cin>>cInput;
+		cInput-='0'; //convert to int
+		checkContent = cInput;
 
         //handle macaddres
         myMacAddress = discoverMyMac();
@@ -299,14 +317,14 @@ public:
         myMacAddress = ByteArray(mac,6);
     }
 
-    ByteArray* getStreamID()
+    std::shared_ptr<ByteArray> getStreamID()
     {
         return streamID;
     }
 
     void setStreamID(const unsigned char* id)
     {
-        streamID = new ByteArray(id, STREAMID_LEN);
+        streamID = std::make_shared<ByteArray>(id, STREAMID_LEN);
     }
 
     ull getBcFramesNum()

@@ -2,13 +2,13 @@
 #include <queue>
 #include <thread>
 #include "src/PacketUnpacker.h"
-#include "src/ConfigurationManager.h"
+#include "src/streamsManager.h"
 #include "../commonHeaders/StatsManager.h"
-
+#include "ConfigurationManager.h"
 using namespace std;
 
 //thread function for receiving packets
-void receive(PacketUnpacker* pu)
+void receive(std::shared_ptr<PacketUnpacker> pu)
 {
 //    int iters = 1000;
     while(true)
@@ -18,7 +18,7 @@ void receive(PacketUnpacker* pu)
 }
 
 //thread function to verifiy received packets
-void verify(PacketUnpacker* pu)
+void verify(std::shared_ptr<PacketUnpacker> pu)
 {
 //    int iters = 100000000;
     while(true)
@@ -28,7 +28,7 @@ void verify(PacketUnpacker* pu)
 }
 
 //thread function to send stats
-void sendStats(StatsManager* sm)
+void sendStats(std::shared_ptr<StatsManager> sm)
 {
     while (true)
     {
@@ -39,15 +39,22 @@ void sendStats(StatsManager* sm)
 int main(int argc, char** argv)
 {
     int verID = 0;
-    if (argc > 1)
+    char *configPath;
+    if (argc > 2)
     {
         verID = std::stoi(argv[1]);
+        configPath = argv[2];
         printf("%d\n", verID);
     }
-    StatsManager* sm = StatsManager::getInstance(verID);
-    ConfigurationManager::initConfigurations();
+    else
+    {
+        printf("Missing Arguments\n");
+        return 0;
+    }
 
-    PacketUnpacker* pu = new PacketUnpacker(verID);
+    Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(currConfig,verID,false);
+    std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID, currConfig);
 
     std::thread reader(receive, pu);
     std::thread verifier(verify, pu);

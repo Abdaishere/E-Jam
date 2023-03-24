@@ -8,15 +8,14 @@
 #include <csignal>
 #include <error.h>
 #include <iostream>
-#include <unistd.h>
-PacketReceiver* PacketReceiver::instance = nullptr;
+std::shared_ptr<PacketReceiver> PacketReceiver::instance = nullptr;
 PacketReceiver::PacketReceiver() {}
 
-PacketReceiver* PacketReceiver::getInstance(int genID, std::string pipeDir, int pipePerm)
+std::shared_ptr<PacketReceiver> PacketReceiver::getInstance(int genID, std::string pipeDir, int pipePerm)
 {
     if(instance  == nullptr)
     {
-        instance = new PacketReceiver();
+        instance.reset(new PacketReceiver());
         instance->pipeDir = pipeDir;
         instance->permissions = pipePerm;
         instance->verID = genID;
@@ -52,17 +51,18 @@ void PacketReceiver::closePipe() {
     close(fd);
 }
 
-void PacketReceiver::receivePackets(ByteArray* packet)
+//fix:must make the smart pointer passed by reference as it is lost when only copied
+void PacketReceiver::receivePackets(std::shared_ptr<ByteArray>& packet)
 {
     int packetSize; read(fd, &packetSize,4);
-    unsigned char* cstr = new unsigned char[packetSize];
-    int received = read(fd, cstr, packetSize);
-    packet = new ByteArray(packetSize, 'a');
-    memcpy(packet, cstr, sizeof(cstr));
-    std::cerr << "packet reached receiver " << received << " \n";
-//    for(int i=0; i<packet->length; i++)
-//        std::cerr<<(int)packet->at(i) << " ";
-//    std::cerr << "\n";
+    unsigned char* cstr = new unsigned char[packetSize]; //why we do not delete it ??
+    read(fd, cstr, packetSize);
+    packet = std::make_shared<ByteArray>(packetSize, 'a');
+    for(int i=0;i<packetSize;i++)
+        packet->at(i) = cstr[i];
+
+//    memcpy(packet, cstr, sizeof(cstr));
+    delete[] cstr;
 }
 
 PacketReceiver::~PacketReceiver() {

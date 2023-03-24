@@ -1,7 +1,16 @@
-//
-// Created by mohamedelhagry on 2/21/23.
-//
 #include "Byte.h"
+
+
+std::string byteArray_to_string(const ByteArray& byteArray)
+{
+	std::string result = "";
+	for(unsigned char uc: byteArray)
+	{
+		char c = (char) uc;
+		result+=c;
+	}
+	return result;
+}
 
 void print(ByteArray* ptr)
 {
