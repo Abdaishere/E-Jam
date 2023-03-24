@@ -87,7 +87,7 @@ public class InstanceController implements Runnable
         {
             for(String sender: stream.generators)
             {
-                if(Objects.equals(sender, myMacAddress))
+                if(sender.equals(myMacAddress))
                 {
                     String command = "../Executables/Generator";
                     String path = configDir + "/config_" + stream.streamID + ".txt";
@@ -107,7 +107,7 @@ public class InstanceController implements Runnable
         {
             for(String receiver: stream.verifiers)
             {
-                if(Objects.equals(receiver, myMacAddress))
+                if(receiver.equals(myMacAddress))
                 {
                     String command = "../Executables/verifier";
                     String []args = {Integer.toString(verID++)};

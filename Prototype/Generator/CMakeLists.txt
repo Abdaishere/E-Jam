@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(Generator)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 set(COMMON_FILES ../commonHeaders)
 include_directories(${COMMON_FILES})
