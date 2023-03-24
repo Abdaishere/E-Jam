@@ -10,10 +10,13 @@ class FrameConstructor
 {
 protected:
     ByteArray frame;
-    ByteArray destination_address; //Destination MAC address
+    ByteArray destination_address;
+    //Destination MAC address
     ByteArray source_address;      //Source MAC address
 public:
+    FrameConstructor(ByteArray);
     FrameConstructor(ByteArray, ByteArray);
+    void setDestinationAddress(const ByteArray &destinationAddress);
     virtual void constructFrame() = 0;
      ByteArray getFrame();
 };

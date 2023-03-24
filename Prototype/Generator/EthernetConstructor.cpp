@@ -4,13 +4,10 @@
 long long EthernetConstructor::seqNum = 1;
 
 
-EthernetConstructor::EthernetConstructor(ByteArray& sourceAddress, ByteArray& destinationAddress,
-                                         ByteArray& payload,
-                                         ByteArray& innerProtocol,
-                                         ByteArray& streamID) : FrameConstructor(sourceAddress, destinationAddress){
-    this->payload = payload;
-    type=innerProtocol;
+EthernetConstructor::EthernetConstructor(ByteArray sourceAddress,
+                                         ByteArray streamID) : FrameConstructor(sourceAddress){
     this->streamID = streamID;
+    seqNum = 1;
 }
 
 void EthernetConstructor::constructFrame() {
@@ -111,3 +108,12 @@ ByteArray EthernetConstructor::calculateCRC(std::shared_ptr<ByteArray> payload)
 //    return ByteArray(crcChar, 4,0);
     return ByteArray(4, '4');
 }
+
+void EthernetConstructor::setType(const ByteArray &type) {
+    EthernetConstructor::type = type;
+}
+
+void EthernetConstructor::setPayload(const ByteArray &payload) {
+    EthernetConstructor::payload = payload;
+}
+

@@ -27,6 +27,7 @@ private:
     std::shared_ptr<PacketSender> sender;
     PayloadGenerator payloadGenerator;
     Configuration configuration;
+    EthernetConstructor ethernetConstructor;
 public:
     PacketCreator(Configuration);
     static std::mutex mtx;

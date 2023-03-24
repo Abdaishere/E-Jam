@@ -40,7 +40,7 @@ public class Communicator
         stream1.flowType = FlowType.BACK_TO_BACK;
         stream1.streamID = "abc";
         stream1.bcFramesNum = 100;
-        stream1.interFrameGap = 15;
+        stream1.interFrameGap = 0;
         stream1.lifeTime = 25000;
         stream1.transportProtocol = TransportProtocol.TCP;
         stream1.checkContent = false;

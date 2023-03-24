@@ -44,3 +44,19 @@ void SeqChecker::receive(ull seqNum) {
     if (recSeqNums.size() > MaxBuffSize)
         recSeqNums.pop_front();
 }
+//for debugging purposes
+ull SeqChecker::getExpectedNext() const {
+    return expectedNext;
+}
+
+ull SeqChecker::getMissing() const {
+    return missing;
+}
+
+ull SeqChecker::getReordered() const {
+    return reordered;
+}
+
+const std::deque<ull> &SeqChecker::getRecSeqNums() const {
+    return recSeqNums;
+}

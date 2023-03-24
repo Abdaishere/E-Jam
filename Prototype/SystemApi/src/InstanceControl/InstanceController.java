@@ -28,7 +28,7 @@ public class InstanceController
         startGateway(genNum, verNum); //start the gateway
 
         try {
-            sleep(30000); //test duration
+            sleep(15000); //test duration
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -128,7 +128,8 @@ public class InstanceController
                 if(Objects.equals(receiver, myMacAddress))
                 {
                     String command = "../Executables/verifier";
-                    String []args = {Integer.toString(verID++)};
+                    String path = configDir + "/config_" + stream.streamID + ".txt";
+                    String []args = {Integer.toString(verID++), path};
                     executeCommand(command, false, args);
                 }
             }
