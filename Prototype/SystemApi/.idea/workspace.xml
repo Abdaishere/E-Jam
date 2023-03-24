@@ -4,13 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="make publish function">
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="relocate stats package">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/GeneratorStatsContainer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/StatsContainer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/StatsManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/VerifierStatsContainer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/GeneratorStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/GeneratorStats.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaProducerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/KafkaProducerConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/KafkaTopicConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/KafkaTopicConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/StatsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/StatsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/stats/VerifierStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/VerifierStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/UTILs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/InstanceControl/UTILs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/GeneratorStats.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/StatsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/StatsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/VerifierStats.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,36 +58,58 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/mostafa/Desktop/E-Jam/Prototype/SystemApi&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;SDKs&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;64d965383f6b496d7a6ea9c14eeeefe8&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/mostafa/Desktop/E-Jam/Prototype/SystemApi/src/main/java/com/example/systemapi/stats",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "SDKs",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
+    "spring.configuration.checksum": "64d965383f6b496d7a6ea9c14eeeefe8",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="Spring Boot.SystemApiApplication">
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats" />
+      <recent name="$PROJECT_DIR$/src/main/java/com/example/systemapi/StatsManagement" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.systemapi.stats" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Communicator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.systemapi.InstanceControl.Communicator" />
       <module name="SystemApi" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.example.systemapi.InstanceControl.Process" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.systemapi.InstanceControl.Main" />
+      <module name="SystemApi" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.systemapi.InstanceControl.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -109,6 +135,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Main" />
         <item itemvalue="Application.Communicator" />
         <item itemvalue="HTTP Request.SystemApi-endpoints_1 | #1" />
         <item itemvalue="HTTP Request.SystemApi-endpoints | #1" />
@@ -195,7 +222,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679693818764</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="relocate stats package">
+      <created>1679694449059</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1679694449059</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,6 +252,7 @@
     <MESSAGE value="make start endpoint receive string instead of json object" />
     <MESSAGE value="Admin client can start streams" />
     <MESSAGE value="make publish function" />
-    <option name="LAST_COMMIT_MESSAGE" value="make publish function" />
+    <MESSAGE value="relocate stats package" />
+    <option name="LAST_COMMIT_MESSAGE" value="relocate stats package" />
   </component>
 </project>

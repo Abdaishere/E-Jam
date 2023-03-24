@@ -7,13 +7,13 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 public class StatsController {
-    private final KafkaTemplate<String, byte[]> kafkaTemplate;
+    private static KafkaTemplate<String, byte[]> kafkaTemplate;
 
     public StatsController(KafkaTemplate<String, byte[]> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
+        StatsController.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishToGenerators(GeneratorStats stats) throws IOException {
+    public static void publishToGenerators(GeneratorStatsContainer stats) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(stats);
@@ -23,7 +23,7 @@ public class StatsController {
         kafkaTemplate.send("generators", serializedStats);
     }
 
-    public void publishToVerifiers(VerifierStats stats) throws IOException {
+    public static void publishToVerifiers(VerifierStatsContainer stats) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
         objectOutputStream.writeObject(stats);

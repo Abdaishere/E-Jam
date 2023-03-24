@@ -2,17 +2,20 @@ package com.example.systemapi.InstanceControl;
 
 import java.io.*;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.concurrent.TimeUnit;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UTILs {
     public String username;
+
     //get username from cmd
-    public static String getUserString()
-    {
+    public static String getUserString() {
         String name = "";
-        try
-        {
+        try {
             String command = "whoami";
             ProcessBuilder processBuilder = new ProcessBuilder();
             processBuilder.command(command);
@@ -21,23 +24,49 @@ public class UTILs {
 
             InputStream inputStream = process.getInputStream();
             name = "";
-            try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
-                while((line = bufferedReader.readLine()) != null) {
+                while ((line = bufferedReader.readLine()) != null) {
                     name = line;
                 }
 
             }
             process.destroyForcibly();
-            if(name.equals("root"))
+            if (name.equals("root"))
                 name = "mohamed";
             return name;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    UTILs() {
+        username = getUserString();
+    }
+
+    public static Set<String> listFiles(String dir) {
+        return Stream.of(new File(dir).listFiles())
+                .filter(file -> !file.isDirectory())
+                .map(File::getName)
+                .collect(Collectors.toSet());
+    }
+
+    public static ArrayList<String> getLines(String fileName) {
+        String WORD_FILE = fileName;
+        ArrayList<String> lines = new ArrayList<>();
+        try {
+            File file = new File(WORD_FILE);
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.length() > 0) lines.add(line);
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR: File not found.");
+        }
+        return lines;
     }
 
     public static String getMyMacAddress() {
@@ -45,48 +74,35 @@ public class UTILs {
         byte[] mac;
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while(networkInterfaces.hasMoreElements())
-            {
+            while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface network = networkInterfaces.nextElement();
                 mac = network.getHardwareAddress();
-                if(mac == null)
-                {
+                if (mac == null) {
                     throw new Exception("Mac is null");
-                }
-                else
-                {
+                } else {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < mac.length; i++)
-                    {
+                    for (int i = 0; i < mac.length; i++) {
                         sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
                     }
-                    String mac12 = sb.toString().replaceAll("-","");
+                    String mac12 = sb.toString().replaceAll("-", "");
                     myMacAddress = mac12;
                     break;
                 }
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return myMacAddress;
     }
 
-//    public String convertToMac6(String mac12)
-//    {
-//        String mac6 = "AAAAAA";
-//        for (int i = 0; i < 12; i+=2)
-//        {
-//            char c = (char)(((int)mac12.charAt(i) - (int)'0') + (((int)mac12.charAt(i+1) - (int)'0') << 4));
-//            // bug: last substring was not taken correctly, the line below is correct
-//            mac6 = mac6.substring(0,i/2)+String.valueOf(c)+mac6.substring(i/2 + 1);
-//        }
-//        return mac6;
-//    }
-
-    UTILs()
-    {
-        username = getUserString();
+    public static String convertMacAddressFormat(String macAddress) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < macAddress.length(); i += 2) {
+            sb.append(Character.toLowerCase(macAddress.charAt(i)));
+            sb.append(Character.toLowerCase(macAddress.charAt(i + 1)));
+            sb.append(":");
+        }
+        sb.setLength(sb.length() - 1);
+        return sb.toString();
     }
 }
