@@ -21,17 +21,23 @@ private:
     ull reordered;
     //frames that have not yet arrived which have a lower sequence number than frames that have arrived
     std::deque<ull>  reorderingExtents, recSeqNums;
-
 public:
     void receive(ull seqNum);
     SeqChecker()
     {
-        expectedNext = 0;
+        expectedNext = 1;
         missing = 0;
         reordered = 0;
         reorderingExtents = std::deque<ull>();
         recSeqNums = std::deque<ull>();
     }
+    ull getExpectedNext() const;
+
+    ull getMissing() const;
+
+    ull getReordered() const;
+
+    const std::deque<ull> &getRecSeqNums() const;
 };
 
 

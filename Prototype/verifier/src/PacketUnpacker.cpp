@@ -8,7 +8,6 @@ void PacketUnpacker::readPacket()
     //massive change: mutex applied only when pushing packet, not when receiving it from the gateway
     std::shared_ptr<ByteArray> packet = std::make_shared<ByteArray>(1600, 'a');
     packetReceiver->receivePackets(packet);
-    std::cerr <<"packet in verification queue\n";
     mtx.lock();
     packetQueue.push(packet);
     mtx.unlock();
@@ -53,11 +52,10 @@ void PacketUnpacker::verifiyPacket()
     if(packet == nullptr) return;
     statsManager->increaseNumPackets(1);
 
-    std::cerr << "verifying packet\n";
     //Extract Source Mac address
     int sourceMac_startIndex = MAC_ADD_LEN;
     ByteArray currSrcMac = packet->substr(sourceMac_startIndex, MAC_ADD_LEN);
-    print(&currSrcMac);
+//    print(&currSrcMac);
     int ind = std::lower_bound(srcMacAddresses.begin(), srcMacAddresses.end(), currSrcMac) - srcMacAddresses.begin();
     if(ind >= srcMacAddresses.size() || srcMacAddresses[ind] != currSrcMac)
     {
@@ -71,7 +69,7 @@ void PacketUnpacker::verifiyPacket()
     for(int i=0; i<8; i++)
         seqNum |= ((unsigned long long )packet->at(seqNumStartIndex+i) << (i*8));
     seqChecker[ind].receive(seqNum);
-    std::cerr << seqNum << "\n";
+    std::cerr << "SeqNum: " << seqNum << " Missing : " << seqChecker[ind].getMissing() << " Reordered:" << seqChecker[ind].getReordered() << "\n";
 
 
     //check for frame errors
@@ -88,14 +86,14 @@ void PacketUnpacker::verifiyPacket()
 
     bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex);
     //must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
-    if(!frameStatus)
-        std::cerr << "frame corrupted\n";
-    else
-        std::cerr << "frame correct\n";
-    if(!payloadStatus)
-        std::cerr << "payload corrupted\n";
-    else
-        std::cerr << "payload correct\n";
+//    if(!frameStatus)
+//        std::cerr << "frame corrupted\n";
+//    else
+//        std::cerr << "frame correct\n";
+//    if(!payloadStatus)
+//        std::cerr << "payload corrupted\n";
+//    else
+//        std::cerr << "payload correct\n";
 }
 
 

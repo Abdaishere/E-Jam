@@ -56,13 +56,12 @@ void PacketReceiver::receivePackets(std::shared_ptr<ByteArray>& packet)
 {
     int packetSize; read(fd, &packetSize,4);
     unsigned char* cstr = new unsigned char[packetSize]; //why we do not delete it ??
-    int received = read(fd, cstr, packetSize);
+    read(fd, cstr, packetSize);
     packet = std::make_shared<ByteArray>(packetSize, 'a');
     for(int i=0;i<packetSize;i++)
         packet->at(i) = cstr[i];
 
 //    memcpy(packet, cstr, sizeof(cstr));
-    std::cerr << "packet reached receiver " << received << " \n";
     delete[] cstr;
 }
 
