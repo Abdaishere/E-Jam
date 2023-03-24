@@ -76,3 +76,35 @@ public class UTILs {
         return lines;
     }
 }
+
+
+/**
+ *
+ *
+ * To use named pipes in Java, you can use a `FileInputStream` or `FileOutputStream` object to read from or write to a named pipe file. Here's an example that shows how to modify the previous code to use a named pipe:
+ *
+ * ```java
+ * String pipeName = "/tmp/mypipe";
+ * BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(pipeName)));
+ *
+ * Thread thread = new Thread(new Runnable() {
+ *     public void run() {
+ *         try {
+ *             String line = reader.readLine();
+ *             while (line != null) {
+ *                 // process line
+ *                 line = reader.readLine();
+ *                 lines.addline
+ *             }
+ *         } catch (IOException e) {
+ *             // handle exception
+ *         }
+ *     }
+ * });
+ * thread.start();
+ *
+ * // write data to pipe
+ * PrintWriter writer = new PrintWriter(new FileOutputStream(pipeName));
+ * writer.println("Hello World!");
+ * ```
+ */

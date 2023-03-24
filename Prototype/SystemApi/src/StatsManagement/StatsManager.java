@@ -2,22 +2,29 @@ package StatsManagement;
 
 import InstanceControl.UTILs;
 
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Set;
+
+import static java.lang.Thread.sleep;
 
 /**
  * @author Khaled Waleed
  * This class is responsible for recieving stats objects from generators and verfiers,
  * aggregate them then sends the result to the admin client through Kafka
  */
-public class StatsManager
+public class StatsManager implements Runnable
 {
     private Inet4Address kafkaServerAddress;
     private static StatsManager instance = null;
     private float sendFrequency = 1.0f;
     private ArrayList<GeneratorStatsContainer> generatorStatsContainers;
     private ArrayList<VerifierStatsContainer> verifierStatsContainers;
+
+    private Thread genStatsThread;
+    private Thread verStatsThread;
 
     /**
      * Get the StatsManager singleton instance
@@ -64,39 +71,89 @@ public class StatsManager
 
         //Open pipes that start with sgen_*
         String parentFolder = "../Executables/genStats/";
-        for(String fileName: UTILs.listFiles(parentFolder))
+
+        ArrayList<BufferedReader> readers = new ArrayList<>();
+        Set<String> dirs = UTILs.listFiles(parentFolder);
+        ArrayList<String> data = new ArrayList<>();
+        for (String dir : dirs)
         {
-            //TODO replace with pipe open
-            ArrayList<String> lines = UTILs.getLines(parentFolder + fileName);
-            //Convert content to containers
-            GeneratorStatsContainer container = new GeneratorStatsContainer(lines.get(0));
-            //add to array
-            generatorStatsContainers.add(container);
+            try
+            {
+                readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(dir))));
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new RuntimeException(e);
+            }
         }
+        genStatsThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    for (BufferedReader reader : readers)
+                    {
+                        String line = reader.readLine();
+                        data.add(line);
+                        reader.close();
+                    }
+                } catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+                for(String s: data)
+                    verifierStatsContainers.add(new VerifierStatsContainer(s));
+
+            }
+        });
+        genStatsThread.start();
     }
 
     private void fillVerStats()
     {
         verifierStatsContainers.clear();
 
-        //Open pipes that start with sver_*
-        String parentFolder = "../Executables/verStats/";
-        for(String fileName: UTILs.listFiles(parentFolder))
-        {
-            //TODO replace with pipe open
-            ArrayList<String> lines = UTILs.getLines(parentFolder + fileName);
-            //Convert content to containers
-            VerifierStatsContainer container = new VerifierStatsContainer(lines.get(0));
-            //add to array
-            verifierStatsContainers.add(container);
-        }
-    }
-    public void runTasks()
-    {
-        fillGenStats();
-        fillVerStats();
 
-        sendStatistics();
+        //Open pipes that start with sver_*
+        String parentFolder = "../Executables/verStatus/";
+
+        ArrayList<BufferedReader> readers = new ArrayList<>();
+        Set<String> dirs = UTILs.listFiles(parentFolder);
+        ArrayList<String> data = new ArrayList<>();
+        for (String dir : dirs)
+        {
+            try
+            {
+                readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(dir))));
+            }
+            catch (FileNotFoundException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+        verStatsThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    for (BufferedReader reader : readers)
+                    {
+                        String line = reader.readLine();
+                        data.add(line);
+                        reader.close();
+                    }
+                } catch (IOException e)
+                {
+                    throw new RuntimeException(e);
+                }
+
+                for(String s: data)
+                    verifierStatsContainers.add(new VerifierStatsContainer(s));
+            }
+        });
+        verStatsThread.start();
     }
     /**
      * Set the time interval between re-sending live stats reports
@@ -118,4 +175,33 @@ public class StatsManager
         //TODO send stored data
     }
 
+    /**
+     *
+     */
+    @Override
+    public void run()
+    {
+        try
+        {
+            while (true)
+            {
+                fillGenStats();
+                fillVerStats();
+
+                try
+                {
+                    genStatsThread.join();
+                    verStatsThread.join();
+                } catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+                sendStatistics();
+                sleep((long) sendFrequency);
+            }
+        } catch (RuntimeException | InterruptedException e)
+        {
+            run();
+        }
+    }
 }

@@ -16,6 +16,6 @@ public class InstanceControlFacade //facade class to hide dependencies and the o
 
         StatsManager statsManager = StatsManager.getInstance(/* add ip here*/);
         statsManager.setSendFrequency(1.0f);
-        statsManager.runTasks();
+        statsManager.run();
     }
 }
