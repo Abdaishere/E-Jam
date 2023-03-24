@@ -28,7 +28,7 @@ public class InstanceController
         startGateway(genNum, verNum); //start the gateway
 
         try {
-            sleep(30000); //test duration
+            sleep(15000); //test duration
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
