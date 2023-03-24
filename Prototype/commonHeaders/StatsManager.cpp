@@ -14,7 +14,10 @@ std::shared_ptr<StatsManager> StatsManager::getInstance(const Configuration& con
     }
     return instance;
 }
-
+std::shared_ptr<StatsManager> StatsManager::getInstance()
+{
+	return instance;
+}
 
 StatsManager::StatsManager(const Configuration& config, int id, bool is_gen1)
 {

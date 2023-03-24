@@ -40,6 +40,7 @@ private:
 
 public:
     static std::shared_ptr<StatsManager> getInstance(const Configuration& config, int instanceID = 0, bool is_gen = false);
+    static std::shared_ptr<StatsManager> getInstance();
     void sendStats();
 	void increaseReceivedCorrectPckts(int);
 	void increaseReceivedWrongPckts(int);

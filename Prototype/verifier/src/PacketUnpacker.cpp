@@ -28,6 +28,8 @@ PacketUnpacker::PacketUnpacker(int verID, Configuration configuration)
     frameVerifier = std::vector<FrameVerifier> (genNum, FrameVerifier(configuration));
     payloadVerifier = std::vector<PayloadVerifier> (genNum, PayloadVerifier(configuration));
     seqChecker = std::vector<SeqChecker> (genNum, SeqChecker());
+
+	statsManager = StatsManager::getInstance(configuration,verID, false);
 }
 
 std::shared_ptr<ByteArray> PacketUnpacker::consumePacket()
@@ -48,7 +50,6 @@ void PacketUnpacker::verifiyPacket()
     bool pcktVerified = true;
     std::shared_ptr<ByteArray> packet = consumePacket();
     //Signal a packet received
-    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
     //nothing to do if no packet
     if(packet == nullptr) return;
 
@@ -92,8 +93,7 @@ void PacketUnpacker::verifiyPacket()
 
 	if(configuration.getCheckContent())
 	{
-		std::shared_ptr<PayloadVerifier> pv = PayloadVerifier::getInstance();
-		bool payloadStatus = pv->verifiy(packet, startIndex, endIndex);
+		bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex);
 		pcktVerified &=payloadStatus;
 		//must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
 		if(!frameStatus)
