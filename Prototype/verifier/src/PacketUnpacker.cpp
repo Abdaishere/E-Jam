@@ -28,6 +28,8 @@ PacketUnpacker::PacketUnpacker(int verID, Configuration configuration)
     frameVerifier = std::vector<FrameVerifier> (genNum, FrameVerifier(configuration));
     payloadVerifier = std::vector<PayloadVerifier> (genNum, PayloadVerifier(configuration));
     seqChecker = std::vector<SeqChecker> (genNum, SeqChecker());
+
+	statsManager = StatsManager::getInstance(configuration,verID, false);
 }
 
 std::shared_ptr<ByteArray> PacketUnpacker::consumePacket()
@@ -45,12 +47,11 @@ std::shared_ptr<ByteArray> PacketUnpacker::consumePacket()
 
 void PacketUnpacker::verifiyPacket()
 {
+    bool pcktVerified = true;
     std::shared_ptr<ByteArray> packet = consumePacket();
     //Signal a packet received
-    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
     //nothing to do if no packet
     if(packet == nullptr) return;
-    statsManager->increaseNumPackets(1);
 
     //Extract Source Mac address
     int sourceMac_startIndex = MAC_ADD_LEN;
@@ -59,7 +60,14 @@ void PacketUnpacker::verifiyPacket()
     int ind = std::lower_bound(srcMacAddresses.begin(), srcMacAddresses.end(), currSrcMac) - srcMacAddresses.begin();
     if(ind >= srcMacAddresses.size() || srcMacAddresses[ind] != currSrcMac)
     {
-        std::cerr<< "mac addresses not found\n";
+        std::cerr << "temp config null\n";
+        std::shared_ptr<ErrorInfo> errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+        if(errorInfo == nullptr)
+        {
+            errorInfo = std::make_shared<ErrorInfo>(packet);
+        }
+        errorInfo->addError(STREAM_ID);
+        ErrorHandler::getInstance()->logError();
         return;
     }
 
@@ -83,17 +91,28 @@ void PacketUnpacker::verifiyPacket()
     startIndex = seqNumStartIndex+SeqNum_LEN;
     endIndex = startIndex+payloadLength-1;
 
-
-    bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex);
-    //must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
-//    if(!frameStatus)
-//        std::cerr << "frame corrupted\n";
-//    else
-//        std::cerr << "frame correct\n";
-//    if(!payloadStatus)
-//        std::cerr << "payload corrupted\n";
-//    else
-//        std::cerr << "payload correct\n";
+	if(configuration.getCheckContent())
+	{
+		bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex);
+		pcktVerified &=payloadStatus;
+		//must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
+		if(!frameStatus)
+			std::cerr << "frame corrupted\n";
+		else
+			std::cerr << "frame correct\n";
+		if(!payloadStatus)
+			std::cerr << "payload corrupted\n";
+		else
+			std::cerr << "payload correct\n";
+	}
+	if(pcktVerified)
+	{
+		statsManager->increaseReceivedCorrectPckts(1);
+	}
+	else
+	{
+		statsManager->increaseReceivedWrongPckts(1);
+	}
 }
 
 

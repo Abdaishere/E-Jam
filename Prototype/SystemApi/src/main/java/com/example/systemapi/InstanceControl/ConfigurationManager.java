@@ -1,4 +1,4 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -39,24 +39,24 @@ public class ConfigurationManager
 
             FileWriter fileWriter = new FileWriter(fileName);
 
-            fileWriter.write(stream.streamID+'\n');
-            fileWriter.write(Integer.toString(stream.senders.size())+'\n');
-            for (String sender: stream.senders)
+            fileWriter.write(stream.streamID +'\n');
+            fileWriter.write(Integer.toString(stream.generators.size())+'\n');
+            for (String sender: stream.generators)
                 fileWriter.write(sender+'\n');
 
-            fileWriter.write(Integer.toString(stream.receivers.size())+'\n');
-            for (String receiver: stream.receivers)
+            fileWriter.write(Integer.toString(stream.verifiers.size())+'\n');
+            for (String receiver: stream.verifiers)
                 fileWriter.write(receiver+'\n');
 
             fileWriter.write(Integer.toString(stream.payloadType.ordinal())+'\n');
             fileWriter.write(Long.toString(stream.numberOfPackets)+'\n');
             fileWriter.write(Integer.toString(stream.payloadLength)+'\n');
             fileWriter.write(Integer.toString(stream.seed)+'\n');
-            fileWriter.write(Long.toString(stream.bcFramesNum)+'\n');
+            fileWriter.write(Long.toString(stream.broadcastFrames)+'\n');
             fileWriter.write(Long.toString(stream.interFrameGap)+'\n');
-            fileWriter.write(Long.toString(stream.lifeTime)+'\n');
-            fileWriter.write(Integer.toString(stream.transportProtocol.ordinal())+'\n');
-            fileWriter.write(Integer.toString(stream.flowType.ordinal())+'\n');
+            fileWriter.write(Long.toString(stream.timeToLive)+'\n');
+            fileWriter.write(stream.transportProtocol.toString()+'\n');
+            fileWriter.write(stream.flowType.toString()+'\n');
             int checkContent = stream.checkContent ? 1 : 0;
             fileWriter.write(checkContent+'\n');
 

@@ -42,7 +42,7 @@ struct ErrorInfo
     {
         //Signal error detection
         std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
-        statsManager->increaseNumErrors();
+//        statsManager->increaseNumErrors();
         //printf("%d", error);
         errorTypes.push_back(error); 
     }

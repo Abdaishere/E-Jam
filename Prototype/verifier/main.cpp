@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     }
 
     Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
-    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(verID);
+    std::shared_ptr<StatsManager> sm = StatsManager::getInstance(currConfig,verID,false);
     std::shared_ptr<PacketUnpacker> pu = std::make_shared<PacketUnpacker>(verID, currConfig);
 
     std::thread reader(receive, pu);

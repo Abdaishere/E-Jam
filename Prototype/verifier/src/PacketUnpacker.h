@@ -23,6 +23,7 @@ private:
     std::vector<ByteArray> srcMacAddresses;
     std::vector<FrameVerifier> frameVerifier;
     std::vector<PayloadVerifier> payloadVerifier;
+	std::shared_ptr<StatsManager> statsManager;
     std::vector<SeqChecker> seqChecker;
 public:
     static std::queue<std::shared_ptr<ByteArray>> packetQueue;

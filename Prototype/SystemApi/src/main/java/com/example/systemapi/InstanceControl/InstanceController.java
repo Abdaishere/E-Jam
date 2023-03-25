@@ -1,10 +1,7 @@
-package InstanceControl;
+package com.example.systemapi.InstanceControl;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.rmi.server.ExportException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import static java.lang.Thread.sleep;
@@ -12,48 +9,33 @@ import static java.lang.Thread.sleep;
 /**
  * This class initializes and manages the generator and verifier instances
  */
-public class InstanceController
+public class InstanceController implements Runnable
 {
     private final String configDir = ConfigurationManager.configDir;
-    private String myMacAddress;
+    private final String myMacAddress;
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
-    
+    ArrayList<Stream> streams;
+
     public InstanceController (ArrayList<Stream> streams)
     {
+        myMacAddress = UTILs.getMyMacAddress();
+        this.streams = streams;
+    }
+
+    public void startStreams() {
         getExecutables();
-        getMyMacAddress();
         int genNum = startGenerators(streams); //start executable generators instances
         int verNum = startVerifiers(streams); //start executable verifiers instances
         startGateway(genNum, verNum); //start the gateway
-
-        try {
-            sleep(15000); //test duration
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("sleep finished");
-        debugStreams();
-        //kill the current running executables if they exist
-        for(Long pid:pids)
-        {
-            String[] args = {"kill", Long.toString(pid)};
-            executeCommand("sudo",true , args);
-        }
-
     }
 
-    private boolean exists(long pid)
-    {
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("ps", "cax", "|", "grep", Long.toString(pid), ">", "/dev/null");
-
-        try {
-            Process process = processBuilder.start();
-            process.waitFor();
-            return process.exitValue() == 0;
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+    public void killStreams() {
+        //kill the current running executables
+        for(Long pid:pids)
+        {
+            String[] args = {"-9", Long.toString(pid)};
+            executeCommand("kill",true , args);
         }
     }
 
@@ -103,9 +85,9 @@ public class InstanceController
         int genID = 0;
         for (Stream stream: streams)
         {
-            for(String sender: stream.senders)
+            for(String sender: stream.generators)
             {
-                if(Objects.equals(sender, myMacAddress))
+                if(sender.equals(myMacAddress))
                 {
                     String command = "../Executables/Generator";
                     String path = configDir + "/config_" + stream.streamID + ".txt";
@@ -123,13 +105,12 @@ public class InstanceController
         int verID = 0;
         for (Stream stream: streams)
         {
-            for(String receiver: stream.receivers)
+            for(String receiver: stream.verifiers)
             {
-                if(Objects.equals(receiver, myMacAddress))
+                if(receiver.equals(myMacAddress))
                 {
                     String command = "../Executables/verifier";
-                    String path = configDir + "/config_" + stream.streamID + ".txt";
-                    String []args = {Integer.toString(verID++), path};
+                    String []args = {Integer.toString(verID++)};
                     executeCommand(command, false, args);
                 }
             }
@@ -137,8 +118,7 @@ public class InstanceController
         return verID;
     }
 
-    private void startGateway(int numGen, int numVer)
-    {
+    private void startGateway(int numGen, int numVer) {
         if(numGen > 0) {
             String command = "sudo";
             String[] genArgs = {"../Executables/Gateway","0", Integer.toString(numGen)};
@@ -182,7 +162,7 @@ public class InstanceController
             if(waitFor) {
                 int exitVal = process.waitFor();
                 if (exitVal != 0) {
-                    throw new Exception("Could not execute command: " + command + Arrays.toString(args));
+                    throw new Exception("Could not execute command: " + command);
                 }
                 System.out.println(command + " " + pid + " exited");
             }
@@ -211,36 +191,44 @@ public class InstanceController
         executeCommand("../Executables/GetExecutables.sh", true, args);
     }
 
-    private void getMyMacAddress()
-    {
-        byte[] mac;
+
+    @Override
+    public void run() {
+        Stream stream = streams.get(0);
+
+        // wait until the start time of the stream
         try {
-            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-            while(networkInterfaces.hasMoreElements())
-            {
-                NetworkInterface network = networkInterfaces.nextElement();
-                mac = network.getHardwareAddress();
-                if(mac == null)
-                {
-                    throw new Exception("Mac is null");
-                }
-                else
-                {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < mac.length; i++)
-                    {
-                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-                    }
-                    String mac12 = sb.toString().replaceAll("-","");
-                    myMacAddress = mac12;
-                    return;
-                }
-            }
+            Thread.sleep(stream.delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+
+        // start the generators, verifiers and gateway
+        startStreams();
+        debugStreams(); //TODO
+        // add stream to running streams
+
+        // notify Admin-client that the stream is finished
+        try {
+            Communicator.notify(stream.streamID, "started");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        myMacAddress = "AAAAAAAAAAAA";
+
+        try {
+            Thread.sleep(stream.timeToLive);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // kill the generators, verifiers and gateway
+        killStreams();
+
+        // notify Admin-client that the stream is finished
+        try {
+            Communicator.notify(stream.streamID, "finished");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

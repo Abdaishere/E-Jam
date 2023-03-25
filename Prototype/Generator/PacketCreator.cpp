@@ -17,8 +17,8 @@ std::mutex PacketCreator::mtx;
 void PacketCreator::createPacket(int rcvInd)
 {
     //Signal a packet created
-    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance();
-    statsManager->increaseNumPackets();
+    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
+    statsManager->increaseSentPckts(1);
 
     //TODO move ByteArray creating inside each constructor class
     ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
@@ -47,7 +47,7 @@ PacketCreator::PacketCreator(Configuration configuration): payloadGenerator(conf
 
 void PacketCreator::sendHead()
 {
-    if(productQueue.size()<1)
+    if(productQueue.empty())
     {
         return;
     }
@@ -57,5 +57,7 @@ void PacketCreator::sendHead()
     mtx.unlock();
 
     sender->transmitPackets(packet);
-    std::cerr << ("Packet transmitted\n");
+	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
+	statsManager->increaseSentPckts(1);
+	std::cerr << ("Packet transmitted\n");
 }

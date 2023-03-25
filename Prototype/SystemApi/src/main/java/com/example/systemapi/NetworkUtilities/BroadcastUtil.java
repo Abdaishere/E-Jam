@@ -1,4 +1,4 @@
-package NetworkUtilities;
+package com.example.systemapi.NetworkUtilities;
 
 import static java.lang.Thread.sleep;
 
