@@ -1,6 +1,7 @@
 pub(crate) mod device;
 pub(crate) mod process;
 pub(crate) mod stream_details;
+pub(crate) mod statistics;
 
 use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
@@ -66,26 +67,26 @@ impl Default for AppState {
 #[doc = r" # Stream Entry
 The StreamEntry struct is used to store the information about the stream with its status and the status of the devices that are running the stream
 ## Values
+* `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
 * `name` - A String that represents the name of the stream (used for clarification)
 * `description` - A String that represents the description of the stream (used for clarification)
 * `last_updated` - A DateTime in Utc that represents the last time that the stream was updated (used for clarification)
 * `start_time` - A DateTime in Utc that represents the time that the stream will start
 * `end_time` - A DateTime in Utc that represents the time that the stream will end
 * `delay` - A u64 that represents the time in ms that the stream will wait before starting
-* `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
+* `time_to_live` - A u64 that represents the time to live that will be used for the stream
+* `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
 * `generators_ids` - A Vec of Strings that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
 * `verifiers_ids` - A Vec of Strings that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
+* `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
+* `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts)
+* `payload_length` - A u16 that represents the length of the payload that will be used in the stream
 * `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
 * `burst_length` - A u64 that represents the length of the burst that will be used in the stream
 * `burst_delay` - A u64 that represents the delay between each burst that will be used in the stream
-* `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
-* `payload_length` - A u16 that represents the length of the payload that will be used in the stream
 * `seed` - A u32 that represents the seed that will be used to generate the payload
-* `broadcast_frames` - A u32 that represents the number of broadcast frames that will be sent in the stream
 * `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
-* `time_to_live` - A u64 that represents the time to live that will be used for the stream
 * `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
-* `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts)
 * `check_content` - A bool that represents if the content of the packets will be checked
 * `running_generators` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status) (used for clarification)
 * `running_verifiers` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a verifier and their status (mac address of the card used in testing, Process Status) (used for clarification)

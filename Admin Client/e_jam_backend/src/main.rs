@@ -1,6 +1,7 @@
 use actix_web::{web, App, HttpServer};
 mod models;
 mod services;
+mod consumer;
 
 #[doc = r"This is the port that the server will listen on"]
 const PORT: u16 = 8080;
@@ -15,6 +16,15 @@ The Host and Port are defined as constants at the top of the file and are used t
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let app_state = web::Data::new(models::AppState::default());
+
+    // run consume on a separate thread
+    std::thread::spawn(|| {
+        consumer::run_generator_consumer();
+    });
+
+    std::thread::spawn(|| {
+        consumer::run_verifier_consumer();
+    });
 
     HttpServer::new(move || {
         App::new()

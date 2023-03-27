@@ -39,11 +39,11 @@ class _AddStreamViewState extends State<AddStreamView>
         height: MediaQuery.of(context).size.height *
             (MediaQuery.of(context).orientation == Orientation.portrait
                 ? 1
-                : 0.75),
+                : 0.8),
         width: MediaQuery.of(context).size.width *
             (MediaQuery.of(context).orientation == Orientation.portrait
                 ? 1
-                : 0.45),
+                : 0.5),
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(15)),
           child: Scaffold(
