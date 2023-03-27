@@ -2,6 +2,7 @@ import 'dart:ffi';
 import 'dart:math';
 
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -96,70 +97,349 @@ class _AddStreamViewState extends State<AddStreamView>
     );
   }
 
-  Padding _addStreamFields() {
-    return Padding(
+  SingleChildScrollView _addStreamFields() {
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                flex: 1,
-                child: _streamIDField(),
-              ),
-              const VerticalDivider(),
-              Expanded(
-                flex: 2,
-                child: _streamNameField(),
-              ),
-            ],
-          ),
+          _iDNameFields(),
           _streamDescriptionField(),
+          _delayTimeToLiveInterFrameGapFields(),
+          _streamDevicesLists(),
+          _packetsBroadcastFramesSizes(),
+          _generationSeed(),
+          _payloadLengthAndType(),
+          _burstLengthAndDelay(),
+          _flowAndTLPTypes(),
         ],
       ),
     );
   }
 
-  TextFormField _streamIDField() {
+  Row _flowAndTLPTypes() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Flow Type',
+              hintText: 'BtB or Bursts',
+            ),
+            validator: (value) {
+              if (value is int) {
+                if (int.parse(value!) < 0 || int.parse(value) > 1) {
+                  return 'Please enter a valid flow type';
+                }
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.flowType = int.parse(value!) as FlowType;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 2,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Transport Layer Protocol',
+              hintText: 'TCP or UDP',
+            ),
+            validator: (value) {
+              if (value is int) {
+                if (int.parse(value!) < 0 || int.parse(value) > 1) {
+                  return 'Please enter a valid transport layer protocol';
+                }
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.transportLayerProtocol =
+                  int.parse(value!) as TransportLayerProtocol;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Check Content',
+              hintText: '0 or 1',
+            ),
+            validator: (value) {
+              if (value is int) {
+                if (int.parse(value!) < 0 || int.parse(value) > 1) {
+                  return 'Please enter 0 or 1';
+                }
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.checkContent = int.parse(value!) as bool;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row _burstLengthAndDelay() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Burst length',
+              hintText: 'Length of the burst',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is UnsignedLong) {
+                return 'Please enter a valid burst length';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.burstLength = value! as UnsignedLong;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Burst Delay',
+              hintText: 'Delay between bursts',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is UnsignedLong) {
+                return 'Please enter a valid burst delay';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.burstDelay = value! as UnsignedLong;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row _payloadLengthAndType() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 3,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Payload Length',
+              hintText: 'Length of the payload',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is UnsignedLong) {
+                return 'Please enter a valid payload length';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.payloadLength = value! as UnsignedShort;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Payload Type',
+              hintText: '0, 1 or 2',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is int) {
+                if (int.parse(value!) < 0 || int.parse(value) > 2) {
+                  return 'Please enter a valid payload type';
+                }
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.payloadType = value! as UnsignedShort;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  TextFormField _generationSeed() {
     return TextFormField(
-      enableIMEPersonalizedLearning: false,
-      maxLength: 3,
       decoration: const InputDecoration(
-        labelText: 'ID',
+        labelText: 'Generation Seed',
+        hintText: 'Seed for the generation of packets',
       ),
+      keyboardType: TextInputType.number,
       validator: (value) {
-        if (!RegExp(r'^\w{3}$').hasMatch(value!)) {
-          return 'Please enter a valid ID';
+        if (value is UnsignedLong) {
+          return 'Please enter a valid number of packets';
         }
         return null;
       },
       onSaved: (value) {
-        streamEntry.streamId = value!;
+        streamEntry.seed = value! as UnsignedLong;
       },
     );
   }
 
-  TextFormField _streamNameField() {
-    return TextFormField(
-      maxLength: 50,
-      decoration: const InputDecoration(
-        labelText: 'Name',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a name for the stream';
-        }
-        if (value.length > 50) {
-          return 'Stream name must be less than 50 characters long';
-        }
-        return null;
-      },
-      onSaved: (value) {
-        streamEntry.name = value!;
-      },
+  Row _packetsBroadcastFramesSizes() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Number of Packets',
+              hintText: 'Number of Packets to be sent',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is UnsignedLong) {
+                return 'Please enter a valid number of packets';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.numberOfPackets = value! as UnsignedLong;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Broadcast Frames Size',
+              hintText: 'Frames to be broadcasted',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is UnsignedLong) {
+                return 'Please enter a valid number of frames';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.broadcastFrames = value! as UnsignedLong;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row _streamDevicesLists() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            enableIMEPersonalizedLearning: false,
+            decoration: const InputDecoration(
+              labelText: 'Generators',
+              hintText: 'Devices separated by commas',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of generators';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.generatorsIds = value!.split(', ');
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            enableIMEPersonalizedLearning: false,
+            decoration: const InputDecoration(
+              labelText: 'Verifiers',
+              hintText: 'Devices separated by commas',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of verifiers';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.verifiersIds = value!.split(', ');
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row _iDNameFields() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            enableIMEPersonalizedLearning: false,
+            maxLength: 3,
+            decoration: const InputDecoration(
+              labelText: 'ID',
+              hintText: '3 characters',
+            ),
+            validator: (value) {
+              if (!RegExp(r'^\w{3}$').hasMatch(value!)) {
+                return 'Please enter a valid ID';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.streamId = value!;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 2,
+          child: TextFormField(
+            maxLength: 50,
+            decoration: const InputDecoration(
+              labelText: 'Name',
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a name for the stream';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.name = value!;
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -174,14 +454,81 @@ class _AddStreamViewState extends State<AddStreamView>
         if (value == null || value.isEmpty) {
           return 'Please enter a description for the stream';
         }
-        if (value.length > 255) {
-          return 'Stream description must be less than 255 characters long';
-        }
         return null;
       },
       onSaved: (value) {
         streamEntry.description = value!;
       },
+    );
+  }
+
+  Row _delayTimeToLiveInterFrameGapFields() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            enableIMEPersonalizedLearning: false,
+            decoration: const InputDecoration(
+              labelText: 'Delay',
+              hintText: 'In milliseconds',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is! UnsignedLong) {
+                return 'Please enter a valid delay time';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.delay = value! as UnsignedLong;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            enableIMEPersonalizedLearning: false,
+            decoration: const InputDecoration(
+              labelText: 'Time to live',
+              hintText: 'In milliseconds',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is! UnsignedLong) {
+                return 'Please enter a valid time to live';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.timeToLive = value! as UnsignedLong;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            enableIMEPersonalizedLearning: false,
+            decoration: const InputDecoration(
+              labelText: 'Inter frame gap',
+              hintText: 'In milliseconds',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value is! UnsignedLong) {
+                return 'Please enter a valid inter frame gap';
+              }
+              return null;
+            },
+            onSaved: (value) {
+              streamEntry.interFrameGap = value! as UnsignedLong;
+            },
+          ),
+        ),
+      ],
     );
   }
 
