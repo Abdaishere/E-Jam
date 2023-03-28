@@ -15,12 +15,15 @@
 #include <unistd.h>
 #include <csignal>
 #include <pthread.h>
+#include "Byte.h"
+#include "ConfigurationManager.h"
 using namespace std;
 //constants
 #define BUFF_LEN 1600
 #define ETHER_TYPE 0x88b5
 #define DEFAULT_IF "enp34s0"
 #define FIFO_FILE_VER "/tmp/fifo_pipe_ver" 
+#define STREAM_ID_OFFSET 14
 typedef unsigned char* Payload;
 const int BUFFER_SIZE_VER = 2000;
 const int MTU = 1600;

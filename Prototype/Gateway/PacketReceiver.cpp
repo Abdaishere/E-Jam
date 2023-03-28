@@ -79,14 +79,21 @@ void PacketReceiver::swapBuffers()
 //send forward buffer to its corresponding verifier
 void PacketReceiver::checkBuffer()
 {
-    int verID = 0;
+    int verID;
     int totSizeFor = 0;
     for(int ptr=0; ptr < toForward; ptr++)
     {
-        sendToVerifier(verID++, forwardingBuffer+totSizeFor, forwardingSizes[ptr]);
-        totSizeFor += forwardingSizes[ptr];
-        if(verID == MAX_VERS) //reset verifier id 
+        //extract the streamID
+        ByteArray streamID;
+        streamID.assign(forwardingBuffer[totSizeFor + STREAM_ID_OFFSET], STREAMID_LEN);
+        verID = ConfigurationManager::getStreamIndex(streamID);
+        if(verID == -1)
+        {
+            std::cerr << "Couldn't find suitable stream\n";
             verID = 0;
+        }
+        sendToVerifier(verID, forwardingBuffer+totSizeFor, forwardingSizes[ptr]);
+        totSizeFor += forwardingSizes[ptr];
     }
 }
 
