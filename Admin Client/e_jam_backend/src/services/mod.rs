@@ -3,6 +3,7 @@ use crate::models::{device::get_devices_table, stream_details::StreamStatusDetai
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 
 mod device;
+mod pre_sets;
 
 use self::device::{
     add_device, check_new_device, delete_device, get_device, get_devices, ping_all_devices,

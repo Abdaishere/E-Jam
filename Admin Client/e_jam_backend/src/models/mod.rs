@@ -79,13 +79,13 @@ The StreamEntry struct is used to store the information about the stream with it
 * `generators_ids` - A Vec of Strings that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
 * `verifiers_ids` - A Vec of Strings that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
 * `number_of_packets` - A u32 that represents the number of packets that will be sent in the stream
-* `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts)
-* `payload_length` - A u16 that represents the length of the payload that will be used in the stream
+* `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts) **changes through the stream**
+* `payload_length` - A u16 that represents the length of the payload that will be used in the stream **changes through the stream**
 * `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
 * `burst_length` - A u64 that represents the length of the burst that will be used in the stream
 * `burst_delay` - A u64 that represents the delay between each burst that will be used in the stream
 * `seed` - A u32 that represents the seed that will be used to generate the payload
-* `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame
+* `inter_frame_gap` - A u32 that represents the time in ms that will be waited between each frame **changes through the stream**
 * `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
 * `check_content` - A bool that represents if the content of the packets will be checked
 * `running_generators` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status) (used for clarification)
@@ -247,7 +247,7 @@ pub struct StreamEntry {
         message = "Payload Length must be between 0 and 1500"
     ))]
     #[serde(default)]
-    payload_length: u16,
+    payload_length: u64,
 
     #[doc = r" ## Seed
     This is the seed that will be used to generate the packets during the stream
@@ -282,7 +282,7 @@ pub struct StreamEntry {
         message = "Inter Frame Gap must be greater than or equal to 0"
     ))]
     #[serde(default)]
-    inter_frame_gap: u32,
+    inter_frame_gap: u64,
 
     #[doc = r" ## Time to Live
     This is the time the stream will live for in the device
@@ -1027,6 +1027,10 @@ this is used to check if the stream status is the same as the status passed
 
     pub fn get_stream_delay_seconds(&self) -> u64 {
         self.delay / 1000
+    }
+
+    pub fn get_time_to_live(&self) -> u64 {
+        self.time_to_live
     }
 }
 
