@@ -1,0 +1,237 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "E-Jam API",
+    "dateExported": "2023-04-12T20:09:26.896Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "66f2352f-b773-47fc-b26d-935944f5eb47",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "list streams",
+            "url": "http://localhost:8080/streams",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-04-10T09:03:50.792Z",
+            "modified": "2023-04-10T09:03:50.792Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "61e7eec8-1768-4529-9735-c44901b3addb",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "list device",
+            "url": "http://localhost:8080/devices",
+            "method": "GET",
+            "sortNum": 12500,
+            "created": "2023-04-10T09:03:50.810Z",
+            "modified": "2023-04-12T11:29:52.244Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "807963ac-378f-48ed-9b5f-bda51e47014b",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "add device",
+            "url": "http://localhost:8080/devices",
+            "method": "POST",
+            "sortNum": 15000,
+            "created": "2023-04-10T09:03:50.795Z",
+            "modified": "2023-04-12T11:34:12.640Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"localhost\",\n  \"description\": \"this is a device\",\n  \"location\": \"My home\",\n  \"lastUpdated\": 0,\n  \"ipAddress\": \"localhost\",\n  \"port\": 8000,\n  \"macAddress\": \"18C04D52A822\"\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "4525db93-f711-4fbd-80ac-f2d35906695b",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "add stream",
+            "url": "http://localhost:8080/streams",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-04-10T09:03:50.793Z",
+            "modified": "2023-04-12T11:34:20.476Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"streamId\": \"000\",\n  \"name\": \"first stream\",\n  \"description\": \"this is stream 000\",\n  \"lastUpdated\": 0,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"delay\": 0,\n  \"generatorsIds\": [\n    \"localhost\"\n  ],\n  \"verifiersIds\": [\n    \"localhost\"\n  ],\n  \"payloadType\": 0,\n  \"burstLength\": 0,\n  \"burstDelay\": 0,\n  \"numberOfPackets\": 100,\n  \"payloadLength\": 1499,\n  \"seed\": 540024,\n  \"broadcastFrames\": 12,\n  \"interFrameGap\": 123,\n  \"timeToLive\": 1000,\n  \"transportLayerProtocol\": \"TCP\",\n  \"flowType\": \"BackToBack\",\n  \"checkContent\": false\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "84c14b93-b0c9-45c9-9dd9-cff028501933",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "start stream",
+            "url": "http://localhost:8080/streams/000/force_start",
+            "method": "POST",
+            "sortNum": 21250,
+            "created": "2023-04-10T09:03:50.801Z",
+            "modified": "2023-04-12T11:34:28.790Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "0f248810-0ac9-4612-b90b-70ed8bea76bc",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "Delete the stream 000",
+            "url": "http://localhost:8080/streams/000",
+            "method": "DELETE",
+            "sortNum": 22500,
+            "created": "2023-04-10T09:03:50.807Z",
+            "modified": "2023-04-12T11:29:34.750Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "41d6c128-8643-4677-a51c-9ede75bc0f57",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "queue all",
+            "url": "http://localhost:8080/streams/start_all",
+            "method": "POST",
+            "sortNum": 27304.8,
+            "created": "2023-04-10T09:03:50.804Z",
+            "modified": "2023-04-10T09:03:50.804Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "3e8aff84-f6c4-4d31-ab88-898028570bf3",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "stop all",
+            "url": "http://localhost:8080/streams/stop_all",
+            "method": "POST",
+            "sortNum": 27334,
+            "created": "2023-04-10T09:03:50.805Z",
+            "modified": "2023-04-10T09:03:50.805Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "56b6f718-4679-475f-9834-589f1f1f3438",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "add invalid stream",
+            "url": "http://localhost:8080/streams",
+            "method": "POST",
+            "sortNum": 48667,
+            "created": "2023-04-10T09:03:50.806Z",
+            "modified": "2023-04-12T11:30:47.942Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n    \"streamId\": \".00\",\n    \"name\": \"first stream\",\n    \"description\": \"this is stream 000\",\n    \"lastUpdated\": 0,\n    \"startTime\": null,\n    \"endTime\": null,\n    \"delay\": 0,\n    \"generatorsIds\": [\n      \"localhost\"\n    ],\n    \"verifiersIds\": [\n      \"localhost\"\n    ],\n    \"payloadType\": 0,\n    \"burstLength\": 0,\n    \"burstDelay\": 0,\n    \"numberOfPackets\": 100,\n    \"payloadLength\": 1499,\n    \"seed\": 540024,\n    \"broadcastFrames\": 12,\n    \"interFrameGap\": 123,\n    \"timeToLive\": 1000,\n    \"transportLayerProtocol\": \"TCP\",\n    \"flowType\": \"BackToBack\",\n    \"checkContent\": false\n  }",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "ef4c1f0c-4b01-448c-8afb-42a0c0113105",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "queue stream",
+            "url": "http://localhost:8080/streams/000/start",
+            "method": "POST",
+            "sortNum": 54000.3,
+            "created": "2023-04-10T09:03:50.800Z",
+            "modified": "2023-04-12T11:31:21.734Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "9411ca62-4dd6-4fcc-b0c4-4ba931db9f9d",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "edit stream 000",
+            "url": "http://localhost:8080/streams/000",
+            "method": "PUT",
+            "sortNum": 59333.5,
+            "created": "2023-04-10T09:03:50.798Z",
+            "modified": "2023-04-12T11:41:39.577Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n    \"streamId\": \"000\",\n    \"name\": \"first stream\",\n    \"description\": \"this is stream 000\",\n    \"lastUpdated\": 0,\n    \"startTime\": null,\n    \"endTime\": null,\n    \"delay\": 0,\n    \"generatorsIds\": [\n      \"localhost\"\n    ],\n    \"verifiersIds\": [\n      \"localhost\"\n    ],\n    \"payloadType\": 0,\n    \"burstLength\": 0,\n    \"burstDelay\": 0,\n    \"numberOfPackets\": 100,\n    \"payloadLength\": 1499,\n    \"seed\": 540024,\n    \"broadcastFrames\": 12,\n    \"interFrameGap\": 123,\n    \"timeToLive\": 1000,\n    \"transportLayerProtocol\": \"TCP\",\n    \"flowType\": \"BackToBack\",\n    \"checkContent\": false\n  }",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "aaefffdb-9e21-49f8-b910-c191ac0107b5",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "get the stream entry",
+            "url": "http://localhost:8080/streams/000",
+            "method": "GET",
+            "sortNum": 64666.8,
+            "created": "2023-04-10T09:03:50.797Z",
+            "modified": "2023-04-12T11:31:07.835Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "94b60a80-e9db-4355-8959-8d9882707703",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "checkt stats of all",
+            "url": "http://localhost:8080/streams_status",
+            "method": "GET",
+            "sortNum": 67333.4,
+            "created": "2023-04-10T09:03:50.802Z",
+            "modified": "2023-04-12T11:31:33.111Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "4325bef8-fefc-442a-a551-b1517cf3e43b",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "systemApi tests",
+            "url": "http://localhost:8000/start",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2023-04-10T09:03:50.811Z",
+            "modified": "2023-04-10T09:03:50.811Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"stream_id\" : \"000\",\n  \"delay\": 100,\n  \"generators\": [\"4214\"],\n  \"verifiers\": [\"42242\"],\n  \"payload_type\": 1,\n  \"number_of_packets\": 144,\n  \"payload_length\": 123,\n  \"seed\": 000,\n  \"broadcast_frames\": 1200,\n  \"inter_frame_gap\": 23,\n  \"time_to_live\": 11,\n  \"transport_layer_protocol\": 0,\n  \"flow_type\": 1,\n  \"check_content\": 1\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ],
+    "settings": {
+        "runOptions": {
+            "delay": 0,
+            "iterations": 100,
+            "dataFilePath": ""
+        }
+    }
+}
