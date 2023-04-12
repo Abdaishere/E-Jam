@@ -16,7 +16,7 @@ class SnacksBar {
           elevation: 0.0,
           dismissDirection: DismissDirection.vertical,
           backgroundColor: Colors.transparent,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 1),
         ),
       );
   }
@@ -35,7 +35,7 @@ class SnacksBar {
           elevation: 0.0,
           dismissDirection: DismissDirection.vertical,
           backgroundColor: Colors.transparent,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 1),
         ),
       );
   }
@@ -54,7 +54,7 @@ class SnacksBar {
           elevation: 0.0,
           dismissDirection: DismissDirection.vertical,
           backgroundColor: Colors.transparent,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 1),
         ),
       );
   }
@@ -73,7 +73,7 @@ class SnacksBar {
           elevation: 0.0,
           dismissDirection: DismissDirection.vertical,
           backgroundColor: Colors.transparent,
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 1),
         ),
       );
   }

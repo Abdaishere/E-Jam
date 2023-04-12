@@ -1,3 +1,4 @@
+use log::{ info, debug};
 use super::AppState;
 use crate::models::device::Device;
 use actix_web::Responder;
@@ -68,22 +69,22 @@ if the device is not in the list, add it and return a 201 Created
 ## Panics
 * `failed to lock device list in add device {device_mac}` - if the device list is not found in the mutex lock"]
 #[post("/devices")]
-async fn add_device(device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
+async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
     let mut devices = data.device_list.lock().expect(
         format!(
             "failed to lock device list in add device {}",
-            device.get_device_mac()
+            new_device.get_device_mac()
         )
         .as_str(),
     );
     let device_index = devices
         .iter()
-        .position(|device| device.get_device_mac() == device.get_device_mac());
+        .position(|device| device.get_device_mac() == new_device.get_device_mac());
     match device_index {
-        Some(_device_index) => HttpResponse::Conflict().body(format!("Device {} already exists in the system, please change the device mac address and try again", device.get_device_mac())),
+        Some(_device_index) => HttpResponse::Conflict().body(format!("Device {} already exists in the system, please change the device mac address and try again", new_device.get_device_mac())),
         None => {
-            let mac = device.get_device_mac().clone();
-            devices.push(device.into_inner());
+            let mac = new_device.get_device_mac().clone();
+            devices.push(new_device.into_inner());
             HttpResponse::Created().body(format!("Device {} added successfully", mac))
         }
     }
@@ -104,11 +105,11 @@ async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -
 
     match device_index {
         Some(device_index) => {
-            let response = devices[device_index].is_reachable();
+            let response = devices[device_index].is_reachable().await;
             match response {
                 true => HttpResponse::Ok().body("Device is reachable and online in the network"),
                 false => HttpResponse::InternalServerError()
-                    .body("Could not reach the device, please check the device and try again"),
+                    .body("Could not reach the device, please check the device's metadata and try again"),
             }
         }
         None => HttpResponse::NotFound().body(format!(
@@ -130,7 +131,7 @@ if the device is reachable, return a 200 OK
 #[post("/devices/ping")]
 async fn check_new_device(device: web::Json<Device>) -> impl Responder {
     let mut device = device.into_inner();
-    let response = device.is_reachable();
+    let response = device.is_reachable().await;
 
     match response {
         true => HttpResponse::Ok()
@@ -161,7 +162,8 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
         _ => {
             let mut counter = 0;
             for device in devices.iter_mut() {
-                counter += device.is_reachable() as usize;
+                let online = device.is_reachable().await;
+                if online { counter += 1};
             }
             match counter {
                 0 => HttpResponse::InternalServerError().body("Could not reach any device, please check the devices and try again"),
@@ -208,13 +210,13 @@ async fn update_device(
     match device_entry {
         Some(device_entry) => {
             // this is used to prevent the user from changing the mac address of the device in the update request without deleting and adding the device again to the list
-            // to ensure that the user is not changing the mac address of the device in the update request accidentally
+            // to ensure that the user is not changing the mac address accidentally
             if device_entry.get_device_mac() != device.get_device_mac() {
                 return HttpResponse::BadRequest().body("The mac address of the device cannot be changed in the update request, please delete the device and add it again with the new mac address");
             }
 
             *device_entry = device.clone();
-            println!("updated device: {:#?}", device);
+            debug!("updated device: {:#?}", device);
             HttpResponse::Ok().body(format!("Device {} updated successfully", device_mac))
         }
         None => HttpResponse::NotFound().body(format!(
@@ -296,7 +298,7 @@ async fn stream_finished(
                 let ip = val.ip().to_string();
 
                 stream_entry.notify_process_completed(mac_address, &data.device_list);
-                println!("stream finished {} by {}", stream_id, ip);
+                info!("stream finished {} by {}", stream_id, ip);
             };
 
             HttpResponse::Ok().finish()
@@ -334,15 +336,17 @@ async fn stream_started(
         )
         .as_str(),
     );
+
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+    
     match stream_entry {
         Some(stream_entry) => {
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
                 stream_entry.notify_process_running(mac_address, &data.device_list);
-                println!(
+                info!(
                     "Address {} notified of starting the stream {}",
                     val.ip(),
                     stream_id

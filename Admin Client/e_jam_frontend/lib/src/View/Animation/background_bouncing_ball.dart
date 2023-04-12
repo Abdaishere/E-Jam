@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -14,9 +15,9 @@ class BouncingBall extends StatefulWidget {
 class _BouncingBallState extends State<BouncingBall> {
   get color => widget.color;
 
-  double ballWidth = 160, ballHeight = 150;
+  final double ballWidth = 160, ballHeight = 150;
   double x = 90, y = 30, xSpeed = 20, ySpeed = 20, speed = 150;
-  int minimumSpeed = 10,
+  final int minimumSpeed = 10,
       speedIncrement = 20,
       speedDecrement = 5,
       speedLimit = 100;
@@ -29,8 +30,8 @@ class _BouncingBallState extends State<BouncingBall> {
 
   update() {
     Timer.periodic(Duration(milliseconds: speed.toInt()), (timer) {
-      double screenWidth = MediaQuery.of(context).size.width;
-      double screenHeight = MediaQuery.of(context).size.height;
+      final double screenWidth = MediaQuery.of(context).size.width;
+      final double screenHeight = MediaQuery.of(context).size.height;
       x += xSpeed;
       y += ySpeed;
 
@@ -82,24 +83,28 @@ class _BouncingBallState extends State<BouncingBall> {
       duration: Duration(milliseconds: speed.toInt()),
       left: x,
       top: y,
-      child: Container(
-        width: ballWidth,
-        height: ballHeight,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: color[0].withOpacity(0.5),
-              spreadRadius: 3,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
+      child: ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2.5),
+        child: Container(
+          width: ballWidth,
+          height: ballHeight,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color[0].withOpacity(0.3),
+                spreadRadius: 3,
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+                blurStyle: BlurStyle.outer,
+              ),
+            ],
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: color,
+              transform: const GradientRotation(3),
             ),
-          ],
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: color,
-            transform: const GradientRotation(3),
           ),
         ),
       ),

@@ -1,9 +1,11 @@
+use log::{error, info, warn, debug};
 use super::models::{AppState, StreamEntry, StreamStatus};
 use crate::models::{device::get_devices_table, stream_details::StreamStatusDetails};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 
 mod device;
 mod pre_sets;
+pub(crate) mod consumer;
 
 use self::device::{
     add_device, check_new_device, delete_device, get_device, get_devices, ping_all_devices,
@@ -99,31 +101,31 @@ if the stream id is empty, generate a new stream id and return it in the respons
 * `Failed to lock streams_entries in post stream {stream_id}` - if the streams_entries is not found in the mutex lock"]
 #[post("/streams")]
 async fn post_stream(
-    stream_entry: web::Json<StreamEntry>,
+    new_stream_entry: web::Json<StreamEntry>,
     data: web::Data<AppState>,
 ) -> impl Responder {
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
             "Failed to lock streams_entries in post stream {}",
-            stream_entry.get_stream_id()
+            new_stream_entry.get_stream_id()
         )
         .as_str(),
     );
 
-    let stream_id = stream_entry.get_stream_id().to_string();
+    let stream_id = new_stream_entry.get_stream_id().to_string();
 
     let stream_entry_check = streams_entries
         .iter()
         .find(|&stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
 
     match stream_entry_check {
-        Some(stream_entry_check) => HttpResponse::Conflict().body(format!(
+        Some(duplicate_stream) => HttpResponse::Conflict().body(format!(
             "Stream with id {} already exists, and is {} in the list of streams",
             stream_id,
-            stream_entry_check.get_stream_status().to_string()
+            duplicate_stream.get_stream_status().to_string()
         )),
         None => {
-            let mut stream_entry = stream_entry.into_inner();
+            let mut stream_entry = new_stream_entry.into_inner();
 
             if stream_entry.get_stream_id() == "" {
                 stream_entry.generate_new_stream_id(&data.stream_id_counter, &data.streams_entries);
@@ -152,12 +154,13 @@ if the stream is found, update it and return a 200 OK
 ## Panics
 * `Failed to lock streams_entries in update stream {stream_id}` - if the streams_entries is not found in the mutex lock
 * `Failed to stop stream {stream_id}` - if the stream failed to stop"]
-#[put("/streams")]
+#[put("/streams/{stream_id}")]
 async fn update_stream(
-    _stream_entry: web::Json<StreamEntry>,
+    stream_id: web::Path<String>,
+    new_stream_entry: web::Json<StreamEntry>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let stream_id = _stream_entry.get_stream_id();
+    let stream_id = stream_id.into_inner();
 
     let mut streams_entries = data.streams_entries.lock().expect(
         format!(
@@ -169,12 +172,12 @@ async fn update_stream(
 
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id() == stream_id);
+        .find(|stream_entry| stream_entry.get_stream_id() == &stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
             // this is to prevent the stream id from being changed in the update stream to ensure that the stream id is unique and the user did not make a mistake
-            if _stream_entry.get_stream_id() != stream_entry.get_stream_id() {
+            if new_stream_entry.get_stream_id() != stream_entry.get_stream_id() {
                 return HttpResponse::BadRequest().body("Stream id cannot be changed in updating a stream please delete and add the stream again with the new id if you want to change the id of the stream");
             }
 
@@ -191,8 +194,8 @@ async fn update_stream(
             }
 
             // update the stream
-            *stream_entry = _stream_entry.clone();
-            println!("Updated stream: {:#?}", stream_entry);
+            *stream_entry = new_stream_entry.clone();
+            info!("Updated stream: {:#?}", stream_entry);
             HttpResponse::Ok().body(format!(
                 "Stream with id {} updated in the list of streams",
                 stream_entry.get_stream_id()
@@ -237,7 +240,8 @@ async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) 
     match stream_entry {
         Some(stream_entry) => {
             streams_entries.remove(stream_entry);
-            println!("Deleted stream {}", stream_id);
+            info!("Deleted stream {}", stream_id);
+            info!("{:?}", "And every where that Mary went");
             HttpResponse::Ok().body(format!("Deleted stream {} successfully", stream_id))
         }
         None => HttpResponse::NotFound().body(format!(
@@ -283,7 +287,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
             if stream_entry.check_stream_status(StreamStatus::Running)
                 || stream_entry.check_stream_status(StreamStatus::Queued)
             {
-                println!("Stream {} is already running", stream_id);
+                warn!("Stream {} is already running", stream_id);
                 HttpResponse::Conflict().body(format!(
                     "Stream {} is already {}, please stop it first and then queue it again",
                     stream_id,
@@ -291,14 +295,40 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                 ))
             } else {
                 // queue the stream in a different thread
-                stream_entry
+                let connections = stream_entry
                     .queue_stream(&data.queued_streams, &data.device_list)
                     .await;
-                println!("Queued stream {}", stream_id);
-                HttpResponse::Ok().body(format!(
-                    "Stream is queued to start after {} seconds",
-                    stream_entry.get_stream_delay_seconds()
-                ))
+                debug!(
+                    "{} stream {}",
+                    stream_entry.get_stream_status().to_string(),
+                    stream_id
+                );
+                match stream_entry.get_stream_status() {
+                    StreamStatus::Queued => HttpResponse::Ok().body(format!(
+                        "Stream is queued to start after {} seconds for {} devices",
+                        stream_entry.get_stream_delay_seconds(),
+                        connections
+                    )),
+                    StreamStatus::Error => {
+                        if connections == 0 {
+                            HttpResponse::InternalServerError()
+                                .body("No devices are running the stream")
+                        } else if connections == 1 {
+                            HttpResponse::InternalServerError()
+                                .body("Only one Process type is running the stream")
+                        } else {
+                            HttpResponse::InternalServerError()
+                                .body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
+                                stream_entry.get_stream_status().to_string()))
+                        }
+                    }
+                    _ => HttpResponse::Ok().body(format!(
+                        "Stream {} is sent for {} devices with status {}",
+                        stream_entry.get_stream_id(),
+                        connections,
+                        stream_entry.get_stream_status().to_string()
+                    )),
+                }
             }
         }
         None => {
@@ -345,12 +375,18 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
                 || stream_entry.check_stream_status(StreamStatus::Queued)
             {
                 stream_entry.stop_stream(&data.device_list).await;
-                println!("Stopped stream {}", stream_id);
-                HttpResponse::Ok().body(format!("Stream {} Stopped Successfully", stream_id))
+                info!("Stopped stream {}", stream_id);
+                if stream_entry.get_stream_status() == &StreamStatus::Stopped {
+                    HttpResponse::Ok().body(format!("Stream {} Stopped Successfully", stream_id))
+                } else {
+                    HttpResponse::InternalServerError()
+                                .body(format!("Stream {}: {} While Stopping the stream, please check the server for more info", stream_id,
+                                stream_entry.get_stream_status().to_string()) )
+                }
             } else {
-                println!("Stream {} is already stopped", stream_id);
+                warn!("Stream {} is already stopped", stream_id);
                 HttpResponse::Conflict().body(format!(
-                    "Stream {} is already {}, please start it first",
+                    "Stream {} is already {}",
                     stream_id,
                     stream_entry.get_stream_status().to_string()
                 ))
@@ -381,7 +417,7 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         .lock()
         .expect("Failed to lock streams_entries in start all streams");
     if streams_entries.len() == 0 {
-        println!("No streams to start");
+        warn!("No streams to start");
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
 
@@ -393,11 +429,13 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
             stream_entry
                 .queue_stream(&data.queued_streams, &data.device_list)
                 .await;
-            counter += 1;
+            if stream_entry.get_stream_status() == &StreamStatus::Queued {
+                counter += 1;
+            }
         }
     }
 
-    println!("Queued all streams to start");
+    info!("Queued all streams to start");
     HttpResponse::Ok().body(format!("Queued {} streams to start", counter))
 }
 
@@ -423,7 +461,7 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         .expect("Failed to lock streams_entries in stop all streams");
 
     if streams_entries.len() == 0 {
-        println!("No streams to stop");
+        warn!("No streams to stop");
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
 
@@ -441,14 +479,14 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
 
             if stream_entry.check_stream_status(StreamStatus::Stopped) {
                 counter += 1;
-                println!("Stopped stream {}", stream_entry.get_stream_id());
+                info!("Stopped stream {}", stream_entry.get_stream_id());
             } else {
-                println!("Failed to stop stream {}", stream_entry.get_stream_id());
+                error!("Failed to stop stream {}", stream_entry.get_stream_id());
             }
         }
     }
 
-    println!("Stopped all streams");
+    info!("Stopped all streams");
     HttpResponse::Ok().body(format!(
         "Stopped {} streams, {} were Unqueued",
         counter, unqueued
@@ -500,13 +538,13 @@ async fn force_start_stream(
             // if the stream is running, stop it
             // if the stream is queued, remove it from the queue
             if stream_entry.check_stream_status(StreamStatus::Running) {
-                println!("Stream {} is already running", stream_id);
+                warn!("Stream {} is already running", stream_id);
                 stream_entry.stop_stream(&data.device_list).await;
                 body += "stopped, ";
             }
 
             if stream_entry.check_stream_status(StreamStatus::Queued) {
-                println!("Stream {} is already queued", stream_id);
+                warn!("Stream {} is already queued", stream_id);
                 stream_entry
                     .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
@@ -515,10 +553,31 @@ async fn force_start_stream(
 
             body += ", force started";
             // start the stream
-            stream_entry.send_stream(true, &data.device_list).await;
+            let connections = stream_entry.send_stream(true, &data.device_list).await;
 
-            println!("Stream {} force started", stream_id);
-            HttpResponse::Ok().body(body)
+            info!("Stream {} force started", stream_id);
+            match stream_entry.get_stream_status() {
+                StreamStatus::Sent => HttpResponse::Ok().body(body),
+                StreamStatus::Error => {
+                    if connections == 0 {
+                        HttpResponse::InternalServerError()
+                            .body("No devices are running the stream")
+                    } else if connections == 1 {
+                        HttpResponse::InternalServerError()
+                            .body("Only one Process type is running the stream")
+                    } else {
+                        HttpResponse::InternalServerError()
+                                .body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
+                                stream_entry.get_stream_status().to_string()))
+                    }
+                }
+                _ => HttpResponse::Ok().body(format!(
+                    "{} sent for {} devices with status {}",
+                    body,
+                    connections,
+                    stream_entry.get_stream_status().to_string()
+                )),
+            }
         }
         None => HttpResponse::NotFound().body(format!(
             "stream {} not found in streams, please check the stream id and try again",
@@ -564,8 +623,14 @@ async fn force_stop_stream(
         Some(stream_entry) => {
             stream_entry.stop_stream(&data.device_list).await;
 
-            println!("Force Stopped stream {}", stream_id);
-            HttpResponse::Ok().body(format!("stream {} force stopped successfully", stream_id))
+            info!("Force Stopped stream {}", stream_id);
+            if stream_entry.get_stream_status() == &StreamStatus::Stopped {
+                HttpResponse::Ok().body(format!("Stream {} Force Stopped Successfully", stream_id))
+            } else {
+                HttpResponse::InternalServerError()
+                            .body(format!("Stream {}: {} While Force Stopping the stream, please check the server for more info", stream_id,
+                            stream_entry.get_stream_status().to_string()) )
+            }
         }
         None => HttpResponse::NotFound().body(format!(
             "stream {} not found in streams, please check the stream id and try again",

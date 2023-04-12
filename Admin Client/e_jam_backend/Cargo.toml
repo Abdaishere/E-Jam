@@ -18,3 +18,6 @@ validator = { version = "0.16.0", features = ["derive"] }
 kafka = "0.9.0"
 schema_registry_converter = { version = "3.1.0", default-features = false, features = ["avro", "blocking"] }
 apache-avro = "0.14.0"
+nanoid = "0.4.0"
+log4rs = { version = "1.2.0", features = ["gzip"] }
+log = "0.4.17"

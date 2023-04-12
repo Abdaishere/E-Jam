@@ -93,10 +93,6 @@ class _HomeState extends State<Home> {
             gradientBackground(theme, context),
             BouncingBall(
                 color: (theme.isDark ? gradientColorDark : gradientColorLight)),
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
-              child: Container(color: Colors.transparent),
-            ),
             bottomLineChartScaffold(context),
             frontBody(),
           ],
