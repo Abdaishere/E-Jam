@@ -1,47 +1,30 @@
-package com.example.systemapi.stats;
+package com.ejam.systemapi.stats;
 
-import com.github.javafaker.Faker;
+import com.ejam.systemapi.stats.SchemaRegistry.Generator;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import com.example.systemapi.stats.SchemaRegistry.Generator;
-
-import java.util.UUID;
 
 
-
-public class GeneratorProducer implements Runnable {
+public class GeneratorProducer {
     static KafkaProducer<String, Generator> producer;
-   
-    @Override
-    public void run() {
-        ProduceFakeData();
+
+    public static Generator rebuildFromString(String string) {
+        String[] values = string.split(String.valueOf(' '));
+
+        return Generator.newBuilder()
+                .setMacAddress(values[0])
+                .setStreamId(values[1])
+                .setPacketsSent(Long.parseLong(values[2]))
+                .setPacketsErrors(Long.parseLong(values[3]))
+                .build();
     }
 
-    public static void ProduceFakeData() {
-        Faker faker = new Faker();
-        // send fake data with Kafka producer each 1 second to the topic is the same as the name of the class
-        
-        while (true) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    public static void produceDataToKafkaBroker(Generator generator) {
+        System.out.println(generator);
+        producer.send(new ProducerRecord<>(generator.getClass().getSimpleName(), generator), (metadata, exception) -> {
+            if (exception != null) {
+                exception.printStackTrace();
             }
-            
-            // create a fake Generator object
-            Generator generator = Generator.newBuilder()
-                    .setMacAddress(faker.internet().macAddress())
-                    .setStreamId(UUID.randomUUID().toString().substring(0, 3))
-                    .setPacketsSent(faker.number().randomNumber())
-                    .setPacketsErrors(faker.number().randomNumber())
-                    .build();
-            
-            // send the fake data to the topic and print the exception if there is any
-            producer.send(new ProducerRecord<>(generator.getClass().getSimpleName(), generator), (metadata, exception) -> {
-                if (exception != null) {
-                    exception.printStackTrace();
-                }
-            });
-        }
+        });
     }
 }

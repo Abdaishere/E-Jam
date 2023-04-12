@@ -1,14 +1,15 @@
-package com.example.systemapi.stats;
+package com.ejam.systemapi.stats;
 
-import com.example.systemapi.InstanceControl.UTILs;
-import com.example.systemapi.stats.GeneratorStatsContainer;
-import com.example.systemapi.stats.VerifierStatsContainer;
-import org.springframework.kafka.core.KafkaTemplate;
+import com.ejam.systemapi.InstanceControl.UTILs;
+import com.ejam.systemapi.stats.SchemaRegistry.Generator;
+import com.ejam.systemapi.stats.SchemaRegistry.Verifier;
 
 import java.io.*;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static java.lang.Thread.sleep;
@@ -18,25 +19,23 @@ import static java.lang.Thread.sleep;
  * This class is responsible for recieving stats objects from generators and verfiers,
  * aggregate them then sends the result to the admin client through Kafka
  */
-public class StatsManager implements Runnable
-{
+public class StatsManager implements Runnable {
     private Inet4Address kafkaServerAddress;
     private static StatsManager instance = null;
     private float sendFrequency = 1.0f;
-    private ArrayList<GeneratorStatsContainer> generatorStatsContainers;
-    private ArrayList<VerifierStatsContainer> verifierStatsContainers;
+    private ArrayList<Generator> generatorStats = new ArrayList<>();
+    private ArrayList<Verifier> verifierStats = new ArrayList<>();
 
     private Thread genStatsThread;
     private Thread verStatsThread;
 
     /**
      * Get the StatsManager singleton instance
+     *
      * @return the StatsManager singleton instance
      */
-    public static StatsManager getInstance(Inet4Address ip)
-    {
-        if(instance == null)
-        {
+    public static StatsManager getInstance(Inet4Address ip) {
+        if (instance == null) {
             instance = new StatsManager(ip);
         }
         return instance;
@@ -45,125 +44,104 @@ public class StatsManager implements Runnable
     /**
      * A simpler version of the original ``getInstance(int,int)`` function
      * to get the StatsManager singleton instance with values already set
+     *
      * @return the StatsManager singleton instance
      */
-    public static StatsManager getInstance()
-    {
-        if(instance == null)
-        {
-            try
-            {
+    public static StatsManager getInstance() {
+        if (instance == null) {
+            try {
                 instance = new StatsManager((Inet4Address) Inet4Address.getByName("127.0.0.1"));
-            }
-            catch (UnknownHostException e)
-            {
+            } catch (UnknownHostException e) {
                 throw new RuntimeException(e);
             }
         }
         return instance;
     }
 
-    private StatsManager(Inet4Address ip)
-    {
+    private StatsManager(Inet4Address ip) {
         kafkaServerAddress = ip;
     }
 
-    private void fillGenStats()
-    {
-        generatorStatsContainers.clear();
+    private void fillGenStats() {
+        System.out.println(verifierStats.size());
+        generatorStats.clear();
 
         //Open pipes that start with sgen_*
-        String parentFolder = "../Executables/genStats/";
+        String parentFolder = "/Executables/genStats/";
 
         ArrayList<BufferedReader> readers = new ArrayList<>();
         Set<String> dirs = UTILs.listFiles(parentFolder);
         ArrayList<String> data = new ArrayList<>();
-        for (String dir : dirs)
-        {
-            try
-            {
+        for (String dir : dirs) {
+            System.out.println("Dir = " + dir);
+            try {
                 readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(dir))));
-            }
-            catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        genStatsThread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
-                    for (BufferedReader reader : readers)
-                    {
+
+        genStatsThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    for (BufferedReader reader : readers) {
                         String line = reader.readLine();
                         data.add(line);
                         reader.close();
                     }
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                for(String s: data)
-                    verifierStatsContainers.add(new VerifierStatsContainer(s));
-
+                for (String s : data)
+                    generatorStats.add(GeneratorProducer.rebuildFromString(s));
             }
         });
         genStatsThread.start();
     }
 
-    private void fillVerStats()
-    {
-        verifierStatsContainers.clear();
+    private void fillVerStats() {
+        System.out.println(verifierStats.size());
+        verifierStats.clear();
 
 
         //Open pipes that start with sver_*
-        String parentFolder = "../Executables/verStatus/";
+        String parentFolder = "/Executables/verStats/";
 
         ArrayList<BufferedReader> readers = new ArrayList<>();
         Set<String> dirs = UTILs.listFiles(parentFolder);
         ArrayList<String> data = new ArrayList<>();
-        for (String dir : dirs)
-        {
-            try
-            {
+        for (String dir : dirs) {
+            try {
                 readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(dir))));
-            }
-            catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        verStatsThread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
-                    for (BufferedReader reader : readers)
-                    {
+        verStatsThread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    for (BufferedReader reader : readers) {
                         String line = reader.readLine();
                         data.add(line);
                         reader.close();
                     }
-                } catch (IOException e)
-                {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
-                for(String s: data)
-                    verifierStatsContainers.add(new VerifierStatsContainer(s));
+                for (String s : data)
+                    verifierStats.add(VerifierProducer.rebuildFromString(s));
             }
         });
         verStatsThread.start();
     }
+
     /**
      * Set the time interval between re-sending live stats reports
+     *
      * @param sendFrequency (new time interval)
      */
-    public void setSendFrequency(float sendFrequency)
-    {
+    public void setSendFrequency(float sendFrequency) {
         this.sendFrequency = sendFrequency;
     }
 
@@ -174,47 +152,85 @@ public class StatsManager implements Runnable
      */
     void sendStatistics() throws IOException {
         // aggregate stats
-//        GeneratorStatsContainer aggregatedGenStats = new GeneratorStatsContainer();
-//        for (GeneratorStatsContainer generatorStatsContainer : generatorStatsContainers) {
-//
-//        }
-//
-//        VerifierStatsContainer aggregatedVerStats = new VerifierStatsContainer();
-//        for (VerifierStatsContainer verifierStatsContainer : verifierStatsContainers) {
-//
-//        }
-//
-//        // send stats to kafka broker
-//        StatsController.publishToGenerators(aggregatedGenStats);
-//        StatsController.publishToVerifiers(aggregatedVerStats);
+        Map<String, ArrayList<Generator>> aggregatedGenStats = new HashMap<>();
+        for (Generator generator : generatorStats) {
+            if (aggregatedGenStats.containsKey(generator.getStreamId().toString())) {
+                aggregatedGenStats.get(generator.getStreamId().toString()).add(generator);
+            } else {
+                ArrayList<Generator> generators = new ArrayList<>();
+                generators.add(generator);
+                aggregatedGenStats.put(generator.getStreamId().toString(), generators);
+            }
+        }
+
+        Map<String, ArrayList<Verifier>> aggregatedVerStats = new HashMap<>();
+        for (Verifier verifier : verifierStats) {
+            if (aggregatedVerStats.containsKey(verifier.getStreamId().toString())) {
+                aggregatedVerStats.get(verifier.getStreamId().toString()).add(verifier);
+            } else {
+                ArrayList<Verifier> verifiers = new ArrayList<>();
+                verifiers.add(verifier);
+                aggregatedVerStats.put(verifier.getStreamId().toString(), verifiers);
+            }
+        }
+
+        System.out.println("should send now");
+
+        // send stats to kafka broker
+        for (String key : aggregatedGenStats.keySet()) {
+            long aggregatedPacketsSent = 0, aggregatedPacketsErrors = 0;
+            for (Generator generator : aggregatedGenStats.get(key)) {
+                aggregatedPacketsSent += generator.getPacketsSent();
+                aggregatedPacketsErrors += generator.getPacketsErrors();
+            }
+            GeneratorProducer.produceDataToKafkaBroker(Generator.newBuilder()
+                    .setMacAddress(aggregatedGenStats.get(key).get(0).getMacAddress())
+                    .setStreamId(aggregatedGenStats.get(key).get(0).getStreamId())
+                    .setPacketsSent(aggregatedPacketsSent)
+                    .setPacketsErrors(aggregatedPacketsErrors)
+                    .build());
+        }
+
+        for (String key : aggregatedVerStats.keySet()) {
+            long aggregatedPacketsCorrect = 0, aggregatedPacketsErrors = 0;
+            long aggregatedPacketsDropped = 0, aggregatedPacketsOutOfOrder = 0;
+            for (Verifier verifier : aggregatedVerStats.get(key)) {
+                aggregatedPacketsCorrect += verifier.getPacketsCorrect();
+                aggregatedPacketsErrors += verifier.getPacketsErrors();
+                aggregatedPacketsDropped += verifier.getPacketsDropped();
+                aggregatedPacketsOutOfOrder += verifier.getPacketsOutOfOrder();
+            }
+            VerifierProducer.produceDataToKafkaBroker(Verifier.newBuilder()
+                    .setMacAddress(aggregatedVerStats.get(key).get(0).getMacAddress())
+                    .setStreamId(aggregatedVerStats.get(key).get(0).getStreamId())
+                    .setPacketsCorrect(aggregatedPacketsCorrect)
+                    .setPacketsErrors(aggregatedPacketsErrors)
+                    .setPacketsDropped(aggregatedPacketsDropped)
+                    .setPacketsOutOfOrder(aggregatedPacketsOutOfOrder)
+                    .build());
+        }
     }
 
     /**
      *
      */
     @Override
-    public void run()
-    {
-        try
-        {
-            while (true)
-            {
+    public void run() {
+        try {
+            while (true) {
                 fillGenStats();
                 fillVerStats();
 
-                try
-                {
+                try {
                     genStatsThread.join();
                     verStatsThread.join();
-                } catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 sendStatistics();
                 sleep((long) sendFrequency);
             }
-        } catch (RuntimeException | InterruptedException e)
-        {
+        } catch (RuntimeException | InterruptedException e) {
             run();
         } catch (IOException e) {
             throw new RuntimeException(e);

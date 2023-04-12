@@ -1,4 +1,4 @@
-package com.example.systemapi.NetworkUtilities;
+package com.ejam.systemapi.NetworkUtilities;
 
 import static java.lang.Thread.sleep;
 

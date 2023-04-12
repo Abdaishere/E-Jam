@@ -1,4 +1,4 @@
-package com.example.systemapi.InstanceControl;
+package com.ejam.systemapi.InstanceControl;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.example.systemapi;
+package com.ejam.systemapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

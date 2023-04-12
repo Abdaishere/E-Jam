@@ -1,4 +1,4 @@
-package com.example.systemapi.InstanceControl;
+package com.ejam.systemapi.InstanceControl;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,11 @@ public class Stream
     long timeToLive;                  //Time to live before ending execution in ms
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
+
+    long burstLen;				    //Number of packets in a burst
+    long burstDelay;				//Delay between bursts in milliseconds
     boolean checkContent;                  //Whether to check content or not
+
 
 
 
@@ -35,7 +39,7 @@ public class Stream
     public Stream(String streamID, long delay, ArrayList<String> generators, ArrayList<String> verifiers,
                   PayloadType payloadType, long numberOfPackets, int payloadLength, int seed, long bcFramesNum,
                   long interFrameGap, long lifeTime, TransportProtocol transportProtocol,
-                  FlowType flowType, boolean checkContent) {
+                  FlowType flowType, long burstLen, long burstDelay, boolean checkContent) {
         this.streamID = streamID;
         this.delay = delay;
         this.generators = generators;
@@ -49,6 +53,8 @@ public class Stream
         this.timeToLive = lifeTime;
         this.transportProtocol = transportProtocol;
         this.flowType = flowType;
+        this.burstLen = burstLen;
+        this.burstDelay = burstDelay;
         this.checkContent = checkContent;
     }
 }

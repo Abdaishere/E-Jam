@@ -1,4 +1,4 @@
-package com.example.systemapi.InstanceControl;
+package com.ejam.systemapi.InstanceControl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,7 +24,7 @@ public class Communicator {
     /**
      * Get configuration from Admin GUI
      */
-    private final static String ADMIN_IP = "10.10.10.153";
+    private final static String ADMIN_IP = "192.168.1.30";
     private final static int ADMIN_PORT = 8080;
     private final static String MAC_ADDRESS = UTILs.getMyMacAddress();
 
@@ -43,10 +43,11 @@ public class Communicator {
     }
 
     @PostMapping("/start")
-    public ResponseEntity startStream(@RequestBody String stringObj) throws JSONException, JsonProcessingException {
+    public ResponseEntity startStream(@RequestBody String stringObj) throws JsonProcessingException {
+        System.out.println("Received configuration: " + stringObj);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonObj = mapper.readTree(stringObj);
-        String streamID = jsonObj.get("streamID").asText();
+        String streamID = jsonObj.get("streamId").asText();
         long delay = jsonObj.get("delay").asLong();
 
         ArrayList<String> generators = new ArrayList<>();
@@ -72,14 +73,16 @@ public class Communicator {
         int seed = jsonObj.get("seed").asInt();
         long interFrameGap = jsonObj.get("interFrameGap").asLong();
         long lifeTime = jsonObj.get("timeToLive").asLong();
-        TransportProtocol transportProtocol = TransportProtocol.values()[jsonObj.get("transportProtocol").asInt()];
+        TransportProtocol transportProtocol = TransportProtocol.values()[jsonObj.get("transportLayerProtocol").asInt()];
         FlowType flowType = FlowType.values()[jsonObj.get("flowType").asInt()];
+        long burstLen = jsonObj.get("burstLength").asLong();
+        long burstDelay = jsonObj.get("burstDelay").asLong();
         boolean checkContent = jsonObj.get("checkContent").asBoolean();
 
         ArrayList<Stream> streams = new ArrayList<>();
         streams.add(new Stream(streamID, delay, generators, verifiers, payloadType,
                 numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap,
-                lifeTime, transportProtocol, flowType, checkContent));
+                lifeTime, transportProtocol, flowType, burstLen, burstDelay, checkContent));
 
         InstanceController instanceController = new InstanceController(streams);
         Thread thread = new Thread(instanceController);

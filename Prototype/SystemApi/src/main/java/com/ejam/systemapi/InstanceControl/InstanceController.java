@@ -1,4 +1,4 @@
-package com.example.systemapi.InstanceControl;
+package com.ejam.systemapi.InstanceControl;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -24,7 +24,7 @@ public class InstanceController implements Runnable
     }
 
     public void startStreams() {
-        getExecutables();
+//        getExecutables();
         int genNum = startGenerators(streams); //start executable generators instances
         int verNum = startVerifiers(streams); //start executable verifiers instances
         startGateway(genNum, verNum); //start the gateway
@@ -87,6 +87,8 @@ public class InstanceController implements Runnable
         {
             for(String sender: stream.generators)
             {
+                System.out.println(sender);
+                System.out.println(myMacAddress);
                 if(sender.equals(myMacAddress))
                 {
                     String command = "../Executables/Generator";
@@ -188,6 +190,8 @@ public class InstanceController implements Runnable
     private void getExecutables()
     {
         String args[] = {};
+        System.out.println(System.getProperty("user.dir"));
+//        System.out.println();
         executeCommand("../Executables/GetExecutables.sh", true, args);
     }
 
