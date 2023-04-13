@@ -20,7 +20,7 @@ appenders:
         
   # Appender for the strong level strategy
   strong_level_ap:
-    kind: file
+    kind: rolling_file
     path: logs/strong_level/strong_level.log
     encoder:
       pattern: "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {f}:{L} — {m}{n}"
@@ -35,7 +35,7 @@ appenders:
         base: 1
 
 root:
-  level: warn
+  level: info
   appenders:
     - stdout
     - step_ap
@@ -47,6 +47,6 @@ loggers:
       - step_ap
       
   strong_level:
-    level: error
+    level: debug
     appenders:
       - strong_level_ap

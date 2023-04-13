@@ -3,11 +3,15 @@ use apache_avro::from_value;
 use kafka::consumer::{Consumer, FetchOffset};
 use log::{error, info, debug, warn};
 use schema_registry_converter::blocking::{avro::AvroDecoder, schema_registry::SrSettings};
+use std::thread::sleep;
+use std::time::Duration;
 
 const NAMESPACE: &str = "com.ejam.systemapi.stats.SchemaRegistry";
 const SCHEMA_REGISTRY_PORT: &str = "8081";
 const MAIN_BROKER_PORT: &str = "9092";
 const HOST: &str = "localhost";
+const SLEEP_TIME: u64 = 5;
+
 
 pub fn run_generator_consumer() {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
@@ -23,7 +27,7 @@ pub fn run_generator_consumer() {
             Ok(v) => break v,
             Err(e) => {
                 error!("{:?}", e);
-                continue;
+                sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
     };
@@ -85,7 +89,7 @@ pub fn run_verifier_consumer() {
             Ok(v) => break v,
             Err(e) => {
                 error!("{:?}", e);
-                continue;
+                sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
     };
