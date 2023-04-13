@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Charts/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
@@ -49,7 +47,6 @@ class MyApp extends StatelessWidget {
                 ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
             themeMode: theme.themeMode,
             home: const Home(),
-            // TODO: Add routes
           );
         },
       ),

@@ -1,10 +1,16 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:math';
 
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
+import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
+import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
@@ -21,13 +27,67 @@ class _AddStreamViewState extends State<AddStreamView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final formKey = GlobalKey<FormState>();
+  final TextEditingController _idController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _delayController = TextEditingController();
+  final TextEditingController _timeToLiveController = TextEditingController();
+  final TextEditingController _interFrameGapController =
+      TextEditingController();
+  final TextEditingController _payloadLengthController =
+      TextEditingController();
+  final TextEditingController _burstLengthController = TextEditingController();
+  final TextEditingController _burstDelayController = TextEditingController();
+  final TextEditingController __broadcastFramesController =
+      TextEditingController();
+  final TextEditingController __packetsController = TextEditingController();
+  final TextEditingController __seedController = TextEditingController();
+  late FlowType __flowType = FlowType.bursts;
+  late int __payloadType = 0;
+  late TransportLayerProtocol __transportLayerProtocol =
+      TransportLayerProtocol.tcp;
+  bool __checkContent = false;
 
-  late StreamEntry streamEntry;
+  List<String> _generators = [];
+  List<String> _verifiers = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+  }
+
+  _addStream() {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      StreamsController.createNewStream(
+        ScaffoldMessenger.of(context),
+        StreamEntry(
+          name: _nameController.text,
+          description: _descriptionController.text,
+          delay: int.parse(_delayController.text),
+          streamId: _idController.text,
+          generatorsIds: _generators,
+          verifiersIds: _verifiers,
+          payloadType: __payloadType,
+          burstLength: int.parse(_burstLengthController.text),
+          burstDelay: int.parse(_burstDelayController.text),
+          numberOfPackets: int.parse(__packetsController.text),
+          payloadLength: int.parse(_payloadLengthController.text),
+          seed: int.parse(__seedController.text),
+          broadcastFrames: int.parse(__broadcastFramesController.text),
+          interFrameGap: int.parse(_interFrameGapController.text),
+          timeToLive: int.parse(_timeToLiveController.text),
+          transportLayerProtocol: __transportLayerProtocol,
+          flowType: __flowType,
+          checkContent: __checkContent,
+          runningGenerators: const Process.empty(),
+          runningVerifiers: const Process.empty(),
+          streamStatus: StreamStatus.created,
+        ),
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -116,71 +176,85 @@ class _AddStreamViewState extends State<AddStreamView>
     );
   }
 
+  // TODO: change to dropdown menu
   Row _flowAndTLPTypes() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        const Icon(FontAwesomeIcons.barsStaggered),
+        const VerticalDivider(),
         Expanded(
-          flex: 1,
-          child: TextFormField(
+          flex: 2,
+          child: DropdownButtonFormField<FlowType>(
             decoration: const InputDecoration(
               labelText: 'Flow Type',
-              hintText: 'BtB or Bursts',
+              hintText: 'Flow Type',
             ),
+            items: const [
+              DropdownMenuItem(
+                value: FlowType.backToBack,
+                child: Text('Back to Back'),
+              ),
+              DropdownMenuItem(
+                value: FlowType.bursts,
+                child: Text('Bursts'),
+              ),
+            ],
             validator: (value) {
-              if (value is int) {
-                if (int.parse(value!) < 0 || int.parse(value) > 1) {
-                  return 'Please enter a valid flow type';
-                }
+              if (value == null) {
+                return 'Please enter a valid flow type';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.flowType = int.parse(value!) as FlowType;
+            onChanged: (value) {
+              __flowType = value!;
             },
           ),
         ),
         const VerticalDivider(),
         Expanded(
           flex: 2,
-          child: TextFormField(
+          child: DropdownButtonFormField<TransportLayerProtocol>(
             decoration: const InputDecoration(
               labelText: 'Transport Layer Protocol',
-              hintText: 'TCP or UDP',
+              hintText: 'TLP Type',
             ),
-            validator: (value) {
-              if (value is int) {
-                if (int.parse(value!) < 0 || int.parse(value) > 1) {
-                  return 'Please enter a valid transport layer protocol';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) {
-              streamEntry.transportLayerProtocol =
-                  int.parse(value!) as TransportLayerProtocol;
+            value: TransportLayerProtocol.tcp,
+            items: const [
+              DropdownMenuItem(
+                value: TransportLayerProtocol.tcp,
+                child: Text('TCP'),
+              ),
+              DropdownMenuItem(
+                value: TransportLayerProtocol.udp,
+                child: Text('UDP'),
+              ),
+            ],
+            onChanged: (value) {
+              __transportLayerProtocol = value!;
             },
           ),
         ),
         const VerticalDivider(),
         Expanded(
           flex: 1,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Check Content',
-              hintText: '0 or 1',
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20, right: 10),
+            child: IconButton(
+              icon: Icon(
+                __checkContent
+                    ? FontAwesomeIcons.eye
+                    : FontAwesomeIcons.eyeSlash,
+                size: 30,
+              ),
+              tooltip:
+                  __checkContent ? 'Check content' : 'Do not check content',
+              onPressed: () {
+                setState(() {
+                  __checkContent = !__checkContent;
+                });
+              },
             ),
-            validator: (value) {
-              if (value is int) {
-                if (int.parse(value!) < 0 || int.parse(value) > 1) {
-                  return 'Please enter 0 or 1';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) {
-              streamEntry.checkContent = int.parse(value!) as bool;
-            },
           ),
         ),
       ],
@@ -197,17 +271,19 @@ class _AddStreamViewState extends State<AddStreamView>
             decoration: const InputDecoration(
               labelText: 'Burst length',
               hintText: 'Length of the burst',
+              icon: Icon(Icons.graphic_eq),
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is UnsignedLong) {
                 return 'Please enter a valid burst length';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.burstLength = value! as UnsignedLong;
-            },
+            controller: _burstLengthController,
           ),
         ),
         const VerticalDivider(),
@@ -219,15 +295,16 @@ class _AddStreamViewState extends State<AddStreamView>
               hintText: 'Delay between bursts',
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is UnsignedLong) {
                 return 'Please enter a valid burst delay';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.burstDelay = value! as UnsignedLong;
-            },
+            controller: _burstDelayController,
           ),
         ),
       ],
@@ -239,43 +316,53 @@ class _AddStreamViewState extends State<AddStreamView>
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          flex: 3,
+          flex: 2,
           child: TextFormField(
             decoration: const InputDecoration(
               labelText: 'Payload Length',
               hintText: 'Length of the payload',
+              icon: Icon(Icons.featured_play_list_rounded),
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is UnsignedLong) {
                 return 'Please enter a valid payload length';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.payloadLength = value! as UnsignedShort;
-            },
+            controller: _payloadLengthController,
           ),
         ),
         const VerticalDivider(),
         Expanded(
           flex: 1,
-          child: TextFormField(
+          child: DropdownButtonFormField<int>(
             decoration: const InputDecoration(
-              labelText: 'Payload Type',
-              hintText: '0, 1 or 2',
+              labelText: 'Type',
+              hintText: 'Type of the payload',
             ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value is int) {
-                if (int.parse(value!) < 0 || int.parse(value) > 2) {
-                  return 'Please enter a valid payload type';
-                }
-              }
-              return null;
-            },
-            onSaved: (value) {
-              streamEntry.payloadType = value! as UnsignedShort;
+            value: 0,
+            items: const [
+              DropdownMenuItem(
+                value: 0,
+                child: Text('Random'),
+              ),
+              DropdownMenuItem(
+                value: 1,
+                child: Text('Incremental'),
+              ),
+              DropdownMenuItem(
+                value: 2,
+                child: Text('Decremental'),
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                __payloadType = value!;
+              });
             },
           ),
         ),
@@ -288,17 +375,19 @@ class _AddStreamViewState extends State<AddStreamView>
       decoration: const InputDecoration(
         labelText: 'Generation Seed',
         hintText: 'Seed for the generation of packets',
+        icon: Icon(MaterialCommunityIcons.seed),
       ),
       keyboardType: TextInputType.number,
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.digitsOnly
+      ],
       validator: (value) {
         if (value is UnsignedLong) {
           return 'Please enter a valid number of packets';
         }
         return null;
       },
-      onSaved: (value) {
-        streamEntry.seed = value! as UnsignedLong;
-      },
+      controller: __seedController,
     );
   }
 
@@ -312,17 +401,19 @@ class _AddStreamViewState extends State<AddStreamView>
             decoration: const InputDecoration(
               labelText: 'Number of Packets',
               hintText: 'Number of Packets to be sent',
+              icon: Icon(Icons.filter_frames_rounded),
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is UnsignedLong) {
                 return 'Please enter a valid number of packets';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.numberOfPackets = value! as UnsignedLong;
-            },
+            controller: __packetsController,
           ),
         ),
         const VerticalDivider(),
@@ -334,65 +425,99 @@ class _AddStreamViewState extends State<AddStreamView>
               hintText: 'Frames to be broadcasted',
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is UnsignedLong) {
                 return 'Please enter a valid number of frames';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.broadcastFrames = value! as UnsignedLong;
-            },
+            controller: __broadcastFramesController,
           ),
         ),
       ],
     );
   }
 
-  Row _streamDevicesLists() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            enableIMEPersonalizedLearning: false,
-            decoration: const InputDecoration(
-              labelText: 'Generators',
-              hintText: 'Devices separated by commas',
+  // TODO: change to dropdown add get devices and checked devices
+  Padding _streamDevicesLists() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+            flex: 1,
+            child: IconButton(
+              icon: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(pi),
+                child: const Icon(
+                  MaterialCommunityIcons.progress_upload,
+                  semanticLabel: 'Devices',
+                  color: uploadColor,
+                  size: 40,
+                ),
+              ),
+              tooltip: 'Generating Devices',
+              onPressed: () {
+                Navigator.of(context).push(
+                  HeroDialogRoute(
+                    builder: (BuildContext context) => Center(
+                      child: DevicesCheckListPicker(
+                        areGenerators: true,
+                        onDevicesSelected: (value) {
+                          // find the value in the list and remove it otherwise add it
+                          if (!_generators.remove(value)) {
+                            _generators.add(value);
+                          }
+                        },
+                      ),
+                    ),
+                    settings:
+                        const RouteSettings(name: 'GeneratingDevicesView'),
+                  ),
+                );
+                print(_generators);
+              },
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of generators';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              streamEntry.generatorsIds = value!.split(', ');
-            },
           ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            enableIMEPersonalizedLearning: false,
-            decoration: const InputDecoration(
-              labelText: 'Verifiers',
-              hintText: 'Devices separated by commas',
+          const VerticalDivider(),
+          Expanded(
+            flex: 1,
+            child: IconButton(
+              icon: const Icon(
+                MaterialCommunityIcons.progress_check,
+                semanticLabel: 'Devices',
+                color: downloadColor,
+                size: 40,
+              ),
+              tooltip: 'Verifying Devices',
+              onPressed: () {
+                _verifiers = Navigator.of(context).push(
+                  HeroDialogRoute(
+                    builder: (BuildContext context) => Center(
+                      child: DevicesCheckListPicker(
+                        areGenerators: false,
+                        onDevicesSelected: (value) {
+                          // find the value in the list and remove it otherwise add it
+                          if (!_verifiers.remove(value)) {
+                            _verifiers.add(value);
+                          }
+                        },
+                      ),
+                    ),
+                    settings: const RouteSettings(name: 'VerifyingDevicesView'),
+                  ),
+                ) as List<String>;
+                print(_verifiers);
+              },
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of verifiers';
-              }
-              return null;
-            },
-            onSaved: (value) {
-              streamEntry.verifiersIds = value!.split(', ');
-            },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -408,16 +533,18 @@ class _AddStreamViewState extends State<AddStreamView>
             decoration: const InputDecoration(
               labelText: 'ID',
               hintText: '3 characters',
+              icon: Icon(Icons.qr_code),
             ),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'\w')),
+            ],
             validator: (value) {
               if (!RegExp(r'^\w{3}$').hasMatch(value!)) {
                 return 'Please enter a valid ID';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.streamId = value!;
-            },
+            controller: _idController,
           ),
         ),
         const VerticalDivider(),
@@ -427,6 +554,7 @@ class _AddStreamViewState extends State<AddStreamView>
             maxLength: 50,
             decoration: const InputDecoration(
               labelText: 'Name',
+              hintText: 'Name of the stream',
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -434,9 +562,7 @@ class _AddStreamViewState extends State<AddStreamView>
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.name = value!;
-            },
+            controller: _nameController,
           ),
         ),
       ],
@@ -449,6 +575,8 @@ class _AddStreamViewState extends State<AddStreamView>
       maxLines: 1,
       decoration: const InputDecoration(
         labelText: 'Description',
+        hintText: 'Description of the stream',
+        icon: Icon(Icons.description),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -456,9 +584,7 @@ class _AddStreamViewState extends State<AddStreamView>
         }
         return null;
       },
-      onSaved: (value) {
-        streamEntry.description = value!;
-      },
+      controller: _descriptionController,
     );
   }
 
@@ -473,17 +599,19 @@ class _AddStreamViewState extends State<AddStreamView>
             decoration: const InputDecoration(
               labelText: 'Delay',
               hintText: 'In milliseconds',
+              icon: Icon(Icons.timer),
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is! UnsignedLong) {
                 return 'Please enter a valid delay time';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.delay = value! as UnsignedLong;
-            },
+            controller: _delayController,
           ),
         ),
         const VerticalDivider(),
@@ -496,15 +624,16 @@ class _AddStreamViewState extends State<AddStreamView>
               hintText: 'In milliseconds',
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is! UnsignedLong) {
                 return 'Please enter a valid time to live';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.timeToLive = value! as UnsignedLong;
-            },
+            controller: _timeToLiveController,
           ),
         ),
         const VerticalDivider(),
@@ -517,15 +646,16 @@ class _AddStreamViewState extends State<AddStreamView>
               hintText: 'In milliseconds',
             ),
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
             validator: (value) {
               if (value is! UnsignedLong) {
                 return 'Please enter a valid inter frame gap';
               }
               return null;
             },
-            onSaved: (value) {
-              streamEntry.interFrameGap = value! as UnsignedLong;
-            },
+            controller: _interFrameGapController,
           ),
         ),
       ],
@@ -551,13 +681,16 @@ class _AddStreamViewState extends State<AddStreamView>
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
             onPressed: () {
+              _addStream();
               Navigator.pop(context);
             },
           ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.plus),
             color: Colors.greenAccent,
-            onPressed: () {},
+            onPressed: () {
+              _addStream();
+            },
           ),
         ],
       ),
@@ -576,134 +709,5 @@ class _AddPresetStreamState extends State<AddPresetStream> {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Add Preset Stream'));
-  }
-}
-
-class VerifyingDevicesDrawer extends StatefulWidget {
-  const VerifyingDevicesDrawer({super.key});
-
-  @override
-  State<VerifyingDevicesDrawer> createState() => _VerifyingDevicesDrawerState();
-}
-
-// TODO: Make the DevicesDrawer a CardView and add the devices list view to it
-// This should override the DeviceGridCardView to one that can mark each card to either be a generator or a verifier for the stream or both (if the device is a generator and a verifier)
-class _VerifyingDevicesDrawerState extends State<VerifyingDevicesDrawer> {
-  @override
-  Widget build(BuildContext context) {
-    return Hero(
-      tag: 'verifyingDevices',
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: Drawer(
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(15),
-            topLeft: Radius.circular(15),
-          ),
-        ),
-        width: MediaQuery.of(context).size.width * 0.25,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            leading: IconButton(
-              icon: const Icon(MaterialCommunityIcons.progress_check,
-                  semanticLabel: 'Devices'),
-              color: downloadColor,
-              tooltip: 'Verifying Devices',
-              onPressed: () {},
-            ),
-            actions: [
-              // TODO: Add a search bar to search for devices
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.magnifyingGlass,
-                    size: 20, semanticLabel: 'Search Devices'),
-                tooltip: 'Search',
-                onPressed: () {},
-              ),
-              // TODO: Add a button to sync the devices list
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.arrowsRotate,
-                    size: 20, semanticLabel: 'Sync Devices'),
-                tooltip: 'Sync',
-                onPressed: () {},
-              ),
-            ],
-          ),
-          // each device should be a card view with a checkbox to select the device as a generator or a verifier or both (if the device is a generator and a verifier)
-          body: const Center(child: Text('Devices Drawer')),
-        ),
-      ),
-    );
-  }
-}
-
-class GeneratingDevicesDrawer extends StatefulWidget {
-  const GeneratingDevicesDrawer({super.key});
-
-  @override
-  State<GeneratingDevicesDrawer> createState() =>
-      _GeneratingDevicesDrawerState();
-}
-
-// TODO: Make the DevicesDrawer a CardView and add the devices list view to it
-// This should override the DeviceGridCardView to one that can mark each card to either be a generator or a verifier for the stream or both (if the device is a generator and a verifier)
-class _GeneratingDevicesDrawerState extends State<GeneratingDevicesDrawer> {
-  @override
-  Widget build(BuildContext context) {
-    return Hero(
-      tag: 'generatingDevices',
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: Drawer(
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topRight: Radius.circular(15),
-            bottomRight: Radius.circular(15),
-          ),
-        ),
-        width: MediaQuery.of(context).size.width * 0.25,
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            leading: IconButton(
-              icon: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.rotationY(pi),
-                child: const Icon(MaterialCommunityIcons.progress_upload,
-                    semanticLabel: 'Devices'),
-              ),
-              color: uploadColor,
-              tooltip: 'Generating Devices',
-              onPressed: () {},
-            ),
-            actions: [
-              // TODO: Add a search bar to search for devices
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.magnifyingGlass,
-                    size: 20, semanticLabel: 'Search Devices'),
-                tooltip: 'Search',
-                onPressed: () {},
-              ),
-              // TODO: Add a button to sync the devices list
-              IconButton(
-                icon: const FaIcon(FontAwesomeIcons.arrowsRotate,
-                    size: 20, semanticLabel: 'Sync Devices'),
-                tooltip: 'Sync',
-                onPressed: () {},
-              ),
-            ],
-          ),
-          // each device should be a card view with a checkbox to select the device as a generator or a verifier or both (if the device is a generator and a verifier)
-          body: const Center(child: Text('Devices Drawer')),
-        ),
-      ),
-    );
   }
 }

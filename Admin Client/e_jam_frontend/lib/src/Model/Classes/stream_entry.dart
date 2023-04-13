@@ -8,9 +8,9 @@ class StreamEntry {
   StreamEntry({
     required this.name,
     required this.description,
-    required this.lastUpdated,
-    required this.startTime,
-    required this.endTime,
+    this.lastUpdated,
+    this.startTime,
+    this.endTime,
     required this.delay,
     required this.streamId,
     required this.generatorsIds,
@@ -32,27 +32,53 @@ class StreamEntry {
     required this.streamStatus,
   });
 
-  late final String name;
-  late final String description;
-  final DateTime lastUpdated;
-  final DateTime startTime;
-  final DateTime endTime;
-  late final UnsignedLong delay;
-  late final String streamId;
-  late final List<String> generatorsIds;
-  late final List<String> verifiersIds;
-  late final UnsignedShort payloadType;
-  late final UnsignedLong burstLength;
-  late final UnsignedLong burstDelay;
-  late final UnsignedLong numberOfPackets;
-  late final UnsignedShort payloadLength;
-  late final UnsignedLong seed;
-  late final UnsignedLong broadcastFrames;
-  late final UnsignedLong interFrameGap;
-  late final UnsignedLong timeToLive;
-  late final TransportLayerProtocol transportLayerProtocol;
-  late final FlowType flowType;
-  late final bool checkContent;
+  const StreamEntry.empty()
+      : name = "",
+        description = "",
+        lastUpdated = null,
+        startTime = null,
+        endTime = null,
+        delay = 0,
+        streamId = "",
+        generatorsIds = const [],
+        verifiersIds = const [],
+        payloadType = 0,
+        burstLength = 0,
+        burstDelay = 0,
+        numberOfPackets = 0,
+        payloadLength = 0,
+        seed = 0,
+        broadcastFrames = 0,
+        interFrameGap = 0,
+        timeToLive = 0,
+        transportLayerProtocol = TransportLayerProtocol.tcp,
+        flowType = FlowType.backToBack,
+        checkContent = false,
+        runningGenerators = const Process.empty(),
+        runningVerifiers = const Process.empty(),
+        streamStatus = StreamStatus.created;
+
+  final String name;
+  final String description;
+  final DateTime? lastUpdated;
+  final DateTime? startTime;
+  final DateTime? endTime;
+  final int delay;
+  final String streamId;
+  final List<String> generatorsIds;
+  final List<String> verifiersIds;
+  final int payloadType;
+  final int burstLength;
+  final int burstDelay;
+  final int numberOfPackets;
+  final int payloadLength;
+  final int seed;
+  final int broadcastFrames;
+  final int interFrameGap;
+  final int timeToLive;
+  final TransportLayerProtocol transportLayerProtocol;
+  final FlowType flowType;
+  final bool checkContent;
   final Process runningGenerators;
   final Process runningVerifiers;
   final StreamStatus streamStatus;
@@ -130,7 +156,9 @@ class Process {
     required this.processes,
   });
 
-  late Map<String, ProcessStatus> processes;
+  const Process.empty() : processes = const {};
+
+  final Map<String, ProcessStatus> processes;
 
   factory Process.fromRawJson(String str) => Process.fromJson(json.decode(str));
 

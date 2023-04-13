@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:e_jam/main.dart';
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -38,11 +39,10 @@ class _StreamsListViewState extends State<StreamsListView> {
 
     StreamsController.loadAllStreamStatus(scaffoldMessenger).then(
       (value) => {
-        if (mounted)
-          setState(() {
-            streams = controllerStreamsStatusDetails;
-            isStreamListLoading = controllerIsStreamListLoading;
-          })
+        setState(() {
+          streams = controllerStreamsStatusDetails;
+          isStreamListLoading = controllerIsStreamListLoading;
+        })
       },
     );
   }
@@ -584,6 +584,8 @@ class _StatusIconButtonState extends State<StatusIconButton> {
 
   IconData getIcon(StreamStatus status) {
     switch (status) {
+      case StreamStatus.sent:
+        return Icons.arrow_upward;
       case StreamStatus.running:
         return MaterialCommunityIcons.star_four_points;
       case StreamStatus.stopped:

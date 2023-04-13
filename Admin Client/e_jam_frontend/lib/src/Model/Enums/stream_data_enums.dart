@@ -1,5 +1,6 @@
 enum StreamStatus {
   created,
+  sent,
   queued,
   running,
   finished,
@@ -13,7 +14,7 @@ StreamStatus streamStatusFromString(String status) {
     case 'Created':
       return StreamStatus.created;
     case 'Sent':
-      return StreamStatus.queued;
+      return StreamStatus.sent;
     case 'Queued':
       return StreamStatus.queued;
     case 'Running':
@@ -35,6 +36,8 @@ String streamStatusToString(StreamStatus streamStatus) {
       return 'Created';
     case StreamStatus.queued:
       return 'Queued';
+    case StreamStatus.sent:
+      return 'Sent';
     case StreamStatus.running:
       return 'Running';
     case StreamStatus.finished:
