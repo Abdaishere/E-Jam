@@ -17,7 +17,7 @@ pub fn run_generator_consumer() {
     let mut consumer: Consumer = loop {
         match Consumer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
             .with_topic("Generator".to_owned())
-            .with_fallback_offset(FetchOffset::Latest)
+            .with_fallback_offset(FetchOffset::Earliest)
             .create()
         {
             Ok(v) => break v,
@@ -73,13 +73,13 @@ pub fn run_generator_consumer() {
 
 pub fn run_verifier_consumer() {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
-    let sr_settings = SrSettings::new(format!("http://{}", schema_registry_url));
+    let sr_settings = SrSettings::new(schema_registry_url);
     let decoder = AvroDecoder::new(sr_settings);
 
     let mut consumer: Consumer = loop {
         match Consumer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
             .with_topic("Verifier".to_owned())
-            .with_fallback_offset(FetchOffset::Latest)
+            .with_fallback_offset(FetchOffset::Earliest)
             .create()
         {
             Ok(v) => break v,

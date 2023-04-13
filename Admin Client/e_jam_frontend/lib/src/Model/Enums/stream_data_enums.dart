@@ -12,6 +12,8 @@ StreamStatus streamStatusFromString(String status) {
   switch (status) {
     case 'Created':
       return StreamStatus.created;
+    case 'Sent':
+      return StreamStatus.queued;
     case 'Queued':
       return StreamStatus.queued;
     case 'Running':

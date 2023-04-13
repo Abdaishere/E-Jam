@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "E-Jam API",
-    "dateExported": "2023-04-12T20:09:26.896Z",
+    "dateExported": "2023-04-13T10:20:27.680Z",
     "version": "1.1",
     "folders": [],
     "requests": [
@@ -38,11 +38,11 @@
             "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
             "containerId": "",
             "name": "add device",
-            "url": "http://localhost:8080/devices",
+            "url": "http://localhost:8080/devices/ping",
             "method": "POST",
             "sortNum": 15000,
             "created": "2023-04-10T09:03:50.795Z",
-            "modified": "2023-04-12T11:34:12.640Z",
+            "modified": "2023-04-13T09:48:31.899Z",
             "headers": [],
             "params": [],
             "body": {
@@ -224,6 +224,20 @@
                 "raw": "{\n  \"stream_id\" : \"000\",\n  \"delay\": 100,\n  \"generators\": [\"4214\"],\n  \"verifiers\": [\"42242\"],\n  \"payload_type\": 1,\n  \"number_of_packets\": 144,\n  \"payload_length\": 123,\n  \"seed\": 000,\n  \"broadcast_frames\": 1200,\n  \"inter_frame_gap\": 23,\n  \"time_to_live\": 11,\n  \"transport_layer_protocol\": 0,\n  \"flow_type\": 1,\n  \"check_content\": 1\n}",
                 "form": []
             },
+            "tests": []
+        },
+        {
+            "_id": "01c14ff2-6eb5-4014-88fb-abfaddf01ae7",
+            "colId": "84c90d4a-d685-4a5a-b798-a1207b531698",
+            "containerId": "",
+            "name": "Check Schemas",
+            "url": "http://localhost:8081/schemas",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2023-04-13T10:20:02.759Z",
+            "modified": "2023-04-13T10:20:22.201Z",
+            "headers": [],
+            "params": [],
             "tests": []
         }
     ],

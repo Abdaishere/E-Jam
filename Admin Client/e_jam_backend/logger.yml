@@ -24,9 +24,18 @@ appenders:
     path: logs/strong_level/strong_level.log
     encoder:
       pattern: "{d(%Y-%m-%d %H:%M:%S)} | {({l}):5.5} | {f}:{L} — {m}{n}"
+    policy:
+      trigger:
+        kind: size
+        limit: 30 mb
+      roller:
+        kind: fixed_window
+        pattern: logs/strong_level/strong_level_{}.gz
+        count: 5
+        base: 1
 
 root:
-  level: debug
+  level: warn
   appenders:
     - stdout
     - step_ap
@@ -38,6 +47,6 @@ loggers:
       - step_ap
       
   strong_level:
-    level: debug
+    level: error
     appenders:
       - strong_level_ap
