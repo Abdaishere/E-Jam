@@ -17,8 +17,9 @@ import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 
 // TODO: Make the AddStreamView a CardView
 class AddStreamView extends StatefulWidget {
-  const AddStreamView({super.key});
+  const AddStreamView({super.key, required this.reload});
 
+  final Function() reload;
   @override
   State<AddStreamView> createState() => _AddStreamViewState();
 }
@@ -464,12 +465,12 @@ class _AddStreamViewState extends State<AddStreamView>
               tooltip: 'Generating Devices',
               onPressed: () {
                 Navigator.of(context).push(
-                  HeroDialogRoute(
+                  DialogRoute(
+                    context: context,
                     builder: (BuildContext context) => Center(
                       child: DevicesCheckListPicker(
                         areGenerators: true,
                         onDevicesSelected: (value) {
-                          // find the value in the list and remove it otherwise add it
                           if (!_generators.remove(value)) {
                             _generators.add(value);
                           }
@@ -480,7 +481,6 @@ class _AddStreamViewState extends State<AddStreamView>
                         const RouteSettings(name: 'GeneratingDevicesView'),
                   ),
                 );
-                print(_generators);
               },
             ),
           ),
@@ -497,12 +497,12 @@ class _AddStreamViewState extends State<AddStreamView>
               tooltip: 'Verifying Devices',
               onPressed: () {
                 _verifiers = Navigator.of(context).push(
-                  HeroDialogRoute(
+                  DialogRoute(
+                    context: context,
                     builder: (BuildContext context) => Center(
                       child: DevicesCheckListPicker(
                         areGenerators: false,
                         onDevicesSelected: (value) {
-                          // find the value in the list and remove it otherwise add it
                           if (!_verifiers.remove(value)) {
                             _verifiers.add(value);
                           }
@@ -512,7 +512,6 @@ class _AddStreamViewState extends State<AddStreamView>
                     settings: const RouteSettings(name: 'VerifyingDevicesView'),
                   ),
                 ) as List<String>;
-                print(_verifiers);
               },
             ),
           ),

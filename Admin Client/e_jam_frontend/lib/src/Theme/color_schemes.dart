@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ const streamStoppedColor = Colors.redAccent; // stop button pressed
 const streamErrorColor = Colors.red; // any error
 const streamFinishedColor = Colors.blueAccent; // finished successfully
 
-Color streamColor(StreamStatus status) {
+Color streamColorScheme(StreamStatus status) {
   switch (status) {
     case StreamStatus.created:
       return streamCreatedColor;
@@ -42,6 +43,21 @@ Color streamColor(StreamStatus status) {
 const deviceRunningOrOnlineColor = Color(0xFF3dcc77); // online
 const deviceIdleColor = Colors.orangeAccent; // idle
 const deviceOfflineOrErrorColor = Color(0xFFe34845); // offline or error
+
+Color deviceColorScheme(DeviceStatus status) {
+  switch (status) {
+    case DeviceStatus.running:
+      return deviceRunningOrOnlineColor;
+    case DeviceStatus.online:
+      return deviceRunningOrOnlineColor;
+    case DeviceStatus.idle:
+      return deviceIdleColor;
+    case DeviceStatus.offline:
+      return deviceOfflineOrErrorColor;
+    default:
+      return deviceOfflineOrErrorColor;
+  }
+}
 
 final gradientColorLight = [
   const Color.fromARGB(255, 253, 209, 146),

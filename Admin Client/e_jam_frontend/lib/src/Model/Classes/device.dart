@@ -23,10 +23,10 @@ class Device {
   final String location;
   final DateTime lastUpdated;
   final String ipAddress;
-  final UnsignedInt port;
+  final int port;
   final String macAddress;
-  final UnsignedInt genProcesses;
-  final UnsignedInt verProcesses;
+  final int genProcesses;
+  final int verProcesses;
   final DeviceStatus status;
 
   factory Device.fromRawJson(String str) => Device.fromJson(json.decode(str));

@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class AddDeviceView extends StatefulWidget {
-  const AddDeviceView({super.key, required this.reload});
+class EditDeviceView extends StatefulWidget {
+  const EditDeviceView({super.key, required this.mac, required this.refresh});
 
-  final Function reload;
+  final String mac;
+  final Function refresh;
   @override
-  State<AddDeviceView> createState() => _AddDeviceViewState();
+  State<EditDeviceView> createState() => _EditDeviceViewState();
 }
 
-class _AddDeviceViewState extends State<AddDeviceView> {
+class _EditDeviceViewState extends State<EditDeviceView> {
   @override
   Widget build(BuildContext context) {
     return Hero(

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
@@ -9,19 +10,19 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class DevicesDetailsView extends StatefulWidget {
-  const DevicesDetailsView(this.index, {super.key});
+  const DevicesDetailsView({super.key, required this.device});
 
-  final int index;
+  final Device device;
   @override
   State<DevicesDetailsView> createState() => _DevicesDetailsViewState();
 }
 
 class _DevicesDetailsViewState extends State<DevicesDetailsView> {
-  get index => widget.index;
+  Device get device => widget.device;
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: 'device$index',
+      tag: device.macAddress,
       createRectTween: (begin, end) =>
           CustomRectTween(begin: begin!, end: end!),
       child: SizedBox(
@@ -38,7 +39,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           child: Scaffold(
             appBar: AppBar(
               title: Text(
-                'Device $index',
+                'Device ${device.name}',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -74,18 +75,18 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               children: [
                 Expanded(
                   flex: 3,
-                  child: DeviceGraph(index),
+                  child: DeviceGraph(0),
                 ),
                 Expanded(
                   flex: 3,
-                  child: DeviceFieldsDetails(index),
+                  child: DeviceFieldsDetails(0),
                 ),
                 const Divider(
                   thickness: 2,
                   indent: 10,
                   endIndent: 10,
                 ),
-                ProgressDeviceDetails(index),
+                ProgressDeviceDetails(0),
                 const SizedBox(height: 10),
               ],
             ),

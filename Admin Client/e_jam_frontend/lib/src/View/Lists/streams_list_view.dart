@@ -56,7 +56,7 @@ class _StreamsListViewState extends State<StreamsListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: streamListViewAppBar(),
+      appBar: streamsListViewAppBar(),
       body: Stack(
         children: [
           Visibility(
@@ -128,7 +128,11 @@ class _StreamsListViewState extends State<StreamsListView> {
             child: Container(
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
-              child: const AddStreamButton(),
+              child: AddStreamButton(
+                reload: () {
+                  loadStreamView();
+                },
+              ),
             ),
           ),
         ],
@@ -136,7 +140,7 @@ class _StreamsListViewState extends State<StreamsListView> {
     );
   }
 
-  AppBar streamListViewAppBar() {
+  AppBar streamsListViewAppBar() {
     return AppBar(
       title: const Text(
         'Streams',
@@ -172,8 +176,9 @@ class _StreamsListViewState extends State<StreamsListView> {
 }
 
 class AddStreamButton extends StatelessWidget {
-  const AddStreamButton({Key? key}) : super(key: key);
+  const AddStreamButton({Key? key, required this.reload}) : super(key: key);
 
+  final Function() reload;
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -184,8 +189,8 @@ class AddStreamButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).push(
           HeroDialogRoute(
-            builder: (BuildContext context) => const Center(
-              child: AddStreamView(),
+            builder: (BuildContext context) => Center(
+              child: AddStreamView(reload: () => reload()),
             ),
             settings: const RouteSettings(name: 'AddStreamView'),
           ),
@@ -351,6 +356,9 @@ class _StreamCardState extends State<StreamCard> {
                   child: const Text('Delete'),
                 ),
               ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
             ),
           );
         } else if (value == 'Edit') {
@@ -471,8 +479,8 @@ class MiniProgressBar extends StatelessWidget {
       child: LinearProgressIndicator(
         minHeight: 5.0,
         value: getStreamProgress(),
-        backgroundColor: streamColor(status).withAlpha(100),
-        valueColor: AlwaysStoppedAnimation<Color>(streamColor(status)),
+        backgroundColor: streamColorScheme(status).withAlpha(100),
+        valueColor: AlwaysStoppedAnimation<Color>(streamColorScheme(status)),
       ),
     );
   }
@@ -488,7 +496,7 @@ class MiniProgressBar extends StatelessWidget {
   }
 }
 
-class StatusIconButton extends StatefulWidget {
+class StatusIconButton extends StatelessWidget {
   const StatusIconButton(
       {super.key,
       required this.status,
@@ -500,12 +508,7 @@ class StatusIconButton extends StatefulWidget {
   final String id;
   final DateTime lastUpdated;
   final Function refresh;
-  @override
-  State<StatusIconButton> createState() => _StatusIconButtonState();
-}
 
-class _StatusIconButtonState extends State<StatusIconButton> {
-  get status => widget.status;
   @override
   Widget build(BuildContext context) {
     if (status == StreamStatus.created) {
@@ -513,7 +516,7 @@ class _StatusIconButtonState extends State<StatusIconButton> {
         tooltip: 'New Stream',
         icon: FaIcon(
           Icons.new_releases,
-          color: streamColor(status),
+          color: streamColorScheme(status),
           size: 20.0,
         ),
         onPressed: () {
@@ -523,18 +526,18 @@ class _StatusIconButtonState extends State<StatusIconButton> {
     } else {
       return IconButton(
         tooltip:
-            '${streamStatusToString(status)}: ${timeago.format(widget.lastUpdated)}',
+            '${streamStatusToString(status)}: ${timeago.format(lastUpdated)}',
         icon: FaIcon(
           getIcon(status),
-          color: streamColor(status),
+          color: streamColorScheme(status),
           size: 20.0,
         ),
         onPressed: () {
           showDialog(
             context: context,
             builder: (BuildContext context) => AlertDialog(
-              title: Text(streamStatusToString(status)),
-              content: Text('Last updated: ${widget.lastUpdated}'),
+              title: Text('Stream is ${streamStatusToString(status)}'),
+              content: Text('Last updated: $lastUpdated'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -543,6 +546,9 @@ class _StatusIconButtonState extends State<StatusIconButton> {
                   child: const Text('Close'),
                 ),
               ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
             ),
           );
         },
@@ -566,11 +572,10 @@ class _StatusIconButtonState extends State<StatusIconButton> {
           ),
           TextButton(
             onPressed: () {
-              StreamsController.startStream(
-                      ScaffoldMessenger.of(context), widget.id)
+              StreamsController.startStream(ScaffoldMessenger.of(context), id)
                   .then((success) {
                 if (success) {
-                  widget.refresh();
+                  refresh();
                 }
               });
               Navigator.of(context).pop();
@@ -578,6 +583,9 @@ class _StatusIconButtonState extends State<StatusIconButton> {
             child: const Text('Start'),
           ),
         ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
       ),
     );
   }

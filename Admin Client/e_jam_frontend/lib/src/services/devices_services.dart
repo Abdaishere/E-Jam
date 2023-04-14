@@ -56,7 +56,7 @@ class DevicesServices {
     }
   }
 
-  Future<bool> addDevice(
+  Future<bool> createDevice(
       ScaffoldMessengerState scaffoldMessenger, Device device) async {
     try {
       final response = await client.post(uri,
@@ -139,9 +139,9 @@ class DevicesServices {
   }
 
   // ping all devices
-  Future<bool> pingAllDevice(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<bool> pingAllDevices(ScaffoldMessengerState scaffoldMessenger) async {
     try {
-      final response = await client.get(Uri.parse('$uri/ping'));
+      final response = await client.get(Uri.parse('$uri/ping_all'));
       if (response.statusCode == 200) {
         SnacksBar.showSuccessSnack(
             scaffoldMessenger, response.body.toString(), 'All Devices Pinged');
