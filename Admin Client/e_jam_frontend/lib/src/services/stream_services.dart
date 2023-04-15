@@ -342,7 +342,7 @@ class StreamServices {
   Future<List<StreamStatusDetails>?> getAllStreamStatus(
       ScaffoldMessengerState scaffoldMessenger) async {
     try {
-      final response = await client.get(Uri.parse('${uri}_status'));
+      final response = await client.get(Uri.parse('$uri/status_all'));
       if (200 == response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => StreamStatusDetails.fromJson(e))

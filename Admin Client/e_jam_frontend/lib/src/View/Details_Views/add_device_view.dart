@@ -1,4 +1,5 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
@@ -24,7 +25,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController =
-      TextEditingController(text: "8000");
+      TextEditingController(text: NetworkController.defaultDevicesPort);
   final TextEditingController _macController = TextEditingController();
   Color _topBarIndicator = Colors.transparent;
   bool? _isPinged;

@@ -1,11 +1,11 @@
-use log::{error, info, warn, debug};
 use super::models::{AppState, StreamEntry, StreamStatus};
 use crate::models::{device::get_devices_table, stream_details::StreamStatusDetails};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use log::{debug, error, info, warn};
 
+pub(crate) mod consumer;
 mod device;
 mod pre_sets;
-pub(crate) mod consumer;
 
 use self::device::{
     add_device, check_new_device, delete_device, get_device, get_devices, ping_all_devices,
@@ -686,7 +686,7 @@ if the stream is not found, return a 404 Not Found
 * `data` - the app state data for the streams
 ## Returns
 * `HttpResponse` - the http response with a list of tuples of the stream status and the stream id"]
-#[get("streams_status")]
+#[get("/streams/status_all")]
 async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
     let streams_entries = data
         .streams_entries
@@ -711,6 +711,10 @@ init all the routes for the server"]
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config
         .service(index)
+        .service(get_all_streams_status)
+        .service(start_all_streams)
+        .service(stop_all_streams)
+        .service(ping_all_devices)
         .service(get_streams)
         .service(get_stream)
         .service(post_stream)
@@ -718,12 +722,9 @@ pub fn init_routes(config: &mut web::ServiceConfig) {
         .service(update_stream)
         .service(start_stream)
         .service(force_start_stream)
-        .service(start_all_streams)
         .service(stop_stream)
-        .service(stop_all_streams)
         .service(force_stop_stream)
         .service(get_stream_status)
-        .service(get_all_streams_status)
         .service(stream_started)
         .service(get_devices)
         .service(get_device)
@@ -732,6 +733,5 @@ pub fn init_routes(config: &mut web::ServiceConfig) {
         .service(delete_device)
         .service(stream_finished)
         .service(ping_device)
-        .service(ping_all_devices)
         .service(check_new_device);
 }

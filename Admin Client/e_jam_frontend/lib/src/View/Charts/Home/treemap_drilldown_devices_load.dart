@@ -4,16 +4,16 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:syncfusion_flutter_treemap/treemap.dart';
 
 // should include all the devices and their streams and the total packets (uploaded and downloaded) of each stream in the device
-class TreeMapDrilldownDevicesLoad extends StatefulWidget {
-  const TreeMapDrilldownDevicesLoad({super.key});
+class TreeMapDrillDownDevicesLoad extends StatefulWidget {
+  const TreeMapDrillDownDevicesLoad({super.key});
 
   @override
-  State<TreeMapDrilldownDevicesLoad> createState() =>
-      _TreeMapDrilldownDevicesLoadState();
+  State<TreeMapDrillDownDevicesLoad> createState() =>
+      _TreeMapDrillDownDevicesLoadState();
 }
 
-class _TreeMapDrilldownDevicesLoadState
-    extends State<TreeMapDrilldownDevicesLoad> {
+class _TreeMapDrillDownDevicesLoadState
+    extends State<TreeMapDrillDownDevicesLoad> {
   late List<DeviceInfo> _source;
   late Map<String, Color> _colors;
 

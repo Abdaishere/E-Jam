@@ -50,6 +50,8 @@ dependencies:
   awesome_snackbar_content: ^0.1.2
   timeago: ^3.3.0
   flutter_picker: ^2.1.0
+  ping_discover_network_forked: ^0.0.1
+  circular_motion: ^0.0.3
   
 
 dev_dependencies:

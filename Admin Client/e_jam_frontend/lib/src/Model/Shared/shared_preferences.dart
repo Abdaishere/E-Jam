@@ -44,4 +44,6 @@ class ThemePreferences {
 class NetworkController {
   static const backendhostaddress = 'http://localhost:8080';
   static var client = http.Client();
+  static String defaultDevicesPort = "8000";
+  static String defaultSystemApiSubnet = "192.168.0";
 }

@@ -9,6 +9,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_device_view.dart';
+import 'package:e_jam/src/View/devices_radar_card_view.dart';
 import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -27,20 +28,23 @@ class _DevicesListViewState extends State<DevicesListView> {
   get scaffoldMessenger => ScaffoldMessenger.of(context);
   get controllerDeviceDetails => DevicesController.devices;
   get controllerIsDeviceListLoading => DevicesController.isLoading;
+  bool macIsShown = false;
+  bool? _isPinged;
+  bool _isPinging = false;
 
   List<Device>? devices;
-  bool isDeviceListLoading = true;
+  bool _isDeviceListLoading = true;
 
   void loadDevicesListView() async {
     setState(() {
-      isDeviceListLoading = true;
+      _isDeviceListLoading = true;
     });
 
     DevicesController.loadAllDevices(scaffoldMessenger).then(
       (value) => {
         setState(() {
           devices = controllerDeviceDetails;
-          isDeviceListLoading = controllerIsDeviceListLoading;
+          _isDeviceListLoading = controllerIsDeviceListLoading;
         })
       },
     );
@@ -59,7 +63,7 @@ class _DevicesListViewState extends State<DevicesListView> {
       body: Stack(
         children: [
           Visibility(
-            visible: !isDeviceListLoading,
+            visible: !_isDeviceListLoading,
             replacement: Center(
               child: LoadingAnimationWidget.threeArchedCircle(
                 color: Colors.grey,
@@ -151,23 +155,101 @@ class _DevicesListViewState extends State<DevicesListView> {
       centerTitle: true,
       leading: const DrawerWidget(),
       actions: <Widget>[
-        // refresh icon for refreshing the Devices list view
+        Hero(
+          tag: 'radar',
+          createRectTween: (begin, end) {
+            return CustomRectTween(begin: begin!, end: end!);
+          },
+          child: IconButton(
+            icon: const Icon(
+              MaterialCommunityIcons.radar,
+              size: 20,
+            ),
+            color: Colors.lime,
+            tooltip: 'Radar',
+            onPressed: () {
+              Navigator.of(context).push(
+                HeroDialogRoute(
+                  builder: (BuildContext context) => Center(
+                    child: DevicesRadarCardView(
+                      loadDevicesListView: loadDevicesListView,
+                    ),
+                  ),
+                  settings: const RouteSettings(name: 'EditDeviceView'),
+                ),
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: Visibility(
+            visible: !_isPinging,
+            replacement: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: LoadingAnimationWidget.beat(
+                color: Colors.lightBlue,
+                size: 20.0,
+              ),
+            ),
+            child: IconButton(
+              icon: const Icon(
+                MaterialCommunityIcons.wifi_sync,
+                size: 20,
+              ),
+              onPressed: () async {
+                setState(() {
+                  _isPinging = true;
+                });
+                await DevicesController.pingAllDevices(scaffoldMessenger).then(
+                  (value) => {
+                    _isPinging = false,
+                    if (value == null)
+                      {
+                        setState(() {
+                          _isPinged = null;
+                        })
+                      }
+                    else if (value == true)
+                      setState(() {
+                        _isPinged = true;
+                        loadDevicesListView();
+                      })
+                    else
+                      setState(() {
+                        _isPinged = false;
+                      })
+                  },
+                );
+              },
+              tooltip: _isPinged == null
+                  ? 'Ping Device'
+                  : _isPinged!
+                      ? 'Device is Online'
+                      : 'Device is Offline',
+              color: _isPinged == null
+                  ? Colors.lightBlueAccent
+                  : _isPinged!
+                      ? deviceRunningOrOnlineColor
+                      : deviceOfflineOrErrorColor,
+            ),
+          ),
+        ),
         IconButton(
-          icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
+          icon: FaIcon(
+            FontAwesomeIcons.arrowsRotate,
+            color: _isDeviceListLoading ? Colors.blueGrey : null,
+            size: 20.0,
+          ),
+          tooltip: 'Refresh',
           onPressed: () {
             loadDevicesListView();
           },
         ),
-        // gear icon for settings and preferences related to the Devices list view (sort by, filter by, etc.)
-        IconButton(
-          icon: const FaIcon(FontAwesomeIcons.gear, size: 20.0),
-          onPressed: () {
-            // TODO: Add a dialog box for settings and preferences related to the Devices list view (sort by, filter by, etc.)
-          },
-        ),
-        // Explaination icon for details about how the Device card works and what the icons mean and what the colors mean
+        // Explanation icon for details about how the Device card works and what the icons mean and what the colors mean
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
+          tooltip: 'Help',
           onPressed: () {
             // TODO: Add a dialog box for explaining the Device card
           },

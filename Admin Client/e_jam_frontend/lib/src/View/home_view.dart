@@ -53,7 +53,7 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Column(
           children: [
@@ -66,7 +66,7 @@ class _HomeViewState extends State<HomeView> {
                 )),
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: TreeMapDrilldownDevicesLoad(),
+                  child: TreeMapDrillDownDevicesLoad(),
                 ),
               ),
             ),

@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.2"
+  circular_motion:
+    dependency: "direct main"
+    description:
+      name: circular_motion
+      sha256: c10c3d2b4479475e5f415883578d44953a254706e663255fc8f9e040e54f7193
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   cli_util:
     dependency: transitive
     description:
@@ -405,6 +413,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.0"
+  ping_discover_network_forked:
+    dependency: "direct main"
+    description:
+      name: ping_discover_network_forked
+      sha256: d3975c4f3fbaa388f78fb4037ad9c33059d8e2ec0e804ed45e05277d2451fe77
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   platform:
     dependency: transitive
     description:
