@@ -906,19 +906,16 @@ this will add the stream to the queue
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
         device_list: &Mutex<Vec<Device>>,
-    ) -> usize{
-        // set the stream status to queued
-        self.update_stream_status(StreamStatus::Queued);
-
+    ) -> usize {
         // log the start time
         info!("Stream queued to start in {} seconds", self.delay / 1000);
 
         // send the stream to the client to update the stream status to queued
         let connections = self.send_stream(true, device_list).await;
-
+        
         // add the thread to the queued streams list
         if self.stream_status == StreamStatus::Sent {
-            self.stream_status = StreamStatus::Queued;
+            self.update_stream_status(StreamStatus::Queued);
         queued_streams
             .lock()
             .expect(format!("Error: Failed to lock the queued streams list for adding stream {} to the queue", self.get_stream_id()).as_str())
@@ -964,7 +961,10 @@ and the last updated time is set to the current time all the time
 ## Arguments
 * `status` - the new stream status"]
     fn update_stream_status(&mut self, status: StreamStatus) {
-        self.stream_status = status;
+        if status != self.stream_status {
+            self.stream_status = status;
+            self.last_updated = Utc::now();
+        }
         if self.stream_status == StreamStatus::Running {
             if self.start_time.is_none() {
                 self.start_time = Some(Utc::now());
@@ -977,7 +977,6 @@ and the last updated time is set to the current time all the time
             self.start_time = None;
             self.end_time = None;
         }
-        self.last_updated = Utc::now();
     }
 
     #[doc = r" ## Check Stream Status

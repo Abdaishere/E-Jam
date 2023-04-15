@@ -15,43 +15,33 @@ class DevicesController {
     });
   }
 
-  static Future<Device?> loadDeviceDetails(
-      ScaffoldMessengerState scaffoldMessenger, String mac) async {
+  static Future<Device?> loadDeviceDetails(String mac) async {
     isLoading = true;
-    return devicesServices.getDevice(scaffoldMessenger, mac).then((value) {
+    return devicesServices.getDevice(mac).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool?> createNewDevice(
-      ScaffoldMessengerState scaffoldMessenger, Device device) async {
+  static Future<int> createNewDevice(Device device) async {
     isLoading = true;
-    return devicesServices
-        .createDevice(scaffoldMessenger, device)
-        .then((value) {
+    return devicesServices.createDevice(device).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool?> pingDevice(
-      ScaffoldMessengerState scaffoldMessenger, String deviceMac) {
+  static Future<bool> pingDevice(String deviceMac) {
     isLoading = true;
-    return devicesServices
-        .pingDevice(scaffoldMessenger, deviceMac)
-        .then((value) {
+    return devicesServices.pingDevice(deviceMac).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool?> checkNewDevice(
-      ScaffoldMessengerState scaffoldMessenger, Device device) {
+  static Future<bool> pingNewDevice(Device device) {
     isLoading = true;
-    return devicesServices
-        .checkNewDevice(scaffoldMessenger, device)
-        .then((value) {
+    return devicesServices.checkNewDevice(device).then((value) {
       isLoading = false;
       return value;
     });
@@ -66,23 +56,17 @@ class DevicesController {
     });
   }
 
-  static Future<bool?> updateDevice(
-      ScaffoldMessengerState scaffoldMessenger, Device device) async {
+  static Future<bool?> updateDevice(Device device) async {
     isLoading = true;
-    return devicesServices
-        .updateDevice(scaffoldMessenger, device)
-        .then((value) {
+    return devicesServices.updateDevice(device).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> deleteDevice(
-      ScaffoldMessengerState scaffoldMessenger, String deviceMac) async {
+  static Future<bool> deleteDevice(String deviceMac) async {
     isLoading = true;
-    return devicesServices
-        .deleteDevice(scaffoldMessenger, deviceMac)
-        .then((value) {
+    return devicesServices.deleteDevice(deviceMac).then((value) {
       isLoading = false;
       return value;
     });

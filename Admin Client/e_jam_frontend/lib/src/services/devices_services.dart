@@ -34,106 +34,71 @@ class DevicesServices {
     }
   }
 
-  Future<Device?> getDevice(
-      ScaffoldMessengerState scaffoldMessenger, String deviceMac) async {
+  Future<Device?> getDevice(String deviceMac) async {
     try {
       final response = await client.get(Uri.parse('$uri/$deviceMac'));
       if (response.statusCode == 200) {
         return Device.fromJson(json.decode(response.body));
       } else if (404 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'No Devices Found');
         return null;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return null;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }
 
-  Future<bool> createDevice(
-      ScaffoldMessengerState scaffoldMessenger, Device device) async {
+  Future<int> createDevice(Device device) async {
     try {
       final response = await client.post(uri,
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
-      if (response.statusCode == 201) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Added');
-        return true;
-      } else if (409 == response.statusCode) {
-        SnacksBar.showWarningSnack(scaffoldMessenger, response.body.toString(),
-            'Device Already Exists');
-        return false;
-      } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
-        return false;
-      }
+      // if (response.statusCode == 201) {
+      //   return true;
+      // } else if (409 == response.statusCode) {
+      //   return false;
+      // } else {
+      //   return false;
+      // }
+      return response.statusCode;
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
-      return false;
+      return -1;
     }
   }
 
   // ping a device
-  Future<bool> pingDevice(
-      ScaffoldMessengerState scaffoldMessenger, String deviceMac) async {
+  Future<bool> pingDevice(String deviceMac) async {
     try {
       final response = await client.get(Uri.parse('$uri/$deviceMac/ping'));
       if (response.statusCode == 200) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Pinged');
         return true;
       } else if (404 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Not Found');
         return false;
       } else if (500 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Offline');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> checkNewDevice(
-      ScaffoldMessengerState scaffoldMessenger, Device device) async {
+  Future<bool> checkNewDevice(Device device) async {
     try {
       final response = await client.post(Uri.parse('$uri/ping'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
 
       if (response.statusCode == 200) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Pinged');
         return true;
       } else if (500 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Offline');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
@@ -166,56 +131,36 @@ class DevicesServices {
     }
   }
 
-  Future<bool> updateDevice(
-      ScaffoldMessengerState scaffoldMessenger, Device device) async {
+  Future<bool> updateDevice(Device device) async {
     try {
       final response = await client.put(Uri.parse('$uri/${device.macAddress}'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
       if (response.statusCode == 200) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Updated');
         return true;
       } else if (404 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Not Found');
         return false;
       } else if (400 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Invalid Data');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> deleteDevice(
-      ScaffoldMessengerState scaffoldMessenger, String deviceMac) async {
+  Future<bool> deleteDevice(String deviceMac) async {
     try {
       final response = await client.delete(Uri.parse('$uri/$deviceMac'));
       if (response.statusCode == 200) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Deleted');
         return true;
       } else if (404 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Not Found');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }

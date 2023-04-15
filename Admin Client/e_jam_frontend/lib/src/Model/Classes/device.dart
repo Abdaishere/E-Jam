@@ -9,25 +9,25 @@ class Device {
     required this.name,
     required this.description,
     required this.location,
-    required this.lastUpdated,
+    this.lastUpdated,
     required this.ipAddress,
     required this.port,
     required this.macAddress,
-    required this.genProcesses,
-    required this.verProcesses,
-    required this.status,
+    this.genProcesses,
+    this.verProcesses,
+    this.status,
   });
 
   final String name;
   final String description;
   final String location;
-  final DateTime lastUpdated;
+  final DateTime? lastUpdated;
   final String ipAddress;
   final int port;
   final String macAddress;
-  final int genProcesses;
-  final int verProcesses;
-  final DeviceStatus status;
+  final int? genProcesses;
+  final int? verProcesses;
+  final DeviceStatus? status;
 
   factory Device.fromRawJson(String str) => Device.fromJson(json.decode(str));
 
@@ -52,12 +52,13 @@ class Device {
         "name": name,
         "description": description,
         "location": location,
-        "lastUpdated": lastUpdated,
+        "lastUpdated": lastUpdated ??
+            DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000,
         "ipAddress": ipAddress,
         "port": port,
         "macAddress": macAddress,
-        "genProcesses": genProcesses,
-        "verProcesses": verProcesses,
+        "genProcesses": genProcesses ?? 0,
+        "verProcesses": verProcesses ?? 0,
         "status": deviceStatusToString(status),
       };
 }
@@ -80,11 +81,11 @@ DeviceStatus deviceStatusFromString(String status) {
     case 'Idle':
       return DeviceStatus.idle;
     default:
-      return DeviceStatus.online;
+      return DeviceStatus.offline;
   }
 }
 
-String deviceStatusToString(DeviceStatus status) {
+String deviceStatusToString(DeviceStatus? status) {
   switch (status) {
     case DeviceStatus.offline:
       return 'Offline';
@@ -95,6 +96,6 @@ String deviceStatusToString(DeviceStatus status) {
     case DeviceStatus.idle:
       return 'Idle';
     default:
-      return 'Online';
+      return 'Offline';
   }
 }

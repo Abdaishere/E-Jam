@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
-import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:e_jam/src/services/stream_services.dart';
@@ -87,7 +86,6 @@ class _AddStreamViewState extends State<AddStreamView>
           streamStatus: StreamStatus.created,
         ),
       );
-      Navigator.of(context).pop();
     }
   }
 
@@ -538,7 +536,9 @@ class _AddStreamViewState extends State<AddStreamView>
               FilteringTextInputFormatter.allow(RegExp(r'\w')),
             ],
             validator: (value) {
-              if (!RegExp(r'^\w{3}$').hasMatch(value!)) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter an ID';
+              } else if (!RegExp(r'^\w{3}$').hasMatch(value)) {
                 return 'Please enter a valid ID';
               }
               return null;
@@ -604,12 +604,6 @@ class _AddStreamViewState extends State<AddStreamView>
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.digitsOnly
             ],
-            validator: (value) {
-              if (value is! UnsignedLong) {
-                return 'Please enter a valid delay time';
-              }
-              return null;
-            },
             controller: _delayController,
           ),
         ),

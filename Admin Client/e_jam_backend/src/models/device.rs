@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{sync::Mutex, time::Duration};
 
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
@@ -162,6 +162,8 @@ this function is used to update the device status according to the status of the
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
     pub fn update_device_status(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
+        let prev_status = self.status.clone();
+
         // update the number of processes that are running on the device
         match type_of_process {
             ProcessType::Generation => match status {
@@ -215,8 +217,22 @@ this function is used to update the device status according to the status of the
             _ => self.status = DeviceStatus::Offline,
         }
 
-        self.last_updated = Utc::now();
-        info!("Device {} update status to {:?}", self.get_device_mac(), &self.status);
+        if prev_status != self.status {
+            info!(
+                "Device {} status changed from {:?} to {:?}",
+                self.get_device_mac(),
+                prev_status,
+                self.status
+            );
+            self.last_updated = Utc::now();
+        }
+
+        info!(
+            "Device {} notified status is {:?} since {}",
+            self.get_device_mac(),
+            &self.status,
+            Utc::now() - self.last_updated
+        );
     }
 
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
@@ -307,7 +323,6 @@ this is used to get the device connection address
                 self.clone_ip_address(),
                 self.get_port()
             ))
-            // send the stream details as a json
             .body(
                 serde_json::to_string(&stream_details).expect("Failed to serialize stream details"),
             )
@@ -317,6 +332,7 @@ this is used to get the device connection address
                 "process-type",
                 serde_json::to_string(&process_type).unwrap(),
             )
+            .timeout(Duration::from_secs(10))
             .send()
             .await
     }
@@ -338,6 +354,7 @@ this is used to get the device connection address
                 "process-type",
                 serde_json::to_string(&process_type).unwrap(),
             )
+            .timeout(Duration::from_secs(10))
             .send()
             .await
     }
@@ -349,28 +366,40 @@ this is used to set the device to reachable or unreachable and update the last u
 "]
     pub async fn is_reachable(&mut self) -> bool {
         let reachable = self.ping_device().await;
+        let prev_status = self.status.clone();
         self.status = if reachable {
-            info!("Device {} is reachable after {:?} since {} UTC", self.get_device_mac(), &self.status, self.last_updated);
+            info!(
+                "Device {} is reachable after {:?} since {} UTC",
+                self.get_device_mac(),
+                &self.status,
+                self.last_updated
+            );
             DeviceStatus::Online
         } else {
-
-            info!("Device {} is not reachable after {:?} since {} UTC", self.get_device_mac(), &self.status, self.last_updated);
+            info!(
+                "Device {} is not reachable after {:?} since {} UTC",
+                self.get_device_mac(),
+                &self.status,
+                self.last_updated
+            );
             DeviceStatus::Offline
         };
-        self.last_updated = Utc::now();
+        if prev_status != self.status {
+            self.last_updated = Utc::now();
+        }
         return reachable;
     }
 
     pub async fn ping_device(&self) -> bool {
-
         let url = format!("http://{}:{}/connect", self.ip_address, self.port);
 
         let response = reqwest::Client::new()
             .post(url)
             .header("mac-address", &self.mac_address)
+            .timeout(Duration::from_secs(5))
             .send()
             .await;
-        
+
         match response {
             Ok(_) => true,
             Err(_) => false,

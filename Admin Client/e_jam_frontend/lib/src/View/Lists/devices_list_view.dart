@@ -9,7 +9,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_device_view.dart';
-import 'package:e_jam/src/controller/devives_controller.dart';
+import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -118,7 +118,7 @@ class _DevicesListViewState extends State<DevicesListView> {
                   itemBuilder: (BuildContext context, int index) {
                     return DeviceCard(
                         device: devices![index],
-                        refresh: () {
+                        loadDevicesListView: () {
                           loadDevicesListView();
                         });
                   },
@@ -131,7 +131,7 @@ class _DevicesListViewState extends State<DevicesListView> {
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
               child: AddDeviceButton(
-                reload: () {
+                loadDevicesListView: () {
                   loadDevicesListView();
                 },
               ),
@@ -178,9 +178,9 @@ class _DevicesListViewState extends State<DevicesListView> {
 }
 
 class AddDeviceButton extends StatelessWidget {
-  const AddDeviceButton({super.key, required this.reload});
+  const AddDeviceButton({super.key, required this.loadDevicesListView});
 
-  final Function() reload;
+  final Function() loadDevicesListView;
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -192,8 +192,8 @@ class AddDeviceButton extends StatelessWidget {
         Navigator.of(context).push(
           // Center from here not from the card
           HeroDialogRoute(
-            builder: (BuildContext context) =>
-                Center(child: AddDeviceView(reload: () => reload())),
+            builder: (BuildContext context) => Center(
+                child: AddDeviceView(refresh: () => loadDevicesListView())),
             settings: const RouteSettings(name: 'AddDeviceView'),
           ),
         );
@@ -204,10 +204,11 @@ class AddDeviceButton extends StatelessWidget {
 }
 
 class DeviceCard extends StatefulWidget {
-  const DeviceCard({super.key, required this.device, required this.refresh});
+  const DeviceCard(
+      {super.key, required this.device, required this.loadDevicesListView});
 
   final Device device;
-  final Function() refresh;
+  final Function() loadDevicesListView;
 
   @override
   State<DeviceCard> createState() => _DeviceCardState();
@@ -216,10 +217,8 @@ class DeviceCard extends StatefulWidget {
 class _DeviceCardState extends State<DeviceCard> {
   Device? updateDevice;
 
-  void reload() {
-    DevicesController.loadDeviceDetails(
-            ScaffoldMessenger.of(context), widget.device.macAddress)
-        .then(
+  void refresh() {
+    DevicesController.loadDeviceDetails(widget.device.macAddress).then(
       (value) => {
         setState(() {
           updateDevice = value;
@@ -236,8 +235,11 @@ class _DeviceCardState extends State<DeviceCard> {
       onTap: () {
         Navigator.of(context).push(
           HeroDialogRoute(
-            builder: (BuildContext context) =>
-                Center(child: DevicesDetailsView(device: device)),
+            builder: (BuildContext context) => Center(
+                child: DevicesDetailsView(
+              device: device,
+              loadDevicesListView: () => widget.loadDevicesListView(),
+            )),
             settings: const RouteSettings(name: 'DevicesDetailsView'),
           ),
         );
@@ -256,37 +258,44 @@ class _DeviceCardState extends State<DeviceCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     StatusIconButton(
-                      status: device.status,
+                      status: device.status ?? DeviceStatus.offline,
                       mac: device.macAddress,
-                      lastUpdated: device.lastUpdated,
+                      lastUpdated: device.lastUpdated ?? DateTime.now(),
                     ),
-                    _deviceIcon(status: device.status, name: device.name),
+                    _deviceIcon(
+                        status: device.status ?? DeviceStatus.offline,
+                        name: device.name),
                     _popupMenuList(context, device),
                   ],
                 ),
-                const SizedBox(height: 10.0),
                 Text(
                   device.name,
                   style: const TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   device.ipAddress,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   device.location,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   device.description,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const Divider(),
                 _deviceProcesses(device),
                 Text(
-                  deviceStatusToString(device.status),
+                  deviceStatusToString(device.status ?? DeviceStatus.offline),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 5.0),
               ],
@@ -365,9 +374,13 @@ class _DeviceCardState extends State<DeviceCard> {
         if (value == 'View') {
           Navigator.of(context).push(
             HeroDialogRoute(
-              builder: (BuildContext context) =>
-                  Center(child: DevicesDetailsView(device: device)),
-              settings: const RouteSettings(name: 'StreamDetailsView'),
+              builder: (BuildContext context) => Center(
+                child: DevicesDetailsView(
+                  device: device,
+                  loadDevicesListView: () => widget.loadDevicesListView(),
+                ),
+              ),
+              settings: const RouteSettings(name: 'DevicesDetailsView'),
             ),
           );
         } else if (value == 'Delete') {
@@ -386,9 +399,9 @@ class _DeviceCardState extends State<DeviceCard> {
                 ),
                 TextButton(
                   onPressed: () {
-                    DevicesController.deleteDevice(
-                            ScaffoldMessenger.of(context), device.macAddress)
-                        .then((success) => {if (success) widget.refresh()});
+                    DevicesController.deleteDevice(device.macAddress).then(
+                        (success) =>
+                            {if (success) widget.loadDevicesListView()});
                     Navigator.of(context).pop();
                   },
                   child: const Text('Delete'),
@@ -403,8 +416,12 @@ class _DeviceCardState extends State<DeviceCard> {
           Navigator.of(context).push(
             HeroDialogRoute(
               builder: (BuildContext context) => Center(
-                  child:
-                      EditDeviceView(mac: device.macAddress, refresh: reload)),
+                child: EditDeviceView(
+                  mac: device.macAddress,
+                  refresh: refresh,
+                  device: device,
+                ),
+              ),
               settings: const RouteSettings(name: 'EditDeviceView'),
             ),
           );
@@ -454,36 +471,6 @@ class _DeviceCardState extends State<DeviceCard> {
       color: deviceColorScheme(status),
       size: 50.0,
     );
-  }
-
-  IconData getDeviceIcon(String name) {
-    name = name.toLowerCase();
-    if (name.contains('server')) {
-      return MaterialCommunityIcons.server;
-    } else if (name.contains('raspberry') || name.contains('pi')) {
-      return MaterialCommunityIcons.raspberry_pi;
-    } else if (name.contains('mac') || name.contains('apple')) {
-      return MaterialCommunityIcons.apple;
-    } else if (name.contains('linux')) {
-      return MaterialCommunityIcons.linux;
-    } else if (name.contains('windows')) {
-      return MaterialCommunityIcons.microsoft_windows;
-    } else if (name.contains('localhost')) {
-      return MaterialCommunityIcons.home_variant;
-    } else if (name.contains('pc')) {
-      return MaterialCommunityIcons.desktop_mac;
-    } else if (name.contains('laptop')) {
-      return MaterialCommunityIcons.laptop;
-    } else if (name.contains('printer')) {
-      return MaterialCommunityIcons.printer;
-    } else if (name.contains('hub') || name.contains('switch')) {
-      return MaterialCommunityIcons.hubspot;
-    } else if (name.contains('router')) {
-      return MaterialCommunityIcons.router_network;
-    } else if (name.contains('security')) {
-      return MaterialCommunityIcons.security_network;
-    }
-    return MaterialCommunityIcons.chip;
   }
 }
 
@@ -548,4 +535,34 @@ class StatusIconButton extends StatelessWidget {
         return MaterialCommunityIcons.progress_close;
     }
   }
+}
+
+IconData getDeviceIcon(String name) {
+  name = name.toLowerCase();
+  if (name.contains('server')) {
+    return MaterialCommunityIcons.server;
+  } else if (name.contains('raspberry') || name.contains('pi')) {
+    return MaterialCommunityIcons.raspberry_pi;
+  } else if (name.contains('mac') || name.contains('apple')) {
+    return MaterialCommunityIcons.apple;
+  } else if (name.contains('linux')) {
+    return MaterialCommunityIcons.linux;
+  } else if (name.contains('windows') || name.contains('microsoft')) {
+    return MaterialCommunityIcons.microsoft_windows;
+  } else if (name.contains('localhost') || name.contains('home')) {
+    return MaterialCommunityIcons.home_variant;
+  } else if (name.contains('pc') || name.contains('desktop')) {
+    return MaterialCommunityIcons.desktop_mac;
+  } else if (name.contains('laptop') || name.contains('notebook')) {
+    return MaterialCommunityIcons.laptop;
+  } else if (name.contains('printer')) {
+    return MaterialCommunityIcons.printer;
+  } else if (name.contains('hub')) {
+    return MaterialCommunityIcons.hubspot;
+  } else if (name.contains('router') || name.contains('switch')) {
+    return MaterialCommunityIcons.router_network;
+  } else if (name.contains('security') || name.contains('firewall')) {
+    return MaterialCommunityIcons.security_network;
+  }
+  return MaterialCommunityIcons.chip;
 }
