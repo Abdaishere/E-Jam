@@ -28,8 +28,6 @@ class _DevicesListViewState extends State<DevicesListView> {
   get scaffoldMessenger => ScaffoldMessenger.of(context);
   get controllerDeviceDetails => DevicesController.devices;
   get controllerIsDeviceListLoading => DevicesController.isLoading;
-  bool macIsShown = false;
-  bool? _isPinged;
   bool _isPinging = false;
 
   List<Device>? devices;
@@ -165,7 +163,7 @@ class _DevicesListViewState extends State<DevicesListView> {
               MaterialCommunityIcons.radar,
               size: 20,
             ),
-            color: Colors.lime,
+            color: Colors.lime.shade500,
             tooltip: 'Radar',
             onPressed: () {
               Navigator.of(context).push(
@@ -175,7 +173,7 @@ class _DevicesListViewState extends State<DevicesListView> {
                       loadDevicesListView: loadDevicesListView,
                     ),
                   ),
-                  settings: const RouteSettings(name: 'EditDeviceView'),
+                  settings: const RouteSettings(name: 'radar'),
                 ),
               );
             },
@@ -188,7 +186,7 @@ class _DevicesListViewState extends State<DevicesListView> {
             replacement: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: LoadingAnimationWidget.beat(
-                color: Colors.lightBlue,
+                color: Colors.lightBlue.shade300,
                 size: 20.0,
               ),
             ),
@@ -204,34 +202,15 @@ class _DevicesListViewState extends State<DevicesListView> {
                 await DevicesController.pingAllDevices(scaffoldMessenger).then(
                   (value) => {
                     _isPinging = false,
-                    if (value == null)
-                      {
-                        setState(() {
-                          _isPinged = null;
-                        })
-                      }
-                    else if (value == true)
+                    if (value == true)
                       setState(() {
-                        _isPinged = true;
                         loadDevicesListView();
-                      })
-                    else
-                      setState(() {
-                        _isPinged = false;
                       })
                   },
                 );
               },
-              tooltip: _isPinged == null
-                  ? 'Ping Device'
-                  : _isPinged!
-                      ? 'Device is Online'
-                      : 'Device is Offline',
-              color: _isPinged == null
-                  ? Colors.lightBlueAccent
-                  : _isPinged!
-                      ? deviceRunningOrOnlineColor
-                      : deviceOfflineOrErrorColor,
+              tooltip: 'Ping Devices',
+              color: Colors.lightBlueAccent,
             ),
           ),
         ),

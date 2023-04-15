@@ -11,9 +11,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class AddDeviceView extends StatefulWidget {
-  const AddDeviceView({super.key, required this.refresh});
+  const AddDeviceView({super.key, required this.refresh, this.ip});
 
   final Function refresh;
+  final String? ip;
   @override
   State<AddDeviceView> createState() => _AddDeviceViewState();
 }
@@ -24,12 +25,18 @@ class _AddDeviceViewState extends State<AddDeviceView> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _ipController = TextEditingController();
-  final TextEditingController _portController =
-      TextEditingController(text: NetworkController.defaultDevicesPort);
+  final TextEditingController _portController = TextEditingController(
+      text: NetworkController.defaultDevicesPort.toString());
   final TextEditingController _macController = TextEditingController();
   Color _topBarIndicator = Colors.transparent;
   bool? _isPinged;
   bool _isPinging = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ipController.text = widget.ip ?? '';
+  }
 
   Future<bool?> _addDevice() async {
     if (formKey.currentState!.validate()) {

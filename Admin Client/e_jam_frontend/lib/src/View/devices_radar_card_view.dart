@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:circular_motion/circular_motion.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
+import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
+import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:flutter_ripple/flutter_ripple.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
 class DevicesRadarCardView extends StatefulWidget {
@@ -16,26 +20,48 @@ class DevicesRadarCardView extends StatefulWidget {
 }
 
 class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
-  Set<String> devices = {'1.1.1.1'};
+  Set<String> devices = {'127.0.0.1'};
+  Timer? timer;
+  bool _isPinging = false;
 
   _radar() {
-    // NetworkController.defaultDevicesPort as int;
-    int port = 8080;
-    String systemApiSubnet = NetworkController.defaultSystemApiSubnet;
-    // ping all devices in the network in the same port
-    final stream = NetworkAnalyzer.discover2(systemApiSubnet, port,
-        timeout: const Duration(milliseconds: 500));
-
-    stream.listen((NetworkAddress addr) {
-      if (addr.exists) {
-        print('Found device: ${addr.ip}:$port');
-        setState(
-          () {
-            devices.add(addr.ip);
-          },
-        );
-      }
+    setState(() {
+      _isPinging = true;
     });
+    // NetworkController.defaultDevicesPort as int;
+    int port = NetworkController.defaultDevicesPort;
+    String systemApiSubnet = NetworkController.defaultSystemApiSubnet;
+    try {
+      // ping all devices in the network in the same port
+      final stream = NetworkAnalyzer.discover2(systemApiSubnet, port,
+          timeout: const Duration(milliseconds: 1000));
+
+      stream.listen((NetworkAddress addr) {
+        if (addr.exists) {
+          setState(
+            () {
+              devices.add(addr.ip);
+            },
+          );
+        }
+      });
+      setState(() {
+        _isPinging = false;
+      });
+    } catch (_) {}
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _radar();
+    timer = Timer.periodic(const Duration(seconds: 5), (Timer t) => _radar());
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -45,14 +71,12 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
       createRectTween: (begin, end) =>
           CustomRectTween(begin: begin!, end: end!),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.5),
+        height: (MediaQuery.of(context).orientation == Orientation.portrait
+            ? MediaQuery.of(context).size.height
+            : min(MediaQuery.of(context).size.height, 400)),
+        width: (MediaQuery.of(context).orientation == Orientation.portrait
+            ? MediaQuery.of(context).size.width
+            : min(MediaQuery.of(context).size.width, 400)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(
@@ -62,28 +86,62 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
               centerTitle: true,
             ),
             body: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: CircularMotion(
-                centerWidget: IconButton(
-                  icon: const Icon(MaterialCommunityIcons.radar,
-                      size: 50, color: Colors.blue),
-                  onPressed: () {
+              padding: const EdgeInsets.all(8.0),
+              child: CircularMotion.builder(
+                centerWidget: FlutterRipple(
+                  onTap: () {
                     _radar();
                   },
-                ),
-                children: [
-                  for (int i = 0; i < devices.length; i++)
-                    Transform.rotate(
-                      angle: i * pi / 2,
-                      child: IconButton(
-                        icon: const Icon(MaterialCommunityIcons.help_network,
-                            size: 50),
-                        onPressed: () {
-                          widget.loadDevicesListView();
-                        },
-                      ),
+                  child: Visibility(
+                    visible: !_isPinging,
+                    replacement: LoadingAnimationWidget.beat(
+                      size: 60,
+                      color: Colors.white,
                     ),
-                ],
+                    child: const Icon(
+                      Icons.refresh,
+                      size: 50,
+                    ),
+                  ),
+                ),
+                itemCount: devices.length,
+                builder: (context, index) {
+                  return SizedBox(
+                    height: 100,
+                    width: 100,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.device_hub),
+                          iconSize: 50,
+                          tooltip:
+                              'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              HeroDialogRoute(
+                                builder: (BuildContext context) => Center(
+                                    child: AddDeviceView(
+                                        refresh: () =>
+                                            widget.loadDevicesListView(),
+                                        ip: devices.elementAt(index))),
+                                settings:
+                                    const RouteSettings(name: 'AddDeviceView'),
+                              ),
+                            );
+                          },
+                        ),
+                        Text(
+                          devices.elementAt(index),
+                          style: const TextStyle(
+                            fontSize: 15,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),

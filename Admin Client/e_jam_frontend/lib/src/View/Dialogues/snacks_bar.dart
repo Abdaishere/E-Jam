@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class SnacksBar {
   static void showFailureSnack(
       ScaffoldMessengerState scaffoldMessenger, String message, String title) {
+    return;
     scaffoldMessenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -23,6 +24,7 @@ class SnacksBar {
 
   static void showHelpSnack(
       ScaffoldMessengerState scaffoldMessenger, String message, String title) {
+    return;
     scaffoldMessenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -42,6 +44,7 @@ class SnacksBar {
 
   static void showWarningSnack(
       ScaffoldMessengerState scaffoldMessenger, String message, String title) {
+    return;
     scaffoldMessenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -61,6 +64,7 @@ class SnacksBar {
 
   static void showSuccessSnack(
       ScaffoldMessengerState scaffoldMessenger, String message, String title) {
+    return;
     scaffoldMessenger
       ..hideCurrentSnackBar()
       ..showSnackBar(

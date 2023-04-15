@@ -319,15 +319,8 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                     fontSize: 20,
                   ),
                 ),
-              ),
-              ListTile(
-                leading: const Icon(MaterialCommunityIcons.ip),
-                title: Text(
+                subtitle: Text(
                   '${device.ipAddress} : ${device.port}',
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
                 ),
               ),
               ListTile(
