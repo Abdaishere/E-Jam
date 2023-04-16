@@ -11,10 +11,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class AddDeviceView extends StatefulWidget {
-  const AddDeviceView({super.key, required this.refresh, this.ip});
+  const AddDeviceView({super.key, required this.refresh, this.ip, this.delete});
 
   final Function refresh;
   final String? ip;
+  final Function()? delete;
   @override
   State<AddDeviceView> createState() => _AddDeviceViewState();
 }
@@ -59,6 +60,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
               widget.refresh();
               _topBarIndicator = Colors.greenAccent.withOpacity(0.8);
             });
+            if (widget.delete != null) widget.delete!();
             return true;
           } else {
             setState(() {

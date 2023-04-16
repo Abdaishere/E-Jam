@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:e_jam/main.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
-import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -29,6 +28,7 @@ class _DevicesListViewState extends State<DevicesListView> {
   get controllerDeviceDetails => DevicesController.devices;
   get controllerIsDeviceListLoading => DevicesController.isLoading;
   bool _isPinging = false;
+  bool? _isPinged;
 
   List<Device>? devices;
   bool _isDeviceListLoading = true;
@@ -44,6 +44,21 @@ class _DevicesListViewState extends State<DevicesListView> {
           devices = controllerDeviceDetails;
           _isDeviceListLoading = controllerIsDeviceListLoading;
         })
+      },
+    );
+  }
+
+  void _pingAll() async {
+    setState(() {
+      _isPinging = true;
+    });
+    await DevicesController.pingAllDevices(scaffoldMessenger).then(
+      (value) => {
+        setState(() {
+          _isPinging = false;
+          _isPinged = value;
+        }),
+        loadDevicesListView()
       },
     );
   }
@@ -195,22 +210,17 @@ class _DevicesListViewState extends State<DevicesListView> {
                 MaterialCommunityIcons.wifi_sync,
                 size: 20,
               ),
-              onPressed: () async {
-                setState(() {
-                  _isPinging = true;
-                });
-                await DevicesController.pingAllDevices(scaffoldMessenger).then(
-                  (value) => {
-                    _isPinging = false,
-                    if (value == true)
-                      setState(() {
-                        loadDevicesListView();
-                      })
-                  },
-                );
-              },
-              tooltip: 'Ping Devices',
-              color: Colors.lightBlueAccent,
+              onPressed: _pingAll,
+              tooltip: _isPinged == null
+                  ? 'Ping devices'
+                  : _isPinged!
+                      ? 'some Devices are online'
+                      : 'All Devices offline',
+              color: _isPinged == null
+                  ? Colors.lightBlue.shade300
+                  : _isPinged!
+                      ? deviceRunningOrOnlineColor
+                      : deviceOfflineOrErrorColor,
             ),
           ),
         ),
