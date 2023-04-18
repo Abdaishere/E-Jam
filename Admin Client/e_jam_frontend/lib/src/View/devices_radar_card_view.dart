@@ -10,6 +10,7 @@ import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ripple/flutter_ripple.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
@@ -83,97 +84,110 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
             (MediaQuery.of(context).orientation == Orientation.portrait
                 ? 1
                 : 0.6),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Scaffold(
-            primary: false,
-            appBar: AppBar(
+        child: GestureDetector(
+          onDoubleTap: () {
+            Navigator.of(context).pop();
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Scaffold(
               backgroundColor: Colors.transparent,
-              title: const Text('Devices Radar',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-              centerTitle: true,
-            ),
-            body: Center(
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlueAccent.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.lightBlueAccent.withOpacity(0.4),
-                      width: 5,
-                    ),
-                  ),
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                leading: IconButton(
+                  icon: const FaIcon(FontAwesome.close,
+                      size: 40, color: Colors.white70),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+              body: Center(
+                child: AspectRatio(
+                  aspectRatio: 1,
                   child: Container(
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).shadowColor.withOpacity(0.45),
+                      color: Colors.lightBlueAccent.withOpacity(0.1),
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.lightBlueAccent.withOpacity(0.4),
+                        width: 5,
+                      ),
                     ),
-                    child: CircularMotion.builder(
-                      behavior: HitTestBehavior.opaque,
-                      centerWidget: FlutterRipple(
-                        onTap: () {
-                          _radar();
-                        },
-                        child: Visibility(
-                          visible: !_isPinging,
-                          replacement: LoadingAnimationWidget.beat(
-                            size: 60,
-                            color: Colors.white,
-                          ),
-                          child: const Icon(
-                            Icons.refresh,
-                            size: 50,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).shadowColor.withOpacity(0.45),
+                        shape: BoxShape.circle,
+                      ),
+                      child: CircularMotion.builder(
+                        behavior: HitTestBehavior.opaque,
+                        centerWidget: FlutterRipple(
+                          onTap: () {
+                            _radar();
+                          },
+                          child: Visibility(
+                            visible: !_isPinging,
+                            replacement: LoadingAnimationWidget.beat(
+                              size: 60,
+                              color: Colors.white,
+                            ),
+                            child: const Icon(
+                              Icons.refresh,
+                              size: 50,
+                            ),
                           ),
                         ),
-                      ),
-                      itemCount: devices.length,
-                      builder: (context, index) {
-                        return SizedBox(
-                          height: 120,
-                          width: 120,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.device_hub_rounded),
-                                iconSize: 50,
-                                tooltip:
-                                    'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    HeroDialogRoute(
-                                      builder: (BuildContext context) => Center(
-                                          child: AddDeviceView(
-                                              refresh: () =>
-                                                  widget.loadDevicesListView(),
-                                              delete: () => {
-                                                    setState(() {
-                                                      devices.remove(devices
-                                                          .elementAt(index));
-                                                    })
-                                                  },
-                                              ip: devices.elementAt(index))),
-                                      settings: const RouteSettings(
-                                          name: 'AddDeviceView'),
-                                    ),
-                                  );
-                                },
-                              ),
-                              Text(
-                                devices.elementAt(index),
-                                style: const TextStyle(
-                                  fontSize: 15,
+                        itemCount: devices.length,
+                        builder: (context, index) {
+                          return SizedBox(
+                            height: 120,
+                            width: 120,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.device_hub_rounded),
+                                  iconSize: 50,
+                                  tooltip:
+                                      'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      HeroDialogRoute(
+                                        builder: (BuildContext context) =>
+                                            Center(
+                                                child: AddDeviceView(
+                                                    refresh: () => widget
+                                                        .loadDevicesListView(),
+                                                    delete: () => {
+                                                          setState(() {
+                                                            devices.remove(
+                                                                devices
+                                                                    .elementAt(
+                                                                        index));
+                                                          })
+                                                        },
+                                                    ip: devices
+                                                        .elementAt(index))),
+                                        settings: const RouteSettings(
+                                            name: 'AddDeviceView'),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                                Text(
+                                  devices.elementAt(index),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

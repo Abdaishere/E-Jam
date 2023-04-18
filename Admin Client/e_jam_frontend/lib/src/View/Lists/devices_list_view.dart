@@ -24,7 +24,6 @@ class DevicesListView extends StatefulWidget {
 }
 
 class _DevicesListViewState extends State<DevicesListView> {
-  get scaffoldMessenger => ScaffoldMessenger.of(context);
   get controllerDeviceDetails => DevicesController.devices;
   get controllerIsDeviceListLoading => DevicesController.isLoading;
   bool _isPinging = false;
@@ -38,7 +37,7 @@ class _DevicesListViewState extends State<DevicesListView> {
       _isDeviceListLoading = true;
     });
 
-    DevicesController.loadAllDevices(scaffoldMessenger).then(
+    DevicesController.loadAllDevices().then(
       (value) => {
         setState(() {
           devices = controllerDeviceDetails;
@@ -52,7 +51,7 @@ class _DevicesListViewState extends State<DevicesListView> {
     setState(() {
       _isPinging = true;
     });
-    await DevicesController.pingAllDevices(scaffoldMessenger).then(
+    await DevicesController.pingAllDevices().then(
       (value) => {
         setState(() {
           _isPinging = false;
@@ -539,7 +538,7 @@ class _DeviceCardState extends State<DeviceCard> {
   Icon _deviceIcon({required String name, required DeviceStatus status}) {
     return Icon(
       getDeviceIcon(name),
-      color: deviceColorScheme(status),
+      color: deviceStatusColorScheme(status),
       size: 50.0,
     );
   }
@@ -564,7 +563,7 @@ class StatusIconButton extends StatelessWidget {
           '${deviceStatusToString(status)}: ${timeago.format(lastUpdated)}',
       icon: FaIcon(
         getIcon(status),
-        color: deviceColorScheme(status),
+        color: deviceStatusColorScheme(status),
         size: 20.0,
       ),
       onPressed: () {

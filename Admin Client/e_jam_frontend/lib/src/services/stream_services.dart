@@ -60,8 +60,7 @@ class StreamServices {
     }
   }
 
-  Future<bool?> createStream(
-      ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
+  Future<bool?> createStream(StreamEntry stream) async {
     try {
       final response = await client.post(
         uri,
@@ -71,23 +70,13 @@ class StreamServices {
         body: json.encode(stream.toJson()),
       );
       if (201 == response.statusCode) {
-        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
-            'Created Successfully');
-
         return true;
       } else if (409 == response.statusCode) {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            'Stream Already Exists');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      e.toString();
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }

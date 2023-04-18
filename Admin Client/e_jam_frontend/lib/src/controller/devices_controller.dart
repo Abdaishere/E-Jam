@@ -1,16 +1,29 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:e_jam/src/services/devices_services.dart';
-import 'package:flutter/material.dart';
 
 class DevicesController {
   static List<Device>? devices;
   static bool isLoading = true;
   static DevicesServices devicesServices = DevicesServices();
 
-  static Future loadAllDevices(ScaffoldMessengerState scaffoldMessenger) async {
+  static Future loadAllDevices() async {
     isLoading = true;
-    return devicesServices.getDevices(scaffoldMessenger).then((value) {
+    return devicesServices.getDevices().then((value) {
       devices = value;
+      if (devices != null) {
+        AddStreamController.pickedGenerators = {
+          for (final Device device in devices!)
+            device.macAddress:
+                AddStreamController.pickedGenerators[device.macAddress] ?? false
+        };
+
+        AddStreamController.pickedVerifiers = {
+          for (final Device device in devices!)
+            device.macAddress:
+                AddStreamController.pickedVerifiers[device.macAddress] ?? false
+        };
+      }
       isLoading = false;
     });
   }
@@ -47,10 +60,9 @@ class DevicesController {
     });
   }
 
-  static Future<bool?> pingAllDevices(
-      ScaffoldMessengerState scaffoldMessenger) {
+  static Future<bool?> pingAllDevices() {
     isLoading = true;
-    return devicesServices.pingAllDevices(scaffoldMessenger).then((value) {
+    return devicesServices.pingAllDevices().then((value) {
       isLoading = false;
       return value;
     });

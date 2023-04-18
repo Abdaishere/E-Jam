@@ -284,7 +284,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                   constraints: const BoxConstraints(),
                   icon: Icon(
                     getDeviceIcon(device.name),
-                    color: deviceColorScheme(device.status),
+                    color: deviceStatusColorScheme(device.status),
                   ),
                   tooltip:
                       '${deviceStatusToString(device.status)}: ${timeago.format(device.lastUpdated!)}',

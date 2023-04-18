@@ -44,7 +44,7 @@ const deviceRunningOrOnlineColor = Color(0xFF3dcc77); // online
 const deviceIdleColor = Colors.orangeAccent; // idle
 const deviceOfflineOrErrorColor = Color(0xFFe34845); // offline or error
 
-Color deviceColorScheme(DeviceStatus? status) {
+Color deviceStatusColorScheme(DeviceStatus? status) {
   switch (status) {
     case DeviceStatus.running:
       return deviceRunningOrOnlineColor;

@@ -27,9 +27,9 @@ class StreamEntry {
     required this.transportLayerProtocol,
     required this.flowType,
     required this.checkContent,
-    required this.runningGenerators,
-    required this.runningVerifiers,
-    required this.streamStatus,
+    this.runningGenerators,
+    this.runningVerifiers,
+    this.streamStatus,
   });
 
   const StreamEntry.empty()
@@ -79,9 +79,9 @@ class StreamEntry {
   final TransportLayerProtocol transportLayerProtocol;
   final FlowType flowType;
   final bool checkContent;
-  final Process runningGenerators;
-  final Process runningVerifiers;
-  final StreamStatus streamStatus;
+  final Process? runningGenerators;
+  final Process? runningVerifiers;
+  final StreamStatus? streamStatus;
 
   factory StreamEntry.fromRawJson(String str) =>
       StreamEntry.fromJson(json.decode(str));
@@ -145,8 +145,8 @@ class StreamEntry {
             transportLayerProtocolToString(transportLayerProtocol),
         "flowType": flowTypeToString(flowType),
         "checkContent": checkContent,
-        "runningGenerators": runningGenerators.toJson(),
-        "runningVerifiers": runningVerifiers.toJson(),
+        "runningGenerators": runningGenerators?.toJson(),
+        "runningVerifiers": runningVerifiers?.toJson(),
         "streamStatus": streamStatus,
       };
 }

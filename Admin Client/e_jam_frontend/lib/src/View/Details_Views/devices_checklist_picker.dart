@@ -1,7 +1,11 @@
 import 'dart:math';
 
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
+import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,50 +14,23 @@ class DevicesCheckListPicker extends StatefulWidget {
   const DevicesCheckListPicker({
     super.key,
     required this.areGenerators,
-    required this.onDevicesSelected,
+    required this.saveChanges,
   });
 
   final bool areGenerators;
-  final Function(String) onDevicesSelected;
+  final Function saveChanges;
 
   @override
   State<DevicesCheckListPicker> createState() => _DevicesCheckListPickerState();
 }
 
 class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
-  bool isDevicesListLoading = false;
-  final List<bool> _devices = List.filled(10, false);
-
-  // load the status of all streams from the server and update the UI with the list of streams status accordingly
-  // void loadStreamView() async {
-  //   setState(() {
-  //     isDevicesListLoading = true;
-  //   });
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-  // TODO: finish after the device list is implemented in the server
-
-  //   StreamsController.loadAllStreamStatus(scaffoldMessenger).then(
-  //     (value) => {
-  //       if (mounted)
-  //         setState(() {
-  //           streams = controllerStreamsStatusDetails;
-  //           isStreamListLoading = controllerIsStreamListLoading;
-  //         })
-  //     },
-  //   );
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   Future.delayed(Duration.zero, () => loadStreamView());
-  // }
+  _syncDevices() {
+    setState(() {
+      DevicesController.loadAllDevices();
+      widget.saveChanges();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,20 +43,12 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
           (MediaQuery.of(context).orientation == Orientation.portrait
               ? 1
               : 0.4),
-      child: Drawer(
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(15),
-            topLeft: Radius.circular(15),
-          ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(
+          Radius.circular(15),
         ),
-        width: MediaQuery.of(context).size.width * 0.25,
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
             leading: IconButton(
               icon: Icon(
                   widget.areGenerators
@@ -94,55 +63,166 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
             ),
             actions: [
               IconButton(
-                icon: const FaIcon(FontAwesomeIcons.shuffle,
+                icon: const Icon(MaterialCommunityIcons.shuffle_variant,
                     size: 20, semanticLabel: 'Randomize'),
                 tooltip: 'Randomize',
-                onPressed: () {
-                  setState(() {
-                    _devices.shuffle(Random());
-                  });
-                },
+                onPressed: () => setState(
+                  () {
+                    if (widget.areGenerators) {
+                      AddStreamController.pickedGenerators = AddStreamController
+                          .pickedGenerators
+                          .map((key, value) {
+                        return MapEntry(key, Random().nextBool());
+                      });
+                    } else {
+                      AddStreamController.pickedVerifiers =
+                          AddStreamController.pickedVerifiers.map((key, value) {
+                        return MapEntry(key, Random().nextBool());
+                      });
+                    }
+                  },
+                ),
               ),
               IconButton(
                 icon: const Icon(MaterialCommunityIcons.check_all,
                     size: 20, semanticLabel: 'Select All'),
                 tooltip: 'Select All',
-                onPressed: () {
-                  setState(() {
-                    _devices.fillRange(0, _devices.length, true);
-                  });
-                },
+                onPressed: () => setState(
+                  () {
+                    if (widget.areGenerators) {
+                      AddStreamController.pickedGenerators = AddStreamController
+                          .pickedGenerators
+                          .map((key, value) {
+                        return MapEntry(key, true);
+                      });
+                    } else {
+                      AddStreamController.pickedVerifiers =
+                          AddStreamController.pickedVerifiers.map((key, value) {
+                        return MapEntry(key, true);
+                      });
+                    }
+                  },
+                ),
               ),
+              // Deselect all button
               IconButton(
                 icon: const Icon(
-                    MaterialCommunityIcons.checkbox_blank_badge_outline,
-                    size: 20,
-                    semanticLabel: 'Deselect All'),
+                  MaterialCommunityIcons.checkbox_blank_badge_outline,
+                  size: 20,
+                ),
                 tooltip: 'Deselect All',
-                onPressed: () {
-                  setState(() {
-                    _devices.fillRange(0, _devices.length, true);
-                  });
+                onPressed: () => setState(
+                  () {
+                    if (widget.areGenerators) {
+                      AddStreamController.pickedGenerators = AddStreamController
+                          .pickedGenerators
+                          .map((key, value) {
+                        return MapEntry(key, false);
+                      });
+                    } else {
+                      AddStreamController.pickedVerifiers =
+                          AddStreamController.pickedVerifiers.map((key, value) {
+                        return MapEntry(key, false);
+                      });
+                    }
+                  },
+                ),
+              ),
+              // Sync button
+              IconButton(
+                icon: DevicesController.devices == null
+                    ? const Icon(
+                        MaterialCommunityIcons.sync_alert,
+                        size: 20,
+                        color: Colors.yellow,
+                      )
+                    : const Icon(
+                        MaterialCommunityIcons.sync_icon,
+                        size: 20,
+                      ),
+                tooltip: 'Sync Devices',
+                onPressed: () async {
+                  _syncDevices();
                 },
               ),
             ],
           ),
-          // each device should be a card view with a checkbox to select the device as a generator or a verifier or both (if the device is a generator and a verifier)
-          body: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return CheckboxListTile(
-                title: Text('Device $index'),
-                value: false,
-                onChanged: (value) {
-                  setState(() {
-                    _devices[index] = value!;
-                  });
-                },
-              );
+          body: Visibility(
+            visible: (widget.areGenerators
+                    ? AddStreamController.pickedGenerators.length
+                    : AddStreamController.pickedVerifiers.length) !=
+                0,
+            replacement: Center(
+              child: DevicesController.devices == null
+                  ? const Text('Cannot Get Devices')
+                  : const Text('No Devices Found'),
+            ),
+            child: ListView.builder(
+              itemCount: (widget.areGenerators
+                  ? AddStreamController.pickedGenerators.length
+                  : AddStreamController.pickedVerifiers.length),
+              itemBuilder: (context, index) {
+                return CheckboxListTile(
+                  title: Text(DevicesController.devices![index].name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                      '${DevicesController.devices![index].ipAddress}:${DevicesController.devices![index].port}'),
+                  value: widget.areGenerators
+                      ? AddStreamController.pickedGenerators[
+                          DevicesController.devices![index].macAddress]
+                      : AddStreamController.pickedVerifiers[
+                          DevicesController.devices![index].macAddress],
+                  secondary: Icon(
+                    getDeviceIcon(DevicesController.devices![index].name),
+                    color: deviceStatusColorScheme(
+                        DevicesController.devices![index].status),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      if (widget.areGenerators) {
+                        AddStreamController.pickedGenerators[DevicesController
+                            .devices![index].macAddress] = value ?? false;
+                      } else {
+                        AddStreamController.pickedVerifiers[DevicesController
+                            .devices![index].macAddress] = value ?? false;
+                      }
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+          bottomNavigationBar: _bottomOptionsBar(),
+        ),
+      ),
+    );
+  }
+
+  BottomAppBar _bottomOptionsBar() {
+    return BottomAppBar(
+      elevation: 0,
+      height: 70,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.xmark),
+            color: Colors.red,
+            tooltip: 'Cancel',
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-        ),
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.check),
+            color: Colors.blue,
+            tooltip: 'Save',
+            onPressed: () async {
+              widget.saveChanges();
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
     );
   }

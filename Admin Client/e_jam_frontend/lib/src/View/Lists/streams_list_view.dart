@@ -129,7 +129,7 @@ class _StreamsListViewState extends State<StreamsListView> {
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
               child: AddStreamButton(
-                reload: () {
+                loadStreamView: () {
                   loadStreamView();
                 },
               ),
@@ -176,9 +176,10 @@ class _StreamsListViewState extends State<StreamsListView> {
 }
 
 class AddStreamButton extends StatelessWidget {
-  const AddStreamButton({Key? key, required this.reload}) : super(key: key);
+  const AddStreamButton({Key? key, required this.loadStreamView})
+      : super(key: key);
 
-  final Function() reload;
+  final Function() loadStreamView;
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -190,7 +191,7 @@ class AddStreamButton extends StatelessWidget {
         Navigator.of(context).push(
           HeroDialogRoute(
             builder: (BuildContext context) => Center(
-              child: AddStreamView(reload: () => reload()),
+              child: AddStreamView(reload: () => loadStreamView()),
             ),
             settings: const RouteSettings(name: 'AddStreamView'),
           ),

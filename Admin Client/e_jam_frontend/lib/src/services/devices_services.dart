@@ -10,8 +10,7 @@ class DevicesServices {
 
   static get client => NetworkController.client;
 
-  Future<List<Device>?> getDevices(
-      ScaffoldMessengerState scaffoldMessenger) async {
+  Future<List<Device>?> getDevices() async {
     try {
       final response = await client.get(uri);
       if (response.statusCode == 200) {
@@ -19,17 +18,11 @@ class DevicesServices {
             .map((e) => Device.fromJson(e))
             .toList();
       } else if (204 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'No Devices Found');
         return [];
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return null;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }
@@ -104,29 +97,19 @@ class DevicesServices {
   }
 
   // ping all devices
-  Future<bool> pingAllDevices(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<bool> pingAllDevices() async {
     try {
       final response = await client.get(Uri.parse('$uri/ping_all'));
       if (response.statusCode == 200) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'All Devices Pinged');
         return true;
       } else if (204 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'No Devices Found');
         return false;
       } else if (500 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'Device Offline');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }

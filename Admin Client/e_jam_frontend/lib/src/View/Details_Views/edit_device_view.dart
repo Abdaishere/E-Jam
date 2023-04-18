@@ -181,14 +181,14 @@ class _EditDeviceViewState extends State<EditDeviceView> {
         children: [
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.xmark),
-            color: Colors.redAccent,
+            color: Colors.red,
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.check),
-            color: Colors.blueAccent,
+            color: Colors.blue,
             onPressed: () async {
               _editDevice().then(
                 (value) => {

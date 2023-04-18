@@ -205,7 +205,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
         children: [
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.xmark),
-            color: Colors.redAccent,
+            color: Colors.red,
             onPressed: () {
               Navigator.pop(context);
             },
@@ -223,7 +223,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
           ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.plus),
-            color: Colors.greenAccent,
+            color: Colors.greenAccent.shade700,
             onPressed: () => _addDevice(),
           ),
         ],
