@@ -58,7 +58,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
           if (result) {
             setState(() {
               widget.refresh();
-              _topBarIndicator = Colors.greenAccent.withOpacity(0.8);
+              _topBarIndicator = Colors.greenAccent.shade700.withOpacity(0.8);
             });
             if (widget.delete != null) widget.delete!();
             return true;

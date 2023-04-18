@@ -28,6 +28,7 @@ class _AddStreamViewState extends State<AddStreamView>
   late TabController _tabController;
   late int _numberOfGenerators;
   late int _numberOfVerifiers;
+  Color _tabBarColor = Colors.blueAccent;
 
   @override
   void initState() {
@@ -81,7 +82,7 @@ class _AddStreamViewState extends State<AddStreamView>
                 borderRadius: BorderRadius.circular(
                   25.0,
                 ),
-                color: Colors.blueAccent,
+                color: _tabBarColor,
               ),
               labelColor: Colors.white,
               labelStyle: const TextStyle(
@@ -183,7 +184,7 @@ class _AddStreamViewState extends State<AddStreamView>
         const Icon(MaterialCommunityIcons.transit_connection_variant),
         const VerticalDivider(),
         Expanded(
-          flex: 2,
+          flex: 1,
           child: DropdownButtonFormField<FlowType>(
             decoration: const InputDecoration(
               labelText: 'Flow Type',
@@ -213,7 +214,7 @@ class _AddStreamViewState extends State<AddStreamView>
         ),
         const VerticalDivider(),
         Expanded(
-          flex: 2,
+          flex: 1,
           child: DropdownButtonFormField<TransportLayerProtocol>(
             decoration: const InputDecoration(
               labelText: 'Transport Layer Protocol',
@@ -294,12 +295,14 @@ class _AddStreamViewState extends State<AddStreamView>
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          flex: 2,
+          flex: 1,
           child: TextFormField(
             decoration: const InputDecoration(
               labelText: 'Payload Length',
               hintText: 'Length of the payload',
-              icon: Icon(Icons.featured_play_list_rounded),
+              icon: Icon(
+                Icons.featured_play_list_rounded,
+              ),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
@@ -670,6 +673,7 @@ class _AddStreamViewState extends State<AddStreamView>
             onPressed: () {
               setState(() {
                 AddStreamController.clearAllFields();
+                _tabBarColor = Colors.blueAccent;
                 formKey.currentState!.reset();
               });
             },
@@ -695,9 +699,14 @@ class _AddStreamViewState extends State<AddStreamView>
             onPressed: () {
               AddStreamController.addStream(formKey).then((success) {
                 if (success != null) {
-                  if (success) {
-                    widget.reload();
-                  }
+                  setState(() {
+                    if (success) {
+                      _tabBarColor = Colors.greenAccent.shade700;
+                      widget.reload();
+                    } else {
+                      _tabBarColor = Colors.redAccent;
+                    }
+                  });
                 }
               });
             },
