@@ -20,8 +20,12 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class StreamDetailsView extends StatefulWidget {
   const StreamDetailsView(
-      {super.key, required this.id, required this.loadStreamsListView});
+      {super.key,
+      required this.id,
+      required this.loadStreamsListView,
+      required this.refreshCard});
   final String id;
+  final Function refreshCard;
   final Function loadStreamsListView;
   @override
   State<StreamDetailsView> createState() => _StreamDetailsViewState();
@@ -497,6 +501,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 onPressed: () {
                   StreamsController.startStream(id).then((success) {
                     _loadStream();
+                    widget.refreshCard();
                   });
                 },
               )
@@ -508,6 +513,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 onPressed: () {
                   StreamsController.pauseStream(id).then((success) {
                     _loadStream();
+                    widget.refreshCard();
                   });
                 },
               ),
@@ -518,6 +524,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           onPressed: () {
             StreamsController.queueStream(id).then((success) {
               _loadStream();
+              widget.refreshCard();
             });
           },
         ),

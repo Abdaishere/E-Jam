@@ -239,6 +239,9 @@ class _StreamCardState extends State<StreamCard> {
                 loadStreamsListView: () => {
                   widget.loadStreamView(),
                 },
+                refreshCard: () {
+                  refreshCard();
+                },
               ),
             ),
             settings: const RouteSettings(name: 'StreamDetailsView'),
@@ -340,6 +343,9 @@ class _StreamCardState extends State<StreamCard> {
                   id: stream.streamId,
                   loadStreamsListView: () => {
                     widget.loadStreamView(),
+                  },
+                  refreshCard: () {
+                    refreshCard();
                   },
                 ),
               ),

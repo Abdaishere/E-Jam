@@ -1,9 +1,12 @@
-use log::{error, info, warn, debug};
+use log::{debug, error, info, warn};
 pub(crate) mod device;
 pub(crate) mod process;
 pub(crate) mod statistics;
 pub(crate) mod stream_details;
 
+use self::device::Device;
+use self::process::{ProcessStatus, ProcessType};
+use self::stream_details::{StreamDetails, StreamStatusDetails};
 use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
 use nanoid::nanoid;
@@ -12,9 +15,6 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Mutex};
 use validator::Validate;
-use self::device::Device;
-use self::process::{ProcessStatus, ProcessType};
-use self::stream_details::{StreamDetails, StreamStatusDetails};
 
 lazy_static! {
     #[doc = r"Regex for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 characters
@@ -554,7 +554,7 @@ The send_stream function is used to send the stream to the devices that will gen
             if the request fails, set the device status to offline
             NOTE: if the device has multiple cards, the request will be sent to all the cards in the device and the device will be added to the running devices list
         */
-        let mut devices_received: HashMap<String, (usize, ProcessType)> = HashMap::new();
+        let mut devices_received: HashMap<String, Vec<(usize, ProcessType)>> = HashMap::new();
 
         let mut verifiers_macs: Vec<String> = Vec::new();
         for name in &self.verifiers_ids {
@@ -575,7 +575,12 @@ The send_stream function is used to send the stream to the devices that will gen
             verifiers_macs.push(mac);
 
             if devices_received.contains_key(&ip_address) {
-                devices_received.insert(ip_address, (receiver, ProcessType::Verification));
+                devices_received
+                    .get_mut(&ip_address)
+                    .unwrap()
+                    .push((receiver, ProcessType::Verification));
+            } else {
+                devices_received.insert(ip_address, vec![(receiver, ProcessType::Verification)]);
             }
         }
 
@@ -599,110 +604,114 @@ The send_stream function is used to send the stream to the devices that will gen
             generators_macs.push(mac);
 
             // add the device to the list of devices that need to receive the request if it already exists, it will be overwritten
-            if !devices_received.contains_key(&ip_address) {
-                devices_received.insert(ip_address, (receiver, ProcessType::Generation));
+            if devices_received.contains_key(&ip_address) {
+                devices_received
+                    .get_mut(&ip_address)
+                    .unwrap()
+                    .push((receiver, ProcessType::Generation));
             } else {
-                devices_received.get_mut(&ip_address).unwrap().1 =
-                    ProcessType::GeneratingAndVerification;
+                devices_received.insert(ip_address, vec![(receiver, ProcessType::Generation)]);
             }
         }
 
         let stream_details = self.get_stream_details(delayed, generators_macs, verifiers_macs);
 
-        for receiver in devices_received {
-            let process_type = receiver.1 .1;
-            let device_index = receiver.1 .0;
+        for receivers in devices_received {
+            for receiver in receivers.1 {
+                let process_type = receiver .1;
+                let device_index = receiver .0;
 
-            let response = device_list
-                .lock()
-                .unwrap()
-                .get_mut(device_index)
-                .unwrap()
-                .send_stream(&stream_details, self.get_stream_id(), &process_type)
-                .await;
-            // check if the request was successful
-            match response {
-                Ok(_response) => {
-                    let mut list = device_list.lock().unwrap();
-                    let device = list.get_mut(device_index).unwrap();
+                let response = device_list
+                    .lock()
+                    .unwrap()
+                    .get_mut(device_index)
+                    .unwrap()
+                    .send_stream(&stream_details, self.get_stream_id(), &process_type)
+                    .await;
+                // check if the request was successful
+                match response {
+                    Ok(_response) => {
+                        let mut list = device_list.lock().unwrap();
+                        let device = list.get_mut(device_index).unwrap();
 
-                    match _response.status() {
-                        StatusCode::OK => {
-                            // set the receiver status to running
-                            device.update_device_status(&ProcessStatus::Queued, &process_type);
+                        match _response.status() {
+                            StatusCode::OK => {
+                                // set the receiver status to running
+                                device.update_device_status(&ProcessStatus::Queued, &process_type);
 
-                            match process_type {
-                                ProcessType::Generation => {
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Queued,
-                                    );
+                                match process_type {
+                                    ProcessType::Generation => {
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Queued,
+                                        );
+                                    }
+                                    ProcessType::Verification => {
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Queued,
+                                        );
+                                    }
+                                    ProcessType::GeneratingAndVerification => {
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Queued,
+                                        );
+
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Queued,
+                                        );
+                                    }
                                 }
-                                ProcessType::Verification => {
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Queued,
-                                    );
-                                }
-                                ProcessType::GeneratingAndVerification => {
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Queued,
-                                    );
 
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Queued,
-                                    );
-                                }
+                                info!(
+                                    "Stream sent to device: {}, process type: {:?}",
+                                    device.get_device_mac(),
+                                    process_type
+                                );
                             }
+                            _ => {
+                                // set the receiver status to offline (generic error)
+                                device.update_device_status(&ProcessStatus::Failed, &process_type);
 
-                            info!(
-                                "Stream sent to device: {}, process type: {:?}",
-                                device.get_device_mac(),
-                                process_type
-                            );
-                        }
-                        _ => {
-                            // set the receiver status to offline (generic error)
-                            device.update_device_status(&ProcessStatus::Failed, &process_type);
+                                // add the device to the running devices list with a failed status
+                                match process_type {
+                                    ProcessType::Generation => {
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Failed,
+                                        );
+                                    }
+                                    ProcessType::Verification => {
+                                        self.running_verifiers.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Failed,
+                                        );
+                                    }
+                                    ProcessType::GeneratingAndVerification => {
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Failed,
+                                        );
 
-                            // add the device to the running devices list with a failed status
-                            match process_type {
-                                ProcessType::Generation => {
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Failed,
-                                    );
+                                        self.running_generators.insert(
+                                            device.get_device_mac().to_string(),
+                                            ProcessStatus::Failed,
+                                        );
+                                    }
                                 }
-                                ProcessType::Verification => {
-                                    self.running_verifiers.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Failed,
-                                    );
-                                }
-                                ProcessType::GeneratingAndVerification => {
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Failed,
-                                    );
-
-                                    self.running_generators.insert(
-                                        device.get_device_mac().to_string(),
-                                        ProcessStatus::Failed,
-                                    );
-                                }
+                                error!(
+                                    "Stream not sent to device: {} process type: {:?}",
+                                    device.get_device_mac(),
+                                    process_type
+                                );
+                                error!("{}", _response.text().await.unwrap());
                             }
-                            error!(
-                                "Stream not sent to device: {} process type: {:?}",
-                                device.get_device_mac(),
-                                process_type
-                            );
-                            error!("{}", _response.text().await.unwrap());
                         }
                     }
+                    Err(_error) => error!("Internal: {}", _error),
                 }
-                Err(_error) => error!("Internal: {}", _error),
             }
         }
 
@@ -911,11 +920,11 @@ this will add the stream to the queue
 
         // send the stream to the client to update the stream status to queued
         let connections = self.send_stream(true, device_list).await;
-        
+
         // add the thread to the queued streams list
         if self.stream_status == StreamStatus::Sent {
             self.update_stream_status(StreamStatus::Queued);
-        queued_streams
+            queued_streams
             .lock()
             .expect(format!("Error: Failed to lock the queued streams list for adding stream {} to the queue", self.get_stream_id()).as_str())
             .push(self.get_stream_id().clone());
