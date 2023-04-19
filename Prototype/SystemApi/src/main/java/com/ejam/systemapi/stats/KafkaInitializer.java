@@ -6,13 +6,17 @@ import io.confluent.kafka.serializers.subject.TopicRecordNameStrategy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Properties;
 
 public class KafkaInitializer {
-    public final static String BOOTSTRAP_SERVERS = "http://192.168.1.30:9092";
+    @Value("${admin.address}")
+    private static String ADMIN_IP;
+
+    public final static String BOOTSTRAP_SERVERS = String.format("%s:9092", ADMIN_IP);
     public final static String CLIENT_ID_CONFIG = "client1";
-    public final static String SCHEMA_REGISTRY_URL = "http://192.168.1.30:8081";
+    public final static String SCHEMA_REGISTRY_URL = String.format("%s:8081", ADMIN_IP);
 
 
     public static void Init() {

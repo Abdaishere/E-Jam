@@ -2,10 +2,7 @@ package com.ejam.systemapi.InstanceControl;
 
 import java.io.*;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,30 +72,35 @@ public class UTILs {
     }
 
     public static String getMyMacAddress() {
-        return "A4C4945C6179";
-//        String myMacAddress = "AAAAAAAAAAAA";
-//        byte[] mac;
-//        try {
-//            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-//            while (networkInterfaces.hasMoreElements()) {
-//                NetworkInterface network = networkInterfaces.nextElement();
-//                mac = network.getHardwareAddress();
-//                if (mac == null) {
-//                    throw new Exception("Mac is null");
-//                } else {
-//                    StringBuilder sb = new StringBuilder();
-//                    for (int i = 0; i < mac.length; i++) {
-//                        sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
-//                    }
-//                    String mac12 = sb.toString().replaceAll("-", "");
-//                    myMacAddress = mac12;
-//                    break;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return myMacAddress;
+        Map<String, String> interfaceToAddress = new HashMap<>();
+        byte[] mac;
+        try {
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface network = networkInterfaces.nextElement();
+                mac = network.getHardwareAddress();
+                if (mac == null) {
+                    continue;
+                }
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < mac.length; i++) {
+                    sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+                }
+                String mac12 = sb.toString().replaceAll("-", "");
+                interfaceToAddress.put(network.getName(), mac12);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String macAddress = interfaceToAddress.get("br-b27af1121dcf");
+        try {
+            if (macAddress == null) {
+                throw new Exception("Mac is null");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return macAddress;
     }
 
     public static String convertMacAddressFormat(String macAddress) {

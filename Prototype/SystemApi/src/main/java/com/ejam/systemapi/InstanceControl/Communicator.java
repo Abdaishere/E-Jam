@@ -2,11 +2,13 @@ package com.ejam.systemapi.InstanceControl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,8 +26,11 @@ public class Communicator {
     /**
      * Get configuration from Admin GUI
      */
-    private final static String ADMIN_IP = "192.168.1.30";
-    private final static int ADMIN_PORT = 8080;
+    @Value("${admin.address}")
+    private static String ADMIN_IP;
+
+    @Value("${admin.port}")
+    private static int ADMIN_PORT;
     private final static String MAC_ADDRESS = UTILs.getMyMacAddress();
 
     @GetMapping("/")
