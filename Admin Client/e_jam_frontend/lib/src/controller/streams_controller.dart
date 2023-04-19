@@ -1,7 +1,8 @@
+import 'dart:ffi';
+
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 
@@ -43,10 +44,9 @@ class StreamsController {
     });
   }
 
-  static Future<bool> deleteStream(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
+  static Future<bool> deleteStream(String id) async {
     isLoading = true;
-    return streamServices.deleteStream(scaffoldMessenger, id).then((value) {
+    return streamServices.deleteStream(id).then((value) {
       isLoading = false;
       return value;
     });
@@ -165,19 +165,19 @@ class AddStreamController {
         StreamEntry(
           name: nameController.text,
           description: descriptionController.text,
-          delay: int.parse(delayController.text),
+          delay: (int.tryParse(delayController.text) ?? 0),
           streamId: idController.text,
           generatorsIds: generators,
           verifiersIds: verifiers,
           payloadType: payloadType,
-          burstLength: int.parse(burstLengthController.text),
-          burstDelay: int.parse(burstDelayController.text),
-          numberOfPackets: int.parse(packetsController.text),
-          payloadLength: int.parse(payloadLengthController.text),
-          seed: int.parse(seedController.text),
-          broadcastFrames: int.parse(broadcastFramesController.text),
-          interFrameGap: int.parse(interFrameGapController.text),
-          timeToLive: int.parse(timeToLiveController.text),
+          burstLength: (int.tryParse(burstLengthController.text) ?? 0),
+          burstDelay: (int.tryParse(burstDelayController.text) ?? 0),
+          numberOfPackets: (int.tryParse(packetsController.text) ?? 0),
+          payloadLength: (int.tryParse(payloadLengthController.text) ?? 0),
+          seed: (int.tryParse(seedController.text) ?? 0),
+          broadcastFrames: (int.tryParse(broadcastFramesController.text) ?? 0),
+          interFrameGap: (int.tryParse(interFrameGapController.text) ?? 0),
+          timeToLive: (int.tryParse(timeToLiveController.text) ?? 0),
           transportLayerProtocol: transportLayerProtocol,
           flowType: flowType,
           checkContent: checkContent,

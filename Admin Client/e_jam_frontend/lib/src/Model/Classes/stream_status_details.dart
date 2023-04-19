@@ -5,16 +5,16 @@ import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 class StreamStatusDetails {
   StreamStatusDetails({
     required this.name,
-    required this.id,
-    required this.status,
+    required this.streamId,
+    required this.streamStatus,
     required this.lastUpdated,
     required this.startTime,
     required this.endTime,
   });
 
   final String name;
-  final String id;
-  final StreamStatus status;
+  final String streamId;
+  final StreamStatus streamStatus;
   final DateTime lastUpdated;
   final DateTime startTime;
   final DateTime endTime;
@@ -27,8 +27,8 @@ class StreamStatusDetails {
   factory StreamStatusDetails.fromJson(Map<String, dynamic> json) =>
       StreamStatusDetails(
         name: json["name"],
-        id: json["streamId"],
-        status: streamStatusFromString(json["streamStatus"]),
+        streamId: json["streamId"],
+        streamStatus: streamStatusFromString(json["streamStatus"]),
         lastUpdated:
             DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"] * 1000)
                 .toLocal(),
@@ -42,8 +42,8 @@ class StreamStatusDetails {
 
   Map<String, dynamic> toJson() => {
         "name": name,
-        "streamId": id,
-        "streamStatus": status,
+        "streamId": streamId,
+        "streamStatus": streamStatus,
         "lastUpdated": lastUpdated,
         "startTime": startTime,
         "endTime": endTime,

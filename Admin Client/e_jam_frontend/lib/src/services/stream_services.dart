@@ -40,6 +40,7 @@ class StreamServices {
   Future<StreamEntry?> getStream(String streamId) async {
     try {
       final response = await client.get(Uri.parse('$uri/$streamId'));
+
       if (200 == response.statusCode) {
         return StreamEntry.fromJson(json.decode(response.body));
       } else if (404 == response.statusCode) {
@@ -109,27 +110,17 @@ class StreamServices {
     }
   }
 
-  Future<bool> deleteStream(
-      ScaffoldMessengerState scaffoldMessenger, String streamId) async {
+  Future<bool> deleteStream(String streamId) async {
     try {
       final response = await client.delete(Uri.parse('$uri/$streamId'));
       if (200 == response.statusCode) {
-        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
-            'Deleted Successfully');
         return true;
       } else if (404 == response.statusCode) {
-        SnacksBar.showFailureSnack(
-            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      e.toString();
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }

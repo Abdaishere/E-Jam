@@ -32,7 +32,7 @@ class _StreamsListViewState extends State<StreamsListView> {
   bool isStreamListLoading = true;
 
   // load the status of all streams from the server and update the UI with the list of streams status accordingly
-  void loadStreamView() async {
+  void loadStreamView() {
     setState(() {
       isStreamListLoading = true;
     });
@@ -117,7 +117,7 @@ class _StreamsListViewState extends State<StreamsListView> {
                 itemBuilder: (BuildContext context, int index) {
                   return StreamCard(
                       stream: streams![index],
-                      refresh: () {
+                      loadStreamView: () {
                         loadStreamView();
                       });
                 },
@@ -203,10 +203,11 @@ class AddStreamButton extends StatelessWidget {
 }
 
 class StreamCard extends StatefulWidget {
-  const StreamCard({super.key, required this.stream, required this.refresh});
+  const StreamCard(
+      {super.key, required this.stream, required this.loadStreamView});
 
   final StreamStatusDetails stream;
-  final Function() refresh;
+  final Function() loadStreamView;
 
   @override
   State<StreamCard> createState() => _StreamCardState();
@@ -215,8 +216,8 @@ class StreamCard extends StatefulWidget {
 class _StreamCardState extends State<StreamCard> {
   StreamStatusDetails? updatedStream;
 
-  void reload() {
-    StreamsController.loadStreamStatusDetails(widget.stream.id).then(
+  void refreshCard() {
+    StreamsController.loadStreamStatusDetails(widget.stream.streamId).then(
       (value) => {
         setState(() {
           updatedStream = value;
@@ -232,14 +233,20 @@ class _StreamCardState extends State<StreamCard> {
       onTap: () {
         Navigator.of(context).push(
           HeroDialogRoute(
-            builder: (BuildContext context) =>
-                Center(child: StreamDetailsView(id: stream.id)),
+            builder: (BuildContext context) => Center(
+              child: StreamDetailsView(
+                id: stream.streamId,
+                loadStreamsListView: () => {
+                  widget.loadStreamView(),
+                },
+              ),
+            ),
             settings: const RouteSettings(name: 'StreamDetailsView'),
           ),
         );
       },
       child: Hero(
-        tag: 'stream${stream.id}',
+        tag: 'stream${stream.streamId}',
         createRectTween: (begin, end) =>
             CustomRectTween(begin: begin!, end: end!),
         child: Card(
@@ -254,12 +261,14 @@ class _StreamCardState extends State<StreamCard> {
                   children: [
                     // status icon according to stream status
                     StatusIconButton(
-                        status: stream.status,
-                        id: stream.id,
-                        lastUpdated: stream.lastUpdated,
-                        refresh: () {
-                          reload();
-                        }),
+                      status: stream.streamStatus,
+                      id: stream.streamId,
+                      lastUpdated: stream.lastUpdated,
+                      refresh: () {
+                        refreshCard();
+                      },
+                      isDense: false,
+                    ),
                     // stream ID
                     _nameIdLabel(stream),
                     // menu icon for more options and details
@@ -267,18 +276,18 @@ class _StreamCardState extends State<StreamCard> {
                   ],
                 ),
                 // upload and download speed
-                SpeedMonitor(stream.id),
+                SpeedMonitor(stream.streamId),
 
                 // delay, start, stop, delete, edit, progress bar
                 // status icons should be the status of the stream (running, error, stopped, queued, finished, ready) and stream name (Alphanumeric 3 letters long names) and menu icon for more options and details
                 _streamActionsBar(
-                  stream.status,
-                  stream.id,
+                  stream.streamStatus,
+                  stream.streamId,
                 ),
 
                 // progress bar for the stream (if the stream is running) otherwise show the color of the status
                 MiniProgressBar(
-                  status: stream.status,
+                  status: stream.streamStatus,
                   startTime: stream.startTime,
                   endTime: stream.endTime,
                 ),
@@ -303,7 +312,7 @@ class _StreamCardState extends State<StreamCard> {
             ),
           ),
           Text(
-            stream.id,
+            stream.streamId,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -326,8 +335,14 @@ class _StreamCardState extends State<StreamCard> {
         if (value == 'View') {
           Navigator.of(context).push(
             HeroDialogRoute(
-              builder: (BuildContext context) =>
-                  Center(child: StreamDetailsView(id: stream.id)),
+              builder: (BuildContext context) => Center(
+                child: StreamDetailsView(
+                  id: stream.streamId,
+                  loadStreamsListView: () => {
+                    widget.loadStreamView(),
+                  },
+                ),
+              ),
               settings: const RouteSettings(name: 'StreamDetailsView'),
             ),
           );
@@ -336,8 +351,8 @@ class _StreamCardState extends State<StreamCard> {
             context: context,
             builder: (BuildContext context) => AlertDialog(
               title: const Text('Delete Stream'),
-              content:
-                  Text('Are you sure you want to delete stream ${stream.id}?'),
+              content: Text(
+                  'Are you sure you want to delete stream ${stream.streamId}?'),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -347,9 +362,10 @@ class _StreamCardState extends State<StreamCard> {
                 ),
                 TextButton(
                   onPressed: () {
-                    StreamsController.deleteStream(
-                            ScaffoldMessenger.of(context), stream.id)
-                        .then((success) => {if (success) widget.refresh()});
+                    StreamsController.deleteStream(stream.streamId)
+                        .then((success) => {
+                              if (success) {widget.loadStreamView()}
+                            });
                     Navigator.of(context).pop();
                   },
                   child: const Text('Delete'),
@@ -361,12 +377,41 @@ class _StreamCardState extends State<StreamCard> {
             ),
           );
         } else if (value == 'Edit') {
-          Navigator.of(context).push(
-            HeroDialogRoute(
-              builder: (BuildContext context) =>
-                  Center(child: EditStreamView(id: stream.id, refresh: reload)),
-              settings: const RouteSettings(name: 'EditStreamView'),
-            ),
+          StreamsController.loadStreamDetails(stream.streamId).then(
+            (value) => {
+              if (value != null)
+                {
+                  Navigator.of(context).push(
+                    HeroDialogRoute(
+                      builder: (BuildContext context) => Center(
+                          child: EditStreamView(
+                              stream: value, refresh: refreshCard)),
+                      settings: const RouteSettings(name: 'EditStreamView'),
+                    ),
+                  ),
+                }
+              else
+                {
+                  showDialog<void>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('Error'),
+                      content: const Text('Error loading stream'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('OK'),
+                        ),
+                      ],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                    ),
+                  ),
+                }
+            },
           );
         }
       },
@@ -375,11 +420,15 @@ class _StreamCardState extends State<StreamCard> {
           PopupMenuItem(
             value: 'View',
             child: Row(
-              children: const [
-                Icon(MaterialCommunityIcons.view_quilt,
-                    color: Colors.blueAccent),
-                SizedBox(width: 10.0),
-                Text('View'),
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(pi),
+                  child: const Icon(MaterialCommunityIcons.view_quilt,
+                      color: Colors.blueAccent),
+                ),
+                const SizedBox(width: 10.0),
+                const Text('View'),
               ],
             ),
           ),
@@ -421,7 +470,7 @@ class _StreamCardState extends State<StreamCard> {
                 tooltip: "Start",
                 onPressed: () {
                   StreamsController.startStream(id).then((success) {
-                    reload();
+                    refreshCard();
                   });
                 },
               )
@@ -432,7 +481,7 @@ class _StreamCardState extends State<StreamCard> {
                 tooltip: "Pause",
                 onPressed: () {
                   StreamsController.pauseStream(id).then((success) {
-                    reload();
+                    refreshCard();
                   });
                 },
               ),
@@ -442,7 +491,7 @@ class _StreamCardState extends State<StreamCard> {
           tooltip: "Delay",
           onPressed: () {
             StreamsController.queueStream(id).then((success) {
-              reload();
+              refreshCard();
             });
           },
         ),
@@ -452,7 +501,7 @@ class _StreamCardState extends State<StreamCard> {
           tooltip: "Stop",
           onPressed: () {
             StreamsController.stopStream(id).then((success) {
-              reload();
+              refreshCard();
             });
           },
         ),
@@ -503,17 +552,21 @@ class StatusIconButton extends StatelessWidget {
       required this.status,
       required this.id,
       required this.lastUpdated,
-      required this.refresh});
+      required this.refresh,
+      required this.isDense});
 
   final StreamStatus status;
   final String id;
   final DateTime lastUpdated;
   final Function refresh;
+  final bool isDense;
 
   @override
   Widget build(BuildContext context) {
     if (status == StreamStatus.created) {
       return IconButton(
+        padding: isDense ? EdgeInsets.zero : null,
+        constraints: isDense ? const BoxConstraints() : null,
         tooltip: 'New Stream',
         icon: FaIcon(
           Icons.new_releases,
@@ -526,6 +579,8 @@ class StatusIconButton extends StatelessWidget {
       );
     } else {
       return IconButton(
+        padding: isDense ? EdgeInsets.zero : null,
+        constraints: isDense ? const BoxConstraints() : null,
         tooltip:
             '${streamStatusToString(status)}: ${timeago.format(lastUpdated)}',
         icon: FaIcon(
@@ -574,9 +629,7 @@ class StatusIconButton extends StatelessWidget {
           TextButton(
             onPressed: () {
               StreamsController.startStream(id).then((success) {
-                if (success) {
-                  refresh();
-                }
+                refresh();
               });
               Navigator.of(context).pop();
             },

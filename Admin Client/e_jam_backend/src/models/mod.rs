@@ -12,7 +12,6 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Mutex};
 use validator::Validate;
-
 use self::device::Device;
 use self::process::{ProcessStatus, ProcessType};
 use self::stream_details::{StreamDetails, StreamStatusDetails};
@@ -253,7 +252,7 @@ pub struct StreamEntry {
     "]
     #[validate(range(min = 0, message = "Seed must be greater than or equal to 0"))]
     #[serde(default)]
-    seed: u32,
+    seed: u64,
 
     #[doc = r" ## Broadcast Frames
     This is the number of broadcast frames that will be sent during the stream

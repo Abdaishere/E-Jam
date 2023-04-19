@@ -67,7 +67,7 @@ class _AddStreamViewState extends State<AddStreamView>
         width: MediaQuery.of(context).size.width *
             (MediaQuery.of(context).orientation == Orientation.portrait
                 ? 1
-                : 0.5),
+                : 0.6),
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(15)),
           child: Scaffold(
@@ -255,6 +255,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a burst length';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid burst length';
               }
               return null;
@@ -276,6 +278,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a burst delay';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid burst delay';
               }
               return null;
@@ -307,7 +311,11 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a payload length';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid payload length';
+              } else if (int.parse(value) > 1500) {
+                return 'Payload length cannot be greater than 1500';
               }
               return null;
             },
@@ -361,7 +369,9 @@ class _AddStreamViewState extends State<AddStreamView>
       ],
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter a valid number of packets';
+          return 'Please enter a Seed';
+        } else if (int.tryParse(value) == null) {
+          return 'Please enter a valid Seed';
         }
         return null;
       },
@@ -390,6 +400,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a number of packets';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid number of packets';
               }
               return null;
@@ -411,6 +423,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a number of frames';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid number of frames';
               }
               return null;
@@ -607,6 +621,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a time to live';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid time to live';
               }
               return null;
@@ -628,6 +644,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a time to live';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid time to live';
               }
               return null;
@@ -649,6 +667,8 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
+                return 'Please enter a inter frame gap';
+              } else if (int.tryParse(value) == null) {
                 return 'Please enter a valid inter frame gap';
               }
               return null;
@@ -681,9 +701,9 @@ class _AddStreamViewState extends State<AddStreamView>
             color: Colors.redAccent,
             onPressed: () {
               setState(() {
-                AddStreamController.clearAllFields();
                 _tabBarColor = Colors.blueAccent;
                 formKey.currentState!.reset();
+                AddStreamController.clearAllFields();
               });
             },
           ),

@@ -34,7 +34,7 @@ pub struct StreamDetails {
     pub payload_length: u64,
     pub burst_length: u64,
     pub burst_delay: u64, 
-    pub seed: u32,
+    pub seed: u64,
     pub broadcast_frames: u32,
     pub inter_frame_gap: u64,
     pub time_to_live: u64,

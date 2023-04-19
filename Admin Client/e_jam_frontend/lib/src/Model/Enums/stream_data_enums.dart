@@ -68,7 +68,7 @@ TransportLayerProtocol transportLayerProtocolFromString(String protocol) {
   }
 }
 
-String transportLayerProtocolToString(TransportLayerProtocol protocol) {
+String transportLayerProtocolToString(TransportLayerProtocol? protocol) {
   switch (protocol) {
     case TransportLayerProtocol.tcp:
       return 'TCP';
@@ -96,7 +96,7 @@ FlowType flowTypeFromString(String flowType) {
   }
 }
 
-String flowTypeToString(FlowType flowType) {
+String flowTypeToString(FlowType? flowType) {
   switch (flowType) {
     case FlowType.backToBack:
       return 'BackToBack';

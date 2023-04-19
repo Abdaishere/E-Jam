@@ -87,16 +87,12 @@ class _DevicesListViewState extends State<DevicesListView> {
                 visible: devices != null && devices!.isNotEmpty,
                 replacement: Visibility(
                   visible: devices != null && devices!.isEmpty,
-                  replacement: Stack(
-                    children: const [
-                      Center(
-                        child: Icon(
-                          Icons.warning_amber_rounded,
-                          color: Colors.redAccent,
-                          size: 100.0,
-                        ),
-                      ),
-                    ],
+                  replacement: const Center(
+                    child: Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 100.0,
+                    ),
                   ),
                   child: Center(
                     child: Column(

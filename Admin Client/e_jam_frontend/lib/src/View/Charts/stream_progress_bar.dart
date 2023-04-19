@@ -1,15 +1,22 @@
+import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class StreamProgressBar extends StatefulWidget {
-  const StreamProgressBar(this.id, {super.key});
-  final String id;
+  const StreamProgressBar({
+    super.key,
+    required this.status,
+    required this.startTime,
+    required this.endTime,
+  });
+  final StreamStatus status;
+  final DateTime startTime;
+  final DateTime endTime;
   @override
   State<StreamProgressBar> createState() => _StreamProgressBarState();
 }
 
 class _StreamProgressBarState extends State<StreamProgressBar> {
-  get index => widget.id;
   @override
   Widget build(BuildContext context) {
     return SfLinearGauge(

@@ -32,32 +32,6 @@ class StreamEntry {
     this.streamStatus,
   });
 
-  const StreamEntry.empty()
-      : name = "",
-        description = "",
-        lastUpdated = null,
-        startTime = null,
-        endTime = null,
-        delay = 0,
-        streamId = "",
-        generatorsIds = const [],
-        verifiersIds = const [],
-        payloadType = 0,
-        burstLength = 0,
-        burstDelay = 0,
-        numberOfPackets = 0,
-        payloadLength = 0,
-        seed = 0,
-        broadcastFrames = 0,
-        interFrameGap = 0,
-        timeToLive = 0,
-        transportLayerProtocol = TransportLayerProtocol.tcp,
-        flowType = FlowType.backToBack,
-        checkContent = false,
-        runningGenerators = const Process.empty(),
-        runningVerifiers = const Process.empty(),
-        streamStatus = StreamStatus.created;
-
   final String name;
   final String description;
   final DateTime? lastUpdated;

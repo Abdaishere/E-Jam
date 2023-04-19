@@ -47,7 +47,8 @@ class _AddDeviceViewState extends State<AddDeviceView> {
         description: _descriptionController.text,
         location: _locationController.text,
         ipAddress: _ipController.text,
-        port: int.parse(_portController.text),
+        port: int.tryParse(_portController.text) ??
+            NetworkController.defaultDevicesPort,
         macAddress: _macController.text,
       );
       ScaffoldMessenger.of(context);

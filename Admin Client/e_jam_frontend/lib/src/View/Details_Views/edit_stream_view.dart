@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -9,9 +10,9 @@ import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 // TODO: Make the AddStreamView a CardView
 class EditStreamView extends StatefulWidget {
   const EditStreamView(
-      {super.key, required this.id, required void Function() refresh});
+      {super.key, required this.stream, required void Function() refresh});
 
-  final String id;
+  final StreamEntry stream;
   @override
   State<EditStreamView> createState() => _EditStreamViewState();
 }
