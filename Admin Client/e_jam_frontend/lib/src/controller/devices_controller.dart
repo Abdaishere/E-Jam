@@ -14,14 +14,14 @@ class DevicesController {
       if (devices != null) {
         AddStreamController.pickedGenerators = {
           for (final Device device in devices!)
-            device.macAddress:
-                AddStreamController.pickedGenerators[device.macAddress] ?? false
+            device.name:
+                AddStreamController.pickedGenerators[device.name] ?? false
         };
 
         AddStreamController.pickedVerifiers = {
           for (final Device device in devices!)
-            device.macAddress:
-                AddStreamController.pickedVerifiers[device.macAddress] ?? false
+            device.name:
+                AddStreamController.pickedVerifiers[device.name] ?? false
         };
       }
       isLoading = false;

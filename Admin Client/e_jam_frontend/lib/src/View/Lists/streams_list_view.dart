@@ -37,7 +37,7 @@ class _StreamsListViewState extends State<StreamsListView> {
       isStreamListLoading = true;
     });
 
-    StreamsController.loadAllStreamStatus(scaffoldMessenger).then(
+    StreamsController.loadAllStreamStatus().then(
       (value) => {
         setState(() {
           streams = controllerStreamsStatusDetails;
@@ -108,8 +108,8 @@ class _StreamsListViewState extends State<StreamsListView> {
                 shrinkWrap: true,
                 itemCount: streams?.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: max(
-                      MediaQuery.of(context).copyWith().size.width ~/ 342.0, 1),
+                  crossAxisCount:
+                      max(MediaQuery.of(context).size.width ~/ 280.0, 1),
                   childAspectRatio: 3 / 2,
                   mainAxisSpacing: 5.0,
                   crossAxisSpacing: 3.0,
@@ -216,9 +216,7 @@ class _StreamCardState extends State<StreamCard> {
   StreamStatusDetails? updatedStream;
 
   void reload() {
-    StreamsController.loadStreamStatusDetails(
-            ScaffoldMessenger.of(context), widget.stream.id)
-        .then(
+    StreamsController.loadStreamStatusDetails(widget.stream.id).then(
       (value) => {
         setState(() {
           updatedStream = value;
@@ -300,7 +298,7 @@ class _StreamCardState extends State<StreamCard> {
             stream.name,
             style: const TextStyle(
               overflow: TextOverflow.ellipsis,
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -415,31 +413,36 @@ class _StreamCardState extends State<StreamCard> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        IconButton(
-          icon: FaIcon(status == StreamStatus.running
-              ? FontAwesomeIcons.pause
-              : FontAwesomeIcons.play),
-          color: status == StreamStatus.running ? streamRunningColor : null,
-          tooltip: "Start",
-          onPressed: () {
-            StreamsController.startStream(ScaffoldMessenger.of(context), id)
-                .then((success) {
-              if (success) {
-                reload();
-              }
-            });
-          },
-        ),
+        status != StreamStatus.running
+            ? IconButton(
+                icon: const FaIcon(FontAwesomeIcons.play),
+                color:
+                    status == StreamStatus.running ? streamRunningColor : null,
+                tooltip: "Start",
+                onPressed: () {
+                  StreamsController.startStream(id).then((success) {
+                    reload();
+                  });
+                },
+              )
+            : IconButton(
+                icon: const FaIcon(FontAwesomeIcons.pause),
+                color:
+                    status == StreamStatus.running ? streamRunningColor : null,
+                tooltip: "Pause",
+                onPressed: () {
+                  StreamsController.pauseStream(id).then((success) {
+                    reload();
+                  });
+                },
+              ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.hourglassStart),
           color: status == StreamStatus.queued ? streamQueuedColor : null,
           tooltip: "Delay",
           onPressed: () {
-            StreamsController.queueStream(ScaffoldMessenger.of(context), id)
-                .then((success) {
-              if (success) {
-                reload();
-              }
+            StreamsController.queueStream(id).then((success) {
+              reload();
             });
           },
         ),
@@ -448,11 +451,8 @@ class _StreamCardState extends State<StreamCard> {
           color: status == StreamStatus.stopped ? streamStoppedColor : null,
           tooltip: "Stop",
           onPressed: () {
-            StreamsController.stopStream(ScaffoldMessenger.of(context), id)
-                .then((success) {
-              if (success) {
-                reload();
-              }
+            StreamsController.stopStream(id).then((success) {
+              reload();
             });
           },
         ),
@@ -573,8 +573,7 @@ class StatusIconButton extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              StreamsController.startStream(ScaffoldMessenger.of(context), id)
-                  .then((success) {
+              StreamsController.startStream(id).then((success) {
                 if (success) {
                   refresh();
                 }
@@ -629,9 +628,8 @@ class SpeedMonitor extends StatelessWidget {
               FaIcon(FontAwesomeIcons.caretUp, color: uploadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '987654321MB/s',
+                  '0 MB/s',
                   style: TextStyle(
-                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     height: 1.5,
                     letterSpacing: 1.0,
@@ -651,9 +649,8 @@ class SpeedMonitor extends StatelessWidget {
                   color: downloadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '987654321MB/s',
+                  '0 MB/s',
                   style: TextStyle(
-                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     height: 1.5,
                     letterSpacing: 1.0,

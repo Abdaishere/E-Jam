@@ -128,6 +128,8 @@ class _AddStreamViewState extends State<AddStreamView>
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           _checkContentButton(),
           _iDNameFields(),
@@ -295,7 +297,7 @@ class _AddStreamViewState extends State<AddStreamView>
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          flex: 1,
+          flex: 2,
           child: TextFormField(
             decoration: const InputDecoration(
               labelText: 'Payload Length',
@@ -428,10 +430,9 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _streamDevicesLists() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Expanded(
-          flex: 1,
           child: ListTile(
             leading: Transform(
               alignment: Alignment.center,
@@ -440,7 +441,6 @@ class _AddStreamViewState extends State<AddStreamView>
                 MaterialCommunityIcons.progress_upload,
                 semanticLabel: 'Generators',
                 color: uploadColor,
-                size: 30,
               ),
             ),
             shape: const RoundedRectangleBorder(
@@ -450,8 +450,9 @@ class _AddStreamViewState extends State<AddStreamView>
             trailing: Text(
               _numberOfGenerators.toString(),
               style: TextStyle(
-                  color: _numberOfGenerators == 0 ? Colors.red : null,
-                  fontSize: 20),
+                color: _numberOfGenerators == 0 ? Colors.red : null,
+                fontSize: 20,
+              ),
             ),
             onTap: () {
               Navigator.of(context).push(
@@ -469,14 +470,13 @@ class _AddStreamViewState extends State<AddStreamView>
             },
           ),
         ),
+        const VerticalDivider(),
         Expanded(
-          flex: 1,
           child: ListTile(
             leading: const Icon(
               MaterialCommunityIcons.progress_check,
               semanticLabel: 'Verifiers',
               color: downloadColor,
-              size: 30,
             ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),

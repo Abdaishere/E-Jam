@@ -208,6 +208,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
   Padding _deviceFieldsDetails(Device device) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

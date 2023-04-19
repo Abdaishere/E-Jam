@@ -162,6 +162,22 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                   ? AddStreamController.pickedGenerators.length
                   : AddStreamController.pickedVerifiers.length),
               itemBuilder: (context, index) {
+                if (index >= DevicesController.devices!.length) {
+                  return CheckboxListTile(
+                    title: Text(widget.areGenerators
+                        ? AddStreamController.pickedGenerators.keys
+                            .elementAt(index)
+                        : AddStreamController.pickedVerifiers.keys
+                            .elementAt(index)),
+                    subtitle: const Text("Deleted"),
+                    value: false,
+                    secondary: const Icon(
+                      MaterialCommunityIcons.alert,
+                      color: Colors.red,
+                    ),
+                    onChanged: null,
+                  );
+                }
                 return CheckboxListTile(
                   title: Text(DevicesController.devices![index].name,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -169,9 +185,9 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                       '${DevicesController.devices![index].ipAddress}:${DevicesController.devices![index].port}'),
                   value: widget.areGenerators
                       ? AddStreamController.pickedGenerators[
-                          DevicesController.devices![index].macAddress]
+                          DevicesController.devices![index].name]
                       : AddStreamController.pickedVerifiers[
-                          DevicesController.devices![index].macAddress],
+                          DevicesController.devices![index].name],
                   secondary: Icon(
                     getDeviceIcon(DevicesController.devices![index].name),
                     color: deviceStatusColorScheme(
@@ -181,10 +197,10 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                     setState(() {
                       if (widget.areGenerators) {
                         AddStreamController.pickedGenerators[DevicesController
-                            .devices![index].macAddress] = value ?? false;
+                            .devices![index].name] = value ?? false;
                       } else {
                         AddStreamController.pickedVerifiers[DevicesController
-                            .devices![index].macAddress] = value ?? false;
+                            .devices![index].name] = value ?? false;
                       }
                     });
                   },

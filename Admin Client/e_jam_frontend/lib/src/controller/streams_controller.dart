@@ -20,11 +20,8 @@ class StreamsController {
     });
   }
 
-  static Future<StreamEntry?> loadStreamDetails(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
-    isLoading = true;
-    return streamServices.getStream(scaffoldMessenger, id).then((value) {
-      isLoading = false;
+  static Future<StreamEntry?> loadStreamDetails(String id) async {
+    return streamServices.getStream(id).then((value) {
       return value;
     });
   }
@@ -55,19 +52,17 @@ class StreamsController {
     });
   }
 
-  static Future<bool> queueStream(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
+  static Future<bool> queueStream(String id) async {
     isLoading = true;
-    return streamServices.startStream(scaffoldMessenger, id).then((value) {
+    return streamServices.startStream(id).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> pauseStream(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
+  static Future<bool> pauseStream(String id) async {
     isLoading = true;
-    return streamServices.stopStream(scaffoldMessenger, id).then((value) {
+    return streamServices.stopStream(id).then((value) {
       isLoading = false;
       return value;
     });
@@ -91,37 +86,33 @@ class StreamsController {
     });
   }
 
-  static Future<bool> startStream(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
+  static Future<bool> startStream(String id) async {
     isLoading = true;
-    return streamServices.forceStartStream(scaffoldMessenger, id).then((value) {
+    return streamServices.forceStartStream(id).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> stopStream(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
+  static Future<bool> stopStream(String id) async {
     isLoading = true;
-    return streamServices.forceStopStream(scaffoldMessenger, id).then((value) {
+    return streamServices.forceStopStream(id).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<StreamStatusDetails?> loadStreamStatusDetails(
-      ScaffoldMessengerState scaffoldMessenger, String id) async {
+  static Future<StreamStatusDetails?> loadStreamStatusDetails(String id) async {
     isLoading = true;
-    return streamServices.getStreamStatus(scaffoldMessenger, id).then((value) {
+    return streamServices.getStreamStatus(id).then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future loadAllStreamStatus(
-      ScaffoldMessengerState scaffoldMessenger) async {
+  static Future loadAllStreamStatus() async {
     isLoading = true;
-    return streamServices.getAllStreamStatus(scaffoldMessenger).then((value) {
+    return streamServices.getAllStreamStatus().then((value) {
       streamsStatusDetails = value;
       isLoading = false;
     });

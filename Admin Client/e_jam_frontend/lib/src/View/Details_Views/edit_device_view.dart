@@ -206,6 +206,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
             decoration: InputDecoration(

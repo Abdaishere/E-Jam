@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
@@ -6,7 +9,6 @@ import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:e_jam/src/View/Charts/line_chart_stream.dart';
 import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
 import 'package:e_jam/src/View/Charts/stream_progress_bar.dart';
-import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -22,6 +24,19 @@ class StreamDetailsView extends StatefulWidget {
 
 class _StreamDetailsViewState extends State<StreamDetailsView> {
   get id => widget.id;
+  StreamEntry? stream;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    StreamsController.loadStreamDetails(id).then((value) {
+      setState(() {
+        isLoading = false;
+        stream = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +46,6 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         return CustomRectTween(begin: begin!, end: end!);
       },
       child: SizedBox(
-        // Should fit all the input fields of the Stream Details
-        // When clicking on generators or verifiers the screen should open the Devices list view in a card view and the user should be able to select devices from the list view and add them to the stream details
-        // Try to make the card view as a drawer that slides in from the right side of the screen or from the left side of the screen (drawer approach)
         height: MediaQuery.of(context).size.height *
             (MediaQuery.of(context).orientation == Orientation.portrait
                 ? 1
@@ -108,7 +120,17 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                       ),
                       Expanded(
                         flex: 2,
-                        child: StreamFieldsDetails(id),
+                        child: Visibility(
+                            visible: !isLoading,
+                            replacement: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            child: Visibility(
+                                visible: stream != null,
+                                replacement: const Center(
+                                  child: Icon(MaterialCommunityIcons.alert),
+                                ),
+                                child: _streamFieldsDetails())),
                       ),
                     ],
                   ),
@@ -124,6 +146,255 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     );
   }
 
+  SingleChildScrollView _streamFieldsDetails() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _idCheckContentDetails(),
+          _generationSeed(),
+          _delayTimeToLiveInterFrameGapDetails(),
+          _packetsBroadcastFramesSizes(),
+          _payloadLengthAndType(),
+          _burstLengthAndDelay(),
+          _flowAndTLPTypes(),
+          _streamDevicesLists(),
+          Text('${stream?.description}'),
+        ],
+      ),
+    );
+  }
+
+  Row _streamDevicesLists() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.rotationY(pi),
+            child: const Icon(
+              MaterialCommunityIcons.progress_upload,
+              semanticLabel: 'Generators',
+              color: uploadColor,
+            ),
+          ),
+          onPressed: () {},
+        ),
+        const VerticalDivider(),
+        IconButton(
+          icon: const Icon(
+            MaterialCommunityIcons.progress_check,
+            semanticLabel: 'Verifiers',
+            color: downloadColor,
+          ),
+          onPressed: () {},
+        )
+      ],
+    );
+  }
+
+  Row _flowAndTLPTypes() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            const Text('Flow Type'),
+            Text(
+              '${stream?.flowType}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const Text('TLP Type'),
+            Text(
+              '${stream?.transportLayerProtocol}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Row _burstLengthAndDelay() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            const Text('Burst Length'),
+            Text(
+              '${stream?.burstLength}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const Text('Burst Delay'),
+            Text(
+              '${stream?.burstDelay}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Row _payloadLengthAndType() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            const Text('Payload Length'),
+            Text(
+              '${stream?.payloadLength}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const Text('Payload Type'),
+            Text(
+              '${stream?.payloadType}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  ListTile _generationSeed() {
+    return ListTile(
+      leading: const Icon(MaterialCommunityIcons.seed),
+      title: const Text('Generation Seed'),
+      subtitle: Text('${stream?.seed}'),
+    );
+  }
+
+  Row _packetsBroadcastFramesSizes() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            const Text('Packets'),
+            Text(
+              '${stream?.numberOfPackets}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const Text('Broadcast'),
+            Text(
+              '${stream?.broadcastFrames}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  ListTile _idCheckContentDetails() {
+    return ListTile(
+      leading: const Icon(Icons.info_outline),
+      title: Text(
+        '${stream?.name}',
+      ),
+      subtitle: Text('${stream?.streamId}'),
+      trailing: Icon(
+        stream?.checkContent ?? false
+            ? FontAwesomeIcons.eye
+            : FontAwesomeIcons.eyeSlash,
+        size: 30,
+        color: stream?.checkContent ?? false
+            ? Colors.greenAccent.shade700
+            : Colors.grey,
+      ),
+    );
+  }
+
+  Row _delayTimeToLiveInterFrameGapDetails() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            const Text('Delay'),
+            Text(
+              '${stream?.delay}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const Text('Time to Live'),
+            Text(
+              '${stream?.timeToLive}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            const Text('Inter Frame Gap'),
+            Text(
+              '${stream?.interFrameGap}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Row _streamActionButtons({required String id, required StreamStatus status}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -136,7 +407,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           color: status == StreamStatus.running ? streamRunningColor : null,
           tooltip: "Start",
           onPressed: () {
-            StreamsController.startStream(ScaffoldMessenger.of(context), id);
+            StreamsController.startStream(id);
             // reload();
           },
         ),
@@ -145,7 +416,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           color: status == StreamStatus.queued ? streamQueuedColor : null,
           tooltip: "Delay",
           onPressed: () {
-            StreamsController.queueStream(ScaffoldMessenger.of(context), id);
+            StreamsController.queueStream(id);
             // reload();
           },
         ),
@@ -154,28 +425,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           color: status == StreamStatus.stopped ? streamStoppedColor : null,
           tooltip: "Stop",
           onPressed: () {
-            StreamsController.stopStream(ScaffoldMessenger.of(context), id);
+            StreamsController.stopStream(id);
             // reload();
           },
         ),
       ],
     );
-  }
-}
-
-class StreamFieldsDetails extends StatefulWidget {
-  const StreamFieldsDetails(this.id, {super.key});
-
-  final String id;
-  @override
-  State<StreamFieldsDetails> createState() => _StreamFieldsDetailsState();
-}
-
-class _StreamFieldsDetailsState extends State<StreamFieldsDetails> {
-  get id => widget.id;
-  @override
-  Widget build(BuildContext context) {
-    return const Text(loremIpsum);
   }
 }
 

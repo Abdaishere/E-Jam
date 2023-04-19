@@ -164,7 +164,7 @@ class Process {
 
   String toRawJson() => json.encode(toJson());
 
-  factory Process.fromJson(Map<String, ProcessStatus> json) => Process(
+  factory Process.fromJson(Map<String, dynamic> json) => Process(
         processes: Map.from(json).map((k, v) =>
             MapEntry<String, ProcessStatus>(k, processStatusFromString(v))),
       );

@@ -235,6 +235,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
             decoration: InputDecoration(
@@ -319,7 +320,6 @@ class _AddDeviceViewState extends State<AddDeviceView> {
 
   Row _connectionIpAndPort() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           flex: 2,
