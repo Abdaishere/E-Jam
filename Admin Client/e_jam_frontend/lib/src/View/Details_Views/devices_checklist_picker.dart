@@ -130,11 +130,16 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
               ),
               // Sync button
               IconButton(
-                icon: DevicesController.devices == null
-                    ? const Icon(
+                icon: (widget.areGenerators
+                            ? AddStreamController.pickedGenerators.length
+                            : AddStreamController.pickedVerifiers.length) ==
+                        0
+                    ? Icon(
                         MaterialCommunityIcons.sync_alert,
                         size: 20,
-                        color: Colors.yellow,
+                        color: DevicesController.devices == null
+                            ? Colors.red
+                            : Colors.orange,
                       )
                     : const Icon(
                         MaterialCommunityIcons.sync_icon,
@@ -179,15 +184,17 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                   );
                 }
                 return CheckboxListTile(
-                  title: Text(DevicesController.devices![index].name,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    DevicesController.devices![index].name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(
                       '${DevicesController.devices![index].ipAddress}:${DevicesController.devices![index].port}'),
                   value: widget.areGenerators
                       ? AddStreamController.pickedGenerators[
-                          DevicesController.devices![index].name]
+                          DevicesController.devices![index].macAddress]
                       : AddStreamController.pickedVerifiers[
-                          DevicesController.devices![index].name],
+                          DevicesController.devices![index].macAddress],
                   secondary: Icon(
                     getDeviceIcon(DevicesController.devices![index].name),
                     color: deviceStatusColorScheme(
@@ -197,10 +204,10 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                     setState(() {
                       if (widget.areGenerators) {
                         AddStreamController.pickedGenerators[DevicesController
-                            .devices![index].name] = value ?? false;
+                            .devices![index].macAddress] = value ?? false;
                       } else {
                         AddStreamController.pickedVerifiers[DevicesController
-                            .devices![index].name] = value ?? false;
+                            .devices![index].macAddress] = value ?? false;
                       }
                     });
                   },

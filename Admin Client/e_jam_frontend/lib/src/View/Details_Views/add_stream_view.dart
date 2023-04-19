@@ -1,11 +1,8 @@
-import 'dart:ffi';
 import 'dart:math';
 
-import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +10,6 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 
-// TODO: Make the AddStreamView a CardView
 class AddStreamView extends StatefulWidget {
   const AddStreamView({super.key, required this.reload});
 
@@ -178,7 +174,6 @@ class _AddStreamViewState extends State<AddStreamView>
     );
   }
 
-  // TODO: change to dropdown menu
   Row _flowAndTLPTypes() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -376,7 +371,6 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _packetsBroadcastFramesSizes() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           flex: 1,
@@ -430,7 +424,6 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _streamDevicesLists() {
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
         Expanded(
           child: ListTile(

@@ -147,14 +147,28 @@ class AddStreamController {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
+      List<String> generators = [];
+      List<String> verifiers = [];
+      pickedGenerators.forEach((key, value) {
+        if (value) {
+          generators.add(key);
+        }
+      });
+
+      pickedVerifiers.forEach((key, value) {
+        if (value) {
+          verifiers.add(key);
+        }
+      });
+
       return StreamsController.createNewStream(
         StreamEntry(
           name: nameController.text,
           description: descriptionController.text,
           delay: int.parse(delayController.text),
           streamId: idController.text,
-          generatorsIds: pickedGenerators.keys.toList(),
-          verifiersIds: pickedVerifiers.keys.toList(),
+          generatorsIds: generators,
+          verifiersIds: verifiers,
           payloadType: payloadType,
           burstLength: int.parse(burstLengthController.text),
           burstDelay: int.parse(burstDelayController.text),
