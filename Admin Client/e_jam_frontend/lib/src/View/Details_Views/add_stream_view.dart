@@ -427,19 +427,27 @@ class _AddStreamViewState extends State<AddStreamView>
       children: [
         Expanded(
           child: ListTile(
-            leading: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationY(pi),
-              child: const Icon(
-                MaterialCommunityIcons.progress_upload,
-                semanticLabel: 'Generators',
-                color: uploadColor,
-              ),
-            ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
-            title: const Text('Generators'),
+            title: Row(
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(pi),
+                  child: const Icon(
+                    MaterialCommunityIcons.progress_upload,
+                    semanticLabel: 'Generators',
+                    color: uploadColor,
+                  ),
+                ),
+                const VerticalDivider(),
+                const Text(
+                  'Generators',
+                  overflow: TextOverflow.clip,
+                ),
+              ],
+            ),
             trailing: Text(
               _numberOfGenerators.toString(),
               style: TextStyle(
@@ -466,15 +474,23 @@ class _AddStreamViewState extends State<AddStreamView>
         const VerticalDivider(),
         Expanded(
           child: ListTile(
-            leading: const Icon(
-              MaterialCommunityIcons.progress_check,
-              semanticLabel: 'Verifiers',
-              color: downloadColor,
-            ),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
-            title: const Text('Verifiers'),
+            title: Row(
+              children: const [
+                Icon(
+                  MaterialCommunityIcons.progress_check,
+                  semanticLabel: 'Verifiers',
+                  color: downloadColor,
+                ),
+                VerticalDivider(),
+                Text(
+                  'Verifiers',
+                  overflow: TextOverflow.clip,
+                ),
+              ],
+            ),
             trailing: Text(
               _numberOfVerifiers.toString(),
               style: TextStyle(
