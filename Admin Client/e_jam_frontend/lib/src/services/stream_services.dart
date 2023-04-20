@@ -74,38 +74,26 @@ class StreamServices {
     }
   }
 
-  Future<bool?> updateStream(
-      ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
+  Future<bool?> updateStream(String id, StreamEntry stream) async {
     try {
       final response = await client.put(
-        Uri.parse('$uri/${stream.streamId}'),
+        Uri.parse('$uri/$id'),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
         },
         body: json.encode(stream.toJson()),
       );
-      if (200 == response.statusCode) {
-        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
-            'Updated Successfully');
 
+      if (200 == response.statusCode) {
         return true;
       } else if (400 == response.statusCode) {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            'Cannot Update Stream');
         return false;
       } else if (404 == response.statusCode) {
-        SnacksBar.showFailureSnack(
-            scaffoldMessenger, response.body.toString(), 'Cannot Find Stream');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      e.toString();
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }

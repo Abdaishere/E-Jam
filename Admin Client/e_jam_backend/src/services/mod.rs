@@ -194,7 +194,7 @@ async fn update_stream(
             }
 
             // update the stream
-            *stream_entry = new_stream_entry.clone();
+            stream_entry.update(&new_stream_entry);
             info!("Updated stream: {:#?}", stream_entry);
             HttpResponse::Ok().body(format!(
                 "Stream with id {} updated in the list of streams",

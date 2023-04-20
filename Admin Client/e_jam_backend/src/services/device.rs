@@ -215,7 +215,7 @@ async fn update_device(
                 return HttpResponse::BadRequest().body("The mac address of the device cannot be changed in the update request, please delete the device and add it again with the new mac address");
             }
 
-            *device_entry = device.clone();
+            device_entry.update(&device);
             debug!("updated device: {:#?}", device);
             HttpResponse::Ok().body(format!("Device {} updated successfully", device_mac))
         }

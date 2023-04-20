@@ -131,9 +131,10 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
               // Sync button
               IconButton(
                 icon: (widget.areGenerators
-                            ? AddStreamController.pickedGenerators.length
-                            : AddStreamController.pickedVerifiers.length) ==
-                        0
+                                ? AddStreamController.pickedGenerators.length
+                                : AddStreamController.pickedVerifiers.length) ==
+                            0 ||
+                        DevicesController.devices == null
                     ? Icon(
                         MaterialCommunityIcons.sync_alert,
                         size: 20,
@@ -154,9 +155,10 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
           ),
           body: Visibility(
             visible: (widget.areGenerators
-                    ? AddStreamController.pickedGenerators.length
-                    : AddStreamController.pickedVerifiers.length) !=
-                0,
+                        ? AddStreamController.pickedGenerators.length
+                        : AddStreamController.pickedVerifiers.length) !=
+                    0 &&
+                DevicesController.devices != null,
             replacement: Center(
               child: DevicesController.devices == null
                   ? const Text('Cannot Get Devices')

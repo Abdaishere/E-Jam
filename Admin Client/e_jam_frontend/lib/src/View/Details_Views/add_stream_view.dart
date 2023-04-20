@@ -543,7 +543,7 @@ class _AddStreamViewState extends State<AddStreamView>
             decoration: const InputDecoration(
               labelText: 'ID',
               hintText: '3 characters',
-              icon: Icon(MaterialCommunityIcons.identifier, size: 25),
+              icon: Icon(MaterialCommunityIcons.id_card, size: 25),
               isDense: true,
             ),
             inputFormatters: <TextInputFormatter>[

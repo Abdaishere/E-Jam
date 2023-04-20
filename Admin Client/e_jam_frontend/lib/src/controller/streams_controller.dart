@@ -35,10 +35,9 @@ class StreamsController {
     });
   }
 
-  static Future<bool?> updateStream(
-      ScaffoldMessengerState scaffoldMessenger, StreamEntry stream) async {
+  static Future<bool?> updateStream(String id, StreamEntry stream) async {
     isLoading = true;
-    return streamServices.updateStream(scaffoldMessenger, stream).then((value) {
+    return streamServices.updateStream(id, stream).then((value) {
       isLoading = false;
       return value;
     });
@@ -181,8 +180,6 @@ class AddStreamController {
           transportLayerProtocol: transportLayerProtocol,
           flowType: flowType,
           checkContent: checkContent,
-          runningGenerators: const Process.empty(),
-          runningVerifiers: const Process.empty(),
         ),
       );
     }

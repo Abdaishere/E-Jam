@@ -317,13 +317,13 @@ pub struct StreamEntry {
     #[doc = r" ## Running Generators
     This is the list of all the Process that are generating the stream (mac_address of the device, process status)
     "]
-    #[serde(default)]
+    #[serde(default, skip_deserializing)]
     running_generators: HashMap<String, ProcessStatus>,
 
     #[doc = r" ## Running Verifiers
     This is the list of all the Process that are verifying the stream (mac_address of the device, process status)
     "]
-    #[serde(default)]
+    #[serde(default, skip_deserializing)]
     running_verifiers: HashMap<String, ProcessStatus>,
 
     #[doc = r" ## Stream Status
@@ -1040,6 +1040,27 @@ this is used to check if the stream status is the same as the status passed
 
     pub fn get_stream_delay_seconds(&self) -> u64 {
         self.delay / 1000
+    }
+
+    pub fn update(&mut self, stream: &StreamEntry) {
+        self.name = stream.name.clone();
+        self.description = stream.description.clone();
+        self.delay = stream.delay;
+        self.generators_ids = stream.generators_ids.clone();
+        self.verifiers_ids = stream.verifiers_ids.clone();
+        self.payload_type = stream.payload_type;
+        self.number_of_packets = stream.number_of_packets;
+        self.payload_length = stream.payload_length;
+        self.burst_delay = stream.burst_delay;
+        self.burst_length = stream.burst_length;
+        self.seed = stream.seed;
+        self.broadcast_frames = stream.broadcast_frames;
+        self.inter_frame_gap = stream.inter_frame_gap;
+        self.time_to_live = stream.time_to_live;
+        self.transport_layer_protocol = stream.transport_layer_protocol.clone();
+        self.flow_type = stream.flow_type.clone();
+        self.check_content = stream.check_content;
+        self.last_updated = Utc::now();
     }
 }
 

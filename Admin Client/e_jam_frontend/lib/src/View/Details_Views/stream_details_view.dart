@@ -87,65 +87,68 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 ),
               ),
               centerTitle: true,
-              actions: [
-                IconButton(
-                  icon: const Icon(MaterialCommunityIcons.pencil),
-                  color: Colors.green,
-                  tooltip: 'Edit Stream',
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      HeroDialogRoute(
-                        builder: (BuildContext context) => Center(
-                          child: EditStreamView(
-                            stream: stream!,
-                            refresh: _loadStream,
-                          ),
-                        ),
-                        settings: const RouteSettings(name: 'EditStreamView'),
+              actions: stream != null
+                  ? [
+                      IconButton(
+                        icon: const Icon(MaterialCommunityIcons.pencil),
+                        color: Colors.green,
+                        tooltip: 'Edit Stream',
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            HeroDialogRoute(
+                              builder: (BuildContext context) => Center(
+                                child: EditStreamView(
+                                  stream: stream!,
+                                  reload: _loadStream,
+                                ),
+                              ),
+                              settings:
+                                  const RouteSettings(name: 'EditStreamView'),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(MaterialCommunityIcons.trash_can),
-                  color: Colors.red,
-                  tooltip: 'Delete Stream',
-                  onPressed: () {
-                    showDialog<void>(
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: const Text('Delete Stream?'),
-                        content: Text(
-                            'Are you sure you want to delete Stream ${stream?.streamId ?? '___'}?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              StreamsController.deleteStream(
-                                      stream?.streamId ?? '___')
-                                  .then((success) => {
-                                        widget.loadStreamsListView(),
-                                        Navigator.of(context).pop(),
-                                        Navigator.of(context).pop(),
-                                      });
-                            },
-                            child: const Text('Delete'),
-                          ),
-                        ],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
+                      IconButton(
+                        icon: const Icon(MaterialCommunityIcons.trash_can),
+                        color: Colors.red,
+                        tooltip: 'Delete Stream',
+                        onPressed: () {
+                          showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Delete Stream?'),
+                              content: Text(
+                                  'Are you sure you want to delete Stream ${stream?.streamId ?? '___'}?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    StreamsController.deleteStream(
+                                            stream?.streamId ?? '___')
+                                        .then((success) => {
+                                              widget.loadStreamsListView(),
+                                              Navigator.of(context).pop(),
+                                              Navigator.of(context).pop(),
+                                            });
+                                  },
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 10),
-              ],
+                      const SizedBox(width: 10),
+                    ]
+                  : null,
             ),
             body: Column(
               children: [
@@ -294,7 +297,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               MaterialCommunityIcons.progress_upload,
               semanticLabel: 'Generators',
               color: uploadColor,
-              size: 40,
+              size: 30,
             ),
           ),
           onPressed: () {
@@ -304,7 +307,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 builder: (BuildContext context) => Center(
                   child: StreamDevicesList(
                     areGenerators: true,
-                    process: stream?.runningGenerators ?? const Process.empty(),
+                    process: stream?.runningGenerators,
                     reloadStream: () => {
                       _loadStream(),
                     },
@@ -321,7 +324,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             MaterialCommunityIcons.progress_check,
             semanticLabel: 'Verifiers',
             color: downloadColor,
-            size: 40,
+            size: 30,
           ),
           onPressed: () {
             Navigator.of(context).push(
@@ -330,7 +333,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 builder: (BuildContext context) => Center(
                   child: StreamDevicesList(
                     areGenerators: false,
-                    process: stream?.runningVerifiers ?? const Process.empty(),
+                    process: stream?.runningVerifiers,
                     reloadStream: () => {
                       _loadStream(),
                     },

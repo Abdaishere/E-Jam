@@ -391,7 +391,7 @@ class _StreamCardState extends State<StreamCard> {
                     HeroDialogRoute(
                       builder: (BuildContext context) => Center(
                           child: EditStreamView(
-                              stream: value, refresh: refreshCard)),
+                              stream: value, reload: refreshCard)),
                       settings: const RouteSettings(name: 'EditStreamView'),
                     ),
                   ),

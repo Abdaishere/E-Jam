@@ -405,6 +405,15 @@ this is used to set the device to reachable or unreachable and update the last u
             Err(_) => false,
         }
     }
+
+    pub fn update(&mut self, device: &Device) {
+        self.name = device.name.clone();
+        self.description = device.description.clone();
+        self.location = device.location.clone();
+        self.ip_address = device.ip_address.clone();
+        self.port = device.port;
+        self.last_updated = Utc::now();
+    }
 }
 
 #[doc = r"## DeviceStatus
