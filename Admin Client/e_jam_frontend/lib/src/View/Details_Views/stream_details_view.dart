@@ -46,10 +46,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
   _loadStream() {
     isLoading = true;
     StreamsController.loadStreamDetails(id).then((value) {
-      setState(() {
-        isLoading = false;
-        stream = value;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          stream = value;
+        });
+      }
     });
   }
 

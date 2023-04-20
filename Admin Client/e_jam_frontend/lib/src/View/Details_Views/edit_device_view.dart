@@ -58,8 +58,8 @@ class _EditDeviceViewState extends State<EditDeviceView> {
       );
       ScaffoldMessenger.of(context);
 
-      return DevicesController.updateDevice(device).then(
-        (result) {
+      return DevicesController.updateDevice(device).then((result) {
+        if (mounted) {
           if (result ?? false) {
             setState(() {
               widget.refresh();
@@ -71,10 +71,21 @@ class _EditDeviceViewState extends State<EditDeviceView> {
             });
             return false;
           }
-        },
-      );
+        }
+        return null;
+      });
     }
     return null;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _locationController.dispose();
+    _ipController.dispose();
+    _portController.dispose();
+    super.dispose();
   }
 
   _pingDevice() async {

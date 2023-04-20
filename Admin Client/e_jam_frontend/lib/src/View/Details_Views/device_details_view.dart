@@ -37,12 +37,15 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
       _isPinging = true;
     });
     DevicesController.pingDevice(widget.device.macAddress).then(
-      (value) => setState(
-        () {
-          _isPinged = value;
-          _isPinging = false;
-        },
-      ),
+      (value) => {
+        if (mounted)
+          setState(
+            () {
+              _isPinged = value;
+              _isPinging = false;
+            },
+          ),
+      },
     );
   }
 
@@ -50,9 +53,10 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
     DevicesController.loadDeviceDetails(widget.device.macAddress).then(
       (value) => {
         widget.loadDevicesListView(),
-        setState(() {
-          updateDevice = value;
-        })
+        if (mounted)
+          setState(() {
+            updateDevice = value;
+          })
       },
     );
   }

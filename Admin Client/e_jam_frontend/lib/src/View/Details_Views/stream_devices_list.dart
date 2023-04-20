@@ -68,9 +68,7 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
                         size: 20,
                       ),
                 tooltip: 'Sync Devices',
-                onPressed: () {
-                  _syncDevices();
-                },
+                onPressed: () => _syncDevices,
               ),
             ],
           ),

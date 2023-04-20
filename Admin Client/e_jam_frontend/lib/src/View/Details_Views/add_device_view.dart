@@ -39,6 +39,17 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     _ipController.text = widget.ip ?? '';
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _locationController.dispose();
+    _ipController.dispose();
+    _portController.dispose();
+    _macController.dispose();
+    super.dispose();
+  }
+
   Future<bool?> _addDevice() async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
@@ -56,19 +67,22 @@ class _AddDeviceViewState extends State<AddDeviceView> {
       return DevicesController.createNewDevice(device).then(
         (code) {
           bool result = _analyzeCode(code);
-          if (result) {
-            setState(() {
-              widget.refresh();
-              _topBarIndicator = Colors.greenAccent.shade700.withOpacity(0.8);
-            });
-            if (widget.delete != null) widget.delete!();
-            return true;
-          } else {
-            setState(() {
-              _topBarIndicator = Colors.redAccent.withOpacity(0.8);
-            });
-            return false;
+          if (mounted) {
+            if (result) {
+              setState(() {
+                widget.refresh();
+                _topBarIndicator = Colors.greenAccent.shade700.withOpacity(0.8);
+              });
+              if (widget.delete != null) widget.delete!();
+              return true;
+            } else {
+              setState(() {
+                _topBarIndicator = Colors.redAccent.withOpacity(0.8);
+              });
+              return false;
+            }
           }
+          return null;
         },
       );
     }

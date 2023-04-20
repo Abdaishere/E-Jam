@@ -10,9 +10,10 @@ import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 // TODO: Make the AddStreamView a CardView
 class EditStreamView extends StatefulWidget {
   const EditStreamView(
-      {super.key, required this.stream, required void Function() refresh});
+      {super.key, required this.stream, required this.refresh});
 
   final StreamEntry stream;
+  final void Function() refresh;
   @override
   State<EditStreamView> createState() => _EditStreamViewState();
 }
