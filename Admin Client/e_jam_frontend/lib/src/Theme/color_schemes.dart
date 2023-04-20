@@ -1,4 +1,5 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
+import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ const streamStoppedColor = Colors.redAccent; // stop button pressed
 const streamErrorColor = Colors.red; // any error
 const streamFinishedColor = Colors.blueAccent; // finished successfully
 
-Color streamColorScheme(StreamStatus status) {
+Color streamColorScheme(StreamStatus? status) {
   switch (status) {
     case StreamStatus.created:
       return streamCreatedColor;
@@ -56,6 +57,23 @@ Color deviceStatusColorScheme(DeviceStatus? status) {
       return deviceOfflineOrErrorColor;
     default:
       return deviceOfflineOrErrorColor;
+  }
+}
+
+Color processStatusColorScheme(ProcessStatus? status) {
+  switch (status) {
+    case ProcessStatus.queued:
+      return streamQueuedColor;
+    case ProcessStatus.running:
+      return deviceRunningOrOnlineColor;
+    case ProcessStatus.stopped:
+      return streamStoppedColor;
+    case ProcessStatus.completed:
+      return streamFinishedColor;
+    case ProcessStatus.failed:
+      return streamErrorColor;
+    default:
+      return streamErrorColor;
   }
 }
 

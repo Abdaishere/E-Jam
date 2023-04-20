@@ -94,13 +94,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
               backgroundColor: Colors.transparent,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
-                leading: IconButton(
-                  icon: const FaIcon(FontAwesome.close,
-                      size: 40, color: Colors.white70),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
+                automaticallyImplyLeading: false,
               ),
               body: Center(
                 child: AspectRatio(

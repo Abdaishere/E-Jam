@@ -11,6 +11,7 @@ import 'package:e_jam/src/View/Charts/line_chart_stream.dart';
 import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
 import 'package:e_jam/src/View/Charts/stream_progress_bar.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
+import 'package:e_jam/src/View/Details_Views/stream_devices_list.dart';
 import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                       builder: (BuildContext context) => AlertDialog(
                         title: const Text('Delete Stream?'),
                         content: Text(
-                            'Are you sure you want to delete Stream ${stream?.streamId}?'),
+                            'Are you sure you want to delete Stream ${stream?.streamId ?? '___'}?'),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -124,7 +125,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                           TextButton(
                             onPressed: () {
                               StreamsController.deleteStream(
-                                      stream?.streamId ?? '')
+                                      stream?.streamId ?? '___')
                                   .then((success) => {
                                         widget.loadStreamsListView(),
                                         Navigator.of(context).pop(),
@@ -227,11 +228,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                     ),
                   ),
                 ),
-                // TODO: Implement Stream Statistics
                 StreamProgressBar(
-                  status: stream?.streamStatus ?? StreamStatus.error,
-                  startTime: stream?.startTime ?? DateTime.now(),
-                  endTime: stream?.endTime ?? DateTime.now(),
+                  status: stream?.streamStatus,
+                  startTime: stream?.startTime,
+                  endTime: stream?.endTime,
                 ),
                 _streamActionButtons(
                     id: id, status: stream?.streamStatus ?? StreamStatus.error),
@@ -250,6 +250,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 15),
         horizontalTitleGap: 5,
         minVerticalPadding: 0,
+        dense: true,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -261,8 +262,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             _payloadLengthAndType(),
             _burstLengthAndDelay(),
             _flowAndTLPTypes(),
-            _streamDevicesLists(),
             const SizedBox(height: 10),
+            _streamDevicesLists(),
             _description(),
           ],
         ),
@@ -274,9 +275,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     return ListTile(
       title: Text(
         textAlign: TextAlign.left,
-        '${stream?.description}',
+        stream?.description ?? 'No Description',
       ),
-      dense: true,
     );
   }
 
@@ -292,10 +292,26 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               MaterialCommunityIcons.progress_upload,
               semanticLabel: 'Generators',
               color: uploadColor,
-              size: 30,
+              size: 40,
             ),
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              DialogRoute(
+                context: context,
+                builder: (BuildContext context) => Center(
+                  child: StreamDevicesList(
+                    areGenerators: true,
+                    process: stream?.runningGenerators ?? const Process.empty(),
+                    reloadStream: () => {
+                      _loadStream(),
+                    },
+                  ),
+                ),
+                settings: const RouteSettings(name: 'AddGenerators'),
+              ),
+            );
+          },
         ),
         const VerticalDivider(),
         IconButton(
@@ -303,9 +319,25 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             MaterialCommunityIcons.progress_check,
             semanticLabel: 'Verifiers',
             color: downloadColor,
-            size: 30,
+            size: 40,
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).push(
+              DialogRoute(
+                context: context,
+                builder: (BuildContext context) => Center(
+                  child: StreamDevicesList(
+                    areGenerators: false,
+                    process: stream?.runningVerifiers ?? const Process.empty(),
+                    reloadStream: () => {
+                      _loadStream(),
+                    },
+                  ),
+                ),
+                settings: const RouteSettings(name: 'AddGenerators'),
+              ),
+            );
+          },
         )
       ],
     );
@@ -321,7 +353,6 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 const Icon(MaterialCommunityIcons.transit_connection_variant),
             title: const Text('Flow Type', overflow: TextOverflow.ellipsis),
             subtitle: Text(flowTypeToString(stream?.flowType)),
-            dense: true,
           ),
         ),
         Expanded(
@@ -330,7 +361,6 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             subtitle: Text(
               transportLayerProtocolToString(stream?.transportLayerProtocol),
             ),
-            dense: true,
           ),
         ),
       ],
@@ -345,17 +375,15 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           child: ListTile(
             leading: const Icon(MaterialCommunityIcons.broadcast),
             title: const Text('Burst Length', overflow: TextOverflow.ellipsis),
-            subtitle:
-                Text('${stream?.burstLength}', overflow: TextOverflow.ellipsis),
-            dense: true,
+            subtitle: Text(stream?.burstLength.toString() ?? 'Unknown',
+                overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
             title: const Text('Burst Delay', overflow: TextOverflow.ellipsis),
-            subtitle:
-                Text('${stream?.burstDelay}', overflow: TextOverflow.ellipsis),
-            dense: true,
+            subtitle: Text(stream?.burstDelay.toString() ?? 'Unknown',
+                overflow: TextOverflow.ellipsis),
           ),
         ),
       ],
@@ -373,17 +401,15 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             ),
             title:
                 const Text('Payload Length', overflow: TextOverflow.ellipsis),
-            subtitle: Text('${stream?.payloadLength}',
+            subtitle: Text(stream?.payloadLength.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
-            dense: true,
           ),
         ),
         Expanded(
           child: ListTile(
             title: const Text('Payload Type', overflow: TextOverflow.ellipsis),
-            subtitle:
-                Text('${stream?.payloadType}', overflow: TextOverflow.ellipsis),
-            dense: true,
+            subtitle: Text(stream?.payloadType.toString() ?? 'Unknown',
+                overflow: TextOverflow.ellipsis),
           ),
         ),
       ],
@@ -394,8 +420,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     return ListTile(
       leading: const Icon(MaterialCommunityIcons.seed),
       title: const Text('Generation Seed', overflow: TextOverflow.ellipsis),
-      subtitle: Text('${stream?.seed}', overflow: TextOverflow.ellipsis),
-      dense: true,
+      subtitle: Text(stream?.seed.toString() ?? 'Unknown',
+          overflow: TextOverflow.ellipsis),
     );
   }
 
@@ -411,17 +437,15 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   : MaterialCommunityIcons.package_variant_closed,
             ),
             title: const Text('Packets', overflow: TextOverflow.ellipsis),
-            subtitle: Text('${stream?.numberOfPackets}',
+            subtitle: Text(stream?.numberOfPackets.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
-            dense: true,
           ),
         ),
         Expanded(
           child: ListTile(
             title: const Text('Frame Size', overflow: TextOverflow.ellipsis),
-            subtitle: Text('${stream?.broadcastFrames}',
+            subtitle: Text(stream?.broadcastFrames.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
-            dense: true,
           ),
         ),
       ],
@@ -432,17 +456,17 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     return ListTile(
       leading: StatusIconButton(
           status: stream?.streamStatus ?? StreamStatus.error,
-          id: stream?.streamId ?? '',
+          id: stream?.streamId ?? '___',
           lastUpdated: stream?.lastUpdated ?? DateTime.now(),
           refresh: () {
             _loadStream();
           },
           isDense: true),
       title: Text(
-        '${stream?.name}',
+        stream?.name ?? 'Unnamed',
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Text('${stream?.streamId}'),
+      subtitle: Text(stream?.streamId ?? '___'),
       trailing: Icon(
         stream?.checkContent ?? false
             ? FontAwesomeIcons.eye
@@ -462,25 +486,23 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           child: ListTile(
             leading: const Icon(MaterialCommunityIcons.timer),
             title: const Text('Delay', overflow: TextOverflow.ellipsis),
-            subtitle: Text('${stream?.delay}', overflow: TextOverflow.ellipsis),
-            dense: true,
+            subtitle: Text(stream?.delay.toString() ?? 'Unknown',
+                overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
             title: const Text('Time to Live', overflow: TextOverflow.ellipsis),
-            subtitle:
-                Text('${stream?.timeToLive}', overflow: TextOverflow.ellipsis),
-            dense: true,
+            subtitle: Text(stream?.timeToLive.toString() ?? 'Unknown',
+                overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
             title:
                 const Text('Inter Frame Gap', overflow: TextOverflow.ellipsis),
-            subtitle: Text('${stream?.interFrameGap}',
+            subtitle: Text(stream?.interFrameGap.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
-            dense: true,
           ),
         ),
       ],

@@ -19,11 +19,11 @@ ProcessStatus processStatusFromString(String status) {
     case 'Failed':
       return ProcessStatus.failed;
     default:
-      return ProcessStatus.queued;
+      return ProcessStatus.failed;
   }
 }
 
-String processStatusToString(ProcessStatus processStatus) {
+String processStatusToString(ProcessStatus? processStatus) {
   switch (processStatus) {
     case ProcessStatus.queued:
       return 'Queued';
@@ -36,7 +36,7 @@ String processStatusToString(ProcessStatus processStatus) {
     case ProcessStatus.failed:
       return 'Failed';
     default:
-      return 'Queued';
+      return 'Failed';
   }
 }
 

@@ -1,0 +1,150 @@
+import 'dart:math';
+
+import 'package:e_jam/src/Model/Classes/device.dart';
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Enums/processes.dart';
+import 'package:e_jam/src/Theme/color_schemes.dart';
+import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+class StreamDevicesList extends StatefulWidget {
+  const StreamDevicesList(
+      {super.key,
+      required this.areGenerators,
+      required this.process,
+      required this.reloadStream});
+
+  final bool areGenerators;
+  final Process process;
+  final Function reloadStream;
+
+  @override
+  State<StreamDevicesList> createState() => _StreamDevicesListState();
+}
+
+class _StreamDevicesListState extends State<StreamDevicesList> {
+  _syncDevices() {
+    setState(() {
+      widget.reloadStream();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height *
+          (MediaQuery.of(context).orientation == Orientation.portrait
+              ? 1
+              : 0.7),
+      width: MediaQuery.of(context).size.width *
+          (MediaQuery.of(context).orientation == Orientation.portrait
+              ? 1
+              : 0.4),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(
+          Radius.circular(15),
+        ),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+                widget.areGenerators ? 'Generating status' : 'Verifying status',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            centerTitle: true,
+            actions: [
+              // Sync button
+              IconButton(
+                icon: widget.process.processes.isEmpty
+                    ? const Icon(
+                        MaterialCommunityIcons.sync_alert,
+                        size: 20,
+                      )
+                    : const Icon(
+                        MaterialCommunityIcons.sync_icon,
+                        size: 20,
+                      ),
+                tooltip: 'Sync Devices',
+                onPressed: () {
+                  _syncDevices();
+                },
+              ),
+            ],
+          ),
+          body: Visibility(
+            visible: widget.process.processes.isNotEmpty &&
+                DevicesController.devices != null,
+            replacement: Center(
+              child: DevicesController.devices == null
+                  ? const Text('Cannot Get Devices List')
+                  : const Text('No Devices Running'),
+            ),
+            child: ListView.builder(
+              itemCount: widget.process.processes.length,
+              itemBuilder: (context, index) {
+                String macAddress =
+                    widget.process.processes.keys.elementAt(index);
+                index = DevicesController.devices!
+                    .indexWhere((element) => element.macAddress == macAddress);
+                if (index == -1) {
+                  return ListTile(
+                    title: Text(
+                      macAddress,
+                    ),
+                    subtitle: const Text(
+                      'Unknown Device',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.red),
+                    ),
+                    leading: const Icon(
+                      MaterialCommunityIcons.help_network,
+                    ),
+                    trailing: RotationTransition(
+                      turns: const AlwaysStoppedAnimation(320 / 360),
+                      child: Text(
+                        processStatusToString(
+                            widget.process.processes[macAddress]),
+                        style: TextStyle(
+                          color: processStatusColorScheme(
+                              widget.process.processes[macAddress]),
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return ListTile(
+                  title: Text(
+                    DevicesController.devices![index].name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(macAddress),
+                  leading: Icon(
+                    getDeviceIcon(DevicesController.devices![index].name),
+                    color: deviceStatusColorScheme(
+                        DevicesController.devices![index].status),
+                  ),
+                  trailing: RotationTransition(
+                    turns: const AlwaysStoppedAnimation(320 / 360),
+                    child: Text(
+                      processStatusToString(
+                          widget.process.processes[macAddress]),
+                      style: TextStyle(
+                        color: processStatusColorScheme(
+                            widget.process.processes[macAddress]),
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

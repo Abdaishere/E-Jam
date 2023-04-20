@@ -534,20 +534,32 @@ class MiniProgressBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(10.0),
       child: LinearProgressIndicator(
         minHeight: 5.0,
-        value: getStreamProgress(),
+        value: getProgress(status, startTime, endTime),
         backgroundColor: streamColorScheme(status).withAlpha(100),
         valueColor: AlwaysStoppedAnimation<Color>(streamColorScheme(status)),
       ),
     );
   }
 
-  double getStreamProgress() {
-    if (status == StreamStatus.running) {
-      final Duration duration = endTime.difference(startTime);
-      final Duration elapsed = DateTime.now().difference(startTime);
-      return elapsed.inSeconds / duration.inSeconds;
+  final double accuracy = 0.8;
+  double getProgress(
+      StreamStatus status, DateTime? startTime, DateTime? endTime) {
+    if (status == StreamStatus.running ||
+        status == StreamStatus.stopped ||
+        status == StreamStatus.error) {
+      return startTime == null
+          ? 0
+          : endTime == null
+              ? 0.5
+              : (startTime.difference(DateTime.now()).inSeconds /
+                      (startTime.difference(endTime).inSeconds == 0
+                          ? 1
+                          : startTime.difference(DateTime.now()).inSeconds)) *
+                  accuracy;
+    } else if (status == StreamStatus.finished) {
+      return 1;
     } else {
-      return 0.0;
+      return 0;
     }
   }
 }
