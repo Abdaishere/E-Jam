@@ -605,8 +605,8 @@ class StatusIconButton extends StatelessWidget {
 
 IconData getDeviceIcon(String name) {
   name = name.toLowerCase();
-  if (name.contains('server')) {
-    return MaterialCommunityIcons.server;
+  if (name.contains('chip') || name.contains('pine64')) {
+    return MaterialCommunityIcons.chip;
   } else if (name.contains('raspberry') || name.contains('pi')) {
     return MaterialCommunityIcons.raspberry_pi;
   } else if (name.contains('mac') || name.contains('apple')) {
@@ -630,5 +630,5 @@ IconData getDeviceIcon(String name) {
   } else if (name.contains('security') || name.contains('firewall')) {
     return MaterialCommunityIcons.security_network;
   }
-  return MaterialCommunityIcons.chip;
+  return MaterialCommunityIcons.server;
 }

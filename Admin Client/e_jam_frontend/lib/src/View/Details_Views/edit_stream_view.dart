@@ -13,10 +13,15 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 
 class EditStreamView extends StatefulWidget {
-  const EditStreamView({super.key, required this.reload, required this.stream});
+  const EditStreamView(
+      {super.key,
+      required this.reload,
+      required this.stream,
+      required this.id});
 
   final Function() reload;
   final StreamEntry stream;
+  final String id;
   @override
   State<EditStreamView> createState() => _EditStreamViewState();
 }
@@ -72,11 +77,31 @@ class _EditStreamViewState extends State<EditStreamView>
     _checkContent = stream.checkContent;
     _numberOfVerifiers = stream.verifiersIds.length;
     _numberOfGenerators = stream.generatorsIds.length;
+    EditStreamController.syncDevicesList(
+        stream.generatorsIds, stream.verifiersIds);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _delayController.dispose();
+    _timeToLiveController.dispose();
+    _interFrameGapController.dispose();
+    _payloadLengthController.dispose();
+    _burstLengthController.dispose();
+    _burstDelayController.dispose();
+    _broadcastFramesController.dispose();
+    _packetsController.dispose();
+    _seedController.dispose();
+    EditStreamController.pickedGenerators.clear();
+    EditStreamController.pickedVerifiers.clear();
+    super.dispose();
   }
 
   _updateDevicesCounter() {
     int counter = 0;
-    AddStreamController.pickedGenerators.forEach((key, value) {
+    EditStreamController.pickedGenerators.forEach((key, value) {
       if (value) counter++;
     });
 
@@ -85,7 +110,7 @@ class _EditStreamViewState extends State<EditStreamView>
     });
 
     counter = 0;
-    AddStreamController.pickedVerifiers.forEach((key, value) {
+    EditStreamController.pickedVerifiers.forEach((key, value) {
       if (value) counter++;
     });
 
@@ -100,13 +125,13 @@ class _EditStreamViewState extends State<EditStreamView>
 
       List<String> generators = [];
       List<String> verifiers = [];
-      AddStreamController.pickedGenerators.forEach((key, value) {
+      EditStreamController.pickedGenerators.forEach((key, value) {
         if (value) {
           generators.add(key);
         }
       });
 
-      AddStreamController.pickedVerifiers.forEach((key, value) {
+      EditStreamController.pickedVerifiers.forEach((key, value) {
         if (value) {
           verifiers.add(key);
         }
@@ -119,8 +144,8 @@ class _EditStreamViewState extends State<EditStreamView>
           description: _descriptionController.text,
           delay: (int.tryParse(_delayController.text) ?? 0),
           streamId: stream.streamId,
-          generatorsIds: stream.generatorsIds,
-          verifiersIds: stream.verifiersIds,
+          generatorsIds: generators,
+          verifiersIds: verifiers,
           payloadType: _payloadType,
           burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
           burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
@@ -136,7 +161,7 @@ class _EditStreamViewState extends State<EditStreamView>
         ),
       ).then(
         (value) => {
-          if (value ?? false)
+          if ((value ?? false) && mounted)
             {
               widget.reload(),
               Navigator.pop(context),
@@ -149,7 +174,7 @@ class _EditStreamViewState extends State<EditStreamView>
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: 'addStream',
+      tag: widget.id,
       createRectTween: (begin, end) =>
           CustomRectTween(begin: begin!, end: end!),
       child: SizedBox(
@@ -223,7 +248,7 @@ class _EditStreamViewState extends State<EditStreamView>
                 const VerticalDivider(),
                 const Text(
                   'Generators',
-                  overflow: TextOverflow.clip,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -238,7 +263,7 @@ class _EditStreamViewState extends State<EditStreamView>
               if (pickedGeneratorsFirstTime) {
                 pickedGeneratorsFirstTime = false;
                 for (String element in stream.generatorsIds) {
-                  AddStreamController.pickedGenerators[element] = true;
+                  EditStreamController.pickedGenerators[element] = true;
                 }
               }
               Navigator.of(context).push(
@@ -248,6 +273,7 @@ class _EditStreamViewState extends State<EditStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: true,
                       saveChanges: () => _updateDevicesCounter(),
+                      isStateless: true,
                     ),
                   ),
                   settings: const RouteSettings(name: 'AddGenerators'),
@@ -286,7 +312,7 @@ class _EditStreamViewState extends State<EditStreamView>
               if (pickedVerifiersFirstTime) {
                 pickedVerifiersFirstTime = false;
                 for (String element in stream.verifiersIds) {
-                  AddStreamController.pickedVerifiers[element] = true;
+                  EditStreamController.pickedVerifiers[element] = true;
                 }
               }
               Navigator.of(context).push(
@@ -296,6 +322,7 @@ class _EditStreamViewState extends State<EditStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: false,
                       saveChanges: () => _updateDevicesCounter(),
+                      isStateless: true,
                     ),
                   ),
                   settings: const RouteSettings(name: 'AddVerifiers'),
@@ -468,15 +495,15 @@ class _EditStreamViewState extends State<EditStreamView>
             items: const [
               DropdownMenuItem(
                 value: 0,
-                child: Text('Random'),
+                child: Text('Type 0'),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text('Incremental'),
+                child: Text('Type 1'),
               ),
               DropdownMenuItem(
                 value: 2,
-                child: Text('Decremental'),
+                child: Text('Random'),
               ),
             ],
             onChanged: (value) {
@@ -502,8 +529,11 @@ class _EditStreamViewState extends State<EditStreamView>
         FilteringTextInputFormatter.digitsOnly
       ],
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a Seed';
+        if (value == null || value.isEmpty || value == '0') {
+          if (_payloadType == 2) {
+            return 'Please enter a Generation Seed for Random Payload';
+          }
+          return null;
         } else if (int.tryParse(value) == null) {
           return 'Please enter a valid Seed';
         }
@@ -584,12 +614,6 @@ class _EditStreamViewState extends State<EditStreamView>
               icon: Icon(MaterialCommunityIcons.id_card, size: 25),
               isDense: true,
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a name for the stream';
-              }
-              return null;
-            },
             controller: _nameController,
           ),
         ),
@@ -622,12 +646,6 @@ class _EditStreamViewState extends State<EditStreamView>
         icon: Icon(Icons.description, size: 25),
         isDense: true,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a description for the stream';
-        }
-        return null;
-      },
       controller: _descriptionController,
     );
   }

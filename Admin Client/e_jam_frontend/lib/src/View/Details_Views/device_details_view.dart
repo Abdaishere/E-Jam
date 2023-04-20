@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
@@ -76,22 +75,23 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
         width: MediaQuery.of(context).size.width *
             (MediaQuery.of(context).orientation == Orientation.portrait
                 ? 1
-                : 0.4),
+                : 0.45),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(
             appBar: AppBar(
               title: Text(
-                'Device ${device.name}',
+                device.name,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
               centerTitle: true,
               actions: [
                 Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 4.0),
                   child: Visibility(
                     visible: !_isPinging,
                     replacement: Padding(
@@ -184,7 +184,6 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               ],
             ),
             body: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                   flex: 3,
@@ -214,65 +213,65 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      IconButton(
-                        icon: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.rotationY(pi),
-                          child: const Icon(
-                              MaterialCommunityIcons.progress_upload,
-                              semanticLabel: 'Processes'),
-                        ),
-                        color: uploadColor,
-                        tooltip: 'Generating Processes',
-                        onPressed: () {},
-                      ),
-                      Text(
-                        device.genProcesses.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        semanticsLabel: 'Number of Processes',
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    children: <Widget>[
-                      IconButton(
-                        icon: const Icon(MaterialCommunityIcons.progress_check,
-                            semanticLabel: 'Processes'),
-                        color: downloadColor,
-                        tooltip: 'Verifying Processes',
-                        onPressed: () {},
-                      ),
-                      Text(
-                        device.verProcesses.toString(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        semanticsLabel: 'Number of Processes',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            _processesCount(device),
             const SizedBox(height: 10),
             _deviceDetailsSection(device),
           ],
         ),
       );
+
+  Row _processesCount(Device device) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              IconButton(
+                icon: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(pi),
+                  child: const Icon(MaterialCommunityIcons.progress_upload,
+                      semanticLabel: 'Processes', size: 30),
+                ),
+                color: uploadColor,
+                tooltip: 'Generating Processes',
+                onPressed: () {},
+              ),
+              Text(
+                device.genProcesses.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(MaterialCommunityIcons.progress_check,
+                    semanticLabel: 'Processes', size: 30),
+                color: downloadColor,
+                tooltip: 'Verifying Processes',
+                onPressed: () {},
+              ),
+              Text(
+                device.verProcesses.toString(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   Expanded _deviceDetailsSection(Device device) {
     return Expanded(
@@ -281,102 +280,117 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 15),
           horizontalTitleGap: 5,
           minVerticalPadding: 0,
+          dense: true,
           child: Column(
             children: [
-              ListTile(
-                leading: IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: Icon(
-                    getDeviceIcon(device.name),
-                    color: deviceStatusColorScheme(device.status),
-                  ),
-                  tooltip:
-                      '${deviceStatusToString(device.status)}: ${timeago.format(device.lastUpdated!)}',
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(
-                              'Device is ${deviceStatusToString(device.status)}'),
-                          content: Text('Last updated: ${device.lastUpdated}'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-                title: Text(
-                  device.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-                subtitle: Text(
-                  '${device.ipAddress} : ${device.port}',
-                ),
-              ),
-              ListTile(
-                leading: const Icon(
-                  MaterialCommunityIcons.ethernet,
-                ),
-                title: Visibility(
-                  visible: macIsShown,
-                  replacement: IconButton(
-                    icon: const Icon(
-                      MaterialCommunityIcons.lock,
-                    ),
-                    color: Colors.red,
-                    tooltip: 'Show MAC Address',
-                    onPressed: () {
-                      setState(() {
-                        macIsShown = true;
-                      });
-                    },
-                  ),
-                  child: Text(
-                    device.macAddress,
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              ListTile(
-                leading: const Icon(
-                  MaterialCommunityIcons.map_marker,
-                ),
-                title: Text(
-                  device.location,
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              _nameAndAddress(device),
+              _macAddress(device),
+              if (device.location.isNotEmpty) _location(device),
               const SizedBox(height: 10),
-              ListTile(
-                title: Text(
-                  textAlign: TextAlign.left,
-                  device.description,
-                ),
-              ),
+              _description(device),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  ListTile _description(Device device) {
+    return ListTile(
+      title: Text(
+        textAlign: TextAlign.left,
+        ((device.description.isEmpty) ? 'No Description' : device.description),
+      ),
+    );
+  }
+
+  ListTile _location(Device device) {
+    return ListTile(
+      leading: const Icon(
+        MaterialCommunityIcons.map_marker,
+      ),
+      title: Text(
+        device.location,
+        textAlign: TextAlign.left,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  ListTile _macAddress(Device device) {
+    return ListTile(
+      leading: const Icon(
+        MaterialCommunityIcons.ethernet,
+      ),
+      title: Visibility(
+        visible: macIsShown,
+        replacement: IconButton(
+          icon: const Icon(
+            MaterialCommunityIcons.lock,
+          ),
+          color: Colors.red,
+          tooltip: 'Show MAC Address',
+          onPressed: () {
+            setState(() {
+              macIsShown = true;
+            });
+          },
+        ),
+        child: Text(
+          device.macAddress,
+          textAlign: TextAlign.left,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  ListTile _nameAndAddress(Device device) {
+    return ListTile(
+      leading: IconButton(
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints(),
+        icon: Icon(
+          getDeviceIcon(device.name),
+          color: deviceStatusColorScheme(device.status),
+        ),
+        tooltip:
+            '${deviceStatusToString(device.status)}: ${timeago.format(device.lastUpdated!)}',
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Device is ${deviceStatusToString(device.status)}'),
+                content: Text('Last updated: ${device.lastUpdated}'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      title: Text(
+        device.name.isNotEmpty ? device.name : device.ipAddress,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: Text(
+        '${device.ipAddress} : ${device.port}',
       ),
     );
   }

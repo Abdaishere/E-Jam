@@ -249,7 +249,7 @@ class _StreamCardState extends State<StreamCard> {
         );
       },
       child: Hero(
-        tag: 'stream${stream.streamId}',
+        tag: stream.streamId,
         createRectTween: (begin, end) =>
             CustomRectTween(begin: begin!, end: end!),
         child: Card(
@@ -391,7 +391,9 @@ class _StreamCardState extends State<StreamCard> {
                     HeroDialogRoute(
                       builder: (BuildContext context) => Center(
                           child: EditStreamView(
-                              stream: value, reload: refreshCard)),
+                              stream: value,
+                              reload: refreshCard,
+                              id: stream.streamId)),
                       settings: const RouteSettings(name: 'EditStreamView'),
                     ),
                   ),

@@ -94,11 +94,9 @@ class _AddStreamViewState extends State<AddStreamView>
               controller: _tabController,
               tabs: const <Widget>[
                 Tab(
-                  height: 42.0,
                   text: 'Stream Details',
                 ),
                 Tab(
-                  height: 42.0,
                   text: 'Pre sets',
                 ),
               ],
@@ -176,16 +174,14 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _flowAndTLPTypes() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        const Icon(MaterialCommunityIcons.transit_connection_variant),
-        const VerticalDivider(),
         Expanded(
           flex: 1,
           child: DropdownButtonFormField<FlowType>(
             decoration: const InputDecoration(
               labelText: 'Flow Type',
               hintText: 'Flow Type',
+              icon: Icon(MaterialCommunityIcons.transit_connection_variant),
             ),
             value: AddStreamController.flowType,
             items: const [
@@ -239,7 +235,6 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _burstLengthAndDelay() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           flex: 1,
@@ -293,7 +288,6 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _payloadLengthAndType() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           flex: 2,
@@ -334,15 +328,15 @@ class _AddStreamViewState extends State<AddStreamView>
             items: const [
               DropdownMenuItem(
                 value: 0,
-                child: Text('Random'),
+                child: Text('Type 0'),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text('Incremental'),
+                child: Text('Type 1'),
               ),
               DropdownMenuItem(
                 value: 2,
-                child: Text('Decremental'),
+                child: Text('Random'),
               ),
             ],
             onChanged: (value) {
@@ -368,8 +362,11 @@ class _AddStreamViewState extends State<AddStreamView>
         FilteringTextInputFormatter.digitsOnly
       ],
       validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a Seed';
+        if (value == null || value.isEmpty || value == '0') {
+          if (AddStreamController.payloadType == 2) {
+            return 'Please enter a Generation Seed for Random Payload';
+          }
+          return null;
         } else if (int.tryParse(value) == null) {
           return 'Please enter a valid Seed';
         }
@@ -453,6 +450,7 @@ class _AddStreamViewState extends State<AddStreamView>
                     MaterialCommunityIcons.progress_upload,
                     semanticLabel: 'Generators',
                     color: uploadColor,
+                    size: 26,
                   ),
                 ),
                 const VerticalDivider(),
@@ -477,6 +475,7 @@ class _AddStreamViewState extends State<AddStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: true,
                       saveChanges: () => _updateDevicesCounter(),
+                      isStateless: false,
                     ),
                   ),
                   settings: const RouteSettings(name: 'AddGenerators'),
@@ -497,6 +496,7 @@ class _AddStreamViewState extends State<AddStreamView>
                   MaterialCommunityIcons.progress_check,
                   semanticLabel: 'Verifiers',
                   color: downloadColor,
+                  size: 26,
                 ),
                 VerticalDivider(),
                 Text(
@@ -519,6 +519,7 @@ class _AddStreamViewState extends State<AddStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: false,
                       saveChanges: () => _updateDevicesCounter(),
+                      isStateless: false,
                     ),
                   ),
                   settings: const RouteSettings(name: 'AddVerifiers'),
@@ -533,7 +534,6 @@ class _AddStreamViewState extends State<AddStreamView>
 
   Row _iDNameFields() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
           flex: 1,
@@ -570,12 +570,6 @@ class _AddStreamViewState extends State<AddStreamView>
               hintText: 'Name of the stream',
               isDense: true,
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a name for the stream';
-              }
-              return null;
-            },
             controller: AddStreamController.nameController,
           ),
         ),
@@ -593,12 +587,6 @@ class _AddStreamViewState extends State<AddStreamView>
         icon: Icon(Icons.description, size: 25),
         isDense: true,
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a description for the stream';
-        }
-        return null;
-      },
       controller: AddStreamController.descriptionController,
     );
   }
@@ -621,9 +609,9 @@ class _AddStreamViewState extends State<AddStreamView>
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter a time to live';
+                return 'Please enter a delay';
               } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid time to live';
+                return 'Please enter a valid delay';
               }
               return null;
             },

@@ -44,6 +44,7 @@ pub struct Device {
         max = 50,
         message = "name must be between 1 and 50 characters long"
     ))]
+    #[serde(default)]
     name: String,
 
     #[doc = " ## Device Description
@@ -59,6 +60,7 @@ pub struct Device {
         max = 255,
         message = "description must be between 1 and 255 characters long"
     ))]
+    #[serde(default)]
     description: String,
 
     #[doc = " ## Device Location
@@ -74,6 +76,7 @@ pub struct Device {
         max = 255,
         message = "location must be between 1 and 255 characters long"
     ))]
+    #[serde(default)]
     location: String,
 
     #[doc = " ## Device Last Updated

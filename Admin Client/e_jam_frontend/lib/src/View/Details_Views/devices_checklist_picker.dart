@@ -15,21 +15,42 @@ class DevicesCheckListPicker extends StatefulWidget {
     super.key,
     required this.areGenerators,
     required this.saveChanges,
+    required this.isStateless,
   });
 
   final bool areGenerators;
   final Function saveChanges;
-
+  final bool isStateless;
   @override
   State<DevicesCheckListPicker> createState() => _DevicesCheckListPickerState();
 }
 
 class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
+  late Map<String, bool> _devicesMap;
   _syncDevices() {
     setState(() {
+      _devicesMap = Map<String, bool>.from(widget.isStateless
+          ? widget.areGenerators
+              ? EditStreamController.pickedGenerators
+              : EditStreamController.pickedVerifiers
+          : widget.areGenerators
+              ? AddStreamController.pickedGenerators
+              : AddStreamController.pickedVerifiers);
       DevicesController.loadAllDevices();
       widget.saveChanges();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _devicesMap = Map<String, bool>.from(widget.isStateless
+        ? widget.areGenerators
+            ? EditStreamController.pickedGenerators
+            : EditStreamController.pickedVerifiers
+        : widget.areGenerators
+            ? AddStreamController.pickedGenerators
+            : AddStreamController.pickedVerifiers);
   }
 
   @override
@@ -38,7 +59,7 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
       height: MediaQuery.of(context).size.height *
           (MediaQuery.of(context).orientation == Orientation.portrait
               ? 1
-              : 0.8),
+              : 0.75),
       width: MediaQuery.of(context).size.width *
           (MediaQuery.of(context).orientation == Orientation.portrait
               ? 1
@@ -68,18 +89,9 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                 tooltip: 'Randomize',
                 onPressed: () => setState(
                   () {
-                    if (widget.areGenerators) {
-                      AddStreamController.pickedGenerators = AddStreamController
-                          .pickedGenerators
-                          .map((key, value) {
-                        return MapEntry(key, Random().nextBool());
-                      });
-                    } else {
-                      AddStreamController.pickedVerifiers =
-                          AddStreamController.pickedVerifiers.map((key, value) {
-                        return MapEntry(key, Random().nextBool());
-                      });
-                    }
+                    _devicesMap = _devicesMap.map((key, value) {
+                      return MapEntry(key, Random().nextBool());
+                    });
                   },
                 ),
               ),
@@ -89,18 +101,9 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                 tooltip: 'Select All',
                 onPressed: () => setState(
                   () {
-                    if (widget.areGenerators) {
-                      AddStreamController.pickedGenerators = AddStreamController
-                          .pickedGenerators
-                          .map((key, value) {
-                        return MapEntry(key, true);
-                      });
-                    } else {
-                      AddStreamController.pickedVerifiers =
-                          AddStreamController.pickedVerifiers.map((key, value) {
-                        return MapEntry(key, true);
-                      });
-                    }
+                    _devicesMap = _devicesMap.map((key, value) {
+                      return MapEntry(key, true);
+                    });
                   },
                 ),
               ),
@@ -113,28 +116,15 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                 tooltip: 'Deselect All',
                 onPressed: () => setState(
                   () {
-                    if (widget.areGenerators) {
-                      AddStreamController.pickedGenerators = AddStreamController
-                          .pickedGenerators
-                          .map((key, value) {
-                        return MapEntry(key, false);
-                      });
-                    } else {
-                      AddStreamController.pickedVerifiers =
-                          AddStreamController.pickedVerifiers.map((key, value) {
-                        return MapEntry(key, false);
-                      });
-                    }
+                    _devicesMap = _devicesMap.map((key, value) {
+                      return MapEntry(key, false);
+                    });
                   },
                 ),
               ),
               // Sync button
               IconButton(
-                icon: (widget.areGenerators
-                                ? AddStreamController.pickedGenerators.length
-                                : AddStreamController.pickedVerifiers.length) ==
-                            0 ||
-                        DevicesController.devices == null
+                icon: _devicesMap.isEmpty || DevicesController.devices == null
                     ? Icon(
                         MaterialCommunityIcons.sync_alert,
                         size: 20,
@@ -147,36 +137,27 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                         size: 20,
                       ),
                 tooltip: 'Sync Devices',
-                onPressed: () async {
-                  _syncDevices();
-                },
+                onPressed: () => _syncDevices(),
               ),
             ],
           ),
           body: Visibility(
-            visible: (widget.areGenerators
-                        ? AddStreamController.pickedGenerators.length
-                        : AddStreamController.pickedVerifiers.length) !=
-                    0 &&
-                DevicesController.devices != null,
+            visible:
+                _devicesMap.isNotEmpty && DevicesController.devices != null,
             replacement: Center(
               child: DevicesController.devices == null
                   ? const Text('Cannot Get Devices')
                   : const Text('No Devices Found'),
             ),
             child: ListView.builder(
-              itemCount: (widget.areGenerators
-                  ? AddStreamController.pickedGenerators.length
-                  : AddStreamController.pickedVerifiers.length),
+              itemCount: _devicesMap.length,
               itemBuilder: (context, index) {
                 if (index >= DevicesController.devices!.length) {
                   return CheckboxListTile(
-                    title: Text(widget.areGenerators
-                        ? AddStreamController.pickedGenerators.keys
-                            .elementAt(index)
-                        : AddStreamController.pickedVerifiers.keys
-                            .elementAt(index)),
-                    subtitle: const Text("Deleted"),
+                    title: const Text("Deleted"),
+                    subtitle: Text(
+                      _getName(index),
+                    ),
                     value: false,
                     secondary: const Icon(
                       MaterialCommunityIcons.alert,
@@ -187,30 +168,27 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                 }
                 return CheckboxListTile(
                   title: Text(
-                    DevicesController.devices![index].name,
+                    _getName(index),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
                       '${DevicesController.devices![index].ipAddress}:${DevicesController.devices![index].port}'),
-                  value: widget.areGenerators
-                      ? AddStreamController.pickedGenerators[
-                          DevicesController.devices![index].macAddress]
-                      : AddStreamController.pickedVerifiers[
-                          DevicesController.devices![index].macAddress],
+                  value: _devicesMap.values.elementAt(index),
                   secondary: Icon(
                     getDeviceIcon(DevicesController.devices![index].name),
                     color: deviceStatusColorScheme(
                         DevicesController.devices![index].status),
                   ),
+                  checkboxShape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(4),
+                    ),
+                  ),
+                  activeColor:
+                      widget.areGenerators ? uploadColor : downloadColor,
                   onChanged: (value) {
                     setState(() {
-                      if (widget.areGenerators) {
-                        AddStreamController.pickedGenerators[DevicesController
-                            .devices![index].macAddress] = value ?? false;
-                      } else {
-                        AddStreamController.pickedVerifiers[DevicesController
-                            .devices![index].macAddress] = value ?? false;
-                      }
+                      _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
                     });
                   },
                 );
@@ -221,6 +199,16 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
         ),
       ),
     );
+  }
+
+  String _getName(int index) {
+    if (index < DevicesController.devices!.length) {
+      return DevicesController.devices![index].name.isNotEmpty
+          ? DevicesController.devices![index].name
+          : DevicesController.devices![index].ipAddress;
+    } else {
+      return _devicesMap.keys.elementAt(index);
+    }
   }
 
   BottomAppBar _bottomOptionsBar() {
@@ -243,6 +231,19 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
             color: Colors.blue,
             tooltip: 'Save',
             onPressed: () async {
+              if (widget.isStateless) {
+                if (widget.areGenerators) {
+                  EditStreamController.pickedGenerators = _devicesMap;
+                } else {
+                  EditStreamController.pickedVerifiers = _devicesMap;
+                }
+              } else {
+                if (widget.areGenerators) {
+                  AddStreamController.pickedGenerators = _devicesMap;
+                } else {
+                  AddStreamController.pickedVerifiers = _devicesMap;
+                }
+              }
               widget.saveChanges();
               Navigator.pop(context);
             },

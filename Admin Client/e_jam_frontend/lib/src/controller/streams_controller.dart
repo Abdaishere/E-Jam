@@ -1,8 +1,10 @@
 import 'dart:ffi';
 
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 
@@ -135,7 +137,7 @@ class AddStreamController {
   static TextEditingController packetsController = TextEditingController();
   static TextEditingController seedController = TextEditingController();
   static FlowType flowType = FlowType.bursts;
-  static int payloadType = 0;
+  static int payloadType = 2;
   static TransportLayerProtocol transportLayerProtocol =
       TransportLayerProtocol.tcp;
   static bool checkContent = false;
@@ -186,6 +188,18 @@ class AddStreamController {
     return null;
   }
 
+  static syncDevicesList() {
+    AddStreamController.pickedGenerators = {
+      for (final Device device in DevicesController.devices!)
+        device.macAddress: pickedGenerators[device.macAddress] ?? false
+    };
+
+    pickedVerifiers = {
+      for (final Device device in DevicesController.devices!)
+        device.macAddress: pickedVerifiers[device.macAddress] ?? false
+    };
+  }
+
   static clearAllFields() {
     idController.clear();
     nameController.clear();
@@ -200,10 +214,27 @@ class AddStreamController {
     packetsController.clear();
     seedController.clear();
     flowType = FlowType.bursts;
-    payloadType = 0;
+    payloadType = 2;
     transportLayerProtocol = TransportLayerProtocol.tcp;
     checkContent = false;
     pickedGenerators = {};
     pickedVerifiers = {};
+  }
+}
+
+class EditStreamController {
+  static Map<String, bool> pickedGenerators = {};
+  static Map<String, bool> pickedVerifiers = {};
+
+  static syncDevicesList(List<String> generators, List<String> verifiers) {
+    pickedGenerators = {
+      for (final Device device in DevicesController.devices!)
+        device.macAddress: generators.contains(device.macAddress)
+    };
+
+    pickedVerifiers = {
+      for (final Device device in DevicesController.devices!)
+        device.macAddress: verifiers.contains(device.macAddress)
+    };
   }
 }

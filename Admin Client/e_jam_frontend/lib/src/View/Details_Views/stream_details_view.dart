@@ -58,7 +58,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Hero(
-      tag: 'stream$id',
+      tag: id,
       createRectTween: (begin, end) {
         return CustomRectTween(begin: begin!, end: end!);
       },
@@ -100,6 +100,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                                 child: EditStreamView(
                                   stream: stream!,
                                   reload: _loadStream,
+                                  id: id,
                                 ),
                               ),
                               settings:
@@ -261,7 +262,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             _idCheckContentDetails(),
-            _generationSeed(),
+            if (stream?.seed != 0) _generationSeed(),
             _delayTimeToLiveInterFrameGapDetails(),
             _packetsBroadcastFramesSizes(),
             _payloadLengthAndType(),
@@ -280,7 +281,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     return ListTile(
       title: Text(
         textAlign: TextAlign.left,
-        stream?.description ?? 'No Description',
+        ((stream?.description.isEmpty ?? true)
+                ? 'No Description'
+                : stream?.description) ??
+            'No Description',
       ),
     );
   }
@@ -356,13 +360,25 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           child: ListTile(
             leading:
                 const Icon(MaterialCommunityIcons.transit_connection_variant),
-            title: const Text('Flow Type', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Flow Type',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(flowTypeToString(stream?.flowType)),
           ),
         ),
         Expanded(
           child: ListTile(
-            title: const Text('TLP Type', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'TLP Type',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(
               transportLayerProtocolToString(stream?.transportLayerProtocol),
             ),
@@ -379,14 +395,26 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         Expanded(
           child: ListTile(
             leading: const Icon(MaterialCommunityIcons.broadcast),
-            title: const Text('Burst Length', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Burst Length',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.burstLength.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
-            title: const Text('Burst Delay', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Burst Delay',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.burstDelay.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
@@ -404,15 +432,26 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             leading: const Icon(
               Icons.featured_play_list_rounded,
             ),
-            title:
-                const Text('Payload Length', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Payload Length',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.payloadLength.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
-            title: const Text('Payload Type', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Payload Type',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.payloadType.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
@@ -424,7 +463,13 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
   ListTile _generationSeed() {
     return ListTile(
       leading: const Icon(MaterialCommunityIcons.seed),
-      title: const Text('Generation Seed', overflow: TextOverflow.ellipsis),
+      title: const Text(
+        'Generation Seed',
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       subtitle: Text(stream?.seed.toString() ?? 'Unknown',
           overflow: TextOverflow.ellipsis),
     );
@@ -441,14 +486,26 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   ? MaterialCommunityIcons.package_variant
                   : MaterialCommunityIcons.package_variant_closed,
             ),
-            title: const Text('Packets', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Packets',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.numberOfPackets.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
-            title: const Text('Frame Size', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Frame Size',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.broadcastFrames.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
@@ -468,8 +525,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           },
           isDense: true),
       title: Text(
-        stream?.name ?? 'Unnamed',
+        ((stream?.name.isEmpty ?? true) ? 'Unnamed' : stream?.name) ??
+            'Unknown',
         overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
       ),
       subtitle: Text(stream?.streamId ?? '___'),
       trailing: Icon(
@@ -490,22 +551,39 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         Expanded(
           child: ListTile(
             leading: const Icon(MaterialCommunityIcons.timer),
-            title: const Text('Delay', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Delay',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.delay.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
-            title: const Text('Time to Live', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Time to Live',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.timeToLive.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
         ),
         Expanded(
           child: ListTile(
-            title:
-                const Text('Inter Frame Gap', overflow: TextOverflow.ellipsis),
+            title: const Text(
+              'Inter Frame Gap',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             subtitle: Text(stream?.interFrameGap.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
