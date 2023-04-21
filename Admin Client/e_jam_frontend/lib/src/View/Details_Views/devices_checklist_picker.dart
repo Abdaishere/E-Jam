@@ -29,33 +29,46 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
   late Map<String, bool> _devicesMap;
   _syncDevices() {
     widget.devicesReloader();
-    setState(
-      () {
-        if (widget.isStateless) {
-          if (widget.areGenerators) {
-            _devicesMap =
-                Map<String, bool>.from(EditStreamController.pickedGenerators);
-          } else {
-            _devicesMap =
-                Map<String, bool>.from(EditStreamController.pickedVerifiers);
-          }
-        } else {
-          if (widget.areGenerators) {
-            _devicesMap =
-                Map<String, bool>.from(AddStreamController.pickedGenerators);
-          } else {
-            _devicesMap =
-                Map<String, bool>.from(AddStreamController.pickedVerifiers);
-          }
-        }
-      },
-    );
+    if (widget.isStateless) {
+      if (widget.areGenerators) {
+        _devicesMap =
+            Map<String, bool>.from(EditStreamController.pickedGenerators);
+      } else {
+        _devicesMap =
+            Map<String, bool>.from(EditStreamController.pickedVerifiers);
+      }
+    } else {
+      if (widget.areGenerators) {
+        _devicesMap =
+            Map<String, bool>.from(AddStreamController.pickedGenerators);
+      } else {
+        _devicesMap =
+            Map<String, bool>.from(AddStreamController.pickedVerifiers);
+      }
+    }
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    _syncDevices();
+    if (widget.isStateless) {
+      if (widget.areGenerators) {
+        _devicesMap =
+            Map<String, bool>.from(EditStreamController.pickedGenerators);
+      } else {
+        _devicesMap =
+            Map<String, bool>.from(EditStreamController.pickedVerifiers);
+      }
+    } else {
+      if (widget.areGenerators) {
+        _devicesMap =
+            Map<String, bool>.from(AddStreamController.pickedGenerators);
+      } else {
+        _devicesMap =
+            Map<String, bool>.from(AddStreamController.pickedVerifiers);
+      }
+    }
   }
 
   @override
@@ -89,28 +102,25 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
             ),
             actions: [
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.shuffle_variant,
-                    size: 20, semanticLabel: 'Randomize'),
-                tooltip: 'Randomize',
-                onPressed: () => setState(
-                  () {
-                    _devicesMap = _devicesMap.map((key, value) {
-                      return MapEntry(key, Random().nextBool());
-                    });
-                  },
-                ),
-              ),
+                  icon: const Icon(MaterialCommunityIcons.shuffle_variant,
+                      size: 20, semanticLabel: 'Randomize'),
+                  tooltip: 'Randomize',
+                  onPressed: () => {
+                        _devicesMap = _devicesMap.map((key, value) {
+                          return MapEntry(key, Random().nextBool());
+                        }),
+                        setState(() {}),
+                      }),
               IconButton(
                 icon: const Icon(MaterialCommunityIcons.check_all,
                     size: 20, semanticLabel: 'Select All'),
                 tooltip: 'Select All',
-                onPressed: () => setState(
-                  () {
-                    _devicesMap = _devicesMap.map((key, value) {
-                      return MapEntry(key, true);
-                    });
-                  },
-                ),
+                onPressed: () => {
+                  _devicesMap = _devicesMap.map((key, value) {
+                    return MapEntry(key, true);
+                  }),
+                  setState(() {}),
+                },
               ),
               // Deselect all button
               IconButton(
@@ -119,13 +129,12 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                   size: 20,
                 ),
                 tooltip: 'Deselect All',
-                onPressed: () => setState(
-                  () {
-                    _devicesMap = _devicesMap.map((key, value) {
-                      return MapEntry(key, false);
-                    });
-                  },
-                ),
+                onPressed: () => {
+                  _devicesMap = _devicesMap.map((key, value) {
+                    return MapEntry(key, false);
+                  }),
+                  setState(() {}),
+                },
               ),
               // Sync button
               IconButton(
@@ -166,7 +175,7 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                     subtitle: Text(
                       _getName(index),
                     ),
-                    value: false,
+                    value: true,
                     secondary: const Icon(
                       MaterialCommunityIcons.alert,
                       color: Colors.red,
@@ -195,9 +204,8 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                   activeColor:
                       widget.areGenerators ? uploadColor : downloadColor,
                   onChanged: (value) {
-                    setState(() {
-                      _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
-                    });
+                    _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
+                    setState(() {});
                   },
                 );
               },

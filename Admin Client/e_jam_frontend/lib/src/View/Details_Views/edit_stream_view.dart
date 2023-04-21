@@ -33,69 +33,19 @@ class _EditStreamViewState extends State<EditStreamView>
   StreamEntry get stream => widget.stream;
   late int _numberOfGenerators;
   late int _numberOfVerifiers;
-  late TextEditingController _nameController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _delayController;
-  late TextEditingController _timeToLiveController;
-  late TextEditingController _interFrameGapController;
-  late TextEditingController _payloadLengthController;
-  late TextEditingController _burstLengthController;
-  late TextEditingController _burstDelayController;
-  late TextEditingController _broadcastFramesController;
-  late TextEditingController _packetsController;
-  late TextEditingController _seedController;
-  late FlowType _flowType;
-  late int _payloadType;
-  late TransportLayerProtocol _transportLayerProtocol;
-  late bool _checkContent;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: stream.name);
-    _descriptionController = TextEditingController(text: stream.description);
-    _delayController = TextEditingController(text: stream.delay.toString());
-    _timeToLiveController =
-        TextEditingController(text: stream.timeToLive.toString());
-    _interFrameGapController =
-        TextEditingController(text: stream.interFrameGap.toString());
-    _payloadLengthController =
-        TextEditingController(text: stream.payloadLength.toString());
-    _burstLengthController =
-        TextEditingController(text: stream.burstLength.toString());
-    _burstDelayController =
-        TextEditingController(text: stream.burstDelay.toString());
-    _broadcastFramesController =
-        TextEditingController(text: stream.broadcastFrames.toString());
-    _packetsController =
-        TextEditingController(text: stream.numberOfPackets.toString());
-    _seedController = TextEditingController(text: stream.seed.toString());
-    _flowType = stream.flowType;
-    _payloadType = stream.payloadType;
-    _transportLayerProtocol = stream.transportLayerProtocol;
-    _checkContent = stream.checkContent;
+    EditStreamController.updateAllFields(stream);
     _numberOfVerifiers = stream.verifiersIds.length;
     _numberOfGenerators = stream.generatorsIds.length;
-    EditStreamController.syncGeneratorsDevicesList(stream.generatorsIds);
-    EditStreamController.syncVerifiersDevicesList(stream.verifiersIds);
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _delayController.dispose();
-    _timeToLiveController.dispose();
-    _interFrameGapController.dispose();
-    _payloadLengthController.dispose();
-    _burstLengthController.dispose();
-    _burstDelayController.dispose();
-    _broadcastFramesController.dispose();
-    _packetsController.dispose();
-    _seedController.dispose();
-    EditStreamController.pickedGenerators.clear();
-    EditStreamController.pickedVerifiers.clear();
     super.dispose();
+    EditStreamController.clearAllFields();
   }
 
   _updateDevicesCounter() {
@@ -108,64 +58,19 @@ class _EditStreamViewState extends State<EditStreamView>
     EditStreamController.pickedVerifiers.forEach((key, value) {
       if (value) counter2++;
     });
-
-    if (mounted &&
-        (counter1 != _numberOfGenerators || counter2 != _numberOfVerifiers)) {
-      setState(() {
-        _numberOfGenerators = counter1;
-        _numberOfVerifiers = counter2;
-      });
+    _numberOfGenerators = counter1;
+    _numberOfVerifiers = counter2;
+    if (mounted) {
+      setState(() {});
     }
   }
 
   _editStream() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-
-      List<String> generators = [];
-      List<String> verifiers = [];
-      EditStreamController.pickedGenerators.forEach((key, value) {
-        if (value) {
-          generators.add(key);
-        }
-      });
-
-      EditStreamController.pickedVerifiers.forEach((key, value) {
-        if (value) {
-          verifiers.add(key);
-        }
-      });
-
-      bool success = await StreamsController.updateStream(
-            stream.streamId,
-            StreamEntry(
-              name: _nameController.text,
-              description: _descriptionController.text,
-              delay: (int.tryParse(_delayController.text) ?? 0),
-              streamId: stream.streamId,
-              generatorsIds: generators,
-              verifiersIds: verifiers,
-              payloadType: _payloadType,
-              burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
-              burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
-              numberOfPackets: (int.tryParse(_packetsController.text) ?? 0),
-              payloadLength: (int.tryParse(_payloadLengthController.text) ?? 0),
-              seed: (int.tryParse(_seedController.text) ?? 0),
-              broadcastFrames:
-                  (int.tryParse(_broadcastFramesController.text) ?? 0),
-              interFrameGap: (int.tryParse(_interFrameGapController.text) ?? 0),
-              timeToLive: (int.tryParse(_timeToLiveController.text) ?? 0),
-              transportLayerProtocol: _transportLayerProtocol,
-              flowType: _flowType,
-              checkContent: _checkContent,
-            ),
-          ) ??
-          false;
-
-      if (success && mounted) {
-        widget.reload();
-        Navigator.pop(context);
-      }
+    bool success =
+        await EditStreamController.updateStream(formKey, widget.id) ?? false;
+    if (success && mounted) {
+      widget.reload();
+      Navigator.pop(context);
     }
   }
 
@@ -193,7 +98,7 @@ class _EditStreamViewState extends State<EditStreamView>
             ),
             body: Form(
               key: formKey,
-              child: _addStreamFields(),
+              child: _editStreamFields(),
             ),
             bottomNavigationBar: _bottomOptionsBar(context),
           ),
@@ -202,7 +107,7 @@ class _EditStreamViewState extends State<EditStreamView>
     );
   }
 
-  SingleChildScrollView _addStreamFields() {
+  SingleChildScrollView _editStreamFields() {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -210,17 +115,74 @@ class _EditStreamViewState extends State<EditStreamView>
         mainAxisSize: MainAxisSize.min,
         children: [
           _nameCheckContentButtonFields(),
-          _streamDescriptionField(),
-          _delayTimeToLiveInterFrameGapFields(),
+          const StreamDescriptionField(),
+          const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
           _streamDevicesLists(),
           _packetsBroadcastFramesSizes(),
-          _generationSeed(),
-          _payloadLengthAndType(),
-          _burstLengthAndDelay(),
-          _flowAndTLPTypes(),
+          const GenerationSeed(),
+          const PayloadLengthAndType(),
+          const BurstLengthAndDelay(),
+          const FlowAndTLPTypes(),
         ],
       ),
+    );
+  }
+
+  Row _packetsBroadcastFramesSizes() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Number of Packets',
+              hintText: 'Number of Packets to be sent',
+              icon: Icon(
+                EditStreamController.checkContent
+                    ? MaterialCommunityIcons.package_variant
+                    : MaterialCommunityIcons.package_variant_closed,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of packets';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid number of packets';
+              }
+              return null;
+            },
+            controller: EditStreamController.packetsController,
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Broadcast Frames Size',
+              hintText: 'Frames to be broadcasted',
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of frames';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid number of frames';
+              }
+              return null;
+            },
+            controller: EditStreamController.broadcastFramesController,
+          ),
+        ),
+      ],
     );
   }
 
@@ -267,12 +229,13 @@ class _EditStreamViewState extends State<EditStreamView>
                       saveChanges: () => _updateDevicesCounter(),
                       devicesReloader: () => {
                         EditStreamController.syncGeneratorsDevicesList(
-                            stream.generatorsIds),
+                            stream.generatorsIds, false),
+                        _updateDevicesCounter(),
                       },
                       isStateless: true,
                     ),
                   ),
-                  settings: const RouteSettings(name: 'AddGenerators'),
+                  settings: const RouteSettings(name: 'EditGenerators'),
                 ),
               );
             },
@@ -314,12 +277,13 @@ class _EditStreamViewState extends State<EditStreamView>
                       saveChanges: () => _updateDevicesCounter(),
                       devicesReloader: () => {
                         EditStreamController.syncVerifiersDevicesList(
-                            stream.verifiersIds),
+                            stream.verifiersIds, false),
+                        _updateDevicesCounter(),
                       },
                       isStateless: true,
                     ),
                   ),
-                  settings: const RouteSettings(name: 'AddVerifiers'),
+                  settings: const RouteSettings(name: 'EditVerifiers'),
                 ),
               );
             },
@@ -329,124 +293,81 @@ class _EditStreamViewState extends State<EditStreamView>
     );
   }
 
-  Row _flowAndTLPTypes() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        const Icon(MaterialCommunityIcons.transit_connection_variant),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: DropdownButtonFormField<FlowType>(
-            decoration: const InputDecoration(
-              labelText: 'Flow Type',
-              hintText: 'Flow Type',
-            ),
-            value: _flowType,
-            items: const [
-              DropdownMenuItem(
-                value: FlowType.backToBack,
-                child: Text('Back to Back'),
-              ),
-              DropdownMenuItem(
-                value: FlowType.bursts,
-                child: Text('Bursts'),
-              ),
-            ],
-            validator: (value) {
-              if (value == null) {
-                return 'Please enter a valid flow type';
-              }
-              return null;
-            },
-            onChanged: (value) {
-              _flowType = value!;
-            },
-          ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: DropdownButtonFormField<TransportLayerProtocol>(
-            decoration: const InputDecoration(
-              labelText: 'Transport Layer Protocol',
-              hintText: 'TLP Type',
-            ),
-            value: _transportLayerProtocol,
-            items: const [
-              DropdownMenuItem(
-                value: TransportLayerProtocol.tcp,
-                child: Text('TCP'),
-              ),
-              DropdownMenuItem(
-                value: TransportLayerProtocol.udp,
-                child: Text('UDP'),
-              ),
-            ],
-            onChanged: (value) {
-              _transportLayerProtocol = value!;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Row _burstLengthAndDelay() {
+  Row _nameCheckContentButtonFields() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          flex: 1,
+          flex: 2,
           child: TextFormField(
+            maxLength: 50,
             decoration: const InputDecoration(
-              labelText: 'Burst length',
-              hintText: 'Length of the burst',
-              icon: Icon(MaterialCommunityIcons.broadcast),
+              labelText: 'Name',
+              hintText: 'Name of the stream',
+              icon: Icon(MaterialCommunityIcons.id_card, size: 25),
+              isDense: true,
             ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a burst length';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid burst length';
-              }
-              return null;
-            },
-            controller: _burstLengthController,
+            controller: EditStreamController.nameController,
           ),
         ),
         const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Burst Delay',
-              hintText: 'Delay between bursts',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a burst delay';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid burst delay';
-              }
-              return null;
-            },
-            controller: _burstDelayController,
+        IconButton(
+          icon: Icon(
+            EditStreamController.checkContent
+                ? FontAwesomeIcons.eye
+                : FontAwesomeIcons.eyeSlash,
+            size: 30,
           ),
+          color: EditStreamController.checkContent
+              ? Colors.greenAccent.shade700
+              : Colors.grey,
+          tooltip: EditStreamController.checkContent
+              ? 'Check content'
+              : 'Do not check content',
+          onPressed: () {
+            EditStreamController.checkContent =
+                !EditStreamController.checkContent;
+            setState(() {});
+          },
         ),
+        const VerticalDivider(),
       ],
     );
   }
 
-  Row _payloadLengthAndType() {
+  BottomAppBar _bottomOptionsBar(BuildContext context) {
+    return BottomAppBar(
+      elevation: 0,
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.xmark),
+            color: Colors.red,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          const Divider(),
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.check),
+            color: Colors.blueAccent,
+            onPressed: () => _editStream(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PayloadLengthAndType extends StatelessWidget {
+  const PayloadLengthAndType({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -474,7 +395,7 @@ class _EditStreamViewState extends State<EditStreamView>
               }
               return null;
             },
-            controller: _payloadLengthController,
+            controller: EditStreamController.payloadLengthController,
           ),
         ),
         const VerticalDivider(),
@@ -485,7 +406,7 @@ class _EditStreamViewState extends State<EditStreamView>
               labelText: 'Type',
               hintText: 'Type of the payload',
             ),
-            value: _payloadType,
+            value: EditStreamController.payloadType,
             items: const [
               DropdownMenuItem(
                 value: 0,
@@ -501,17 +422,153 @@ class _EditStreamViewState extends State<EditStreamView>
               ),
             ],
             onChanged: (value) {
-              setState(() {
-                _payloadType = value!;
-              });
+              EditStreamController.payloadType = value!;
             },
           ),
         ),
       ],
     );
   }
+}
 
-  TextFormField _generationSeed() {
+class FlowAndTLPTypes extends StatelessWidget {
+  const FlowAndTLPTypes({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        const Icon(MaterialCommunityIcons.transit_connection_variant),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: DropdownButtonFormField<FlowType>(
+            decoration: const InputDecoration(
+              labelText: 'Flow Type',
+              hintText: 'Flow Type',
+            ),
+            value: EditStreamController.flowType,
+            items: const [
+              DropdownMenuItem(
+                value: FlowType.backToBack,
+                child: Text('Back to Back'),
+              ),
+              DropdownMenuItem(
+                value: FlowType.bursts,
+                child: Text('Bursts'),
+              ),
+            ],
+            validator: (value) {
+              if (value == null) {
+                return 'Please enter a valid flow type';
+              }
+              return null;
+            },
+            onChanged: (value) {
+              EditStreamController.flowType = value!;
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: DropdownButtonFormField<TransportLayerProtocol>(
+            decoration: const InputDecoration(
+              labelText: 'Transport Layer Protocol',
+              hintText: 'TLP Type',
+            ),
+            value: EditStreamController.transportLayerProtocol,
+            items: const [
+              DropdownMenuItem(
+                value: TransportLayerProtocol.tcp,
+                child: Text('TCP'),
+              ),
+              DropdownMenuItem(
+                value: TransportLayerProtocol.udp,
+                child: Text('UDP'),
+              ),
+            ],
+            onChanged: (value) {
+              EditStreamController.transportLayerProtocol = value!;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class BurstLengthAndDelay extends StatelessWidget {
+  const BurstLengthAndDelay({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Burst length',
+              hintText: 'Length of the burst',
+              icon: Icon(MaterialCommunityIcons.broadcast),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a burst length';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid burst length';
+              }
+              return null;
+            },
+            controller: EditStreamController.burstLengthController,
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Burst Delay',
+              hintText: 'Delay between bursts',
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a burst delay';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid burst delay';
+              }
+              return null;
+            },
+            controller: EditStreamController.burstDelayController,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class GenerationSeed extends StatelessWidget {
+  const GenerationSeed({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return TextFormField(
       decoration: const InputDecoration(
         labelText: 'Generation Seed',
@@ -524,7 +581,7 @@ class _EditStreamViewState extends State<EditStreamView>
       ],
       validator: (value) {
         if (value == null || value.isEmpty || value == '0') {
-          if (_payloadType == 2) {
+          if (EditStreamController.payloadType == 2) {
             return 'Please enter a Generation Seed for Random Payload';
           }
           return null;
@@ -533,118 +590,18 @@ class _EditStreamViewState extends State<EditStreamView>
         }
         return null;
       },
-      controller: _seedController,
+      controller: EditStreamController.seedController,
     );
   }
+}
 
-  Row _packetsBroadcastFramesSizes() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Number of Packets',
-              hintText: 'Number of Packets to be sent',
-              icon: Icon(
-                _checkContent
-                    ? MaterialCommunityIcons.package_variant
-                    : MaterialCommunityIcons.package_variant_closed,
-              ),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of packets';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid number of packets';
-              }
-              return null;
-            },
-            controller: _packetsController,
-          ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Broadcast Frames Size',
-              hintText: 'Frames to be broadcasted',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of frames';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid number of frames';
-              }
-              return null;
-            },
-            controller: _broadcastFramesController,
-          ),
-        ),
-      ],
-    );
-  }
+class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
+  const DelayTimeToLiveInterFrameGapFields({
+    super.key,
+  });
 
-  Row _nameCheckContentButtonFields() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          flex: 2,
-          child: TextFormField(
-            maxLength: 50,
-            decoration: const InputDecoration(
-              labelText: 'Name',
-              hintText: 'Name of the stream',
-              icon: Icon(MaterialCommunityIcons.id_card, size: 25),
-              isDense: true,
-            ),
-            controller: _nameController,
-          ),
-        ),
-        const VerticalDivider(),
-        IconButton(
-          icon: Icon(
-            _checkContent ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash,
-            size: 30,
-          ),
-          color: _checkContent ? Colors.greenAccent.shade700 : Colors.grey,
-          tooltip: _checkContent ? 'Check content' : 'Do not check content',
-          onPressed: () {
-            setState(() {
-              _checkContent = !_checkContent;
-            });
-          },
-        ),
-        const VerticalDivider(),
-      ],
-    );
-  }
-
-  TextFormField _streamDescriptionField() {
-    return TextFormField(
-      maxLength: 255,
-      maxLines: 2,
-      decoration: const InputDecoration(
-        labelText: 'Description',
-        hintText: 'Description of the stream',
-        icon: Icon(Icons.description, size: 25),
-        isDense: true,
-      ),
-      controller: _descriptionController,
-    );
-  }
-
-  Row _delayTimeToLiveInterFrameGapFields() {
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -668,7 +625,7 @@ class _EditStreamViewState extends State<EditStreamView>
               }
               return null;
             },
-            controller: _delayController,
+            controller: EditStreamController.delayController,
           ),
         ),
         const VerticalDivider(),
@@ -691,7 +648,7 @@ class _EditStreamViewState extends State<EditStreamView>
               }
               return null;
             },
-            controller: _timeToLiveController,
+            controller: EditStreamController.timeToLiveController,
           ),
         ),
         const VerticalDivider(),
@@ -714,35 +671,31 @@ class _EditStreamViewState extends State<EditStreamView>
               }
               return null;
             },
-            controller: _interFrameGapController,
+            controller: EditStreamController.interFrameGapController,
           ),
         ),
       ],
     );
   }
+}
 
-  BottomAppBar _bottomOptionsBar(BuildContext context) {
-    return BottomAppBar(
-      elevation: 0,
-      height: 60,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.xmark),
-            color: Colors.red,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          const Divider(),
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.check),
-            color: Colors.blueAccent,
-            onPressed: () => _editStream(),
-          ),
-        ],
+class StreamDescriptionField extends StatelessWidget {
+  const StreamDescriptionField({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      maxLength: 255,
+      maxLines: 2,
+      decoration: const InputDecoration(
+        labelText: 'Description',
+        hintText: 'Description of the stream',
+        icon: Icon(Icons.description, size: 25),
+        isDense: true,
       ),
+      controller: EditStreamController.descriptionController,
     );
   }
 }

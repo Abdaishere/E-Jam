@@ -23,9 +23,7 @@ class StreamDevicesList extends StatefulWidget {
 
 class _StreamDevicesListState extends State<StreamDevicesList> {
   _syncDevices() {
-    setState(() {
-      widget.reloadStream();
-    });
+    widget.reloadStream();
   }
 
   @override

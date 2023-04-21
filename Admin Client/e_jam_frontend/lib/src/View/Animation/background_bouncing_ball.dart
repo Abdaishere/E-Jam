@@ -2,25 +2,25 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+const double ballWidth = 160, ballHeight = 150;
+const int minimumSpeed = 10,
+    speedIncrement = 20,
+    speedDecrement = 5,
+    speedLimit = 100;
 
 class BouncingBall extends StatefulWidget {
-  const BouncingBall({Key? key, required this.color}) : super(key: key);
+  const BouncingBall({Key? key}) : super(key: key);
 
-  final List<Color> color;
   @override
   State<BouncingBall> createState() => _BouncingBallState();
 }
 
 class _BouncingBallState extends State<BouncingBall> {
-  get color => widget.color;
-
-  final double ballWidth = 160, ballHeight = 150;
   double x = 90, y = 30, xSpeed = 20, ySpeed = 20, speed = 150;
-  final int minimumSpeed = 10,
-      speedIncrement = 20,
-      speedDecrement = 5,
-      speedLimit = 100;
 
   @override
   initState() {
@@ -83,7 +83,21 @@ class _BouncingBallState extends State<BouncingBall> {
       duration: Duration(milliseconds: speed.toInt()),
       left: x,
       top: y,
-      child: ImageFiltered(
+      child: const BallShape(),
+    );
+  }
+}
+
+class BallShape extends StatelessWidget {
+  const BallShape({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(builder: (context, ThemeModel theme, child) {
+      List<Color> color = theme.isDark ? gradientColorDark : gradientColorLight;
+      return ImageFiltered(
         imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2.5),
         child: Container(
           width: ballWidth,
@@ -107,7 +121,7 @@ class _BouncingBallState extends State<BouncingBall> {
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

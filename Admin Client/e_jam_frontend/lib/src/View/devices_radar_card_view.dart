@@ -130,58 +130,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                         ),
                         itemCount: devices.length,
                         builder: (context, index) {
-                          return SizedBox(
-                            height: 120,
-                            width: 120,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.device_hub_rounded),
-                                  iconSize: 50,
-                                  tooltip:
-                                      'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      HeroDialogRoute(
-                                        builder: (BuildContext context) =>
-                                            Center(
-                                                child: AddDeviceView(
-                                                    refresh: () => widget
-                                                        .loadDevicesListView(),
-                                                    delete: () => {
-                                                          if (mounted)
-                                                            {
-                                                              setState(
-                                                                () {
-                                                                  devices
-                                                                      .remove(
-                                                                    devices.elementAt(
-                                                                        index),
-                                                                  );
-                                                                },
-                                                              )
-                                                            }
-                                                        },
-                                                    ip: devices
-                                                        .elementAt(index))),
-                                        settings: const RouteSettings(
-                                            name: 'AddDeviceView'),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                Text(
-                                  devices.elementAt(index),
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          );
+                          return _deviceIcon(index, context);
                         },
                       ),
                     ),
@@ -191,6 +140,52 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  SizedBox _deviceIcon(int index, BuildContext context) {
+    return SizedBox(
+      height: 120,
+      width: 120,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.device_hub_rounded),
+            iconSize: 50,
+            tooltip:
+                'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
+            onPressed: () {
+              Navigator.of(context).push(
+                HeroDialogRoute(
+                  builder: (BuildContext context) => Center(
+                    child: AddDeviceView(
+                      refresh: () => widget.loadDevicesListView(),
+                      ip: devices.elementAt(index),
+                      delete: () => {
+                        if (mounted)
+                          {
+                            devices.remove(devices.elementAt(index)),
+                            setState(() {})
+                          }
+                      },
+                    ),
+                  ),
+                  settings: const RouteSettings(name: 'AddDeviceView'),
+                ),
+              );
+            },
+          ),
+          Text(
+            devices.elementAt(index),
+            style: const TextStyle(
+              fontSize: 15,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }

@@ -11,7 +11,7 @@ class DevicesController {
 
   static Future loadAllDevices() async {
     isLoading = true;
-    return devicesServices.getDevices().then((value) {
+    return await devicesServices.getDevices().then((value) {
       devices = value;
       AddStreamController.syncDevicesList();
       isLoading = false;
@@ -127,5 +127,69 @@ class AddDeviceController {
     ipController.clear();
     portController.text = NetworkController.defaultDevicesPort.toString();
     macController.clear();
+  }
+}
+
+class EditDeviceController {
+  static TextEditingController nameController = TextEditingController();
+  static TextEditingController descriptionController = TextEditingController();
+  static TextEditingController locationController = TextEditingController();
+  static TextEditingController ipController = TextEditingController();
+  static TextEditingController portController = TextEditingController(
+      text: NetworkController.defaultDevicesPort.toString());
+  static String mac = "";
+
+  static Future<bool?> updateDevice(GlobalKey<FormState> formKey) async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      Device device = Device(
+        name: nameController.text,
+        description: descriptionController.text,
+        location: locationController.text,
+        ipAddress: ipController.text,
+        port: int.tryParse(portController.text) ??
+            NetworkController.defaultDevicesPort,
+        macAddress: mac,
+      );
+
+      return await DevicesController.updateDevice(device);
+    }
+    return null;
+  }
+
+  static Future<bool?> pingDevice(GlobalKey<FormState> formKey) async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      Device device = Device(
+        name: nameController.text,
+        description: descriptionController.text,
+        location: locationController.text,
+        ipAddress: ipController.text,
+        port: int.tryParse(portController.text) ??
+            NetworkController.defaultDevicesPort,
+        macAddress: mac,
+      );
+
+      return await DevicesController.pingNewDevice(device);
+    }
+    return null;
+  }
+
+  static clearAllFields() {
+    nameController.clear();
+    descriptionController.clear();
+    locationController.clear();
+    ipController.clear();
+    portController.text = NetworkController.defaultDevicesPort.toString();
+    mac = "";
+  }
+
+  static updateFields(Device device, String mac) {
+    nameController.text = device.name;
+    descriptionController.text = device.description;
+    locationController.text = device.location;
+    ipController.text = device.ipAddress;
+    portController.text = device.port.toString();
+    mac = mac;
   }
 }

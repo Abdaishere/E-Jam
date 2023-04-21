@@ -10,6 +10,8 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+final formKey = GlobalKey<FormState>();
+
 class EditDeviceView extends StatefulWidget {
   const EditDeviceView(
       {super.key,
@@ -25,49 +27,31 @@ class EditDeviceView extends StatefulWidget {
 }
 
 class _EditDeviceViewState extends State<EditDeviceView> {
-  final formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _ipController = TextEditingController();
-  final TextEditingController _portController = TextEditingController();
-  Color _topBarIndicator = Colors.transparent;
-  bool? _isPinged;
-  bool _isPinging = false;
-
   @override
   void initState() {
     super.initState();
-    _nameController.text = widget.device.name;
-    _descriptionController.text = widget.device.description;
-    _locationController.text = widget.device.location;
-    _ipController.text = widget.device.ipAddress;
-    _portController.text = widget.device.port.toString();
+    EditDeviceController.updateFields(widget.device, widget.mac);
   }
 
   Future<bool?> _editDevice() async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       Device device = Device(
-        name: _nameController.text,
-        description: _descriptionController.text,
-        location: _locationController.text,
-        ipAddress: _ipController.text,
-        port: int.parse(_portController.text),
+        name: EditDeviceController.nameController.text,
+        description: EditDeviceController.descriptionController.text,
+        location: EditDeviceController.locationController.text,
+        ipAddress: EditDeviceController.ipController.text,
+        port: int.parse(EditDeviceController.portController.text),
         macAddress: widget.mac,
       );
 
       bool? result = await DevicesController.updateDevice(device);
       if (mounted) {
+        widget.refresh();
+        setState(() {});
         if (result ?? false) {
-          setState(() {
-            widget.refresh();
-          });
           return true;
         } else {
-          setState(() {
-            _topBarIndicator = Colors.redAccent.withOpacity(0.8);
-          });
           return false;
         }
       }
@@ -78,39 +62,8 @@ class _EditDeviceViewState extends State<EditDeviceView> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _locationController.dispose();
-    _ipController.dispose();
-    _portController.dispose();
+    EditDeviceController.clearAllFields();
     super.dispose();
-  }
-
-  _pingDevice() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      Device device = Device(
-        name: _nameController.text,
-        description: _descriptionController.text,
-        location: _locationController.text,
-        ipAddress: _ipController.text,
-        port: int.parse(_portController.text),
-        macAddress: widget.mac,
-      );
-      setState(() {
-        _isPinging = true;
-      });
-      bool value = await DevicesController.pingNewDevice(device);
-
-      if (mounted) {
-        setState(
-          () {
-            _isPinged = value;
-            _isPinging = false;
-          },
-        );
-      }
-    }
   }
 
   @override
@@ -132,44 +85,14 @@ class _EditDeviceViewState extends State<EditDeviceView> {
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: _topBarIndicator,
               title: Text(
                 'Edit ${widget.device.name}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
               centerTitle: true,
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Visibility(
-                    visible: !_isPinging,
-                    replacement: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: LoadingAnimationWidget.beat(
-                        color: Colors.lightBlueAccent,
-                        size: 20.0,
-                      ),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        MaterialCommunityIcons.wifi_sync,
-                        size: 20,
-                      ),
-                      onPressed: () => _pingDevice(),
-                      tooltip: _isPinged == null
-                          ? 'Ping device'
-                          : _isPinged!
-                              ? 'Device is online'
-                              : 'Device is offline',
-                      color: _isPinged == null
-                          ? Colors.lightBlueAccent
-                          : _isPinged!
-                              ? deviceRunningOrOnlineColor
-                              : deviceOfflineOrErrorColor,
-                    ),
-                  ),
-                ),
+              actions: const [
+                DevicePinger(),
               ],
               automaticallyImplyLeading: false,
             ),
@@ -177,7 +100,6 @@ class _EditDeviceViewState extends State<EditDeviceView> {
               key: formKey,
               child: _addDeviceFields(),
             ),
-            // for now this is the same as the add stream view
             bottomNavigationBar: _bottomOptionsBar(),
           ),
         ),
@@ -219,19 +141,94 @@ class _EditDeviceViewState extends State<EditDeviceView> {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
-        children: [
-          NameField(
-            nameController: _nameController,
-          ),
-          _description(),
-          _location(),
-          _connectionIpAndPort(),
+        children: const [
+          NameField(),
+          Description(),
+          Location(),
+          ConnectionIpAndPort(),
         ],
       ),
     );
   }
+}
 
-  TextFormField _location() {
+class DevicePinger extends StatefulWidget {
+  const DevicePinger({super.key});
+
+  @override
+  State<DevicePinger> createState() => _DevicePingerState();
+}
+
+class _DevicePingerState extends State<DevicePinger> {
+  bool? _isPinged;
+  bool _isPinging = false;
+
+  _pingDevice() async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      Device device = Device(
+        name: EditDeviceController.nameController.text,
+        description: EditDeviceController.descriptionController.text,
+        location: EditDeviceController.locationController.text,
+        ipAddress: EditDeviceController.ipController.text,
+        port: int.parse(EditDeviceController.portController.text),
+        macAddress: EditDeviceController.mac,
+      );
+      _isPinging = true;
+      setState(() {});
+      bool value = await DevicesController.pingNewDevice(device);
+
+      _isPinged = value;
+      _isPinging = false;
+
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Visibility(
+        visible: !_isPinging,
+        replacement: Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: LoadingAnimationWidget.beat(
+            color: Colors.lightBlueAccent,
+            size: 20.0,
+          ),
+        ),
+        child: IconButton(
+          icon: const Icon(
+            MaterialCommunityIcons.wifi_sync,
+            size: 20,
+          ),
+          onPressed: () => _pingDevice(),
+          tooltip: _isPinged == null
+              ? 'Ping device'
+              : _isPinged!
+                  ? 'Device is online'
+                  : 'Device is offline',
+          color: _isPinged == null
+              ? Colors.lightBlueAccent
+              : _isPinged!
+                  ? deviceRunningOrOnlineColor
+                  : deviceOfflineOrErrorColor,
+        ),
+      ),
+    );
+  }
+}
+
+class Location extends StatelessWidget {
+  const Location({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return TextFormField(
       decoration: const InputDecoration(
         labelText: 'Location',
@@ -246,11 +243,18 @@ class _EditDeviceViewState extends State<EditDeviceView> {
         }
         return null;
       },
-      controller: _locationController,
+      controller: EditDeviceController.locationController,
     );
   }
+}
 
-  TextFormField _description() {
+class Description extends StatelessWidget {
+  const Description({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return TextFormField(
       maxLines: 2,
       decoration: const InputDecoration(
@@ -266,11 +270,18 @@ class _EditDeviceViewState extends State<EditDeviceView> {
         }
         return null;
       },
-      controller: _descriptionController,
+      controller: EditDeviceController.descriptionController,
     );
   }
+}
 
-  Row _connectionIpAndPort() {
+class ConnectionIpAndPort extends StatelessWidget {
+  const ConnectionIpAndPort({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -297,7 +308,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
               }
               return null;
             },
-            controller: _ipController,
+            controller: EditDeviceController.ipController,
           ),
         ),
         const Text(" : ", style: TextStyle(fontSize: 30)),
@@ -319,7 +330,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
               }
               return null;
             },
-            controller: _portController,
+            controller: EditDeviceController.portController,
           ),
         ),
       ],
@@ -328,9 +339,8 @@ class _EditDeviceViewState extends State<EditDeviceView> {
 }
 
 class NameField extends StatefulWidget {
-  const NameField({super.key, required this.nameController});
+  const NameField({super.key});
 
-  final TextEditingController nameController;
   @override
   State<NameField> createState() => _NameFieldState();
 }
@@ -342,7 +352,7 @@ class _NameFieldState extends State<NameField> {
       decoration: InputDecoration(
         labelText: 'Name',
         hintText: 'Name of the Device',
-        icon: Icon(getDeviceIcon(AddDeviceController.nameController.text)),
+        icon: Icon(getDeviceIcon(EditDeviceController.nameController.text)),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -352,7 +362,7 @@ class _NameFieldState extends State<NameField> {
         }
         return null;
       },
-      controller: widget.nameController,
+      controller: EditDeviceController.nameController,
       onChanged: (value) {
         setState(() {});
       },

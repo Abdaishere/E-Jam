@@ -24,8 +24,6 @@ class DevicesListView extends StatefulWidget {
 }
 
 class _DevicesListViewState extends State<DevicesListView> {
-  get controllerDeviceDetails => DevicesController.devices;
-  get controllerIsDeviceListLoading => DevicesController.isLoading;
   bool _isPinging = false;
   bool? _isPinged;
 
@@ -33,37 +31,25 @@ class _DevicesListViewState extends State<DevicesListView> {
   bool _isDeviceListLoading = true;
 
   void loadDevicesListView() async {
-    setState(() {
-      _isDeviceListLoading = true;
-    });
+    _isDeviceListLoading = true;
+    setState(() {});
 
-    DevicesController.loadAllDevices().then(
-      (value) => {
-        if (mounted)
-          {
-            setState(() {
-              devices = controllerDeviceDetails;
-              _isDeviceListLoading = controllerIsDeviceListLoading;
-            })
-          }
-      },
-    );
+    await DevicesController.loadAllDevices();
+    devices = DevicesController.devices;
+    _isDeviceListLoading = DevicesController.isLoading;
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _pingAll() async {
-    setState(() {
-      _isPinging = true;
-    });
+    _isPinging = true;
+    setState(() {});
     await DevicesController.pingAllDevices().then(
       (value) => {
-        if (mounted)
-          {
-            setState(() {
-              _isPinging = false;
-              _isPinged = value;
-            }),
-          },
-        loadDevicesListView()
+        _isPinging = false,
+        _isPinged = value,
+        loadDevicesListView(),
       },
     );
   }
@@ -292,12 +278,7 @@ class _DeviceCardState extends State<DeviceCard> {
   void refresh() {
     DevicesController.loadDeviceDetails(widget.device.macAddress).then(
       (value) => {
-        if (mounted)
-          {
-            setState(() {
-              updateDevice = value;
-            })
-          }
+        if (mounted) {updateDevice = value, setState(() {})}
       },
     );
   }

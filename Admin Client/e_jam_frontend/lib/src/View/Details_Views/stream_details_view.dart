@@ -47,10 +47,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     isLoading = true;
     StreamsController.loadStreamDetails(id).then((value) {
       if (mounted) {
-        setState(() {
-          isLoading = false;
-          stream = value;
-        });
+        isLoading = false;
+        stream = value;
+        setState(() {});
       }
     });
   }
@@ -320,7 +319,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                     },
                   ),
                 ),
-                settings: const RouteSettings(name: 'AddGenerators'),
+                settings: const RouteSettings(name: 'Generators'),
               ),
             );
           },
@@ -346,7 +345,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                     },
                   ),
                 ),
-                settings: const RouteSettings(name: 'AddGenerators'),
+                settings: const RouteSettings(name: 'Verifiers'),
               ),
             );
           },

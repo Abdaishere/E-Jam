@@ -24,29 +24,22 @@ class StreamsListView extends StatefulWidget {
 
 class _StreamsListViewState extends State<StreamsListView> {
   get scaffoldMessenger => ScaffoldMessenger.of(context);
-  get controllerStreamsStatusDetails => StreamsController.streamsStatusDetails;
-  get controllerIsStreamListLoading => StreamsController.isLoading;
 
   List<StreamStatusDetails>? streams;
   bool isStreamListLoading = true;
 
   // load the status of all streams from the server and update the UI with the list of streams status accordingly
-  void loadStreamView() {
-    setState(() {
-      isStreamListLoading = true;
-    });
+  void loadStreamView() async {
+    isStreamListLoading = true;
+    setState(() {});
 
-    StreamsController.loadAllStreamStatus().then(
-      (value) => {
-        if (mounted)
-          {
-            setState(() {
-              streams = controllerStreamsStatusDetails;
-              isStreamListLoading = controllerIsStreamListLoading;
-            })
-          }
-      },
-    );
+    await StreamsController.loadAllStreamStatus();
+
+    streams = StreamsController.streamsStatusDetails;
+    isStreamListLoading = StreamsController.isLoading;
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -221,12 +214,7 @@ class _StreamCardState extends State<StreamCard> {
   void refreshCard() {
     StreamsController.loadStreamStatusDetails(widget.stream.streamId).then(
       (value) => {
-        if (mounted)
-          {
-            setState(() {
-              updatedStream = value;
-            })
-          }
+        if (mounted) {updatedStream = value, setState(() {})}
       },
     );
   }

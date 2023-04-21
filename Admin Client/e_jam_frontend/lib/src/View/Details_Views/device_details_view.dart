@@ -33,10 +33,9 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
         await DevicesController.loadDeviceDetails(widget.device.macAddress);
 
     widget.loadDevicesListView();
+    updateDevice = value;
     if (mounted) {
-      setState(() {
-        updateDevice = value;
-      });
+      setState(() {});
     }
   }
 
@@ -151,7 +150,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                   indent: 10,
                   endIndent: 10,
                 ),
-                _progressDeviceDetails(),
+                const ProgressDeviceDetails(),
                 const SizedBox(height: 10),
               ],
             ),
@@ -166,14 +165,32 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _processesCount(device),
+            ProcessesCount(
+              genProcesses: device.genProcesses.toString(),
+              verProcesses: device.verProcesses.toString(),
+            ),
             const SizedBox(height: 10),
-            _deviceDetailsSection(device),
+            DeviceDetailsSection(
+              context: context,
+              device: device,
+            ),
           ],
         ),
       );
+}
 
-  Row _processesCount(Device device) {
+class ProcessesCount extends StatelessWidget {
+  const ProcessesCount({
+    super.key,
+    required this.genProcesses,
+    required this.verProcesses,
+  });
+
+  final String genProcesses;
+  final String verProcesses;
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -191,7 +208,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                 onPressed: () {},
               ),
               Text(
-                device.genProcesses.toString(),
+                genProcesses,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
@@ -212,7 +229,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                 onPressed: () {},
               ),
               Text(
-                device.verProcesses.toString(),
+                verProcesses,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
@@ -225,8 +242,20 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
       ],
     );
   }
+}
 
-  Expanded _deviceDetailsSection(Device device) {
+class DeviceDetailsSection extends StatelessWidget {
+  const DeviceDetailsSection({
+    super.key,
+    required this.context,
+    required this.device,
+  });
+
+  final BuildContext context;
+  final Device device;
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: SingleChildScrollView(
         child: ListTileTheme(
@@ -236,19 +265,29 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           dense: true,
           child: Column(
             children: [
-              _nameAndAddress(device),
+              NameAndAddress(context: context, device: device),
               MacAddress(macAddress: device.macAddress),
-              if (device.location.isNotEmpty) _location(device),
+              if (device.location.isNotEmpty) Location(device: device),
               const SizedBox(height: 10),
-              _description(device),
+              Description(device: device),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  ListTile _description(Device device) {
+class Description extends StatelessWidget {
+  const Description({
+    super.key,
+    required this.device,
+  });
+
+  final Device device;
+
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
       title: Text(
         textAlign: TextAlign.left,
@@ -256,8 +295,18 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
       ),
     );
   }
+}
 
-  ListTile _location(Device device) {
+class Location extends StatelessWidget {
+  const Location({
+    super.key,
+    required this.device,
+  });
+
+  final Device device;
+
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(
         MaterialCommunityIcons.map_marker,
@@ -271,8 +320,20 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
       ),
     );
   }
+}
 
-  ListTile _nameAndAddress(Device device) {
+class NameAndAddress extends StatelessWidget {
+  const NameAndAddress({
+    super.key,
+    required this.context,
+    required this.device,
+  });
+
+  final BuildContext context;
+  final Device device;
+
+  @override
+  Widget build(BuildContext context) {
     return ListTile(
       leading: IconButton(
         padding: EdgeInsets.zero,
@@ -317,8 +378,15 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
       ),
     );
   }
+}
 
-  Row _progressDeviceDetails() => Row(
+class ProgressDeviceDetails extends StatelessWidget {
+  const ProgressDeviceDetails({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Expanded(
@@ -376,13 +444,10 @@ class _DevicePingerState extends State<DevicePinger> {
     });
 
     bool? success = await DevicesController.pingDevice(widget.mac);
+    _isPinged = success;
+    _isPinging = false;
     if (mounted) {
-      setState(
-        () {
-          _isPinged = success;
-          _isPinging = false;
-        },
-      );
+      setState(() {});
     }
   }
 
@@ -447,9 +512,8 @@ class _MacAddressState extends State<MacAddress> {
           color: Colors.red,
           tooltip: 'Show MAC Address',
           onPressed: () {
-            setState(() {
-              macIsShown = true;
-            });
+            macIsShown = true;
+            setState(() {});
           },
         ),
         child: Text(

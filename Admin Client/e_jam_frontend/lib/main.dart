@@ -88,8 +88,7 @@ class _HomeState extends State<Home> {
         return Stack(
           children: [
             gradientBackground(theme, context),
-            BouncingBall(
-                color: (theme.isDark ? gradientColorDark : gradientColorLight)),
+            const BouncingBall(),
             bottomLineChartScaffold(context),
             frontBody(),
           ],
@@ -157,8 +156,6 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  bool isSwitched = true;
-  bool isFrozen = false;
   @override
   Widget build(BuildContext context) {
     return Consumer(
@@ -192,40 +189,8 @@ class _MenuScreenState extends State<MenuScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // start and pause icon button
-                    IconButton(
-                      tooltip: isSwitched ? 'Pause' : 'Start',
-                      onPressed: () {
-                        setState(() {
-                          isSwitched = !isSwitched;
-                        });
-                      },
-                      color: !isSwitched
-                          ? theme.colorScheme.error
-                          : theme.colorScheme.secondary,
-                      icon: FaIcon(
-                        isSwitched
-                            ? FontAwesomeIcons.play
-                            : FontAwesomeIcons.pause,
-                        size: 21,
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: isFrozen ? 'Unfreeze Graphs' : 'Freeze Graphs',
-                      onPressed: () {
-                        setState(() {
-                          isFrozen = !isFrozen;
-                        });
-                      },
-                      color: isFrozen
-                          ? theme.colorScheme.surfaceTint
-                          : theme.colorScheme.secondary,
-                      icon: FaIcon(
-                          isFrozen
-                              ? FontAwesomeIcons.solidSnowflake
-                              : FontAwesomeIcons.camera,
-                          size: 21),
-                    ),
+                    const StreamsControllerButton(),
+                    const GraphsControllerButton(),
                     IconButton(
                       tooltip: 'Save as CSV or PDF',
                       onPressed: () {},
@@ -337,6 +302,69 @@ class _MenuScreenState extends State<MenuScreen> {
         );
       },
     );
+  }
+}
+
+class StreamsControllerButton extends StatefulWidget {
+  const StreamsControllerButton({super.key});
+
+  @override
+  State<StreamsControllerButton> createState() =>
+      _StreamsControllerButtonState();
+}
+
+class _StreamsControllerButtonState extends State<StreamsControllerButton> {
+  bool isSwitched = true;
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(builder: (context, ThemeModel theme, child) {
+      return IconButton(
+        tooltip: isSwitched ? 'Pause' : 'Start',
+        onPressed: () {
+          setState(() {
+            isSwitched = !isSwitched;
+          });
+        },
+        color:
+            !isSwitched ? theme.colorScheme.error : theme.colorScheme.secondary,
+        icon: FaIcon(
+          isSwitched ? FontAwesomeIcons.play : FontAwesomeIcons.pause,
+          size: 21,
+        ),
+      );
+    });
+  }
+}
+
+class GraphsControllerButton extends StatefulWidget {
+  const GraphsControllerButton({super.key});
+
+  @override
+  State<GraphsControllerButton> createState() => _GraphsControllerButtonState();
+}
+
+class _GraphsControllerButtonState extends State<GraphsControllerButton> {
+  bool isFrozen = false;
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(builder: (context, ThemeModel theme, child) {
+      return IconButton(
+        tooltip: isFrozen ? 'Unfreeze Graphs' : 'Freeze Graphs',
+        onPressed: () {
+          setState(() {
+            isFrozen = !isFrozen;
+          });
+        },
+        color: isFrozen
+            ? theme.colorScheme.surfaceTint
+            : theme.colorScheme.secondary,
+        icon: FaIcon(
+            isFrozen
+                ? FontAwesomeIcons.solidSnowflake
+                : FontAwesomeIcons.camera,
+            size: 21),
+      );
+    });
   }
 }
 

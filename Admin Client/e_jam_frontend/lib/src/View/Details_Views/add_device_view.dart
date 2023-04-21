@@ -22,8 +22,6 @@ class AddDeviceView extends StatefulWidget {
 }
 
 class _AddDeviceViewState extends State<AddDeviceView> {
-  Color _tabBarColor = Colors.transparent;
-
   @override
   void initState() {
     super.initState();
@@ -32,6 +30,81 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: 'addDevice',
+      createRectTween: (begin, end) =>
+          CustomRectTween(begin: begin!, end: end!),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height *
+            (MediaQuery.of(context).orientation == Orientation.portrait
+                ? 1
+                : 0.8),
+        width: MediaQuery.of(context).size.width *
+            (MediaQuery.of(context).orientation == Orientation.portrait
+                ? 1
+                : 0.45),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Add Device',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              centerTitle: true,
+              actions: const [
+                DevicePinger(),
+              ],
+              automaticallyImplyLeading: false,
+            ),
+            body: Form(
+              key: formKey,
+              child: const AddDeviceFields(),
+            ),
+            bottomNavigationBar: BottomOptionsBar(
+              refresh: widget.refresh,
+              delete: widget.delete ?? () {},
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AddDeviceFields extends StatelessWidget {
+  const AddDeviceFields({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        children: const [
+          NameField(),
+          DescriptionField(),
+          LocationField(),
+          ConnectionIpAndPort(),
+          MacAddressField(),
+        ],
+      ),
+    );
+  }
+}
+
+class BottomOptionsBar extends StatefulWidget {
+  const BottomOptionsBar(
+      {super.key, required this.refresh, required this.delete});
+
+  final Function refresh;
+  final Function() delete;
+  @override
+  State<BottomOptionsBar> createState() => _BottomOptionsBarState();
+}
+
+class _BottomOptionsBarState extends State<BottomOptionsBar> {
   Future<bool?> _addDevice() async {
     int? code = await AddDeviceController.createNewDevice(formKey);
     if (code == null) return null;
@@ -39,16 +112,11 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     bool result = _analyzeCode(code);
     if (mounted) {
       if (result) {
-        setState(() {
-          widget.refresh();
-          _tabBarColor = Colors.greenAccent.shade700.withOpacity(0.8);
-        });
-        if (widget.delete != null) widget.delete!();
+        widget.refresh();
+
+        widget.delete();
         return true;
       } else {
-        setState(() {
-          _tabBarColor = Colors.redAccent.withOpacity(0.8);
-        });
         return false;
       }
     }
@@ -84,46 +152,6 @@ class _AddDeviceViewState extends State<AddDeviceView> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'addDevice',
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.45),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Scaffold(
-            // IDEA: make it ping a device and if it responds then add it to the list of devices
-            appBar: AppBar(
-              backgroundColor: _tabBarColor,
-              title: const Text('Add Device',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              centerTitle: true,
-              actions: const [
-                DevicePinger(),
-              ],
-              automaticallyImplyLeading: false,
-            ),
-            body: Form(
-              key: formKey,
-              child: _addDeviceFields(),
-            ),
-            // for now this is the same as the add stream view
-            bottomNavigationBar: _bottomOptionsBar(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  BottomAppBar _bottomOptionsBar() {
     return BottomAppBar(
       elevation: 0,
       height: 70,
@@ -143,11 +171,8 @@ class _AddDeviceViewState extends State<AddDeviceView> {
             tooltip: 'Clear all fields',
             color: Colors.redAccent,
             onPressed: () {
-              setState(() {
-                _tabBarColor = Colors.transparent;
-                formKey.currentState!.reset();
-                AddDeviceController.clearAllFields();
-              });
+              formKey.currentState!.reset();
+              AddDeviceController.clearAllFields();
             },
           ),
           const Divider(),
@@ -170,62 +195,15 @@ class _AddDeviceViewState extends State<AddDeviceView> {
       ),
     );
   }
+}
 
-  SingleChildScrollView _addDeviceFields() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        children: [
-          const NameField(),
-          _descriptionField(),
-          _locationField(),
-          _connectionIpAndPort(),
-          const MacAddressField(),
-        ],
-      ),
-    );
-  }
+class ConnectionIpAndPort extends StatelessWidget {
+  const ConnectionIpAndPort({
+    super.key,
+  });
 
-  TextFormField _descriptionField() {
-    return TextFormField(
-      maxLines: 2,
-      decoration: const InputDecoration(
-        labelText: 'Description',
-        hintText: 'Description of the Device',
-        icon: Icon(Icons.description),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return null;
-        } else if (value.length > 255) {
-          return 'Please enter a description less than 255 characters';
-        }
-        return null;
-      },
-      controller: AddDeviceController.descriptionController,
-    );
-  }
-
-  TextFormField _locationField() {
-    return TextFormField(
-      decoration: const InputDecoration(
-        labelText: 'Location',
-        hintText: 'Location of the Device',
-        icon: Icon(MaterialCommunityIcons.map_marker),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return null;
-        } else if (value.length > 50) {
-          return 'Please enter a Location less than 50 characters';
-        }
-        return null;
-      },
-      controller: AddDeviceController.locationController,
-    );
-  }
-
-  Row _connectionIpAndPort() {
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -277,6 +255,59 @@ class _AddDeviceViewState extends State<AddDeviceView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class LocationField extends StatelessWidget {
+  const LocationField({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: 'Location',
+        hintText: 'Location of the Device',
+        icon: Icon(MaterialCommunityIcons.map_marker),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return null;
+        } else if (value.length > 50) {
+          return 'Please enter a Location less than 50 characters';
+        }
+        return null;
+      },
+      controller: AddDeviceController.locationController,
+    );
+  }
+}
+
+class DescriptionField extends StatelessWidget {
+  const DescriptionField({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      maxLines: 2,
+      decoration: const InputDecoration(
+        labelText: 'Description',
+        hintText: 'Description of the Device',
+        icon: Icon(Icons.description),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return null;
+        } else if (value.length > 255) {
+          return 'Please enter a description less than 255 characters';
+        }
+        return null;
+      },
+      controller: AddDeviceController.descriptionController,
     );
   }
 }
@@ -341,9 +372,8 @@ class _MacAddressFieldState extends State<MacAddressField> {
       },
       controller: AddDeviceController.macController,
       onSaved: (value) {
-        setState(() {
-          AddDeviceController.macController.text = value?.toUpperCase() ?? '';
-        });
+        AddDeviceController.macController.text = value?.toUpperCase() ?? '';
+        setState(() {});
       },
     );
   }
@@ -363,16 +393,17 @@ class _DevicePingerState extends State<DevicePinger> {
   _pingDevice() async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
-      setState(() {
-        _isPinging = true;
-      });
+      _isPinging = true;
+      setState(() {});
       bool result = await AddDeviceController.pingDevice(formKey) ?? false;
-      setState(
-        () {
-          _isPinged = result;
-          _isPinging = false;
-        },
-      );
+
+      _isPinged = result;
+      _isPinging = false;
+      if (mounted) {
+        setState(
+          () {},
+        );
+      }
     }
   }
 

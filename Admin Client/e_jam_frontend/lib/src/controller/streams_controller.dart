@@ -108,7 +108,7 @@ class StreamsController {
 
   static Future loadAllStreamStatus() async {
     isLoading = true;
-    return streamServices.getAllStreamStatus().then((value) {
+    return await streamServices.getAllStreamStatus().then((value) {
       streamsStatusDetails = value;
       isLoading = false;
     });
@@ -221,10 +221,31 @@ class AddStreamController {
 }
 
 class EditStreamController {
+  static TextEditingController idController = TextEditingController();
+  static TextEditingController nameController = TextEditingController();
+  static TextEditingController descriptionController = TextEditingController();
+  static TextEditingController delayController = TextEditingController();
+  static TextEditingController timeToLiveController = TextEditingController();
+  static TextEditingController interFrameGapController =
+      TextEditingController();
+  static TextEditingController payloadLengthController =
+      TextEditingController();
+  static TextEditingController burstLengthController = TextEditingController();
+  static TextEditingController burstDelayController = TextEditingController();
+  static TextEditingController broadcastFramesController =
+      TextEditingController();
+  static TextEditingController packetsController = TextEditingController();
+  static TextEditingController seedController = TextEditingController();
+  static FlowType flowType = FlowType.bursts;
+  static int payloadType = 2;
+  static TransportLayerProtocol transportLayerProtocol =
+      TransportLayerProtocol.tcp;
+  static bool checkContent = false;
   static Map<String, bool> pickedGenerators = {};
   static Map<String, bool> pickedVerifiers = {};
 
-  static syncGeneratorsDevicesList(List<String> generators) async {
+  static syncGeneratorsDevicesList(
+      List<String> generators, bool showDeleted) async {
     if (DevicesController.devices == null) {
       await DevicesController.loadAllDevices();
       if (DevicesController.devices == null) {
@@ -234,11 +255,20 @@ class EditStreamController {
 
     pickedGenerators = {
       for (final Device device in DevicesController.devices!)
-        device.macAddress: generators.contains(device.macAddress)
+        device.macAddress: false
     };
+
+    for (final String mac in generators) {
+      if (pickedGenerators[mac] == null) {
+        if (showDeleted) pickedGenerators[mac] = true;
+      } else {
+        pickedGenerators[mac] = true;
+      }
+    }
   }
 
-  static syncVerifiersDevicesList(List<String> verifiers) async {
+  static syncVerifiersDevicesList(
+      List<String> verifiers, bool showDeleted) async {
     if (DevicesController.devices == null) {
       await DevicesController.loadAllDevices();
       if (DevicesController.devices == null) {
@@ -248,8 +278,103 @@ class EditStreamController {
 
     pickedVerifiers = {
       for (final Device device in DevicesController.devices!)
-        device.macAddress: verifiers.contains(device.macAddress)
+        device.macAddress: false
     };
-    return true;
+
+    for (final String mac in verifiers) {
+      if (pickedVerifiers[mac] == null) {
+        if (showDeleted) pickedVerifiers[mac] = true;
+      } else {
+        pickedVerifiers[mac] = true;
+      }
+    }
+  }
+
+  static Future<bool?> updateStream(
+      GlobalKey<FormState> formKey, String id) async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+
+      List<String> generators = [];
+      List<String> verifiers = [];
+      pickedGenerators.forEach((key, value) {
+        if (value) {
+          generators.add(key);
+        }
+      });
+
+      pickedVerifiers.forEach((key, value) {
+        if (value) {
+          verifiers.add(key);
+        }
+      });
+
+      return StreamsController.updateStream(
+        id,
+        StreamEntry(
+          name: nameController.text,
+          description: descriptionController.text,
+          delay: (int.tryParse(delayController.text) ?? 0),
+          streamId: idController.text,
+          generatorsIds: generators,
+          verifiersIds: verifiers,
+          payloadType: payloadType,
+          burstLength: (int.tryParse(burstLengthController.text) ?? 0),
+          burstDelay: (int.tryParse(burstDelayController.text) ?? 0),
+          numberOfPackets: (int.tryParse(packetsController.text) ?? 0),
+          payloadLength: (int.tryParse(payloadLengthController.text) ?? 0),
+          seed: (int.tryParse(seedController.text) ?? 0),
+          broadcastFrames: (int.tryParse(broadcastFramesController.text) ?? 0),
+          interFrameGap: (int.tryParse(interFrameGapController.text) ?? 0),
+          timeToLive: (int.tryParse(timeToLiveController.text) ?? 0),
+          transportLayerProtocol: transportLayerProtocol,
+          flowType: flowType,
+          checkContent: checkContent,
+        ),
+      );
+    }
+    return null;
+  }
+
+  static updateAllFields(StreamEntry stream) {
+    idController.text = stream.streamId;
+    nameController.text = stream.name;
+    descriptionController.text = stream.description;
+    delayController.text = stream.delay.toString();
+    timeToLiveController.text = stream.timeToLive.toString();
+    interFrameGapController.text = stream.interFrameGap.toString();
+    payloadLengthController.text = stream.payloadLength.toString();
+    burstLengthController.text = stream.burstLength.toString();
+    burstDelayController.text = stream.burstDelay.toString();
+    broadcastFramesController.text = stream.broadcastFrames.toString();
+    packetsController.text = stream.numberOfPackets.toString();
+    seedController.text = stream.seed.toString();
+    flowType = stream.flowType;
+    payloadType = stream.payloadType;
+    transportLayerProtocol = stream.transportLayerProtocol;
+    checkContent = stream.checkContent;
+    syncGeneratorsDevicesList(stream.generatorsIds, true);
+    syncVerifiersDevicesList(stream.verifiersIds, true);
+  }
+
+  static clearAllFields() {
+    idController.clear();
+    nameController.clear();
+    descriptionController.clear();
+    delayController.clear();
+    timeToLiveController.clear();
+    interFrameGapController.clear();
+    payloadLengthController.clear();
+    burstLengthController.clear();
+    burstDelayController.clear();
+    broadcastFramesController.clear();
+    packetsController.clear();
+    seedController.clear();
+    flowType = FlowType.bursts;
+    payloadType = 2;
+    transportLayerProtocol = TransportLayerProtocol.tcp;
+    checkContent = false;
+    pickedGenerators = {};
+    pickedVerifiers = {};
   }
 }
