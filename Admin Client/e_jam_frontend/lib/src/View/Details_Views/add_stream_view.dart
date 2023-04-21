@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
+import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,8 +23,8 @@ class _AddStreamViewState extends State<AddStreamView>
     with SingleTickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
   late TabController _tabController;
-  late int _numberOfGenerators;
-  late int _numberOfVerifiers;
+  int _numberOfGenerators = 0;
+  int _numberOfVerifiers = 0;
   Color _tabBarColor = Colors.blueAccent;
 
   @override
@@ -34,23 +35,23 @@ class _AddStreamViewState extends State<AddStreamView>
   }
 
   _updateDevicesCounter() {
-    int counter = 0;
+    int counter1 = 0;
     AddStreamController.pickedGenerators.forEach((key, value) {
-      if (value) counter++;
+      if (value) counter1++;
     });
 
-    setState(() {
-      _numberOfGenerators = counter;
-    });
-
-    counter = 0;
+    int counter2 = 0;
     AddStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) counter++;
+      if (value) counter2++;
     });
 
-    setState(() {
-      _numberOfVerifiers = counter;
-    });
+    if (mounted &&
+        (counter1 != _numberOfGenerators || counter2 != _numberOfVerifiers)) {
+      setState(() {
+        _numberOfVerifiers = counter2;
+        _numberOfGenerators = counter1;
+      });
+    }
   }
 
   @override
@@ -133,7 +134,7 @@ class _AddStreamViewState extends State<AddStreamView>
           _streamDevicesLists(),
           _packetsBroadcastFramesSizes(),
           _generationSeed(),
-          _payloadLengthAndType(),
+          const PayloadLengthAndType(),
           _burstLengthAndDelay(),
           _flowAndTLPTypes(),
         ],
@@ -286,70 +287,6 @@ class _AddStreamViewState extends State<AddStreamView>
     );
   }
 
-  Row _payloadLengthAndType() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Payload Length',
-              hintText: 'Length of the payload',
-              icon: Icon(
-                Icons.featured_play_list_rounded,
-              ),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a payload length';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid payload length';
-              } else if (int.parse(value) > 1500) {
-                return 'Payload length cannot be greater than 1500';
-              }
-              return null;
-            },
-            controller: AddStreamController.payloadLengthController,
-          ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: DropdownButtonFormField<int>(
-            decoration: const InputDecoration(
-              labelText: 'Type',
-              hintText: 'Type of the payload',
-            ),
-            value: AddStreamController.payloadType,
-            items: const [
-              DropdownMenuItem(
-                value: 0,
-                child: Text('Type 0'),
-              ),
-              DropdownMenuItem(
-                value: 1,
-                child: Text('Type 1'),
-              ),
-              DropdownMenuItem(
-                value: 2,
-                child: Text('Random'),
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                AddStreamController.payloadType = value!;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   TextFormField _generationSeed() {
     return TextFormField(
       decoration: const InputDecoration(
@@ -475,6 +412,9 @@ class _AddStreamViewState extends State<AddStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: true,
                       saveChanges: () => _updateDevicesCounter(),
+                      devicesReloader: () => {
+                        DevicesController.loadAllDevices(),
+                      },
                       isStateless: false,
                     ),
                   ),
@@ -519,6 +459,9 @@ class _AddStreamViewState extends State<AddStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: false,
                       saveChanges: () => _updateDevicesCounter(),
+                      devicesReloader: () => {
+                        DevicesController.loadAllDevices(),
+                      },
                       isStateless: false,
                     ),
                   ),
@@ -691,6 +634,7 @@ class _AddStreamViewState extends State<AddStreamView>
               setState(() {
                 _tabBarColor = Colors.blueAccent;
                 formKey.currentState!.reset();
+                _numberOfGenerators = _numberOfVerifiers = 0;
                 AddStreamController.clearAllFields();
               });
             },
@@ -700,36 +644,109 @@ class _AddStreamViewState extends State<AddStreamView>
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
             onPressed: () async {
-              AddStreamController.addStream(formKey).then((success) {
-                if (success != null) {
-                  if (success) {
-                    widget.reload();
-                    Navigator.pop(context);
-                  }
+              bool? success = await AddStreamController.addStream(formKey);
+
+              if (success != null) {
+                if (success) {
+                  widget.reload();
+                  if (mounted) Navigator.pop(context);
                 }
-              });
+              }
             },
           ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.plus),
             color: Colors.greenAccent.shade700,
-            onPressed: () {
-              AddStreamController.addStream(formKey).then((success) {
-                if (success != null) {
-                  setState(() {
-                    if (success) {
-                      _tabBarColor = Colors.greenAccent.shade700;
-                      widget.reload();
-                    } else {
-                      _tabBarColor = Colors.redAccent;
-                    }
-                  });
-                }
-              });
+            onPressed: () async {
+              bool? success = await AddStreamController.addStream(formKey);
+              if (success != null) {
+                setState(() {
+                  if (success) {
+                    _tabBarColor = Colors.greenAccent.shade700;
+                    widget.reload();
+                  } else {
+                    _tabBarColor = Colors.redAccent;
+                  }
+                });
+              }
             },
           ),
         ],
       ),
+    );
+  }
+}
+
+class PayloadLengthAndType extends StatefulWidget {
+  const PayloadLengthAndType({super.key});
+
+  @override
+  State<PayloadLengthAndType> createState() => _PayloadLengthAndTypeState();
+}
+
+class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Payload Length',
+              hintText: 'Length of the payload',
+              icon: Icon(
+                Icons.featured_play_list_rounded,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a payload length';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid payload length';
+              } else if (int.parse(value) > 1500) {
+                return 'Payload length cannot be greater than 1500';
+              }
+              return null;
+            },
+            controller: AddStreamController.payloadLengthController,
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: DropdownButtonFormField<int>(
+            decoration: const InputDecoration(
+              labelText: 'Type',
+              hintText: 'Type of the payload',
+            ),
+            value: AddStreamController.payloadType,
+            items: const [
+              DropdownMenuItem(
+                value: 0,
+                child: Text('Type 0'),
+              ),
+              DropdownMenuItem(
+                value: 1,
+                child: Text('Type 1'),
+              ),
+              DropdownMenuItem(
+                value: 2,
+                child: Text('Random'),
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                AddStreamController.payloadType = value!;
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 }

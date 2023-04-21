@@ -4,7 +4,6 @@ import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -77,8 +76,8 @@ class _EditStreamViewState extends State<EditStreamView>
     _checkContent = stream.checkContent;
     _numberOfVerifiers = stream.verifiersIds.length;
     _numberOfGenerators = stream.generatorsIds.length;
-    EditStreamController.syncDevicesList(
-        stream.generatorsIds, stream.verifiersIds);
+    EditStreamController.syncGeneratorsDevicesList(stream.generatorsIds);
+    EditStreamController.syncVerifiersDevicesList(stream.verifiersIds);
   }
 
   @override
@@ -100,23 +99,23 @@ class _EditStreamViewState extends State<EditStreamView>
   }
 
   _updateDevicesCounter() {
-    int counter = 0;
+    int counter1 = 0;
     EditStreamController.pickedGenerators.forEach((key, value) {
-      if (value) counter++;
+      if (value) counter1++;
     });
 
-    setState(() {
-      _numberOfGenerators = counter;
-    });
-
-    counter = 0;
+    int counter2 = 0;
     EditStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) counter++;
+      if (value) counter2++;
     });
 
-    setState(() {
-      _numberOfVerifiers = counter;
-    });
+    if (mounted &&
+        (counter1 != _numberOfGenerators || counter2 != _numberOfVerifiers)) {
+      setState(() {
+        _numberOfGenerators = counter1;
+        _numberOfVerifiers = counter2;
+      });
+    }
   }
 
   _editStream() async {
@@ -137,37 +136,36 @@ class _EditStreamViewState extends State<EditStreamView>
         }
       });
 
-      StreamsController.updateStream(
-        stream.streamId,
-        StreamEntry(
-          name: _nameController.text,
-          description: _descriptionController.text,
-          delay: (int.tryParse(_delayController.text) ?? 0),
-          streamId: stream.streamId,
-          generatorsIds: generators,
-          verifiersIds: verifiers,
-          payloadType: _payloadType,
-          burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
-          burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
-          numberOfPackets: (int.tryParse(_packetsController.text) ?? 0),
-          payloadLength: (int.tryParse(_payloadLengthController.text) ?? 0),
-          seed: (int.tryParse(_seedController.text) ?? 0),
-          broadcastFrames: (int.tryParse(_broadcastFramesController.text) ?? 0),
-          interFrameGap: (int.tryParse(_interFrameGapController.text) ?? 0),
-          timeToLive: (int.tryParse(_timeToLiveController.text) ?? 0),
-          transportLayerProtocol: _transportLayerProtocol,
-          flowType: _flowType,
-          checkContent: _checkContent,
-        ),
-      ).then(
-        (value) => {
-          if ((value ?? false) && mounted)
-            {
-              widget.reload(),
-              Navigator.pop(context),
-            }
-        },
-      );
+      bool success = await StreamsController.updateStream(
+            stream.streamId,
+            StreamEntry(
+              name: _nameController.text,
+              description: _descriptionController.text,
+              delay: (int.tryParse(_delayController.text) ?? 0),
+              streamId: stream.streamId,
+              generatorsIds: generators,
+              verifiersIds: verifiers,
+              payloadType: _payloadType,
+              burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
+              burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
+              numberOfPackets: (int.tryParse(_packetsController.text) ?? 0),
+              payloadLength: (int.tryParse(_payloadLengthController.text) ?? 0),
+              seed: (int.tryParse(_seedController.text) ?? 0),
+              broadcastFrames:
+                  (int.tryParse(_broadcastFramesController.text) ?? 0),
+              interFrameGap: (int.tryParse(_interFrameGapController.text) ?? 0),
+              timeToLive: (int.tryParse(_timeToLiveController.text) ?? 0),
+              transportLayerProtocol: _transportLayerProtocol,
+              flowType: _flowType,
+              checkContent: _checkContent,
+            ),
+          ) ??
+          false;
+
+      if (success && mounted) {
+        widget.reload();
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -260,12 +258,6 @@ class _EditStreamViewState extends State<EditStreamView>
               ),
             ),
             onTap: () {
-              if (pickedGeneratorsFirstTime) {
-                pickedGeneratorsFirstTime = false;
-                for (String element in stream.generatorsIds) {
-                  EditStreamController.pickedGenerators[element] = true;
-                }
-              }
               Navigator.of(context).push(
                 DialogRoute(
                   context: context,
@@ -273,6 +265,10 @@ class _EditStreamViewState extends State<EditStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: true,
                       saveChanges: () => _updateDevicesCounter(),
+                      devicesReloader: () => {
+                        EditStreamController.syncGeneratorsDevicesList(
+                            stream.generatorsIds),
+                      },
                       isStateless: true,
                     ),
                   ),
@@ -309,12 +305,6 @@ class _EditStreamViewState extends State<EditStreamView>
                   fontSize: 20),
             ),
             onTap: () {
-              if (pickedVerifiersFirstTime) {
-                pickedVerifiersFirstTime = false;
-                for (String element in stream.verifiersIds) {
-                  EditStreamController.pickedVerifiers[element] = true;
-                }
-              }
               Navigator.of(context).push(
                 DialogRoute(
                   context: context,
@@ -322,6 +312,10 @@ class _EditStreamViewState extends State<EditStreamView>
                     child: DevicesCheckListPicker(
                       areGenerators: false,
                       saveChanges: () => _updateDevicesCounter(),
+                      devicesReloader: () => {
+                        EditStreamController.syncVerifiersDevicesList(
+                            stream.verifiersIds),
+                      },
                       isStateless: true,
                     ),
                   ),

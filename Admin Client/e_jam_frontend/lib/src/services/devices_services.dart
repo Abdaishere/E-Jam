@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/View/Dialogues/snacks_bar.dart';
-import 'package:flutter/material.dart';
 
+// TODO: add a wrapper for the response to handle errors and exceptions and return a custom response
 class DevicesServices {
   static get backendhostaddress => NetworkController.backendhostaddress;
   static Uri uri = Uri.parse('$backendhostaddress/devices');
@@ -47,13 +46,6 @@ class DevicesServices {
       final response = await client.post(uri,
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
-      // if (response.statusCode == 201) {
-      //   return true;
-      // } else if (409 == response.statusCode) {
-      //   return false;
-      // } else {
-      //   return false;
-      // }
       return response.statusCode;
     } catch (e) {
       return -1;

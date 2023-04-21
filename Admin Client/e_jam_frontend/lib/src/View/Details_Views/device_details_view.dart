@@ -27,37 +27,17 @@ class DevicesDetailsView extends StatefulWidget {
 
 class _DevicesDetailsViewState extends State<DevicesDetailsView> {
   Device? updateDevice;
-  bool macIsShown = false;
-  bool? _isPinged;
-  bool _isPinging = false;
 
-  _pingDevice() async {
-    setState(() {
-      _isPinging = true;
-    });
-    DevicesController.pingDevice(widget.device.macAddress).then(
-      (value) => {
-        if (mounted)
-          setState(
-            () {
-              _isPinged = value;
-              _isPinging = false;
-            },
-          ),
-      },
-    );
-  }
+  void refresh() async {
+    Device? value =
+        await DevicesController.loadDeviceDetails(widget.device.macAddress);
 
-  void refresh() {
-    DevicesController.loadDeviceDetails(widget.device.macAddress).then(
-      (value) => {
-        widget.loadDevicesListView(),
-        if (mounted)
-          setState(() {
-            updateDevice = value;
-          })
-      },
-    );
+    widget.loadDevicesListView();
+    if (mounted) {
+      setState(() {
+        updateDevice = value;
+      });
+    }
   }
 
   @override
@@ -90,36 +70,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               ),
               centerTitle: true,
               actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 4.0),
-                  child: Visibility(
-                    visible: !_isPinging,
-                    replacement: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: LoadingAnimationWidget.beat(
-                        color: Colors.lightBlueAccent,
-                        size: 20.0,
-                      ),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        MaterialCommunityIcons.wifi_sync,
-                        size: 20,
-                      ),
-                      onPressed: () => _pingDevice(),
-                      tooltip: _isPinged == null
-                          ? 'Ping Device'
-                          : _isPinged!
-                              ? 'Device is Online'
-                              : 'Device is Offline',
-                      color: _isPinged == null
-                          ? Colors.lightBlueAccent
-                          : _isPinged!
-                              ? deviceRunningOrOnlineColor
-                              : deviceOfflineOrErrorColor,
-                    ),
-                  ),
-                ),
+                DevicePinger(mac: device.macAddress),
                 IconButton(
                   icon: const Icon(MaterialCommunityIcons.pencil),
                   color: Colors.green,
@@ -163,9 +114,11 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                                   .then(
                                 (value) {
                                   if (value) {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
-                                    widget.loadDevicesListView();
+                                    if (mounted) {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
+                                      widget.loadDevicesListView();
+                                    }
                                   }
                                 },
                               );
@@ -284,7 +237,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           child: Column(
             children: [
               _nameAndAddress(device),
-              _macAddress(device),
+              MacAddress(macAddress: device.macAddress),
               if (device.location.isNotEmpty) _location(device),
               const SizedBox(height: 10),
               _description(device),
@@ -314,36 +267,6 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
         textAlign: TextAlign.left,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  ListTile _macAddress(Device device) {
-    return ListTile(
-      leading: const Icon(
-        MaterialCommunityIcons.ethernet,
-      ),
-      title: Visibility(
-        visible: macIsShown,
-        replacement: IconButton(
-          icon: const Icon(
-            MaterialCommunityIcons.lock,
-          ),
-          color: Colors.red,
-          tooltip: 'Show MAC Address',
-          onPressed: () {
-            setState(() {
-              macIsShown = true;
-            });
-          },
-        ),
-        child: Text(
-          device.macAddress,
-          textAlign: TextAlign.left,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ),
     );
@@ -434,4 +357,109 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           ),
         ],
       );
+}
+
+class DevicePinger extends StatefulWidget {
+  const DevicePinger({super.key, required this.mac});
+
+  final String mac;
+  @override
+  State<DevicePinger> createState() => _DevicePingerState();
+}
+
+class _DevicePingerState extends State<DevicePinger> {
+  bool? _isPinged;
+  bool _isPinging = false;
+  _pingDevice() async {
+    setState(() {
+      _isPinging = true;
+    });
+
+    bool? success = await DevicesController.pingDevice(widget.mac);
+    if (mounted) {
+      setState(
+        () {
+          _isPinged = success;
+          _isPinging = false;
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 4.0),
+      child: Visibility(
+        visible: !_isPinging,
+        replacement: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: LoadingAnimationWidget.beat(
+            color: Colors.lightBlueAccent,
+            size: 20.0,
+          ),
+        ),
+        child: IconButton(
+          icon: const Icon(
+            MaterialCommunityIcons.wifi_sync,
+            size: 20,
+          ),
+          onPressed: () => _pingDevice(),
+          tooltip: _isPinged == null
+              ? 'Ping Device'
+              : _isPinged!
+                  ? 'Device is Online'
+                  : 'Device is Offline',
+          color: _isPinged == null
+              ? Colors.lightBlueAccent
+              : _isPinged!
+                  ? deviceRunningOrOnlineColor
+                  : deviceOfflineOrErrorColor,
+        ),
+      ),
+    );
+  }
+}
+
+class MacAddress extends StatefulWidget {
+  const MacAddress({super.key, required this.macAddress});
+
+  final String macAddress;
+  @override
+  State<MacAddress> createState() => _MacAddressState();
+}
+
+class _MacAddressState extends State<MacAddress> {
+  bool macIsShown = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(
+        MaterialCommunityIcons.ethernet,
+      ),
+      title: Visibility(
+        visible: macIsShown,
+        replacement: IconButton(
+          icon: const Icon(
+            MaterialCommunityIcons.lock,
+          ),
+          color: Colors.red,
+          tooltip: 'Show MAC Address',
+          onPressed: () {
+            setState(() {
+              macIsShown = true;
+            });
+          },
+        ),
+        child: Text(
+          widget.macAddress,
+          textAlign: TextAlign.left,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -39,10 +39,13 @@ class _DevicesListViewState extends State<DevicesListView> {
 
     DevicesController.loadAllDevices().then(
       (value) => {
-        setState(() {
-          devices = controllerDeviceDetails;
-          _isDeviceListLoading = controllerIsDeviceListLoading;
-        })
+        if (mounted)
+          {
+            setState(() {
+              devices = controllerDeviceDetails;
+              _isDeviceListLoading = controllerIsDeviceListLoading;
+            })
+          }
       },
     );
   }
@@ -53,11 +56,14 @@ class _DevicesListViewState extends State<DevicesListView> {
     });
     await DevicesController.pingAllDevices().then(
       (value) => {
-        setState(() {
-          _isPinging = false;
-          _isPinged = value;
-        }),
-        loadDevicesListView()
+        if (mounted)
+          {
+            setState(() {
+              _isPinging = false;
+              _isPinged = value;
+            }),
+            loadDevicesListView()
+          }
       },
     );
   }
@@ -286,9 +292,12 @@ class _DeviceCardState extends State<DeviceCard> {
   void refresh() {
     DevicesController.loadDeviceDetails(widget.device.macAddress).then(
       (value) => {
-        setState(() {
-          updateDevice = value;
-        })
+        if (mounted)
+          {
+            setState(() {
+              updateDevice = value;
+            })
+          }
       },
     );
   }

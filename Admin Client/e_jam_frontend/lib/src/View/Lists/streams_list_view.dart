@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -39,10 +38,13 @@ class _StreamsListViewState extends State<StreamsListView> {
 
     StreamsController.loadAllStreamStatus().then(
       (value) => {
-        setState(() {
-          streams = controllerStreamsStatusDetails;
-          isStreamListLoading = controllerIsStreamListLoading;
-        })
+        if (mounted)
+          {
+            setState(() {
+              streams = controllerStreamsStatusDetails;
+              isStreamListLoading = controllerIsStreamListLoading;
+            })
+          }
       },
     );
   }
@@ -219,9 +221,12 @@ class _StreamCardState extends State<StreamCard> {
   void refreshCard() {
     StreamsController.loadStreamStatusDetails(widget.stream.streamId).then(
       (value) => {
-        setState(() {
-          updatedStream = value;
-        })
+        if (mounted)
+          {
+            setState(() {
+              updatedStream = value;
+            })
+          }
       },
     );
   }
@@ -385,40 +390,43 @@ class _StreamCardState extends State<StreamCard> {
         } else if (value == 'Edit') {
           StreamsController.loadStreamDetails(stream.streamId).then(
             (value) => {
-              if (value != null)
+              if (mounted)
                 {
-                  Navigator.of(context).push(
-                    HeroDialogRoute(
-                      builder: (BuildContext context) => Center(
-                          child: EditStreamView(
-                              stream: value,
-                              reload: refreshCard,
-                              id: stream.streamId)),
-                      settings: const RouteSettings(name: 'EditStreamView'),
-                    ),
-                  ),
-                }
-              else
-                {
-                  showDialog<void>(
-                    context: context,
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text('Error'),
-                      content: const Text('Error loading stream'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('OK'),
+                  if (value != null)
+                    {
+                      Navigator.of(context).push(
+                        HeroDialogRoute(
+                          builder: (BuildContext context) => Center(
+                              child: EditStreamView(
+                                  stream: value,
+                                  reload: refreshCard,
+                                  id: stream.streamId)),
+                          settings: const RouteSettings(name: 'EditStreamView'),
                         ),
-                      ],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
                       ),
-                    ),
-                  ),
-                }
+                    }
+                  else
+                    {
+                      showDialog<void>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: const Text('Error'),
+                          content: const Text('Error loading stream'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                        ),
+                      ),
+                    }
+                },
             },
           );
         }

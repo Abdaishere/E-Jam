@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
@@ -14,10 +12,9 @@ class StreamsController {
   static bool isLoading = true;
   static StreamServices streamServices = StreamServices();
 
-  static Future loadAllStreamsWithDetails(
-      ScaffoldMessengerState scaffoldMessenger) async {
+  static Future loadAllStreamsWithDetails() async {
     isLoading = true;
-    return streamServices.getStreams(scaffoldMessenger).then((value) {
+    return streamServices.getStreams().then((value) {
       streams = value;
       isLoading = false;
     });
@@ -69,19 +66,17 @@ class StreamsController {
     });
   }
 
-  static Future<bool> startAllStreams(
-      ScaffoldMessengerState scaffoldMessenger) async {
+  static Future<bool> startAllStreams() async {
     isLoading = true;
-    return streamServices.startAllStreams(scaffoldMessenger).then((value) {
+    return streamServices.startAllStreams().then((value) {
       isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> stopAllStreams(
-      ScaffoldMessengerState scaffoldMessenger) async {
+  static Future<bool> stopAllStreams() async {
     isLoading = true;
-    return streamServices.stopAllStreams(scaffoldMessenger).then((value) {
+    return streamServices.stopAllStreams().then((value) {
       isLoading = false;
       return value;
     });
@@ -189,6 +184,8 @@ class AddStreamController {
   }
 
   static syncDevicesList() {
+    if (DevicesController.devices == null) return;
+
     AddStreamController.pickedGenerators = {
       for (final Device device in DevicesController.devices!)
         device.macAddress: pickedGenerators[device.macAddress] ?? false
@@ -217,8 +214,9 @@ class AddStreamController {
     payloadType = 2;
     transportLayerProtocol = TransportLayerProtocol.tcp;
     checkContent = false;
-    pickedGenerators = {};
-    pickedVerifiers = {};
+    pickedGenerators =
+        pickedGenerators.map((key, value) => MapEntry(key, false));
+    pickedVerifiers = pickedVerifiers.map((key, value) => MapEntry(key, false));
   }
 }
 
@@ -226,15 +224,32 @@ class EditStreamController {
   static Map<String, bool> pickedGenerators = {};
   static Map<String, bool> pickedVerifiers = {};
 
-  static syncDevicesList(List<String> generators, List<String> verifiers) {
+  static syncGeneratorsDevicesList(List<String> generators) async {
+    if (DevicesController.devices == null) {
+      await DevicesController.loadAllDevices();
+      if (DevicesController.devices == null) {
+        return;
+      }
+    }
+
     pickedGenerators = {
       for (final Device device in DevicesController.devices!)
         device.macAddress: generators.contains(device.macAddress)
     };
+  }
+
+  static syncVerifiersDevicesList(List<String> verifiers) async {
+    if (DevicesController.devices == null) {
+      await DevicesController.loadAllDevices();
+      if (DevicesController.devices == null) {
+        return;
+      }
+    }
 
     pickedVerifiers = {
       for (final Device device in DevicesController.devices!)
         device.macAddress: verifiers.contains(device.macAddress)
     };
+    return true;
   }
 }

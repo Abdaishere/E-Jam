@@ -335,7 +335,7 @@ this is used to get the device connection address
                 "process-type",
                 serde_json::to_string(&process_type).unwrap(),
             )
-            .timeout(Duration::from_secs(10))
+            .timeout(Duration::from_secs(5))
             .send()
             .await
     }
@@ -357,7 +357,7 @@ this is used to get the device connection address
                 "process-type",
                 serde_json::to_string(&process_type).unwrap(),
             )
-            .timeout(Duration::from_secs(10))
+            .timeout(Duration::from_secs(5))
             .send()
             .await
     }

@@ -43,7 +43,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     _loadStream();
   }
 
-  _loadStream() {
+  _loadStream() async {
     isLoading = true;
     StreamsController.loadStreamDetails(id).then((value) {
       if (mounted) {
@@ -132,9 +132,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                                     StreamsController.deleteStream(
                                             stream?.streamId ?? '___')
                                         .then((success) => {
-                                              widget.loadStreamsListView(),
-                                              Navigator.of(context).pop(),
-                                              Navigator.of(context).pop(),
+                                              if (mounted)
+                                                {
+                                                  widget.loadStreamsListView(),
+                                                  Navigator.of(context).pop(),
+                                                  Navigator.of(context).pop(),
+                                                }
                                             });
                                   },
                                   child: const Text('Delete'),
@@ -363,7 +366,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Flow Type',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -375,7 +378,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'TLP Type',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -398,7 +401,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Burst Length',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -411,7 +414,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Burst Delay',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -435,7 +438,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Payload Length',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -448,7 +451,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Payload Type',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -466,7 +469,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       title: const Text(
         'Generation Seed',
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -489,7 +492,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Packets',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -502,7 +505,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Frame Size',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -567,7 +570,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Time to Live',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -580,7 +583,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             title: const Text(
               'Inter Frame Gap',
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -605,8 +608,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 tooltip: "Start",
                 onPressed: () {
                   StreamsController.startStream(id).then((success) {
-                    _loadStream();
-                    widget.refreshCard();
+                    if (mounted) {
+                      _loadStream();
+                      widget.refreshCard();
+                    }
                   });
                 },
               )
@@ -617,8 +622,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 tooltip: "Pause",
                 onPressed: () {
                   StreamsController.pauseStream(id).then((success) {
-                    _loadStream();
-                    widget.refreshCard();
+                    if (mounted) {
+                      _loadStream();
+                      widget.refreshCard();
+                    }
                   });
                 },
               ),
@@ -628,8 +635,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           tooltip: "Delay",
           onPressed: () {
             StreamsController.queueStream(id).then((success) {
-              _loadStream();
-              widget.refreshCard();
+              if (mounted) {
+                _loadStream();
+                widget.refreshCard();
+              }
             });
           },
         ),
@@ -639,7 +648,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           tooltip: "Stop",
           onPressed: () {
             StreamsController.stopStream(id).then((success) {
-              _loadStream();
+              if (mounted) {
+                _loadStream();
+              }
             });
           },
         ),

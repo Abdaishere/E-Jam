@@ -3,17 +3,15 @@ import 'dart:io';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
-import 'package:e_jam/src/View/Dialogues/snacks_bar.dart';
-import 'package:flutter/material.dart';
 
+// TODO: add a wrapper for the response to handle errors and exceptions and return a custom response
 class StreamServices {
   static get backendhostaddress => NetworkController.backendhostaddress;
   static Uri uri = Uri.parse('$backendhostaddress/streams');
 
   static get client => NetworkController.client;
 
-  Future<List<StreamEntry>?> getStreams(
-      ScaffoldMessengerState scaffoldMessenger) async {
+  Future<List<StreamEntry>?> getStreams() async {
     try {
       final response = await client.get(uri);
       if (200 == response.statusCode) {
@@ -21,18 +19,11 @@ class StreamServices {
             .map((e) => StreamEntry.fromJson(e))
             .toList();
       } else if (204 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'No Streams Found');
         return [];
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return [];
       }
     } catch (e) {
-      e.toString();
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return null;
     }
   }
@@ -148,51 +139,32 @@ class StreamServices {
     }
   }
 
-  Future<bool> startAllStreams(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<bool> startAllStreams() async {
     try {
       final response = await client.post(Uri.parse('$uri/start_all'));
       if (200 == response.statusCode) {
-        SnacksBar.showSuccessSnack(
-            scaffoldMessenger, response.body.toString(), 'Queued Successfully');
         return true;
       } else if (204 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'No Streams to Queue');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      e.toString();
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }
 
-  Future<bool> stopAllStreams(ScaffoldMessengerState scaffoldMessenger) async {
+  Future<bool> stopAllStreams() async {
     try {
       final response = await client.post(Uri.parse('$uri/stop_all'));
       if (200 == response.statusCode) {
-        SnacksBar.showSuccessSnack(scaffoldMessenger, response.body.toString(),
-            'Stopped Successfully');
-
         return true;
       } else if (204 == response.statusCode) {
-        SnacksBar.showWarningSnack(
-            scaffoldMessenger, response.body.toString(), 'No Streams to Stop');
         return false;
       } else {
-        SnacksBar.showFailureSnack(scaffoldMessenger, response.body.toString(),
-            response.statusCode.toString());
         return false;
       }
     } catch (e) {
-      e.toString();
-      SnacksBar.showFailureSnack(scaffoldMessenger,
-          'Unable to connect to Server \n ${e.toString()}', 'Server Error');
       return false;
     }
   }

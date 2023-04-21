@@ -9,6 +9,8 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+final formKey = GlobalKey<FormState>();
+
 class AddDeviceView extends StatefulWidget {
   const AddDeviceView({super.key, required this.refresh, this.ip, this.delete});
 
@@ -20,10 +22,7 @@ class AddDeviceView extends StatefulWidget {
 }
 
 class _AddDeviceViewState extends State<AddDeviceView> {
-  final formKey = GlobalKey<FormState>();
   Color _tabBarColor = Colors.transparent;
-  bool? _isPinged;
-  bool _isPinging = false;
 
   @override
   void initState() {
@@ -83,22 +82,6 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     }
   }
 
-  _pingDevice() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      setState(() {
-        _isPinging = true;
-      });
-      bool result = await AddDeviceController.pingDevice(formKey) ?? false;
-      setState(
-        () {
-          _isPinged = result;
-          _isPinging = false;
-        },
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -123,37 +106,8 @@ class _AddDeviceViewState extends State<AddDeviceView> {
               title: const Text('Add Device',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               centerTitle: true,
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: Visibility(
-                    visible: !_isPinging,
-                    replacement: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: LoadingAnimationWidget.beat(
-                        color: Colors.lightBlueAccent,
-                        size: 20.0,
-                      ),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        MaterialCommunityIcons.wifi_sync,
-                        size: 20,
-                      ),
-                      onPressed: () => _pingDevice(),
-                      tooltip: _isPinged == null
-                          ? 'Ping device'
-                          : _isPinged!
-                              ? 'Device is online'
-                              : 'Device is offline',
-                      color: _isPinged == null
-                          ? Colors.lightBlueAccent
-                          : _isPinged!
-                              ? deviceRunningOrOnlineColor
-                              : deviceOfflineOrErrorColor,
-                    ),
-                  ),
-                ),
+              actions: const [
+                DevicePinger(),
               ],
               automaticallyImplyLeading: false,
             ),
@@ -201,11 +155,10 @@ class _AddDeviceViewState extends State<AddDeviceView> {
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
             onPressed: () async {
-              _addDevice().then(
-                (value) => {
-                  if (value != null && value) {Navigator.pop(context)}
-                },
-              );
+              bool? value = await _addDevice();
+              if (value != null && value) {
+                if (mounted) Navigator.pop(context);
+              }
             },
           ),
           IconButton(
@@ -223,11 +176,11 @@ class _AddDeviceViewState extends State<AddDeviceView> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         children: [
-          _nameField(),
+          const NameField(),
           _descriptionField(),
           _locationField(),
           _connectionIpAndPort(),
-          _macAddressField(),
+          const MacAddressField(),
         ],
       ),
     );
@@ -253,28 +206,6 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     );
   }
 
-  TextFormField _nameField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'Name',
-        hintText: 'Name of the Device',
-        icon: Icon(getDeviceIcon(AddDeviceController.nameController.text)),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return null;
-        } else if (value.length > 50) {
-          return 'Please enter a name less than 50 characters';
-        }
-        return null;
-      },
-      controller: AddDeviceController.nameController,
-      onChanged: (value) {
-        setState(() {});
-      },
-    );
-  }
-
   TextFormField _locationField() {
     return TextFormField(
       decoration: const InputDecoration(
@@ -291,32 +222,6 @@ class _AddDeviceViewState extends State<AddDeviceView> {
         return null;
       },
       controller: AddDeviceController.locationController,
-    );
-  }
-
-  TextFormField _macAddressField() {
-    return TextFormField(
-      decoration: const InputDecoration(
-        labelText: 'MAC Address',
-        hintText: 'MAC Address of the Device',
-        icon: Icon(MaterialCommunityIcons.ethernet),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter a mac address for the Device';
-        } else if (!RegExp(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
-            .hasMatch(value)) {
-          return 'Please enter a valid mac address for the Device';
-        }
-
-        return null;
-      },
-      controller: AddDeviceController.macController,
-      onSaved: (value) {
-        setState(() {
-          AddDeviceController.macController.text = value?.toUpperCase() ?? '';
-        });
-      },
     );
   }
 
@@ -372,6 +277,136 @@ class _AddDeviceViewState extends State<AddDeviceView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class NameField extends StatefulWidget {
+  const NameField({super.key});
+
+  @override
+  State<NameField> createState() => _NameFieldState();
+}
+
+class _NameFieldState extends State<NameField> {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'Name',
+        hintText: 'Name of the Device',
+        icon: Icon(getDeviceIcon(AddDeviceController.nameController.text)),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return null;
+        } else if (value.length > 50) {
+          return 'Please enter a name less than 50 characters';
+        }
+        return null;
+      },
+      controller: AddDeviceController.nameController,
+      onChanged: (value) {
+        setState(() {});
+      },
+    );
+  }
+}
+
+class MacAddressField extends StatefulWidget {
+  const MacAddressField({super.key});
+
+  @override
+  State<MacAddressField> createState() => _MacAddressFieldState();
+}
+
+class _MacAddressFieldState extends State<MacAddressField> {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: 'MAC Address',
+        hintText: 'MAC Address of the Device',
+        icon: Icon(MaterialCommunityIcons.ethernet),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a mac address for the Device';
+        } else if (!RegExp(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
+            .hasMatch(value)) {
+          return 'Please enter a valid mac address for the Device';
+        }
+
+        return null;
+      },
+      controller: AddDeviceController.macController,
+      onSaved: (value) {
+        setState(() {
+          AddDeviceController.macController.text = value?.toUpperCase() ?? '';
+        });
+      },
+    );
+  }
+}
+
+class DevicePinger extends StatefulWidget {
+  const DevicePinger({super.key});
+
+  @override
+  State<DevicePinger> createState() => _DevicePingerState();
+}
+
+class _DevicePingerState extends State<DevicePinger> {
+  bool? _isPinged;
+  bool _isPinging = false;
+
+  _pingDevice() async {
+    if (formKey.currentState!.validate()) {
+      formKey.currentState!.save();
+      setState(() {
+        _isPinging = true;
+      });
+      bool result = await AddDeviceController.pingDevice(formKey) ?? false;
+      setState(
+        () {
+          _isPinged = result;
+          _isPinging = false;
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Visibility(
+        visible: !_isPinging,
+        replacement: Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: LoadingAnimationWidget.beat(
+            color: Colors.lightBlueAccent,
+            size: 20.0,
+          ),
+        ),
+        child: IconButton(
+          icon: const Icon(
+            MaterialCommunityIcons.wifi_sync,
+            size: 20,
+          ),
+          onPressed: () => _pingDevice(),
+          tooltip: _isPinged == null
+              ? 'Ping device'
+              : _isPinged!
+                  ? 'Device is online'
+                  : 'Device is offline',
+          color: _isPinged == null
+              ? Colors.lightBlueAccent
+              : _isPinged!
+                  ? deviceRunningOrOnlineColor
+                  : deviceOfflineOrErrorColor,
+        ),
+      ),
     );
   }
 }

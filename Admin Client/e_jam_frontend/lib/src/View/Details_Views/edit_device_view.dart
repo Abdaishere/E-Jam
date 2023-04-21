@@ -57,22 +57,21 @@ class _EditDeviceViewState extends State<EditDeviceView> {
         macAddress: widget.mac,
       );
 
-      return DevicesController.updateDevice(device).then((result) {
-        if (mounted) {
-          if (result ?? false) {
-            setState(() {
-              widget.refresh();
-            });
-            return true;
-          } else {
-            setState(() {
-              _topBarIndicator = Colors.redAccent.withOpacity(0.8);
-            });
-            return false;
-          }
+      bool? result = await DevicesController.updateDevice(device);
+      if (mounted) {
+        if (result ?? false) {
+          setState(() {
+            widget.refresh();
+          });
+          return true;
+        } else {
+          setState(() {
+            _topBarIndicator = Colors.redAccent.withOpacity(0.8);
+          });
+          return false;
         }
-        return null;
-      });
+      }
+      return null;
     }
     return null;
   }
@@ -101,17 +100,16 @@ class _EditDeviceViewState extends State<EditDeviceView> {
       setState(() {
         _isPinging = true;
       });
-      DevicesController.pingNewDevice(device).then(
-        (value) => {
-          if (mounted)
-            setState(
-              () {
-                _isPinged = value;
-                _isPinging = false;
-              },
-            ),
-        },
-      );
+      bool value = await DevicesController.pingNewDevice(device);
+
+      if (mounted) {
+        setState(
+          () {
+            _isPinged = value;
+            _isPinging = false;
+          },
+        );
+      }
     }
   }
 
@@ -207,7 +205,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
             onPressed: () async {
               _editDevice().then(
                 (value) => {
-                  if (value != null && value) {Navigator.pop(context)}
+                  if (mounted && (value ?? false)) {Navigator.pop(context)}
                 },
               );
             },
@@ -222,7 +220,9 @@ class _EditDeviceViewState extends State<EditDeviceView> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         children: [
-          _nameField(),
+          NameField(
+            nameController: _nameController,
+          ),
           _description(),
           _location(),
           _connectionIpAndPort(),
@@ -267,28 +267,6 @@ class _EditDeviceViewState extends State<EditDeviceView> {
         return null;
       },
       controller: _descriptionController,
-    );
-  }
-
-  TextFormField _nameField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        labelText: 'Name',
-        hintText: 'Name of the Device',
-        icon: Icon(getDeviceIcon(AddDeviceController.nameController.text)),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return null;
-        } else if (value.length > 50) {
-          return 'Please enter a name less than 50 characters';
-        }
-        return null;
-      },
-      controller: _nameController,
-      onChanged: (value) {
-        setState(() {});
-      },
     );
   }
 
@@ -345,6 +323,39 @@ class _EditDeviceViewState extends State<EditDeviceView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class NameField extends StatefulWidget {
+  const NameField({super.key, required this.nameController});
+
+  final TextEditingController nameController;
+  @override
+  State<NameField> createState() => _NameFieldState();
+}
+
+class _NameFieldState extends State<NameField> {
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: 'Name',
+        hintText: 'Name of the Device',
+        icon: Icon(getDeviceIcon(AddDeviceController.nameController.text)),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return null;
+        } else if (value.length > 50) {
+          return 'Please enter a name less than 50 characters';
+        }
+        return null;
+      },
+      controller: widget.nameController,
+      onChanged: (value) {
+        setState(() {});
+      },
     );
   }
 }

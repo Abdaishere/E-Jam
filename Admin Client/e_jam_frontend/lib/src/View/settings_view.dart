@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // should not be scrollable
 // should include but not limited to:
 // TODO: Disable animation for system button
-// TODO: Chnange Line charts curve to smooth
+// TODO: Change Line charts curve to smooth
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 

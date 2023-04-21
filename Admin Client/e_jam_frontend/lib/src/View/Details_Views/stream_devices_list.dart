@@ -1,15 +1,10 @@
-import 'dart:math';
-
-import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
 import 'package:e_jam/src/controller/devices_controller.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class StreamDevicesList extends StatefulWidget {
   const StreamDevicesList(

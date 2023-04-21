@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         builder: (context, ThemeModel theme, child) {
           return MaterialApp(
             title: 'E Jam',
-            debugShowCheckedModeBanner: false,
+            // debugShowCheckedModeBanner: false,
             theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
             darkTheme:
                 ThemeData(useMaterial3: true, colorScheme: darkColorScheme),

@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 

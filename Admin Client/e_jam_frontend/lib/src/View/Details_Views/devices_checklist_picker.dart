@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
-import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
 import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
@@ -16,10 +14,12 @@ class DevicesCheckListPicker extends StatefulWidget {
     required this.areGenerators,
     required this.saveChanges,
     required this.isStateless,
+    required this.devicesReloader,
   });
 
   final bool areGenerators;
   final Function saveChanges;
+  final Function devicesReloader;
   final bool isStateless;
   @override
   State<DevicesCheckListPicker> createState() => _DevicesCheckListPickerState();
@@ -28,29 +28,34 @@ class DevicesCheckListPicker extends StatefulWidget {
 class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
   late Map<String, bool> _devicesMap;
   _syncDevices() {
-    setState(() {
-      _devicesMap = Map<String, bool>.from(widget.isStateless
-          ? widget.areGenerators
-              ? EditStreamController.pickedGenerators
-              : EditStreamController.pickedVerifiers
-          : widget.areGenerators
-              ? AddStreamController.pickedGenerators
-              : AddStreamController.pickedVerifiers);
-      DevicesController.loadAllDevices();
-      widget.saveChanges();
-    });
+    widget.devicesReloader();
+    setState(
+      () {
+        if (widget.isStateless) {
+          if (widget.areGenerators) {
+            _devicesMap =
+                Map<String, bool>.from(EditStreamController.pickedGenerators);
+          } else {
+            _devicesMap =
+                Map<String, bool>.from(EditStreamController.pickedVerifiers);
+          }
+        } else {
+          if (widget.areGenerators) {
+            _devicesMap =
+                Map<String, bool>.from(AddStreamController.pickedGenerators);
+          } else {
+            _devicesMap =
+                Map<String, bool>.from(AddStreamController.pickedVerifiers);
+          }
+        }
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
-    _devicesMap = Map<String, bool>.from(widget.isStateless
-        ? widget.areGenerators
-            ? EditStreamController.pickedGenerators
-            : EditStreamController.pickedVerifiers
-        : widget.areGenerators
-            ? AddStreamController.pickedGenerators
-            : AddStreamController.pickedVerifiers);
+    _syncDevices();
   }
 
   @override
@@ -126,11 +131,14 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
               IconButton(
                 icon: _devicesMap.isEmpty || DevicesController.devices == null
                     ? Icon(
-                        MaterialCommunityIcons.sync_alert,
-                        size: 20,
+                        DevicesController.devices == null
+                            ? Icons.warning_amber_rounded
+                            : MaterialCommunityIcons.sync_alert,
                         color: DevicesController.devices == null
                             ? Colors.red
-                            : Colors.orange,
+                            : _devicesMap.isNotEmpty
+                                ? Colors.orange
+                                : null,
                       )
                     : const Icon(
                         MaterialCommunityIcons.sync_icon,
@@ -230,7 +238,7 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blue,
             tooltip: 'Save',
-            onPressed: () async {
+            onPressed: () {
               if (widget.isStateless) {
                 if (widget.areGenerators) {
                   EditStreamController.pickedGenerators = _devicesMap;
@@ -244,8 +252,8 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                   AddStreamController.pickedVerifiers = _devicesMap;
                 }
               }
-              widget.saveChanges();
               Navigator.pop(context);
+              widget.saveChanges();
             },
           ),
         ],

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:circular_motion/circular_motion.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
@@ -9,8 +8,6 @@ import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ripple/flutter_ripple.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
@@ -38,22 +35,21 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
     final stream = NetworkAnalyzer.discover2(systemApiSubnet, port,
         timeout: const Duration(milliseconds: 2000));
     stream.listen((NetworkAddress addr) {
-      if (addr.exists) {
+      if (addr.exists && mounted) {
         if (DevicesController.devices
                 ?.indexWhere((element) => element.ipAddress == addr.ip) !=
             -1) {
           return;
         }
-        setState(
-          () {
-            devices.add(addr.ip);
-          },
-        );
+
+        devices.add(addr.ip);
       }
     });
-    setState(() {
-      _isPinging = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isPinging = false;
+      });
+    }
   }
 
   @override
@@ -155,12 +151,18 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                                                     refresh: () => widget
                                                         .loadDevicesListView(),
                                                     delete: () => {
-                                                          setState(() {
-                                                            devices.remove(
-                                                                devices
-                                                                    .elementAt(
-                                                                        index));
-                                                          })
+                                                          if (mounted)
+                                                            {
+                                                              setState(
+                                                                () {
+                                                                  devices
+                                                                      .remove(
+                                                                    devices.elementAt(
+                                                                        index),
+                                                                  );
+                                                                },
+                                                              )
+                                                            }
                                                         },
                                                     ip: devices
                                                         .elementAt(index))),

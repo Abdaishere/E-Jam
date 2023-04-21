@@ -710,7 +710,42 @@ The send_stream function is used to send the stream to the devices that will gen
                             }
                         }
                     }
-                    Err(_error) => error!("Internal: {}", _error),
+                    Err(_error) => {
+                        error!("Connection {}", _error);
+
+                        let mut list = device_list.lock().unwrap();
+                        let device = list.get_mut(device_index).unwrap();
+
+                        // set the receiver status to offline (generic error)
+                        device.update_device_status(&ProcessStatus::Failed, &process_type);
+
+                        // add the device to the running devices list with a failed status
+                        match process_type {
+                            ProcessType::Generation => {
+                                self.running_generators.insert(
+                                    device.get_device_mac().to_string(),
+                                    ProcessStatus::Failed,
+                                );
+                            }
+                            ProcessType::Verification => {
+                                self.running_verifiers.insert(
+                                    device.get_device_mac().to_string(),
+                                    ProcessStatus::Failed,
+                                );
+                            }
+                            ProcessType::GeneratingAndVerification => {
+                                self.running_generators.insert(
+                                    device.get_device_mac().to_string(),
+                                    ProcessStatus::Failed,
+                                );
+
+                                self.running_generators.insert(
+                                    device.get_device_mac().to_string(),
+                                    ProcessStatus::Failed,
+                                );
+                            }
+                        }
+                    },
                 }
             }
         }
@@ -885,7 +920,41 @@ if the request fails, the device status will be set to Offline
                         }
                     }
                 }
-                Err(_error) => error!("Generators: {}", _error),
+                Err(_error) => {
+                    error!("Connection {}", _error);
+
+                    receiver.update_device_status(
+                        &ProcessStatus::Failed,
+                        &ProcessType::Generation,
+                    );
+
+                    match device.1 .1 {
+                        ProcessType::Generation => {
+                            self.running_generators.insert(
+                                receiver.get_device_mac().to_string(),
+                                ProcessStatus::Failed,
+                            );
+                        }
+                        ProcessType::Verification => {
+                            self.running_verifiers.insert(
+                                receiver.get_device_mac().to_string(),
+                                ProcessStatus::Failed,
+                            );
+                        }
+                        ProcessType::GeneratingAndVerification => {
+                            self.running_generators.insert(
+                                receiver.get_device_mac().to_string(),
+                                ProcessStatus::Failed,
+                            );
+
+                            self.running_generators.insert(
+                                receiver.get_device_mac().to_string(),
+                                ProcessStatus::Failed,
+                            );
+                        }
+                    
+                    }
+                },
             }
         }
 
