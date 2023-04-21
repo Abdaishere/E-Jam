@@ -62,8 +62,8 @@ class _DevicesListViewState extends State<DevicesListView> {
               _isPinging = false;
               _isPinged = value;
             }),
-            loadDevicesListView()
-          }
+          },
+        loadDevicesListView()
       },
     );
   }

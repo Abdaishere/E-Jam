@@ -77,7 +77,7 @@ class _AddStreamViewState extends State<AddStreamView>
               indicatorWeight: 0,
               indicator: BoxDecoration(
                 borderRadius: BorderRadius.circular(
-                  25.0,
+                  16.0,
                 ),
                 color: _tabBarColor,
               ),
@@ -633,9 +633,9 @@ class _AddStreamViewState extends State<AddStreamView>
             onPressed: () {
               setState(() {
                 _tabBarColor = Colors.blueAccent;
-                formKey.currentState!.reset();
-                _numberOfGenerators = _numberOfVerifiers = 0;
                 AddStreamController.clearAllFields();
+                if (formKey.currentState != null) formKey.currentState!.reset();
+                _numberOfGenerators = _numberOfVerifiers = 0;
               });
             },
           ),
