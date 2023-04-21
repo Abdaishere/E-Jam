@@ -171,7 +171,7 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
               itemBuilder: (context, index) {
                 if (index >= DevicesController.devices!.length) {
                   return CheckboxListTile(
-                    title: const Text("Deleted"),
+                    title: const Text("Unknown Device"),
                     subtitle: Text(
                       _getName(index),
                     ),
@@ -180,7 +180,10 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                       MaterialCommunityIcons.alert,
                       color: Colors.red,
                     ),
-                    onChanged: null,
+                    onChanged: (value) {
+                      _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
+                      setState(() {});
+                    },
                   );
                 }
                 return CheckboxListTile(

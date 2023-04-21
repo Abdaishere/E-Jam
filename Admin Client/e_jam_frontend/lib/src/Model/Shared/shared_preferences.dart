@@ -42,7 +42,7 @@ class ThemePreferences {
 }
 
 class NetworkController {
-  static String backendhostaddress = 'http://localhost:8080';
+  static String serverIpAddress = 'http://localhost:8080';
   static var client = http.Client();
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";
