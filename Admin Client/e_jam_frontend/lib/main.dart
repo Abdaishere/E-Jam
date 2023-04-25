@@ -195,7 +195,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   icon: const Icon(Icons.arrow_forward_ios_outlined),
                 ),
               ),
-              const SizedBox(height: 100),
+              const SizedBox(height: 20),
               // TODO: control panel with icons start and camera icon and save icon
               Container(
                 margin: const EdgeInsets.only(left: 5),
@@ -223,7 +223,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
               ListTile(
                 leading: const Icon(MaterialCommunityIcons.home),
                 iconColor: Colors.white,

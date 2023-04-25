@@ -44,16 +44,19 @@ class ThemePreferences {
 }
 
 class NetworkController {
-  static String serverIpAddress = 'http://localhost:8080';
+  static Uri serverIpAddress = Uri.parse('http://127.0.0.1:8080');
   static changeServerIpAddress(String newIpAddress, String newPort) {
     if (newIpAddress == "") {
-      newIpAddress = "localhost";
+      newIpAddress = "127.0.0.1";
     }
     if (newPort == "") {
       newPort = "8080";
     }
-    serverIpAddress = "http://$newIpAddress:$newPort";
-
+    serverIpAddress = Uri.parse('http://$newIpAddress:$newPort');
+    DevicesServices.uri.replace(
+        scheme: serverIpAddress.scheme,
+        host: serverIpAddress.host,
+        port: serverIpAddress.port);
     DevicesServices.uri = Uri.parse('$serverIpAddress/devices');
     StreamServices.uri = Uri.parse('$serverIpAddress/streams');
   }

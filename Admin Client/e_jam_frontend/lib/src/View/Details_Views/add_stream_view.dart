@@ -28,6 +28,43 @@ class _AddStreamViewState extends State<AddStreamView>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    AddStreamController.syncDevicesList();
+
+    AddStreamController.pickedGenerators.forEach((key, value) {
+      if (value) numberOfGenerators++;
+    });
+
+    AddStreamController.pickedVerifiers.forEach((key, value) {
+      if (value) numberOfVerifiers++;
+    });
+  }
+
+  int numberOfGenerators = 0;
+  int numberOfVerifiers = 0;
+
+  updateDevicesCounter() {
+    int counter1 = 0;
+    AddStreamController.pickedGenerators.forEach((key, value) {
+      if (value) counter1++;
+    });
+
+    int counter2 = 0;
+    AddStreamController.pickedVerifiers.forEach((key, value) {
+      if (value) counter2++;
+    });
+
+    if (mounted &&
+        (counter1 != numberOfGenerators || counter2 != numberOfVerifiers)) {
+      setState(() {
+        numberOfVerifiers = counter2;
+        numberOfGenerators = counter1;
+      });
+    }
+  }
+
+  void checkContentSwitch() {
+    AddStreamController.checkContent = !AddStreamController.checkContent;
+    setState(() {});
   }
 
   @override
@@ -78,71 +115,19 @@ class _AddStreamViewState extends State<AddStreamView>
               children: <Widget>[
                 Form(
                   key: formKey,
-                  child: const AddStreamFields(),
+                  child: _addStreamFields(),
                 ),
                 const AddPresetStream(),
               ],
             ),
-            bottomNavigationBar: BottomOptionsBar(reload: widget.reload),
+            bottomNavigationBar: _bottomOptionsBar(),
           ),
         ),
       ),
     );
   }
-}
 
-class AddStreamFields extends StatefulWidget {
-  const AddStreamFields({super.key});
-
-  @override
-  State<AddStreamFields> createState() => _AddStreamFieldsState();
-}
-
-class _AddStreamFieldsState extends State<AddStreamFields> {
-  int _numberOfGenerators = 0;
-  int _numberOfVerifiers = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    AddStreamController.syncDevicesList();
-
-    AddStreamController.pickedGenerators.forEach((key, value) {
-      if (value) _numberOfGenerators++;
-    });
-
-    AddStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) _numberOfVerifiers++;
-    });
-  }
-
-  _updateDevicesCounter() {
-    int counter1 = 0;
-    AddStreamController.pickedGenerators.forEach((key, value) {
-      if (value) counter1++;
-    });
-
-    int counter2 = 0;
-    AddStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) counter2++;
-    });
-
-    if (mounted &&
-        (counter1 != _numberOfGenerators || counter2 != _numberOfVerifiers)) {
-      setState(() {
-        _numberOfVerifiers = counter2;
-        _numberOfGenerators = counter1;
-      });
-    }
-  }
-
-  void checkContentSwitch() {
-    AddStreamController.checkContent = !AddStreamController.checkContent;
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  SingleChildScrollView _addStreamFields() {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -154,8 +139,14 @@ class _AddStreamFieldsState extends State<AddStreamFields> {
           const StreamDescriptionField(),
           const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
-          _streamDevicesLists(),
-          _packetsBroadcastFramesSizes(),
+          StreamDevicesLists(
+            updateDevicesCounter: updateDevicesCounter,
+            numberOfGenerators: numberOfGenerators,
+            numberOfVerifiers: numberOfVerifiers,
+          ),
+          PacketsBroadcastFramesSizes(
+            checkContent: AddStreamController.checkContent,
+          ),
           const GenerationSeed(),
           const PayloadLengthAndType(),
           const BurstLengthAndDelay(),
@@ -165,167 +156,65 @@ class _AddStreamFieldsState extends State<AddStreamFields> {
     );
   }
 
-  Row _packetsBroadcastFramesSizes() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Number of Packets',
-              hintText: 'Number of Packets to be sent',
-              icon: Icon(
-                AddStreamController.checkContent
-                    ? MaterialCommunityIcons.package_variant
-                    : MaterialCommunityIcons.package_variant_closed,
-              ),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of packets';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid number of packets';
-              }
-              return null;
+  BottomAppBar _bottomOptionsBar() {
+    return BottomAppBar(
+      elevation: 0,
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            icon: const Icon(MaterialCommunityIcons.delete_empty),
+            tooltip: 'Clear',
+            color: Colors.redAccent,
+            onPressed: () {
+              numberOfGenerators = 0;
+              numberOfVerifiers = 0;
+              AddStreamController.defaultStreamFields();
+              if (formKey.currentState != null) formKey.currentState!.reset();
+              setState(() {});
             },
-            controller: AddStreamController.packetsController,
           ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Broadcast Frames Size',
-              hintText: 'Frames to be broadcasted',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of frames';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid number of frames';
-              }
-              return null;
-            },
-            controller: AddStreamController.broadcastFramesController,
-          ),
-        ),
-      ],
-    );
-  }
+          const Divider(),
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.check),
+            color: Colors.blueAccent,
+            tooltip: 'OK',
+            onPressed: () async {
+              bool? success = await AddStreamController.addStream(formKey);
 
-  Row _streamDevicesLists() {
-    return Row(
-      children: [
-        Expanded(
-          child: ListTile(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            title: Row(
-              children: [
-                Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.rotationY(pi),
-                  child: const Icon(
-                    MaterialCommunityIcons.progress_upload,
-                    semanticLabel: 'Generators',
-                    color: uploadColor,
-                    size: 26,
-                  ),
-                ),
-                const VerticalDivider(),
-                const Text(
-                  'Generators',
-                  overflow: TextOverflow.clip,
-                ),
-              ],
-            ),
-            trailing: Text(
-              _numberOfGenerators.toString(),
-              style: TextStyle(
-                color: _numberOfGenerators == 0 ? Colors.red : null,
-                fontSize: 20,
-              ),
-            ),
-            onTap: () {
-              Navigator.of(context).push(
-                DialogRoute(
-                  context: context,
-                  builder: (BuildContext context) => Center(
-                    child: DevicesCheckListPicker(
-                      areGenerators: true,
-                      saveChanges: () => _updateDevicesCounter(),
-                      devicesReloader: () => {
-                        DevicesController.loadAllDevices(),
-                        _updateDevicesCounter(),
-                      },
-                      isStateless: false,
-                    ),
-                  ),
-                  settings: const RouteSettings(name: 'AddGenerators'),
-                ),
-              );
+              if (success != null) {
+                if (success) {
+                  widget.reload();
+                  if (mounted) Navigator.pop(context);
+                }
+              }
             },
           ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          child: ListTile(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            title: Row(
-              children: const [
-                Icon(
-                  MaterialCommunityIcons.progress_check,
-                  semanticLabel: 'Verifiers',
-                  color: downloadColor,
-                  size: 26,
-                ),
-                VerticalDivider(),
-                Text(
-                  'Verifiers',
-                  overflow: TextOverflow.clip,
-                ),
-              ],
-            ),
-            trailing: Text(
-              _numberOfVerifiers.toString(),
-              style: TextStyle(
-                  color: _numberOfVerifiers == 0 ? Colors.red : null,
-                  fontSize: 20),
-            ),
-            onTap: () {
-              Navigator.of(context).push(
-                DialogRoute(
-                  context: context,
-                  builder: (BuildContext context) => Center(
-                    child: DevicesCheckListPicker(
-                      areGenerators: false,
-                      saveChanges: () => _updateDevicesCounter(),
-                      devicesReloader: () => {
-                        DevicesController.loadAllDevices(),
-                        _updateDevicesCounter(),
-                      },
-                      isStateless: false,
-                    ),
-                  ),
-                  settings: const RouteSettings(name: 'AddVerifiers'),
-                ),
-              );
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.xmark),
+            color: Colors.red,
+            tooltip: 'Cancel',
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-        ),
-      ],
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.plus),
+            color: Colors.greenAccent.shade700,
+            tooltip: 'Apply',
+            onPressed: () async {
+              bool? success = await AddStreamController.addStream(formKey);
+              if (success != null) {
+                if (success) {
+                  widget.reload();
+                }
+                // TODO: Add an icon to show the result
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -758,6 +647,203 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
   }
 }
 
+class PacketsBroadcastFramesSizes extends StatefulWidget {
+  const PacketsBroadcastFramesSizes({super.key, required this.checkContent});
+
+  final bool checkContent;
+
+  @override
+  State<PacketsBroadcastFramesSizes> createState() =>
+      _PacketsBroadcastFramesSizesState();
+}
+
+class _PacketsBroadcastFramesSizesState
+    extends State<PacketsBroadcastFramesSizes> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Number of Packets',
+              hintText: 'Number of Packets to be sent',
+              icon: Icon(
+                widget.checkContent
+                    ? MaterialCommunityIcons.package_variant
+                    : MaterialCommunityIcons.package_variant_closed,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of packets';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid number of packets';
+              }
+              return null;
+            },
+            controller: AddStreamController.packetsController,
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Broadcast Frames Size',
+              hintText: 'Frames to be broadcasted',
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of frames';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid number of frames';
+              }
+              return null;
+            },
+            controller: AddStreamController.broadcastFramesController,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class StreamDevicesLists extends StatefulWidget {
+  const StreamDevicesLists({
+    super.key,
+    required this.numberOfGenerators,
+    required this.numberOfVerifiers,
+    required this.updateDevicesCounter,
+  });
+
+  final int numberOfGenerators;
+  final int numberOfVerifiers;
+  final Function updateDevicesCounter;
+
+  @override
+  State<StreamDevicesLists> createState() => _StreamDevicesListsState();
+}
+
+class _StreamDevicesListsState extends State<StreamDevicesLists> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ListTile(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            title: Row(
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(pi),
+                  child: const Icon(
+                    MaterialCommunityIcons.progress_upload,
+                    semanticLabel: 'Generators',
+                    color: uploadColor,
+                    size: 26,
+                  ),
+                ),
+                const VerticalDivider(),
+                const Text(
+                  'Generators',
+                  overflow: TextOverflow.clip,
+                ),
+              ],
+            ),
+            trailing: Text(
+              widget.numberOfGenerators.toString(),
+              style: TextStyle(
+                color: widget.numberOfGenerators == 0 ? Colors.red : null,
+                fontSize: 20,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                DialogRoute(
+                  context: context,
+                  builder: (BuildContext context) => Center(
+                    child: DevicesCheckListPicker(
+                      areGenerators: true,
+                      saveChanges: () => widget.updateDevicesCounter(),
+                      devicesReloader: () => {
+                        DevicesController.loadAllDevices(),
+                        widget.updateDevicesCounter(),
+                      },
+                      isStateless: false,
+                    ),
+                  ),
+                  settings: const RouteSettings(name: 'AddGenerators'),
+                ),
+              );
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          child: ListTile(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            title: Row(
+              children: const [
+                Icon(
+                  MaterialCommunityIcons.progress_check,
+                  semanticLabel: 'Verifiers',
+                  color: downloadColor,
+                  size: 26,
+                ),
+                VerticalDivider(),
+                Text(
+                  'Verifiers',
+                  overflow: TextOverflow.clip,
+                ),
+              ],
+            ),
+            trailing: Text(
+              widget.numberOfVerifiers.toString(),
+              style: TextStyle(
+                  color: widget.numberOfVerifiers == 0 ? Colors.red : null,
+                  fontSize: 20),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                DialogRoute(
+                  context: context,
+                  builder: (BuildContext context) => Center(
+                    child: DevicesCheckListPicker(
+                      areGenerators: false,
+                      saveChanges: () => widget.updateDevicesCounter(),
+                      devicesReloader: () => {
+                        DevicesController.loadAllDevices(),
+                        widget.updateDevicesCounter(),
+                      },
+                      isStateless: false,
+                    ),
+                  ),
+                  settings: const RouteSettings(name: 'AddVerifiers'),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class AddPresetStream extends StatefulWidget {
   const AddPresetStream({super.key});
 
@@ -769,72 +855,5 @@ class _AddPresetStreamState extends State<AddPresetStream> {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Add Preset Stream'));
-  }
-}
-
-class BottomOptionsBar extends StatefulWidget {
-  const BottomOptionsBar({super.key, required this.reload});
-
-  final Function reload;
-
-  @override
-  State<BottomOptionsBar> createState() => _BottomOptionsBarState();
-}
-
-class _BottomOptionsBarState extends State<BottomOptionsBar> {
-  @override
-  Widget build(BuildContext context) {
-    return BottomAppBar(
-      elevation: 0,
-      height: 60,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.xmark),
-            color: Colors.red,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          const Divider(),
-          IconButton(
-            icon: const Icon(MaterialCommunityIcons.delete_empty),
-            tooltip: 'Clear all fields',
-            color: Colors.redAccent,
-            onPressed: () {
-              AddStreamController.clearAllFields();
-              if (formKey.currentState != null) formKey.currentState!.reset();
-              setState(() {});
-            },
-          ),
-          const Divider(),
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.check),
-            color: Colors.blueAccent,
-            onPressed: () async {
-              bool? success = await AddStreamController.addStream(formKey);
-
-              if (success != null) {
-                if (success) {
-                  widget.reload();
-                  if (mounted) Navigator.pop(context);
-                }
-              }
-            },
-          ),
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.plus),
-            color: Colors.greenAccent.shade700,
-            onPressed: () async {
-              bool? success = await AddStreamController.addStream(formKey);
-              if (success != null) {
-                // TODO: Add an icon to show the result
-              }
-            },
-          ),
-        ],
-      ),
-    );
   }
 }

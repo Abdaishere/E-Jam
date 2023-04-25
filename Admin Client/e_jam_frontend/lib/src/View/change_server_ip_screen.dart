@@ -17,6 +17,14 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
   final TextEditingController _serverPortController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _serverIpAddressController.text = NetworkController.serverIpAddress.host;
+    _serverPortController.text =
+        NetworkController.serverIpAddress.port.toString();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -56,6 +64,9 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                         if (_serverPortController.text.isEmpty) {
                           _serverPortController.text = "8080";
                         }
+                        if (_serverIpAddressController.text.isEmpty) {
+                          _serverIpAddressController.text = "127.0.0.1";
+                        }
                         formKey.currentState!.save();
                         NetworkController.changeServerIpAddress(
                             "localhost", _serverPortController.text);
@@ -64,7 +75,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                          borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
                       child: Column(
@@ -97,7 +108,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                          borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
                       child: Column(

@@ -197,19 +197,7 @@ class AddStreamController {
     };
   }
 
-  static clearAllFields() {
-    idController.clear();
-    nameController.clear();
-    descriptionController.clear();
-    delayController.clear();
-    timeToLiveController.clear();
-    interFrameGapController.clear();
-    payloadLengthController.clear();
-    burstLengthController.clear();
-    burstDelayController.clear();
-    broadcastFramesController.clear();
-    packetsController.clear();
-    seedController.clear();
+  static defaultStreamFields() {
     flowType = FlowType.bursts;
     payloadType = 2;
     transportLayerProtocol = TransportLayerProtocol.tcp;

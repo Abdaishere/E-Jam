@@ -112,6 +112,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.xmark),
             color: Colors.red,
+            tooltip: 'Cancel',
             onPressed: () {
               Navigator.pop(context);
             },
@@ -119,6 +120,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blue,
+            tooltip: 'Save',
             onPressed: () async {
               _editDevice().then(
                 (value) => {

@@ -1,11 +1,11 @@
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/View/Charts/extensions/icons_system_elements.dart';
-import 'package:e_jam/src/View/Charts/extensions/gauge_speed_chart.dart';
-import 'package:e_jam/src/View/Charts/extensions/progress_task_for_all_system.dart';
+import 'package:e_jam/src/View/extensions/icons_system_elements.dart';
+import 'package:e_jam/src/View/extensions/gauge_speed_chart.dart';
+import 'package:e_jam/src/View/extensions/progress_task_for_all_system.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'package:e_jam/src/View/Charts/extensions/treemap_drilldown_devices_load.dart';
+import 'package:e_jam/src/View/extensions/treemap_drilldown_devices_load.dart';
 
 // should not be scrollable
 class HomeView extends StatefulWidget {

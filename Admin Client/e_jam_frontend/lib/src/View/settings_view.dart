@@ -1,10 +1,10 @@
 import 'package:e_jam/main.dart';
 import 'package:flutter/material.dart';
 
-// should not be scrollable
 // should include but not limited to:
 // TODO: Disable animation for system button
 // TODO: Change Line charts curve to smooth
+// TODO: Change Order and types of extensions in main screen
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 

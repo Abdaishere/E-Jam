@@ -143,7 +143,7 @@ class _TreeMapDrillDownDevicesLoadState
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.only(bottom: 12, left: 10, right: 10),
         child: SfTreemap(
           legend: const TreemapLegend(
             position: TreemapLegendPosition.top,

@@ -154,26 +154,19 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.xmark),
-            color: Colors.red,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          const Divider(),
-          IconButton(
             icon: const Icon(MaterialCommunityIcons.delete_empty),
-            tooltip: 'Clear all fields',
+            tooltip: 'Clear',
             color: Colors.redAccent,
             onPressed: () {
-              formKey.currentState!.reset();
-              AddDeviceController.clearAllFields();
+              AddDeviceController.defaultDevicesPortField();
+              if (formKey.currentState != null) formKey.currentState!.reset();
             },
           ),
           const Divider(),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
+            tooltip: 'OK',
             onPressed: () async {
               bool? value = await _addDevice();
               if (value != null && value) {
@@ -182,8 +175,17 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             },
           ),
           IconButton(
+            icon: const FaIcon(FontAwesomeIcons.xmark),
+            color: Colors.red,
+            tooltip: 'Cancel',
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          IconButton(
             icon: const FaIcon(FontAwesomeIcons.plus),
             color: Colors.greenAccent.shade700,
+            tooltip: 'Apply',
             onPressed: () => _addDevice(),
           ),
         ],

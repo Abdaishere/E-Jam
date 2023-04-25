@@ -158,7 +158,7 @@ const darkColorScheme = ColorScheme(
 );
 
 class ThemeModel extends ChangeNotifier {
-  bool _isDark = false;
+  bool _isDark = true;
   ThemePreferences themePreferences = ThemePreferences();
 
   bool get isDark => _isDark;
@@ -166,7 +166,7 @@ class ThemeModel extends ChangeNotifier {
   ColorScheme get colorScheme => _isDark ? darkColorScheme : lightColorScheme;
 
   ThemeModel() {
-    _isDark = false;
+    _isDark = true;
     getTheme();
   }
 

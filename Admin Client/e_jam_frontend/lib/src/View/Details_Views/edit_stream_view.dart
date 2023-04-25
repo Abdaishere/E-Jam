@@ -114,70 +114,15 @@ class _EditStreamViewState extends State<EditStreamView>
           const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
           _streamDevicesLists(),
-          _packetsBroadcastFramesSizes(),
+          PacketsBroadcastFramesSizes(
+            checkContent: EditStreamController.checkContent,
+          ),
           const GenerationSeed(),
           const PayloadLengthAndType(),
           const BurstLengthAndDelay(),
           const FlowAndTLPTypes(),
         ],
       ),
-    );
-  }
-
-  Row _packetsBroadcastFramesSizes() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: InputDecoration(
-              labelText: 'Number of Packets',
-              hintText: 'Number of Packets to be sent',
-              icon: Icon(
-                EditStreamController.checkContent
-                    ? MaterialCommunityIcons.package_variant
-                    : MaterialCommunityIcons.package_variant_closed,
-              ),
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of packets';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid number of packets';
-              }
-              return null;
-            },
-            controller: EditStreamController.packetsController,
-          ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          flex: 1,
-          child: TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Broadcast Frames Size',
-              hintText: 'Frames to be broadcasted',
-            ),
-            keyboardType: TextInputType.number,
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly
-            ],
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a number of frames';
-              } else if (int.tryParse(value) == null) {
-                return 'Please enter a valid number of frames';
-              }
-              return null;
-            },
-            controller: EditStreamController.broadcastFramesController,
-          ),
-        ),
-      ],
     );
   }
 
@@ -352,6 +297,76 @@ class _EditStreamViewState extends State<EditStreamView>
           ),
         ],
       ),
+    );
+  }
+}
+
+class PacketsBroadcastFramesSizes extends StatefulWidget {
+  const PacketsBroadcastFramesSizes({super.key, required this.checkContent});
+
+  final bool checkContent;
+  @override
+  State<PacketsBroadcastFramesSizes> createState() =>
+      _PacketsBroadcastFramesSizesState();
+}
+
+class _PacketsBroadcastFramesSizesState
+    extends State<PacketsBroadcastFramesSizes> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Number of Packets',
+              hintText: 'Number of Packets to be sent',
+              icon: Icon(
+                widget.checkContent
+                    ? MaterialCommunityIcons.package_variant
+                    : MaterialCommunityIcons.package_variant_closed,
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of packets';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid number of packets';
+              }
+              return null;
+            },
+            controller: EditStreamController.packetsController,
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          flex: 1,
+          child: TextFormField(
+            decoration: const InputDecoration(
+              labelText: 'Broadcast Frames Size',
+              hintText: 'Frames to be broadcasted',
+            ),
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.digitsOnly
+            ],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a number of frames';
+              } else if (int.tryParse(value) == null) {
+                return 'Please enter a valid number of frames';
+              }
+              return null;
+            },
+            controller: EditStreamController.broadcastFramesController,
+          ),
+        ),
+      ],
     );
   }
 }
