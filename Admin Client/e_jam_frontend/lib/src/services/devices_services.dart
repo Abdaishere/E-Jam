@@ -4,8 +4,7 @@ import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 
 // TODO: add a wrapper for the response to handle errors and exceptions and return a custom response
 class DevicesServices {
-  static get backendhostaddress => NetworkController.serverIpAddress;
-  static Uri uri = Uri.parse('$backendhostaddress/devices');
+  static Uri uri = Uri.parse('${NetworkController.serverIpAddress}/devices');
 
   static get client => NetworkController.client;
 

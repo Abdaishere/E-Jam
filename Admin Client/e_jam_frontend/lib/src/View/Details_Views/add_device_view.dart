@@ -32,19 +32,14 @@ class _AddDeviceViewState extends State<AddDeviceView> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'addDevice',
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.45),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
+          : const EdgeInsets.all(20),
+      child: Hero(
+        tag: 'addDevice',
+        createRectTween: (begin, end) =>
+            CustomRectTween(begin: begin!, end: end!),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Scaffold(

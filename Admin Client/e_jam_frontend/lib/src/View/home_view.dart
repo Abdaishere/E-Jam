@@ -1,11 +1,11 @@
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/View/Charts/Home/icons_system_elements.dart';
-import 'package:e_jam/src/View/Charts/Home/gauge_speed_chart.dart';
-import 'package:e_jam/src/View/Charts/Home/progress_task_for_all_system.dart';
+import 'package:e_jam/src/View/Charts/extensions/icons_system_elements.dart';
+import 'package:e_jam/src/View/Charts/extensions/gauge_speed_chart.dart';
+import 'package:e_jam/src/View/Charts/extensions/progress_task_for_all_system.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'package:e_jam/src/View/Charts/Home/treemap_drilldown_devices_load.dart';
+import 'package:e_jam/src/View/Charts/extensions/treemap_drilldown_devices_load.dart';
 
 // should not be scrollable
 class HomeView extends StatefulWidget {
@@ -54,60 +54,16 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.55,
-              child: const Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                  Radius.circular(8),
-                )),
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TreeMapDrillDownDevicesLoad(),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.35,
-              child: Row(
-                children: const [
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      )),
-                      child: GaugeTotalProgressForSystem(),
-                    ),
-                  ),
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      )),
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: IconsElementsSystem(),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                        Radius.circular(8),
-                      )),
-                      child: Center(
-                        child: GaugeSpeedChart(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 350, child: TreeMapDrillDownDevicesLoad()),
+            Wrap(
+              children: const [
+                GaugeTotalProgressForSystem(),
+                IconsElementsSystem(),
+                GaugeSpeedChart(),
+              ],
             ),
           ],
         ),

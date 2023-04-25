@@ -1,7 +1,8 @@
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
+import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Charts/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
-import 'package:e_jam/src/View/login_screen.dart';
+import 'package:e_jam/src/View/change_server_ip_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -32,7 +33,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         builder: (context, ThemeModel theme, child) {
           return MaterialApp(
             title: 'E Jam',
-            // debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: false,
             theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
             darkTheme:
                 ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
@@ -87,17 +87,19 @@ class _HomeState extends State<Home> {
       builder: (context, ThemeModel theme, child) {
         return Stack(
           children: [
-            gradientBackground(theme, context),
+            const GradientBackground(),
             const BouncingBall(),
-            bottomLineChartScaffold(context),
-            frontBody(),
+            const BottomLineChartScaffold(),
+            frontBody(theme.isDark
+                ? const Color.fromARGB(183, 255, 197, 117)
+                : const Color.fromARGB(183, 2, 105, 240)),
           ],
         );
       },
     );
   }
 
-  ZoomDrawer frontBody() {
+  ZoomDrawer frontBody(Color shadowColor) {
     return ZoomDrawer(
       menuScreen: MenuScreen(
         setIndex: (index) {
@@ -110,39 +112,57 @@ class _HomeState extends State<Home> {
       androidCloseOnBackTap: true,
       showShadow: true,
       mainScreenTapClose: true,
-      shadowLayer1Color: const Color.fromARGB(183, 255, 197, 117),
+      shadowLayer1Color: shadowColor,
       angle: 0.0,
       slideWidth: 250.0,
       openCurve: Curves.easeIn,
       closeCurve: Curves.easeOut,
     );
   }
+}
 
-  Scaffold bottomLineChartScaffold(BuildContext context) {
-    return Scaffold(
+class BottomLineChartScaffold extends StatelessWidget {
+  const BottomLineChartScaffold({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
       backgroundColor: Colors.transparent,
       bottomNavigationBar: BottomAppBar(
         elevation: 0,
-        padding: const EdgeInsets.only(left: 200),
-        height: MediaQuery.of(context).size.height * 0.14,
-        child: const BottomLineChart(),
+        padding: EdgeInsets.only(left: 200),
+        height: 100,
+        child: BottomLineChart(),
       ),
     );
   }
+}
 
-  Container gradientBackground(ThemeModel theme, BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: theme.isDark ? gradientColorDark : gradientColorLight,
-          transform: const GradientRotation(0.5),
-        ),
-        backgroundBlendMode: BlendMode.darken,
-      ),
+class GradientBackground extends StatelessWidget {
+  const GradientBackground({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(
+      builder: (context, ThemeModel theme, child) {
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: theme.isDark ? gradientColorDark : gradientColorLight,
+              transform: const GradientRotation(0.5),
+            ),
+            backgroundBlendMode: BlendMode.darken,
+          ),
+        );
+      },
     );
   }
 }
@@ -175,7 +195,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   icon: const Icon(Icons.arrow_forward_ios_outlined),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+              const SizedBox(height: 100),
               // TODO: control panel with icons start and camera icon and save icon
               Container(
                 margin: const EdgeInsets.only(left: 5),
@@ -203,7 +223,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.035),
+              const SizedBox(height: 30),
               ListTile(
                 leading: const Icon(MaterialCommunityIcons.home),
                 iconColor: Colors.white,
@@ -247,7 +267,7 @@ class _MenuScreenState extends State<MenuScreen> {
               AboutListTile(
                 icon: const Icon(MaterialCommunityIcons.information, size: 21),
                 applicationName: "E-Jam",
-                applicationVersion: "1.0.0",
+                applicationVersion: "1.0.2",
                 applicationIcon: Image.asset("assets/Icon-logo.ico",
                     width: 100, height: 100),
                 applicationLegalese: "© 2023 E-Jam",
@@ -274,13 +294,16 @@ class _MenuScreenState extends State<MenuScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      tooltip: 'Change Switch',
+                      tooltip: 'Change Server',
                       icon: const Icon(Icons.logout),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
+                        Navigator.of(context).push(
+                          HeroDialogRoute(
+                            builder: (BuildContext context) => const Center(
+                              child: ChangeServerIPScreen(),
+                            ),
+                            settings:
+                                const RouteSettings(name: 'AddStreamView'),
                           ),
                         );
                       },
@@ -296,7 +319,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+              const SizedBox(height: 20),
             ],
           ),
         );

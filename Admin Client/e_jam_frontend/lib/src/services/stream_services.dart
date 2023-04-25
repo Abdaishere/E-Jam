@@ -6,8 +6,7 @@ import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 
 // TODO: add a wrapper for the response to handle errors and exceptions and return a custom response
 class StreamServices {
-  static get backendhostaddress => NetworkController.serverIpAddress;
-  static Uri uri = Uri.parse('$backendhostaddress/streams');
+  static Uri uri = Uri.parse('${NetworkController.serverIpAddress}/streams');
 
   static get client => NetworkController.client;
 

@@ -1,3 +1,5 @@
+import 'package:e_jam/src/services/devices_services.dart';
+import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -43,6 +45,19 @@ class ThemePreferences {
 
 class NetworkController {
   static String serverIpAddress = 'http://localhost:8080';
+  static changeServerIpAddress(String newIpAddress, String newPort) {
+    if (newIpAddress == "") {
+      newIpAddress = "localhost";
+    }
+    if (newPort == "") {
+      newPort = "8080";
+    }
+    serverIpAddress = "http://$newIpAddress:$newPort";
+
+    DevicesServices.uri = Uri.parse('$serverIpAddress/devices');
+    StreamServices.uri = Uri.parse('$serverIpAddress/streams');
+  }
+
   static var client = http.Client();
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";

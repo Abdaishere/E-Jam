@@ -42,19 +42,14 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
   @override
   Widget build(BuildContext context) {
     Device device = updateDevice ?? widget.device;
-    return Hero(
-      tag: device.macAddress,
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.45),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.symmetric(horizontal: 280, vertical: 100)
+          : const EdgeInsets.all(20),
+      child: Hero(
+        tag: device.macAddress,
+        createRectTween: (begin, end) =>
+            CustomRectTween(begin: begin!, end: end!),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(

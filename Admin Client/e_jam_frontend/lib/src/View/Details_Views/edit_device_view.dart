@@ -68,19 +68,14 @@ class _EditDeviceViewState extends State<EditDeviceView> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: widget.device.macAddress,
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.7),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.4),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
+          : const EdgeInsets.all(20),
+      child: Hero(
+        tag: widget.device.macAddress,
+        createRectTween: (begin, end) =>
+            CustomRectTween(begin: begin!, end: end!),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(

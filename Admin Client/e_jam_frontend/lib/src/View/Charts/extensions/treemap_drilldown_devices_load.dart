@@ -138,90 +138,102 @@ class _TreeMapDrillDownDevicesLoadState
 
   @override
   Widget build(BuildContext context) {
-    return SfTreemap(
-      dataCount: _source.length,
-      weightValueMapper: (int index) {
-        return _source[index].totalPackets!;
-      },
-      enableDrilldown: true,
-      breadcrumbs: TreemapBreadcrumbs(
-        builder: (BuildContext context, TreemapTile tile, bool isCurrent) {
-          if (tile.group == 'Home') {
-            return const Icon(MaterialCommunityIcons.home, size: 20);
-          } else {
-            return Text(
-              tile.group,
-            );
-          }
-        },
-        divider: const Icon(Icons.chevron_right),
-        position: TreemapBreadcrumbPosition.top,
+    return Card(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
-      levels: [
-        // Displays the device name in the first level.
-        TreemapLevel(
-          border: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(3.0)),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: SfTreemap(
+          legend: const TreemapLegend(
+            position: TreemapLegendPosition.top,
+            title: Text('Devices Load'),
           ),
-          padding: const EdgeInsets.all(1.0),
-          groupMapper: (int index) => _source[index].deviceName,
-          labelBuilder: (BuildContext context, TreemapTile tile) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 5.0, top: 5.0),
-              child: Text(
-                tile.group,
-                style: const TextStyle(color: Colors.black),
-                overflow: TextOverflow.ellipsis,
+          dataCount: _source.length,
+          weightValueMapper: (int index) {
+            return _source[index].totalPackets!;
+          },
+          enableDrilldown: true,
+          breadcrumbs: TreemapBreadcrumbs(
+            builder: (BuildContext context, TreemapTile tile, bool isCurrent) {
+              if (tile.group == 'Home') {
+                return const Icon(MaterialCommunityIcons.home, size: 20);
+              } else {
+                return Text(
+                  tile.group,
+                );
+              }
+            },
+            divider: const Icon(Icons.chevron_right),
+            position: TreemapBreadcrumbPosition.top,
+          ),
+          levels: [
+            // Displays the device name in the first level.
+            TreemapLevel(
+              border: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(3.0)),
               ),
-            );
-          },
-          colorValueMapper: (TreemapTile tile) {
-            return _colors[_source[tile.indices[0]].deviceName];
-          },
-          tooltipBuilder: (BuildContext context, TreemapTile tile) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Device: ${tile.group}',
-                style: const TextStyle(color: Colors.black),
-              ),
-            );
-          },
-        ),
+              padding: const EdgeInsets.all(1.0),
+              groupMapper: (int index) => _source[index].deviceName,
+              labelBuilder: (BuildContext context, TreemapTile tile) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 5.0, top: 5.0),
+                  child: Text(
+                    tile.group,
+                    style: const TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              },
+              colorValueMapper: (TreemapTile tile) {
+                return _colors[_source[tile.indices[0]].deviceName];
+              },
+              tooltipBuilder: (BuildContext context, TreemapTile tile) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Device: ${tile.group}',
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
+              },
+            ),
 
-        // Displays the stream name in the second level.
-        TreemapLevel(
-          border: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(3.0)),
-          ),
-          padding: const EdgeInsets.all(1.0),
-          groupMapper: (int index) {
-            return _source[index].stream;
-          },
-          colorValueMapper: (TreemapTile tile) {
-            return _colors[_source[tile.indices[0]].deviceName];
-          },
-          labelBuilder: (BuildContext context, TreemapTile tile) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 5.0, top: 5.0),
-              child: Text(
-                tile.group,
-                style: const TextStyle(color: Colors.black),
-                overflow: TextOverflow.ellipsis,
+            // Displays the stream name in the second level.
+            TreemapLevel(
+              border: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(3.0)),
               ),
-            );
-          },
-          tooltipBuilder: (BuildContext context, TreemapTile tile) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'Stream: ${tile.group}',
-                style: const TextStyle(color: Colors.black),
-              ),
-            );
-          },
+              padding: const EdgeInsets.all(1.0),
+              groupMapper: (int index) {
+                return _source[index].stream;
+              },
+              colorValueMapper: (TreemapTile tile) {
+                return _colors[_source[tile.indices[0]].deviceName];
+              },
+              labelBuilder: (BuildContext context, TreemapTile tile) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 5.0, top: 5.0),
+                  child: Text(
+                    tile.group,
+                    style: const TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                );
+              },
+              tooltipBuilder: (BuildContext context, TreemapTile tile) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Stream: ${tile.group}',
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

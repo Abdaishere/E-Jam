@@ -56,20 +56,15 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: id,
-      createRectTween: (begin, end) {
-        return CustomRectTween(begin: begin!, end: end!);
-      },
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.all(80)
+          : const EdgeInsets.all(20),
+      child: Hero(
+        tag: id,
+        createRectTween: (begin, end) {
+          return CustomRectTween(begin: begin!, end: end!);
+        },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: Scaffold(

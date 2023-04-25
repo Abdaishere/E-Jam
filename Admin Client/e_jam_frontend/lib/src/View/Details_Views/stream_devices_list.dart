@@ -28,15 +28,10 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height *
-          (MediaQuery.of(context).orientation == Orientation.portrait
-              ? 1
-              : 0.7),
-      width: MediaQuery.of(context).size.width *
-          (MediaQuery.of(context).orientation == Orientation.portrait
-              ? 1
-              : 0.4),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
+          : const EdgeInsets.all(20),
       child: ClipRRect(
         borderRadius: const BorderRadius.all(
           Radius.circular(15),

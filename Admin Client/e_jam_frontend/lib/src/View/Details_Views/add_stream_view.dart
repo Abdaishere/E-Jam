@@ -32,19 +32,14 @@ class _AddStreamViewState extends State<AddStreamView>
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'addStream',
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.6),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.symmetric(horizontal: 200, vertical: 100)
+          : const EdgeInsets.all(20),
+      child: Hero(
+        tag: 'addStream',
+        createRectTween: (begin, end) =>
+            CustomRectTween(begin: begin!, end: end!),
         child: ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(15)),
           child: Scaffold(

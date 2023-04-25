@@ -67,74 +67,57 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'radar',
-      createRectTween: (begin, end) =>
-          CustomRectTween(begin: begin!, end: end!),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.8),
-        width: MediaQuery.of(context).size.width *
-            (MediaQuery.of(context).orientation == Orientation.portrait
-                ? 1
-                : 0.6),
+    return Padding(
+      padding: MediaQuery.of(context).orientation == Orientation.landscape
+          ? const EdgeInsets.all(100)
+          : const EdgeInsets.all(20),
+      child: Hero(
+        tag: 'radar',
+        createRectTween: (begin, end) =>
+            CustomRectTween(begin: begin!, end: end!),
         child: GestureDetector(
           onDoubleTap: () {
             Navigator.of(context).pop();
           },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                automaticallyImplyLeading: false,
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.lightBlueAccent.withOpacity(0.1),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.lightBlueAccent.withOpacity(0.4),
+                  width: 5,
+                ),
               ),
-              body: Center(
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlueAccent.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.lightBlueAccent.withOpacity(0.4),
-                        width: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).shadowColor.withOpacity(0.45),
+                  shape: BoxShape.circle,
+                ),
+                child: CircularMotion.builder(
+                  behavior: HitTestBehavior.opaque,
+                  centerWidget: FlutterRipple(
+                    onTap: () {
+                      _radar();
+                    },
+                    child: Visibility(
+                      visible: !_isPinging,
+                      replacement: LoadingAnimationWidget.beat(
+                        size: 60,
+                        color: Colors.white,
                       ),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).shadowColor.withOpacity(0.45),
-                        shape: BoxShape.circle,
-                      ),
-                      child: CircularMotion.builder(
-                        behavior: HitTestBehavior.opaque,
-                        centerWidget: FlutterRipple(
-                          onTap: () {
-                            _radar();
-                          },
-                          child: Visibility(
-                            visible: !_isPinging,
-                            replacement: LoadingAnimationWidget.beat(
-                              size: 60,
-                              color: Colors.white,
-                            ),
-                            child: const Icon(
-                              Icons.refresh,
-                              size: 50,
-                            ),
-                          ),
-                        ),
-                        itemCount: devices.length,
-                        builder: (context, index) {
-                          return _deviceIcon(index, context);
-                        },
+                      child: const Icon(
+                        Icons.refresh,
+                        size: 50,
                       ),
                     ),
                   ),
+                  itemCount: devices.length,
+                  builder: (context, index) {
+                    return _deviceIcon(index, context);
+                  },
                 ),
               ),
             ),
