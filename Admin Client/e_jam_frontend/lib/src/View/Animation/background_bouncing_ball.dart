@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 const double ballWidth = 160, ballHeight = 150;
-const int minimumSpeed = 10,
-    speedIncrement = 20,
+const int minimumSpeed = 20,
+    speedIncrement = 15,
     speedDecrement = 5,
-    speedLimit = 100;
+    speedLimit = 100,
+    duration = 150;
 
 class BouncingBall extends StatefulWidget {
   const BouncingBall({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class BouncingBall extends StatefulWidget {
 }
 
 class _BouncingBallState extends State<BouncingBall> {
-  double x = 90, y = 30, xSpeed = 20, ySpeed = 20, speed = 150;
+  double x = 90, y = 30, xSpeed = 20, ySpeed = 20;
 
   @override
   initState() {
@@ -29,7 +30,7 @@ class _BouncingBallState extends State<BouncingBall> {
   }
 
   update() {
-    Timer.periodic(Duration(milliseconds: speed.toInt()), (timer) {
+    Timer.periodic(const Duration(milliseconds: duration), (timer) {
       final double screenWidth = MediaQuery.of(context).size.width;
       final double screenHeight = MediaQuery.of(context).size.height;
       x += xSpeed;
@@ -80,7 +81,7 @@ class _BouncingBallState extends State<BouncingBall> {
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      duration: Duration(milliseconds: speed.toInt()),
+      duration: Duration(milliseconds: duration.toInt()),
       left: x,
       top: y,
       child: const BallShape(),

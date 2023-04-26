@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:circular_motion/circular_motion.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
@@ -43,6 +44,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
         }
 
         devices.add(addr.ip);
+        setState(() {});
       }
     });
     if (mounted) {
@@ -116,7 +118,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                   ),
                   itemCount: devices.length,
                   builder: (context, index) {
-                    return _deviceIcon(index, context);
+                    return _deviceIcon(index);
                   },
                 ),
               ),
@@ -127,7 +129,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
     );
   }
 
-  SizedBox _deviceIcon(int index, BuildContext context) {
+  SizedBox _deviceIcon(int index) {
     return SizedBox(
       height: 120,
       width: 120,
@@ -138,6 +140,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
           IconButton(
             icon: const Icon(Icons.device_hub_rounded),
             iconSize: 50,
+            color: deviceIdleColor,
             tooltip:
                 'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
             onPressed: () {
@@ -164,7 +167,9 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
           Text(
             devices.elementAt(index),
             style: const TextStyle(
-              fontSize: 15,
+              color: Colors.white,
+              decoration: TextDecoration.none,
+              fontSize: 12,
             ),
             overflow: TextOverflow.ellipsis,
           ),

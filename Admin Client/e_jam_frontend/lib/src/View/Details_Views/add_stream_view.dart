@@ -170,8 +170,8 @@ class _AddStreamViewState extends State<AddStreamView>
             onPressed: () {
               numberOfGenerators = 0;
               numberOfVerifiers = 0;
-              AddStreamController.defaultStreamFields();
               if (formKey.currentState != null) formKey.currentState!.reset();
+              AddStreamController.clearAllFields();
               setState(() {});
             },
           ),

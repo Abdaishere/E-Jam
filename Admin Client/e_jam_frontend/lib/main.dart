@@ -1,6 +1,6 @@
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
-import 'package:e_jam/src/View/Charts/bottom_line_chart.dart';
+import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';
 import 'package:flutter/material.dart';
@@ -128,13 +128,15 @@ class BottomLineChartScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.transparent,
       bottomNavigationBar: BottomAppBar(
         elevation: 0,
-        padding: EdgeInsets.only(left: 200),
+        padding: const EdgeInsets.only(left: 200),
         height: 100,
-        child: BottomLineChart(),
+        child: MediaQuery.of(context).orientation == Orientation.landscape
+            ? const BottomLineChart()
+            : const SizedBox.shrink(),
       ),
     );
   }

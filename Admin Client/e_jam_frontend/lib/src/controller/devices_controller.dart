@@ -120,8 +120,13 @@ class AddDeviceController {
     return null;
   }
 
-  static defaultDevicesPortField() {
+  static clearAllFields() {
+    nameController.clear();
+    descriptionController.clear();
+    locationController.clear();
+    ipController.clear();
     portController.text = NetworkController.defaultDevicesPort.toString();
+    macController.clear();
   }
 }
 

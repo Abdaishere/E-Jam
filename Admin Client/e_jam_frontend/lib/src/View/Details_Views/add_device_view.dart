@@ -158,8 +158,8 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             tooltip: 'Clear',
             color: Colors.redAccent,
             onPressed: () {
-              AddDeviceController.defaultDevicesPortField();
               if (formKey.currentState != null) formKey.currentState!.reset();
+              AddDeviceController.clearAllFields();
             },
           ),
           const Divider(),
