@@ -90,7 +90,14 @@ async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) ->
     }
 }
 
-// TODO: document this function
+#[doc = r"# ping a device
+ping a device in the list of devices
+if the device is not found, return a 404 Not Found
+if the device is found, ping it and return the result and update the device in the list of devices
+## Arguments
+* `device_mac` - the device mac address
+## Returns
+* `HttpResponse` - the http response"]
 #[get("/devices/{device_mac}/ping")]
 async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_mac = device_mac.into_inner();

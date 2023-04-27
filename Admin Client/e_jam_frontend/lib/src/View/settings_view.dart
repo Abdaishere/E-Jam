@@ -19,15 +19,19 @@ class SettingsView extends StatelessWidget {
         centerTitle: true,
         leading: const DrawerWidget(),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            Text(
-              'Settings Screen',
-              style: TextStyle(fontSize: 24),
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: const <Widget>[
+              SizedBox(height: 20),
+              Text(
+                'Settings',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

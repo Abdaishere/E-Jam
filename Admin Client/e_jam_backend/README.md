@@ -1,26 +1,43 @@
 # E-Jam API
 
-<img src="./E-Jam-api-logo.png" alt="E-Jam API" width="300"/>
-
-![Rust](https://img.shields.io/badge/rust-latest-blue)
-![Actix](https://img.shields.io/badge/actix-4.3.0-blue)
-![Raspberry Pi](https://img.shields.io/badge/raspberry%20pi-4%20model%20b-blue)
-![Ubuntu](https://img.shields.io/badge/ubuntu-20.04%20LTS-blue)
-![Version](https://img.shields.io/badge/version-0.0.1-orange)
-![Status](https://img.shields.io/badge/status-Development-yellow)
+![img|320x271,50%](./E-Jam-api-logo.png)
+![Rust](https://img.shields.io/badge/rust-Latest-blue)
+![Actix](https://img.shields.io/badge/actix-Latest-blue)
+![Version](https://img.shields.io/badge/version-1.0.1-Green)
+![Status](https://img.shields.io/badge/status-Testing-orange)
 
 ## The E-Jam API documentation
+
+To view the E-Jam API documentation, run the following command:
+
+```bash
+cargo doc --open
+```
 
 This API is used to create and manage streams.
 The E-Jam API is a REST API that allows you to manage the list of streams in the E-Jam application.
 The API is implemented using the Actix Web framework and Rust.
 
-The API is hosted on a Raspberry Pi 4 Model B with 4GB of RAM.
-The Raspberry Pi is connected to a 1Gbps network.
-The Raspberry Pi is running Ubuntu 20.04 LTS.
+The API is tested on a Raspberry Pi 4 Model B with 4GB of RAM.
+The Raspberry Pi is connected to a 100 Mbps network.
+The Raspberry Pi is running Pie OS.
 
 The API is hosted on port 8080.
-The API is hosted on the IP address
+
+### What's new
+
+- all endpoints are now asynchronous
+- added pinging to the devices
+- added Synchronization to the streams
+- tested All endpoints and fixed all bugs
+- tested All Communication between the System API and the Admin Client Center Point
+- Status of the streams and devices are now updated accordingly
+- if failure accrued in any thread the system will send a message to the admin client.
+
+### To Do
+
+- System testing of the Whole System at once
+- Validation of the data sent to the API (mac address, stream id, etc...) (only needs activation)
 
 ## The E-Jam System
 
@@ -52,10 +69,6 @@ The Process State Machine is as follows:
 
 ![Process State Machine](./docs/process_state_machine.png)
 
-## API Documentation
-
-The API Devices Table is available at [http://localhost:8080/](http://localhost:8080/).
-
 ## Endpoints
 
 ### GET /streams
@@ -74,7 +87,7 @@ Adds a new stream to the list
 
 Deletes the stream with the given stream_id.
 
-### PUT /streams
+### PUT /streams/{stream_id}
 
 Updates the stream with the given stream_id.
 
@@ -106,7 +119,7 @@ Stops all streams in the list of streams.
 
 Returns the status of the stream with the given stream_id.
 
-### GET /streams/status
+### GET /streams/status_all
 
 Returns the status of all streams in the list of streams.
 
@@ -114,367 +127,137 @@ Returns the status of all streams in the list of streams.
 
 Returns a list of all devices in the list of devices.
 
-### GET /devices/{device_ip}
+### GET /devices/{device_mac}
 
-Returns the device with the given device ip address.
+Returns the device with the given device mac address.
 
 ### POST /devices
 
 Adds a new device to the list
 
-### DELETE /devices/{device_ip}
+### DELETE /devices/{device_mac}
 
-Deletes the device with the given device_ip.
+Deletes the device with the given device_mac.
 
-### PUT /devices/{device_ip}
+### PUT /devices/{device_mac}
 
-Updates the device with the given device_ip.
+Updates the device with the given device_mac.
 
-### GET /devices/ping/all
+### /devices/{device_mac}/ping
+
+Pings the device with the given device_mac.
+
+### GET /devices/ping_all
 
 Pings all devices in the list of devices.
 
 ### GET /devices/ping
 
-Pings the device with the given device_ip.
+Pings the device with the given device data.
 
-## Stream object
+### post /streams/{stream_id}/started
 
-The Key of the Stream object is the stream_id.
-The structure of the Stream object as a table is as follows:
+Notify the system that the stream is started by the device
 
-<table>
-<tr>
-    <th>Field</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Default</th>
-    <th>Min</th>
-    <th>Max</th>
-    <th>Validation</th>
-</tr>
-<tr>
-    <td>name</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td></td>
-    <td>1</td>
-    <td>50</td>
-    <td>stream name must be between 1 and 50 characters long</td>
-</tr>
-<tr>
-    <td>description</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td></td>
-    <td>1</td>
-    <td>255</td>
-    <td>stream description must be between 1 and 255 characters long</td>
-</tr>
-<tr>
-    <td>first_started</td>
-    <td>DateTime Utc</td>
-    <td>No</td>
-    <td>None</td>
-    <td>0</td>
-    <td></td>
-    <td>chrono ts Seconds Time in Utc</td>
-</tr>
-<tr>
-    <td>last_updated</td>
-    <td>DateTime Utc</td>
-    <td>No</td>
-    <td>Utc::now()</td>
-    <td>0</td>
-    <td></td>
-    <td>chrono ts Seconds Time in Utc</td>
-</tr>
-<tr>
-    <td>stream_id</td>
-    <td>String</td>
-    <td>No</td>
-    <td>Incremental</td>
-    <td>3</td>
-    <td>3</td>
-    <td>stream_id must be 3 characters long alphanumeric</td>
-</tr>
-<tr>
-    <td>delay</td>
-    <td>u64</td>
-    <td>No</td>
-    <td>0</td>
-    <td>0</td>
-    <td>2^63-1</td>
-    <td>stream start time must be greater than 0</td>
-</tr>
-<tr>
-    <td>generators</td>
-    <td>Vec of Strings</td>
-    <td>Yes</td>
-    <td></td>
-    <td>1</td>
-    <td></td>
-    <td>number of generators must be greater than 0</td>
-</tr>
-<tr>
-    <td>verifiers</td>
-    <td>Vec of Strings</td>
-    <td>Yes</td>
-    <td></td>
-    <td>1</td>
-    <td></td>
-    <td>number of verifiers must be greater than 0</td>
-</tr>
-<tr>
-    <td>payload_type</td>
-    <td>u8</td>
-    <td>Yes</td>
-    <td></td>
-    <td>0</td>
-    <td>2</td>
-    <td>payload_type must be 0, 1 or 2</td>
-</tr>
-<tr>
-    <td>number_of_packets</td>
-    <td>u32</td>
-    <td>Yes</td>
-    <td></td>
-    <td>0</td>
-    <td></td>
-    <td>number_of_packets must be greater than 0</td>
-</tr>
-<tr>
-    <td>payload_length</td>
-    <td>u16</td>
-    <td>Yes</td>
-    <td></td>
-    <td>0</td>
-    <td>1500</td>
-    <td>payload_length must be between 0 and 1500</td>
-</tr>
-<tr>
-    <td>seed</td>
-    <td>u32</td>
-    <td>NO</td>
-    <td>rand::Rng</td>
-    <td>0</td>
-    <td></td>
-    <td>seed must be greater than 0</td>
-</tr>
-<tr>
-    <td>broadcast_frames</td>
-    <td>u32</td>
-    <td>Yes</td>
-    <td></td>
-    <td>0</td>
-    <td></td>
-    <td>broadcast_frames must be greater than 0</td>
-</tr>
-<tr>
-    <td>inter_frame_gap</td>
-    <td>u32</td>
-    <td>Yes</td>
-    <td></td>
-    <td>0</td>
-    <td></td>
-    <td>inter_frame_gap must be greater than 0</td>
-</tr>
-<tr>
-    <td>time_to_live</td>
-    <td>u64</td>
-    <td>Yes</td>
-    <td></td>
-    <td>0</td>
-    <td>2^63-1</td>
-    <td>time_to_live must be greater than 0</td>
-</tr>
-<tr>
-    <td>transport_layer_protocol</td>
-    <td>TransportLayerProtocol</td>
-    <td>No</td>
-    <td>TCP</td>
-    <td></td>
-    <td></td>
-    <td>transport_layer_protocol must be TCP or UDP</td>
-</tr>
-<tr>
-    <td>flow_type</td>
-    <td>FlowType</td>
-    <td>No</td>
-    <td>BtB</td>
-    <td></td>
-    <td></td>
-    <td>flow_type must be BtB or Bursts</td>
-</tr>
-<tr>
-    <td>check_content</td>
-    <td>bool</td>
-    <td>No</td>
-    <td>false</td>
-    <td></td>
-    <td></td>
-    <td>check_content must be true or false</td>
-</tr>
-<tr>
-    <td>running_generators</td>
-    <td>HashMap of String ProcessStatus Pairs</td>
-    <td>No</td>
-    <td>empty</td>
-    <td>0</td>
-    <td></td>
-    <td>must containe Processes running courent stream as generators only when running it</td>
-</tr>
-<tr>
-    <td>running_verifiers</td>
-    <td>HashMap of String ProcessStatus Pairs</td>
-    <td>No</td>
-    <td>empty</td>
-    <td>0</td>
-    <td></td>
-    <td>must containe Processes running courent stream as verifiers only when running it</td>
-</tr>
-<tr>
-    <td>stream_status</td>
-    <td>StreamStatus</td>
-    <td>No</td>
-    <td>0</td>
-    <td>0</td>
-    <td></td>
-    <td>must containe the status of the Stream at the current point in time</td>
-</tr>
-</table>
+### post /streams/{stream_id}/finished
 
-## Device object
-
-The Key of the Device object is the MAC address of the device.
-The structure of the Device object as a table is as follows:
-
-<table>
-<tr>
-    <th>Field</th>
-    <th>Type</th>
-    <th>Required</th>
-    <th>Default</th>
-    <th>Min</th>
-    <th>Max</th>
-    <th>Validation</th>
-</tr>
-<tr>
-    <td>name</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td>ip Variable</td>
-    <td>1</td>
-    <td>50</td>
-    <td>name must be between 1 and 50 characters long</td>
-</tr>
-<tr>
-    <td>description</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td></td>
-    <td>1</td>
-    <td>255</td>
-    <td>stream description must be between 1 and 255 characters long</td>
-</tr>
-<tr>
-    <td>location</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td></td>
-    <td>1</td>
-    <td>255</td>
-    <td>stream location must be between 1 and 255 characters long</td>
-</tr>
-<tr>
-    <td>last_updated</td>
-    <td>DateTime Utc</td>
-    <td>No</td>
-    <td>0</td>
-    <td>0</td>
-    <td></td>
-    <td>chrono ts Seconds</td>
-</tr>
-<tr>
-    <td>ip</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td></td>
-    <td>7</td>
-    <td>15</td>
-    <td>ip must be between 7 and 15 characters long, ip must be a valid ip address</td>
-</tr>
-<tr>
-    <td>mac</td>
-    <td>String</td>
-    <td>Yes</td>
-    <td></td>
-    <td>17</td>
-    <td>17</td>
-    <td>must be a valid mac address</td>
-</tr>
-</table>
+Notify the system that the stream is finished by the device
 
 ## System API endpoints
 
 The default port for the system API is 8000.
 The following endpoints are available for the system API:
 
-<table>
-<tr>
-    <th>Endpoint</th>
-    <th>Method</th>
-    <th>Header</th>
-    <th>Body</th>
-    <th>Response</th>
-    <th>Description</th>
-</tr>
-<tr>
-    <td>/streams/{stream_id}/finished</td>
-    <td>POST</td>
-    <td>mac-address = the mac address of the device that finished the stream</td>
-    <td></td>
-    <td></td>
-    <td>Notify the Admin-Client that the Stream has finished only when the stream is finished in the systemAPI side (must be sent from the systemapi to the admin client)</td>
-</tr>
-<tr>
-    <td>/streams/{stream_id}/started</td>
-    <td>POST</td>
-    <td>mac-address = the mac address of the device that started the stream</td>
-    <td></td>
-    <td></td>
-    <td>Notify the Admin-Client that the Stream has started in one of the systemAPI's (must be sent from the systemapi to the admin client)</td>
-</tr>
-<tr>
-    <td>/</td>
-    <td>GET</td>
-    <td>TODO</td>
-    <td></td>
-    <td>TODO</td>
-    <td>will be called to Ping the system API</td>
-</tr>
-<tr>
-    <td>/connect</td>
-    <td>POST</td>
-    <td>mac-address = mac address of the card used in the testing process</td>
-    <td></td>
-    <td>Success if mac_address is correct</td>
-    <td>will be called to Connect to the system API</td>
-</tr>
-<tr>
-    <td>/start</td>
-    <td>POST</td>
-    <td>stream-id = the id of the stream to start, TODO mac-address = mac address of the card used in the testing process, process-type = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
-    <td>StreamDetails</td>
-    <td>Success</td>
-    <td>generate or verify the Provided Stream</td>
-</tr>
-<tr>
-    <td>/stop</td>
-    <td>POST</td>
-    <td>stream-id = the id of the stream to start, TODO mac-address = mac address of the card used in the testing process, process-type = the type of process to start (Generation or Verification, or GenerationAndVerification)</td>
-    <td></td>
-    <td>Success</td>
-    <td>Stop a currently running Stream</td>
-</tr>
-</table>
+### Get / (index)
+
+will be called to Ping the system API and check if it is Online. (will be used in the devices Radar)
+
+### Post /connect
+
+will be called to Connect to the system API and register the device in the system only if the mac address provided is accepted by the systemAPI.
+
+### Post /start
+
+Generate or verify the Provided Stream.
+
+### Post /stop
+
+Stop a currently running Stream.
+
+All endPoint headers will have mac-address = the mac address of the device that started the stream for verification.
+
+## Data Structures
+
+### Stream Details object
+
+The StreamDetails struct is used to store the information about the stream that is sent to the device to start or queue the stream
+
+- `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
+- `delay` - A u64 that represents the time in ms that the stream will wait before starting
+- `time_to_live` - A u64 that represents the time to live that will be used for the stream
+- `inter_frame_gap` - A u64 that represents the time in ms that will be waited between each frame
+- `generators` - A Vec of String that has all the mac addresses of the devices that will generate the stream
+- `verifiers` - A Vec of String that has all the mac addresses of the devices that will verify the stream
+- `number_of_packets` - A u64 that represents the number of packets that will be sent in the stream
+- `broadcast_frames` - A u64 that represents the number of broadcast frames that will be sent in the stream
+- `payload_length` - A u16 that represents the length of the payload that will be used in the stream
+- `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
+- `burst_length` - A u64 that represents the number of packets that will be sent in a burst
+- `burst_delay` - A u64 that represents the time in ms that will be waited between each burst
+- `seed` - A u64 that represents the seed that will be used to generate the payload
+- `flow_type` - A u8 that represents the flow type that will be used for the stream (0 = BtB, 1 = Bursts)
+- `transport_layer_protocol` - A u8 that represents the transport layer protocol that will be used for the stream (0 = TCP, 1 = UDP)
+- `check_content` - A bool that represents if the content of the packets will be checked
+
+## Stream Entry object
+
+The StreamEntry struct is used to store the information about the stream with its status and the status of the devices that are running the stream
+Notice: The stream Data is sent in camelCase naming style.
+
+The Key of the Stream object is the stream_id.
+The structure of the Stream object as a table is as follows:
+
+- `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
+- `name` - A String that represents the name of the stream (used for clarification)
+- `description` - A String that represents the description of the stream (used for clarification)
+- `last_updated` - A DateTime in Utc that represents the last time that the stream was updated (used for clarification)
+- `start_time` - A DateTime in Utc that represents the time that the stream will start (notified by the systemAPI)
+- `end_time` - A DateTime in Utc that represents the time that the stream will end (is predicted by the server)
+- `delay` - A u64 that represents the time in ms that the stream will wait before starting
+- `time_to_live` - A u64 that represents the time to live that will be used for the stream
+- `broadcast_frames` - A u64 that represents the number of broadcast frames that will be sent in the stream
+- `generators_ids` - A Vec of Strings that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
+- `verifiers_ids` - A Vec of Strings that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
+- `number_of_packets` - A u64 that represents the number of packets that will be sent in the stream
+- `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts) **changes through the stream**
+- `payload_length` - A u16 that represents the length of the payload that will be used in the stream **changes through the stream**
+- `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
+- `burst_length` - A u64 that represents the length of the burst that will be used in the stream
+- `burst_delay` - A u64 that represents the delay between each burst that will be used in the stream
+- `seed` - A u64 that represents the seed that will be used to generate the payload
+- `inter_frame_gap` - A u64 that represents the time in ms that will be waited between each frame **changes through the stream**
+- `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
+- `check_content` - A bool that represents if the content of the packets will be checked
+- `running_generators` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status) (used for clarification)
+- `running_verifiers` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a verifier and their status (mac address of the card used in testing, Process Status) (used for clarification)
+- `stream_status` - A StreamStatus that represents the status of the stream.
+
+> Note: The Stream Entry is used to store the information about the stream with its status and the status of the devices that are running the stream (used for clarification).
+
+## Device object
+
+A device is a computer that is connected to the system and can run a process either a verification process or a generation process or both.
+
+The Key of the Device object is the MAC address of the device.
+The structure of the Device object as a table is as follows:
+
+- `name` - A string that represents the name of the device (used for identification and clarification) the name must be greater than 0 characters long if it is not provided the default value is the ip address of the device
+- `description` - A string that represents the description of the device (used for clarification)
+- `location` - A string that represents the location of the device (used for clarification)
+- `last_updated` - A DateTime that represents the last time the device status was updated (used for clarification)
+- `ip_address` - A string that represents the ip address of the device (used for Communication) IP_ADDRESS is a regex that is used to validate the ip address
+- `port` - A u16 that represents the port number of the device (used for Communication) the port number must be between 1 and 65535
+- `gen_processes` - A u16 that represents the number of generation processes that are running on the device
+- `ver_processes` - A u16 that represents the number of verification processes that are running on the device
+- `status` - A DeviceStatus that represents the status of the device (Offline, Idle, Running)
+- `mac_address` - A string that represents the mac address of the device (used for authentication) MAC_ADDRESS is a regex that is used to validate the mac address

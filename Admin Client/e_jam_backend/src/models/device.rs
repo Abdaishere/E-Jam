@@ -14,20 +14,18 @@ use super::{
 #[doc = r"Device Model
 A device is a computer that is connected to the system and can run a process either a verification process or a generation process or both
 ## Values
-* `name` - A string that represents the name of the device (used for identification and clarification) the name must be greater than 0 characters long if it is not provided the default value is the ip address of the device
-* `description` - A string that represents the description of the device (used for clarification)
-* `location` - A string that represents the location of the device (used for clarification)
-* `last_updated` - A DateTime that represents the last time the device status was updated (used for clarification)
-* `ip_address` - A string that represents the ip address of the device (used for Communication) IP_ADDRESS is a regex that is used to validate the ip address
-* `port` - A u16 that represents the port number of the device (used for Communication) the port number must be between 1 and 65535
-* `gen_processes` - A u16 that represents the number of generation processes that are running on the device
-* `ver_processes` - A u16 that represents the number of verification processes that are running on the device
-* `status` - A DeviceStatus that represents the status of the device (Offline, Idle, Running)
-* `mac_address` - A string that represents the mac address of the device (used for authentication) MAC_ADDRESS is a regex that is used to validate the mac address
-## DeviceStatus
-* `Offline` - the device is offline (not connected to the system)
-* `Idle` - the device is idle (connected to the system but not running any process)
-* `Running` - the device is running (connected to the system and running at least one process)"]
+
+- `name` - A string that represents the name of the device (used for identification and clarification) the name must be greater than 0 characters long if it is not provided the default value is the ip address of the device
+- `description` - A string that represents the description of the device (used for clarification)
+- `location` - A string that represents the location of the device (used for clarification)
+- `last_updated` - A DateTime that represents the last time the device status was updated (used for clarification)
+- `ip_address` - A string that represents the ip address of the device (used for Communication) IP_ADDRESS is a regex that is used to validate the ip address
+- `port` - A u16 that represents the port number of the device (used for Communication) the port number must be between 1 and 65535
+- `gen_processes` - A u16 that represents the number of generation processes that are running on the device
+- `ver_processes` - A u16 that represents the number of verification processes that are running on the device
+- `status` - A DeviceStatus that represents the status of the device (Offline, Idle, Running)
+- `mac_address` - A string that represents the mac address of the device (used for authentication) MAC_ADDRESS is a regex that is used to validate the mac address
+"]
 #[derive(Serialize, Deserialize, Validate, Debug, Clone, PartialEq, Hash, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Device {
