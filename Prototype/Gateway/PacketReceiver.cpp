@@ -138,8 +138,9 @@ void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
 PacketReceiver::~PacketReceiver()
 {
     closePipes();
-    delete recBuffer;
-    delete forwardingBuffer;
-    delete recSizes;
-    delete forwardingSizes;
+    delete[] recBuffer;
+    delete[] forwardingBuffer;
+    delete[] recSizes;
+    delete[] forwardingSizes;
+    delete[] fd;
 }

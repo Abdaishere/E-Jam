@@ -99,4 +99,5 @@ bool PacketSender::sendToSwitch(ByteArray payload) {
 
 PacketSender::~PacketSender() {
     closePipes();
+    delete[] fd;
 }
