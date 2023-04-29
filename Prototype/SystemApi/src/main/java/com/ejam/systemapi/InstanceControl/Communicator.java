@@ -77,13 +77,12 @@ public class Communicator {
         long burstDelay = jsonObj.get("burstDelay").asLong();
         boolean checkContent = jsonObj.get("checkContent").asBoolean();
 
-        ArrayList<Stream> streams = new ArrayList<>();
-        streams.add(new Stream(streamID, delay, generators, verifiers, payloadType,
+        Stream stream = new Stream(streamID, delay, generators, verifiers, payloadType,
                 numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap,
-                lifeTime, transportProtocol, flowType, burstLen, burstDelay, checkContent));
+                lifeTime, transportProtocol, flowType, burstLen, burstDelay, checkContent);
 
-        ConfigurationManager configurationManager = new ConfigurationManager(streams);
-        InstanceController instanceController = new InstanceController(streams);
+        ConfigurationManager configurationManager = new ConfigurationManager(stream);
+        InstanceController instanceController = new InstanceController(stream);
         Thread thread = new Thread(instanceController);
         thread.start();
         ProcessController.addProcess(new StreamProcess(instanceController, thread));

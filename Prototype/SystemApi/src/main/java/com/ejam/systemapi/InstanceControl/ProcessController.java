@@ -10,7 +10,7 @@ public class ProcessController {
     }
 
     public static void addProcess(StreamProcess process) {
-        runningProcesses.put(process.instanceController.streams.get(0).streamID, process);
+        runningProcesses.put(process.instanceController.stream.streamID, process);
     }
 
     public static void removeProcess(String streamID) {

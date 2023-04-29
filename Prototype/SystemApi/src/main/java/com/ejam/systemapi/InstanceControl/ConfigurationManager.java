@@ -12,18 +12,10 @@ public class ConfigurationManager
     public static String configDir;
 
 
-    public ConfigurationManager(ArrayList<Stream> config)
+    public ConfigurationManager(Stream config)
     {
         setConfigDir();
-        writeConfigurationToFiles(config);
-    }
-
-    //Write Configuration To Files
-    private void writeConfigurationToFiles(ArrayList<Stream> config)
-    {
-        //call writeStreamToFile for all streams
-        for(Stream stream: config)
-            writeStreamToFile(stream);
+        writeStreamToFile(config);
     }
 
     //write steam information to file
