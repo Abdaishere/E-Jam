@@ -1,9 +1,13 @@
 #include "PacketReceiver.h"
 
-PacketReceiver::PacketReceiver(int verNum)
+PacketReceiver::PacketReceiver(int verNum, const char* IF_NAME_P)
 {
     //initialize maximum number of verifiers and initialize the connection to pipes
     MAX_VERS = verNum;
+    if (IF_NAME_P != nullptr)
+        ::memcpy(this->IF_NAME, IF_NAME_P, IF_NAMESIZE);
+    else
+        ::memcpy(this->IF_NAME, DEFAULT_IF_NAME_REC, IF_NAMESIZE);
     fd = new int[verNum];
     recBuffer = new unsigned char[BUFFER_SIZE_VER];
     forwardingBuffer = new unsigned char[BUFFER_SIZE_VER];
@@ -28,7 +32,6 @@ void PacketReceiver::openPipes()
 bool PacketReceiver::initializeSwitchConnection()
 {
 
-    strcpy(ifName, DEFAULT_IF);
     struct ifreq ifopts;
 
     //open socket
@@ -43,7 +46,7 @@ bool PacketReceiver::initializeSwitchConnection()
        i.e. read everything even if the destination
        mac address doesn't match your address
        we might not need to do this*/
-    strncpy(ifopts.ifr_name, ifName, IFNAMSIZ-1);
+    strncpy(ifopts.ifr_name, IF_NAME, IFNAMSIZ-1);
     //get interface flags
     ioctl(sock, SIOCGIFFLAGS, &ifopts);
     //turn on promiscuous mode mask
