@@ -6,7 +6,7 @@
 #define VERIFIER_SEQCHECKER_H
 #include <vector>
 #include <deque>
-#include "Configuration.h"
+#include "../../commonHeaders/Configuration.h"
 
 const int MaxBuffSize = 300;
 const int MaxReordering = 1000;

@@ -1,10 +1,10 @@
 #include <iostream>
 #include <queue>
 #include <thread>
-#include "src/PacketUnpacker.h"
-#include "src/streamsManager.h"
-#include "../commonHeaders/StatsManager.h"
-#include "ConfigurationManager.h"
+#include "PacketUnpacker.h"
+#include "streamsManager.h"
+#include "../../commonHeaders/StatsManager.h"
+#include "../../commonHeaders/ConfigurationManager.h"
 using namespace std;
 
 //thread function for receiving packets

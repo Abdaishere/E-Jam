@@ -71,7 +71,7 @@ public class UTILs {
         return lines;
     }
 
-    public static String getMyMacAddress() {
+    public static String getMyMacAddress(String interfaceName) {
         Map<String, String> interfaceToAddress = new HashMap<>();
         byte[] mac;
         try {
@@ -92,7 +92,7 @@ public class UTILs {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String macAddress = interfaceToAddress.get("br-b27af1121dcf");
+        String macAddress = interfaceToAddress.get(interfaceName);
         try {
             if (macAddress == null) {
                 throw new Exception("Mac is null");

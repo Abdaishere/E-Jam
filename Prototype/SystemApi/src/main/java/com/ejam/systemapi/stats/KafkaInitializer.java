@@ -1,5 +1,6 @@
 package com.ejam.systemapi.stats;
 
+import com.ejam.systemapi.GlobalVariables;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import io.confluent.kafka.serializers.subject.TopicRecordNameStrategy;
@@ -11,15 +12,19 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.Properties;
 
 public class KafkaInitializer {
-    @Value("${admin.address}")
-    private static String ADMIN_IP;
-
-    public final static String BOOTSTRAP_SERVERS = String.format("%s:9092", ADMIN_IP);
+    static GlobalVariables globalVariables = new GlobalVariables();
+    public static String BOOTSTRAP_SERVERS;
     public final static String CLIENT_ID_CONFIG = "client1";
-    public final static String SCHEMA_REGISTRY_URL = String.format("%s:8081", ADMIN_IP);
+    public static String SCHEMA_REGISTRY_URL;
 
 
     public static void Init() {
+        BOOTSTRAP_SERVERS = String.format("%s:9092", globalVariables.ADMIN_ADDRESS);
+        SCHEMA_REGISTRY_URL = String.format("%s:8081", globalVariables.ADMIN_ADDRESS);
+
+        System.out.println(BOOTSTRAP_SERVERS);
+        System.out.println(SCHEMA_REGISTRY_URL);
+
         Properties prop = new Properties();
         prop.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaInitializer.BOOTSTRAP_SERVERS);
         prop.put(ProducerConfig.CLIENT_ID_CONFIG, KafkaInitializer.CLIENT_ID_CONFIG);

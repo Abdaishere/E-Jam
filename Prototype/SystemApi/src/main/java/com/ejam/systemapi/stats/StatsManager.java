@@ -22,7 +22,7 @@ import static java.lang.Thread.sleep;
 public class StatsManager implements Runnable {
     private Inet4Address kafkaServerAddress;
     private static StatsManager instance = null;
-    private float sendFrequency = 1.0f;
+    private float sendFrequency = 1000.0f;
     private ArrayList<Generator> generatorStats = new ArrayList<>();
     private ArrayList<Verifier> verifierStats = new ArrayList<>();
 
@@ -218,6 +218,7 @@ public class StatsManager implements Runnable {
     public void run() {
         try {
             while (true) {
+                System.out.println("collecting stats");
                 fillGenStats();
                 fillVerStats();
 
@@ -227,6 +228,8 @@ public class StatsManager implements Runnable {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+
+                System.out.println("sending");
                 sendStatistics();
                 sleep((long) sendFrequency);
             }

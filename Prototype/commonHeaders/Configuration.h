@@ -62,6 +62,18 @@ private:
             return 'F';
     }
 
+
+public:
+    Configuration()
+    {
+        filePath = nullptr;
+    }
+
+    bool isSet()
+    {
+        return filePath != nullptr;
+    }
+
     //Discover the mac address of this machine
     ByteArray discoverMyMac()
     {
@@ -95,16 +107,6 @@ private:
         unsigned char mac_address[MAC_ADD_LEN];
         if (success) memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
         return ByteArray(mac_address, MAC_ADD_LEN);
-    }
-public:
-    Configuration()
-    {
-        filePath = nullptr;
-    }
-
-    bool isSet()
-    {
-        return filePath != nullptr;
     }
 
     //Read configuration from a file of the correct format
@@ -320,6 +322,11 @@ public:
     std::shared_ptr<ByteArray> getStreamID()
     {
         return streamID;
+    }
+
+    ByteArray getStreamIDVal()
+    {
+        return *streamID;
     }
 
     void setStreamID(const unsigned char* id)

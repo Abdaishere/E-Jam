@@ -1,14 +1,12 @@
 package com.ejam.systemapi.InstanceControl;
+import com.ejam.systemapi.GlobalVariables;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,12 +24,7 @@ public class Communicator {
     /**
      * Get configuration from Admin GUI
      */
-    @Value("${admin.address}")
-    private static String ADMIN_IP;
-
-    @Value("${admin.port}")
-    private static int ADMIN_PORT;
-    private final static String MAC_ADDRESS = UTILs.getMyMacAddress();
+    static GlobalVariables globalVariables = new GlobalVariables();
 
     @GetMapping("/")
     public ResponseEntity index() {
@@ -41,7 +34,7 @@ public class Communicator {
     @PostMapping("/connect")
     public ResponseEntity connect(@RequestHeader("mac-address") String macAddress) {
 //        System.out.println("Received mac address: " + macAddress);
-        if (macAddress.equals(MAC_ADDRESS)) {
+        if (macAddress.equals(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE))) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
@@ -89,6 +82,7 @@ public class Communicator {
                 numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap,
                 lifeTime, transportProtocol, flowType, burstLen, burstDelay, checkContent));
 
+        ConfigurationManager configurationManager = new ConfigurationManager(streams);
         InstanceController instanceController = new InstanceController(streams);
         Thread thread = new Thread(instanceController);
         thread.start();
@@ -116,7 +110,11 @@ public class Communicator {
         System.out.println("Finished step 1");
 
         // kill all processes of the stream
-        process.instanceController.killStreams();
+        try {
+            process.instanceController.killStreams();
+        } catch (Exception e) {
+
+        }
 
         // kill the thread made by that stream
         if (process.thread.isAlive()) {
@@ -136,10 +134,10 @@ public class Communicator {
 
     // notify admin-client that stream has started or finished
     public static void notify(String streamId, String type) throws URISyntaxException {
-        URI uri = new URI(String.format("http://%s:%d/streams/%s/%s", ADMIN_IP, ADMIN_PORT, streamId, type));
+        URI uri = new URI(String.format("http://%s:%d/streams/%s/%s", globalVariables.ADMIN_ADDRESS, globalVariables.ADMIN_PORT, streamId, type));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("mac-address", MAC_ADDRESS);
+        headers.set("mac-address", UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE));
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(null, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);

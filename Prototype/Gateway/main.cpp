@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <memory>
+#include "ConfigurationManager.h"
 using namespace std;
 // functions used in the sender part of the gateway
 void checkingThread(std::shared_ptr<PacketSender> packetSender)
@@ -30,14 +31,22 @@ void checkingThreadV(std::shared_ptr<PacketReceiver> packetReceiver)
 
 int main(int argc, char ** argv)
 {
+    writeToFile("Entered gateway");
     //sender or receiver mode
     int mode;
     // num of either generators or verifiers
     int num = 1;
-    if(argc > 1)
-        mode = stoi(argv[1]);
-    if(argc > 2)
-        num = stoi(argv[2]);
+    if(argc < 2)
+    {
+        std::cout << "Not enough arguments\n";
+        return 0;
+    }
+    mode = stoi(argv[1]);
+    num = stoi(argv[2]);
+    char* IFName;
+    if(argc >= 3)
+        IFName = argv[3];
+
 
     //if mode == 0 then it's a generator otherwise it's a verifier
     //generator
@@ -58,7 +67,8 @@ int main(int argc, char ** argv)
     //verifier
     else
     {
-        std::shared_ptr<PacketReceiver> packetReceiver = std::make_shared<PacketReceiver>(num);
+        ConfigurationManager::initConfigurations();
+        std::shared_ptr<PacketReceiver> packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams());
 
         while(true)
         {

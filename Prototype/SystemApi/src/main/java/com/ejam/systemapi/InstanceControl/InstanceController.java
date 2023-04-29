@@ -1,10 +1,10 @@
 package com.ejam.systemapi.InstanceControl;
 
+import com.ejam.systemapi.GlobalVariables;
+
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
-
-import static java.lang.Thread.sleep;
 
 /**
  * This class initializes and manages the generator and verifier instances
@@ -16,10 +16,11 @@ public class InstanceController implements Runnable
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
     ArrayList<Stream> streams;
+    GlobalVariables globalVariables = new GlobalVariables();
 
     public InstanceController (ArrayList<Stream> streams)
     {
-        myMacAddress = UTILs.getMyMacAddress();
+        myMacAddress = UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE);
         this.streams = streams;
     }
 
@@ -164,6 +165,7 @@ public class InstanceController implements Runnable
             if(waitFor) {
                 int exitVal = process.waitFor();
                 if (exitVal != 0) {
+//                    System.out.println("Could not execute command: " + command);
                     throw new Exception("Could not execute command: " + command);
                 }
                 System.out.println(command + " " + pid + " exited");
@@ -226,7 +228,11 @@ public class InstanceController implements Runnable
         }
 
         // kill the generators, verifiers and gateway
-        killStreams();
+        try {
+            killStreams();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // notify Admin-client that the stream is finished
         try {

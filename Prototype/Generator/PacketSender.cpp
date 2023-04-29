@@ -1,10 +1,12 @@
-
+#include "Utils.h"
 #include "PacketSender.h"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <iostream>
 #include <queue>
 #include <unistd.h>
+#include <fstream>
+
 
 std::shared_ptr<PacketSender> PacketSender::instance = nullptr;
 PacketSender::PacketSender() {}
@@ -25,9 +27,10 @@ std::shared_ptr<PacketSender> PacketSender::getInstance(int genID, std::string p
 
 void PacketSender::openFifo()
 {
+    writeToFile("Entered openFifo.");
     //create pipe with read and write permissions
     int status = mkfifo((instance->pipeDir + std::to_string(instance->genID)).c_str(), permissions);
-
+    writeToFile("Created pipe.");
     if(status == -1) {
         if (errno != EEXIST) //if the error was more than the file already existing
         {
@@ -38,6 +41,7 @@ void PacketSender::openFifo()
     }
 
     //open pipe as file
+    // TODO
     fd = open((instance->pipeDir + std::to_string(instance->genID)).c_str(), O_WRONLY);
     std::cerr << "File descriptor " << fd << "\n";
 }

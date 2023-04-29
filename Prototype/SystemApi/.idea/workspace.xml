@@ -4,14 +4,41 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Add stats containers">
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Edit getMacAddress method">
+      <change beforePath="$PROJECT_DIR$/../Executables/Gateway" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Executables/Generator" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/Generator" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Executables/verifier" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/verifier" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gateway/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gateway/PacketReceiver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/PacketReceiver.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gateway/PacketReceiver.h" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/PacketReceiver.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gateway/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Generator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Generator/PacketSender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/PacketSender.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Generator/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SystemApi/Main.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Communicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Communicator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/UTILs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/UTILs.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/StatsManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/StatsManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/Configuration.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/Configuration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/StatsManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/StatsManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/StatsManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/StatsManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/Utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/Utils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../commonHeaders/Utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/Utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/DatagramVerifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/DatagramVerifier.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/ErrorHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/ErrorHandler.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/PacketReceiver.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/PacketReceiver.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/PacketUnpacker.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/PacketUnpacker.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/PayloadVerifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/PayloadVerifier.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/SegmentVerifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/SegmentVerifier.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../verifier/src/SeqChecker.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/SeqChecker.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,16 +91,16 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/mostafa/Desktop/E-Jam/Prototype/SystemApi/src/main/java/com/example/systemapi/stats/avro&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/mostafa/Desktop/E-Jam/Prototype/SystemApi&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;SDKs&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
     &quot;spring.configuration.checksum&quot;: &quot;64d965383f6b496d7a6ea9c14eeeefe8&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -89,7 +116,7 @@
       <recent name="com.example.systemapi.stats" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.com.ejam.systemapi.InstanceControl.Communicator">
+  <component name="RunManager" selected="Application.com.ejam.systemapi.stats.KafkaInitializer">
     <configuration name="KafkaInitializer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.systemapi.stats.KafkaInitializer" />
       <module name="SystemApi" />
@@ -171,9 +198,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.com.ejam.systemapi.InstanceControl.Communicator" />
-        <item itemvalue="Application.com.ejam.systemapi.InstanceControl.Main" />
         <item itemvalue="Application.com.ejam.systemapi.stats.KafkaInitializer" />
+        <item itemvalue="Application.com.ejam.systemapi.InstanceControl.Main" />
+        <item itemvalue="Application.com.ejam.systemapi.InstanceControl.Communicator" />
         <item itemvalue="Application.KafkaInitializer" />
         <item itemvalue="Application.Main" />
       </list>
@@ -230,7 +257,14 @@
       <workItem from="1681212657737" duration="6251000" />
       <workItem from="1681219349192" duration="5000" />
       <workItem from="1681873611646" duration="861000" />
-      <workItem from="1681875881641" duration="2303000" />
+      <workItem from="1681875881641" duration="2654000" />
+      <workItem from="1681942343875" duration="4500000" />
+      <workItem from="1682000346352" duration="2032000" />
+      <workItem from="1682013317831" duration="745000" />
+      <workItem from="1682258675581" duration="3845000" />
+      <workItem from="1682370029801" duration="1678000" />
+      <workItem from="1682371844043" duration="4956000" />
+      <workItem from="1682454658247" duration="1305000" />
     </task>
     <task id="LOCAL-00001" summary="create endpoints to communicate with admin-client">
       <created>1677019822321</created>
@@ -288,7 +322,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679697262614</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Edit getMacAddress method">
+      <created>1681878405709</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1681878405709</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -313,7 +354,8 @@
     <MESSAGE value="make publish function" />
     <MESSAGE value="relocate stats package" />
     <MESSAGE value="Add stats containers" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add stats containers" />
+    <MESSAGE value="Edit getMacAddress method" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edit getMacAddress method" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
