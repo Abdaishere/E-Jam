@@ -4,55 +4,54 @@
 #include <thread>
 #include <memory>
 #include "ConfigurationManager.h"
+
+
 using namespace std;
+
 // functions used in the sender part of the gateway
-void checkingThread(std::shared_ptr<PacketSender> packetSender)
-{
+void checkingThread(std::shared_ptr<PacketSender> packetSender) {
     while (true)
         packetSender->checkPipes(); //check the buffe to read payloads 
 }
 
-void sendingThread(std::shared_ptr<PacketSender> packetSender)
-{
+void sendingThread(std::shared_ptr<PacketSender> packetSender) {
     while (true)
         packetSender->roundRobin(); //round robin technique to send to switch
 }
 
 //functions used in receiving part of the gateway
-void receivingThread(std::shared_ptr<PacketReceiver> packetReceiver)
-{
+void receivingThread(std::shared_ptr<PacketReceiver> packetReceiver) {
     packetReceiver->receiveFromSwitch();
 }
 
-void checkingThreadV(std::shared_ptr<PacketReceiver> packetReceiver)
-{
+void checkingThreadV(std::shared_ptr<PacketReceiver> packetReceiver) {
     packetReceiver->checkBuffer(); //checking the buffer then send to verifiers
 }
 
-int main(int argc, char ** argv)
-{
-    writeToFile("Entered gateway");
+int main(int argc, char **argv) {
     //sender or receiver mode
     int mode;
     // num of either generators or verifiers
     int num = 1;
-    if(argc < 2)
-    {
+    if (argc < 2) {
         std::cout << "Not enough arguments\n";
         return 0;
     }
     mode = stoi(argv[1]);
     num = stoi(argv[2]);
-    char* IFName;
-    if(argc >= 3)
+    char *IFName = nullptr;
+    if (argc > 3)
         IFName = argv[3];
 
 
     //if mode == 0 then it's a generator otherwise it's a verifier
     //generator
-    if(mode == 0)
-    {
-        std::shared_ptr<PacketSender> packetSender = std::make_shared<PacketSender>(num);
+    if (mode == 0) {
+        std::shared_ptr<PacketSender> packetSender;
+        if(IFName == nullptr)
+            packetSender = std::make_shared<PacketSender>(num);
+        else
+            packetSender = std::make_shared<PacketSender>(num, IFName);
         packetSender->openPipes();
 
         thread checker(checkingThread, packetSender);
@@ -64,18 +63,21 @@ int main(int argc, char ** argv)
         packetSender->closePipes();
         return 0;
     }
-    //verifier
-    else
-    {
+        //verifier
+    else {
         ConfigurationManager::initConfigurations();
-        std::shared_ptr<PacketReceiver> packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams());
+        std::shared_ptr<PacketReceiver> packetReceiver;
+        if(IFName == nullptr)
+            packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams());
+        else
+            packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams(), IFName);
 
-        while(true)
-        {
+
+        while (true) {
             //synchronization without locks by swapping the two buffers
 
-            std::thread t1 (receivingThread, packetReceiver); 
-            std::thread t2 (checkingThreadV, packetReceiver);
+            std::thread t1(receivingThread, packetReceiver);
+            std::thread t2(checkingThreadV, packetReceiver);
 
             t1.join();
             t2.join();

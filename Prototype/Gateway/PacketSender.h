@@ -20,11 +20,9 @@ using namespace std;
 
 #define FIFO_FILE "/tmp/fifo_pipe_gen"
 #define protocol 0x88b5
-#define DEFAULT_IF_NAME "wlp5s0"
-//#define DEFAULT_IF_NAME "enp34s0"
+
 typedef unsigned char* Payload;
 const int BUFFER_SIZE = 1600;
-//const char* DEFAULT_IF_NAME = "enp34s0";
 
 //this module receives packets from generators and sends them the switch
 class PacketSender {
@@ -32,13 +30,15 @@ private:
     int genNum;
     std::vector<queue<ByteArray>> payloads;
     int* fd;
+    char IF_NAME[IF_NAMESIZE];
     unsigned char buffer[BUFFER_SIZE];
+    const char* DEFAULT_IF_NAME = "wlp0s20f3";
     int sock;
     struct ifreq ifr;
     int ifIndex;
     struct sockaddr_ll addr;
 public:
-    PacketSender(int genNum);
+    PacketSender(int genNum, const char* IF_NAME = nullptr);
     void openPipes();
     void closePipes();
     void checkPipes();
