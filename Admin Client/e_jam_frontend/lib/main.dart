@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
@@ -27,6 +30,9 @@ void main() async {
       ),
     );
   };
+  // init shared preferences
+  SystemSettings.init();
+
   runApp(const MyApp());
 }
 
@@ -227,7 +233,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               const SizedBox(height: 15),
               ListTile(
-                leading: const Icon(MaterialCommunityIcons.home),
+                leading: const FaIcon(FontAwesome.home),
                 iconColor: Colors.white,
                 title: const Text('Home'),
                 onTap: () {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:circular_motion/circular_motion.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
@@ -29,24 +30,29 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
     setState(() {
       _isPinging = true;
     });
-    int port = NetworkController.defaultDevicesPort;
-    String systemApiSubnet = NetworkController.defaultSystemApiSubnet;
+    int port = SystemSettings.defaultDevicesPort;
+    String systemApiSubnet = SystemSettings.defaultSystemApiSubnet;
 
-    // ping all devices in the network in the same port
-    final stream = NetworkAnalyzer.discover2(systemApiSubnet, port,
-        timeout: const Duration(milliseconds: 2000));
-    stream.listen((NetworkAddress addr) {
-      if (addr.exists && mounted) {
-        if (DevicesController.devices
-                ?.indexWhere((element) => element.ipAddress == addr.ip) !=
-            -1) {
-          return;
+    try {
+      // ping all devices in the network in the same port
+      final stream = NetworkAnalyzer.discover2(systemApiSubnet, port,
+          timeout: const Duration(milliseconds: 2000));
+      stream.listen((NetworkAddress addr) {
+        if (addr.exists && mounted) {
+          if (DevicesController.devices
+                  ?.indexWhere((element) => element.ipAddress == addr.ip) !=
+              -1) {
+            return;
+          }
+
+          devices.add(addr.ip);
+          setState(() {});
         }
-
-        devices.add(addr.ip);
-        setState(() {});
-      }
-    });
+      });
+    } catch (e) {
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(content: Text('Error while scanning devices: $e')));
+    }
     if (mounted) {
       setState(() {
         _isPinging = false;
@@ -142,7 +148,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
             iconSize: 50,
             color: deviceIdleColor,
             tooltip:
-                'Add ${devices.elementAt(index)}:${NetworkController.defaultDevicesPort}',
+                'Add ${devices.elementAt(index)}:${SystemSettings.defaultDevicesPort}',
             onPressed: () {
               Navigator.of(context).push(
                 HeroDialogRoute(

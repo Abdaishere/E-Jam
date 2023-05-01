@@ -1,4 +1,5 @@
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -69,7 +70,7 @@ class _StreamProgressBarState extends State<StreamProgressBar> {
         LinearBarPointer(
           value: getProgress(widget.status ?? StreamStatus.created,
               widget.startTime, widget.endTime),
-          enableAnimation: false,
+          enableAnimation: SystemSettings.showChartsAnimation,
           animationType: LinearAnimationType.ease,
           color: streamColorScheme(widget.status),
         ),

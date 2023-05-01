@@ -69,7 +69,8 @@ class _EditDeviceViewState extends State<EditDeviceView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: MediaQuery.of(context).orientation == Orientation.landscape
+      padding: MediaQuery.of(context).orientation == Orientation.landscape &&
+              MediaQuery.of(context).size.width > 900
           ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(
@@ -315,7 +316,7 @@ class ConnectionIpAndPort extends StatelessWidget {
             enableIMEPersonalizedLearning: false,
             decoration: InputDecoration(
               labelText: 'Port',
-              hintText: NetworkController.defaultDevicesPort.toString(),
+              hintText: SystemSettings.defaultDevicesPort.toString(),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[

@@ -33,7 +33,8 @@ class _AddDeviceViewState extends State<AddDeviceView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: MediaQuery.of(context).orientation == Orientation.landscape
+      padding: MediaQuery.of(context).orientation == Orientation.landscape &&
+              MediaQuery.of(context).size.width > 900
           ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(
@@ -236,7 +237,7 @@ class ConnectionIpAndPort extends StatelessWidget {
             enableIMEPersonalizedLearning: false,
             decoration: InputDecoration(
               labelText: 'Port',
-              hintText: NetworkController.defaultDevicesPort.toString(),
+              hintText: SystemSettings.defaultDevicesPort.toString(),
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
@@ -245,6 +246,8 @@ class ConnectionIpAndPort extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a port for the Device';
+              } else if (int.parse(value) > 65535) {
+                return 'Please enter a valid port for the Device';
               }
               return null;
             },

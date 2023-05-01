@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
               title: const GaugeTitle(
                 text: 'Performance',
               ),
-              enableLoadingAnimation: true,
+              enableLoadingAnimation: SystemSettings.showHomeAnimations,
               animationDuration: 1500,
               axes: <RadialAxis>[
                 // Acceptence rate for packets in the system
@@ -52,10 +53,10 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                       ),
                     ),
                   ],
-                  pointers: const <GaugePointer>[
+                  pointers: <GaugePointer>[
                     MarkerPointer(
                       value: 90,
-                      enableAnimation: true,
+                      enableAnimation: SystemSettings.showHomeAnimations,
                     ),
                   ],
                   ranges: <GaugeRange>[
@@ -110,7 +111,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                     NeedlePointer(
                       needleColor: theme.colorScheme.secondary,
                       value: 90,
-                      enableAnimation: true,
+                      enableAnimation: SystemSettings.showHomeAnimations,
                       needleStartWidth: 1,
                       needleEndWidth: 5,
                       needleLength: 0.8,
@@ -174,7 +175,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                     NeedlePointer(
                       needleColor: theme.colorScheme.secondary,
                       value: 90,
-                      enableAnimation: true,
+                      enableAnimation: SystemSettings.showHomeAnimations,
                       needleStartWidth: 1,
                       needleEndWidth: 5,
                       needleLength: 0.8,
@@ -233,10 +234,10 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                       ),
                     ),
                   ],
-                  pointers: const <GaugePointer>[
+                  pointers: <GaugePointer>[
                     MarkerPointer(
                       value: 10,
-                      enableAnimation: true,
+                      enableAnimation: SystemSettings.showHomeAnimations,
                     ),
                   ],
                   ranges: <GaugeRange>[

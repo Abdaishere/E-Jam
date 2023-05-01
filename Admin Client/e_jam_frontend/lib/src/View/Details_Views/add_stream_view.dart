@@ -70,7 +70,8 @@ class _AddStreamViewState extends State<AddStreamView>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: MediaQuery.of(context).orientation == Orientation.landscape
+      padding: MediaQuery.of(context).orientation == Orientation.landscape &&
+              MediaQuery.of(context).size.width > 900
           ? const EdgeInsets.symmetric(horizontal: 200, vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(

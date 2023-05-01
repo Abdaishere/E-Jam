@@ -57,7 +57,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: MediaQuery.of(context).orientation == Orientation.landscape
+      padding: MediaQuery.of(context).orientation == Orientation.landscape &&
+              MediaQuery.of(context).size.width > 800
           ? const EdgeInsets.all(80)
           : const EdgeInsets.all(20),
       child: Hero(
@@ -301,6 +302,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               size: 30,
             ),
           ),
+          tooltip: stream?.runningGenerators?.processes == null ||
+                  stream!.runningGenerators!.processes.isEmpty
+              ? 'No Generators'
+              : stream?.runningGenerators!.processes.length == 1
+                  ? '1 Generator'
+                  : '${stream?.runningGenerators!.processes.length} Generators',
           onPressed: () {
             Navigator.of(context).push(
               DialogRoute(
@@ -327,6 +334,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             color: downloadColor,
             size: 30,
           ),
+          tooltip: stream?.runningVerifiers?.processes == null ||
+                  stream!.runningVerifiers!.processes.isEmpty
+              ? 'No Verifiers'
+              : stream?.runningVerifiers!.processes.length == 1
+                  ? '1 Verifier'
+                  : '${stream?.runningVerifiers!.processes.length} Verifiers',
           onPressed: () {
             Navigator.of(context).push(
               DialogRoute(
@@ -675,8 +688,8 @@ class _StreamGraphState extends State<StreamGraph> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(child: PieDevices(runningDevices)),
-              Expanded(child: DoughnutChartPackets(packetsState)),
+              Expanded(child: PieDevices(runningDevices())),
+              Expanded(child: DoughnutChartPackets(packetsState())),
             ],
           ),
         ),

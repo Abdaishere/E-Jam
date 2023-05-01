@@ -1,5 +1,10 @@
+import 'dart:math';
+
 import 'package:e_jam/main.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
+import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_doughnut_chart_packets.dart';
+import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_line_chart_stream.dart';
+import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_pie_chart_devices_per_stream.dart';
 import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:flutter/material.dart';
 
@@ -32,10 +37,13 @@ class _GraphsListViewState extends State<GraphsListView> {
                   : 3,
         ),
         itemBuilder: (BuildContext context, int index) {
+          Widget randomWidget = [
+            DynamicDoughnutChartPackets(packetsState()),
+            DynamicLineChartStream(index.toString()),
+            DynamicPieDevices(runningDevices()),
+          ][Random().nextInt(3)];
           return Card(
-            child: Center(
-              child: DoughnutChartPackets(packetsState),
-            ),
+            child: Center(child: randomWidget),
           );
         },
       ),

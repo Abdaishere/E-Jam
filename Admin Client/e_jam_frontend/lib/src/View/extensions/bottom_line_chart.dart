@@ -30,7 +30,7 @@ class _BottomLineChartState extends State<BottomLineChart> {
         SplineAreaSeries<ChartData, int>(
           borderColor: uploadColor,
           borderWidth: 1,
-          dataSource: chartData,
+          dataSource: chartData(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: uploadColor.withOpacity(0.2),
@@ -40,7 +40,7 @@ class _BottomLineChartState extends State<BottomLineChart> {
         SplineAreaSeries<ChartData, int>(
           borderColor: downloadColor,
           borderWidth: 1,
-          dataSource: chartData2,
+          dataSource: chartData2(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: downloadColor.withOpacity(0.2),

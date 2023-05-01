@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -15,21 +16,24 @@ class _DoughnutChartPacketsState extends State<DoughnutChartPackets> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onLongPress: () {
-          print('Long Pressed');
-        },
-        child: _buildDefaultDoughnutChart());
+      onLongPress: () {
+        // TODO: Implement Pinned Charts
+      },
+      child: _buildDefaultDoughnutChart(),
+    );
   }
 
   /// Return the circular chart with default doughnut series.
   SfCircularChart _buildDefaultDoughnutChart() {
     return SfCircularChart(
-      title: ChartTitle(
-        text: 'Packets',
-        textStyle: const TextStyle(),
-      ),
+      title: SystemSettings.fullChartsDetails
+          ? ChartTitle(
+              text: 'Packets',
+              textStyle: const TextStyle(),
+            )
+          : null,
       legend: Legend(
-        isVisible: true,
+        isVisible: SystemSettings.fullChartsDetails,
         textStyle: const TextStyle(fontSize: 12),
         iconHeight: 12,
         iconWidth: 12,
@@ -47,11 +51,10 @@ class _DoughnutChartPacketsState extends State<DoughnutChartPackets> {
   List<DoughnutSeries<PacketsState, String>> _getDefaultDoughnutSeries() {
     return <DoughnutSeries<PacketsState, String>>[
       DoughnutSeries<PacketsState, String>(
+          animationDuration: SystemSettings.showChartsAnimation ? 800 : 0,
           radius: '90%',
-          explode: true,
+          explode: SystemSettings.fullChartsDetails,
           explodeOffset: '15%',
-          animationDuration: 1100,
-          animationDelay: 150,
           dataSource: packetsState,
           xValueMapper: (PacketsState data, _) => data.state,
           yValueMapper: (PacketsState data, _) => data.value,

@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -16,18 +17,25 @@ class _PieDevicesState extends State<PieDevices> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildDefaultPieChart();
+    return GestureDetector(
+      onLongPress: () {
+        // TODO: Implement Pinned Charts
+      },
+      child: _buildDefaultPieChart(),
+    );
   }
 
   /// Returns the circular  chart with pie series.
   SfCircularChart _buildDefaultPieChart() {
     return SfCircularChart(
-      title: ChartTitle(
-        text: 'Devices',
-        textStyle: const TextStyle(),
-      ),
+      title: SystemSettings.fullChartsDetails
+          ? ChartTitle(
+              text: 'Devices',
+              textStyle: const TextStyle(),
+            )
+          : null,
       legend: Legend(
-        isVisible: true,
+        isVisible: SystemSettings.fullChartsDetails,
         textStyle: const TextStyle(fontSize: 12),
         iconHeight: 12,
         iconWidth: 12,
@@ -45,12 +53,11 @@ class _PieDevicesState extends State<PieDevices> {
   List<PieSeries<RunningDevices, String>> _getDefaultPieSeries() {
     return <PieSeries<RunningDevices, String>>[
       PieSeries<RunningDevices, String>(
+        animationDuration: SystemSettings.showChartsAnimation ? 800 : 0,
         radius: '90%',
-        explode: true,
+        explode: SystemSettings.fullChartsDetails,
         explodeIndex: 0,
         explodeOffset: '15%',
-        animationDuration: 1000,
-        animationDelay: 150,
         dataSource: data,
         xValueMapper: (RunningDevices data, _) => data.state,
         yValueMapper: (RunningDevices data, _) => data.value,

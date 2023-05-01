@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -145,10 +146,12 @@ class _TreeMapDrillDownDevicesLoadState
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12, left: 10, right: 10),
         child: SfTreemap(
-          legend: const TreemapLegend(
-            position: TreemapLegendPosition.top,
-            title: Text('Devices Load'),
-          ),
+          legend: SystemSettings.fullTreeMap
+              ? const TreemapLegend(
+                  position: TreemapLegendPosition.top,
+                  title: Text('Devices Load'),
+                )
+              : null,
           dataCount: _source.length,
           weightValueMapper: (int index) {
             return _source[index].totalPackets!;

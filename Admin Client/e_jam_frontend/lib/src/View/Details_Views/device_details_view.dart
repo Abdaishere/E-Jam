@@ -43,7 +43,8 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
   Widget build(BuildContext context) {
     Device device = updateDevice ?? widget.device;
     return Padding(
-      padding: MediaQuery.of(context).orientation == Orientation.landscape
+      padding: MediaQuery.of(context).orientation == Orientation.landscape &&
+              MediaQuery.of(context).size.width > 800
           ? const EdgeInsets.symmetric(horizontal: 280, vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(
@@ -133,8 +134,8 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
             body: Column(
               children: [
                 Expanded(
-                  flex: 3,
-                  child: DoughnutChartPackets(packetsState),
+                  flex: 4,
+                  child: DoughnutChartPackets(packetsState()),
                 ),
                 Expanded(
                   flex: 3,
@@ -164,7 +165,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               genProcesses: device.genProcesses.toString(),
               verProcesses: device.verProcesses.toString(),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
             DeviceDetailsSection(
               context: context,
               device: device,

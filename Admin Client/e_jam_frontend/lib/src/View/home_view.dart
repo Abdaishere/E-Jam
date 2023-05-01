@@ -1,4 +1,5 @@
 import 'package:e_jam/main.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/extensions/icons_system_elements.dart';
 import 'package:e_jam/src/View/extensions/gauge_speed_chart.dart';
 import 'package:e_jam/src/View/extensions/progress_task_for_all_system.dart';
@@ -35,14 +36,6 @@ class _HomeViewState extends State<HomeView> {
             ),
             onPressed: () {},
           ),
-          // settings icon for changing the settings of the system
-          IconButton(
-            icon: const Icon(
-              FontAwesomeIcons.gear,
-              size: 20,
-            ),
-            onPressed: () {},
-          ),
           // question mark icon for help
           IconButton(
             icon: const Icon(
@@ -59,15 +52,28 @@ class _HomeViewState extends State<HomeView> {
           children: [
             const SizedBox(height: 350, child: TreeMapDrillDownDevicesLoad()),
             Wrap(
-              children: const [
-                GaugeTotalProgressForSystem(),
-                IconsElementsSystem(),
-                GaugeSpeedChart(),
-              ],
+              children: SystemSettings.homeExtensionsOrder
+                  .map(
+                    (e) => widgetFilter(e),
+                  )
+                  .toList(),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget widgetFilter(String e) {
+    switch (e) {
+      case '1Progress':
+        return const GaugeTotalProgressForSystem();
+      case '1Elements':
+        return const IconsElementsSystem();
+      case '1Performance':
+        return const GaugeSpeedChart();
+      default:
+        return const SizedBox();
+    }
   }
 }

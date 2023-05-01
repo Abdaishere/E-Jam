@@ -80,8 +80,8 @@ class AddDeviceController {
   static TextEditingController descriptionController = TextEditingController();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController ipController = TextEditingController();
-  static TextEditingController portController = TextEditingController(
-      text: NetworkController.defaultDevicesPort.toString());
+  static TextEditingController portController =
+      TextEditingController(text: SystemSettings.defaultDevicesPort.toString());
   static TextEditingController macController = TextEditingController();
 
   static Future<int?> createNewDevice(GlobalKey<FormState> formKey) async {
@@ -93,7 +93,7 @@ class AddDeviceController {
         location: locationController.text,
         ipAddress: ipController.text,
         port: int.tryParse(portController.text) ??
-            NetworkController.defaultDevicesPort,
+            SystemSettings.defaultDevicesPort,
         macAddress: macController.text,
       );
 
@@ -111,7 +111,7 @@ class AddDeviceController {
         location: locationController.text,
         ipAddress: ipController.text,
         port: int.tryParse(portController.text) ??
-            NetworkController.defaultDevicesPort,
+            SystemSettings.defaultDevicesPort,
         macAddress: macController.text,
       );
 
@@ -125,7 +125,7 @@ class AddDeviceController {
     descriptionController.clear();
     locationController.clear();
     ipController.clear();
-    portController.text = NetworkController.defaultDevicesPort.toString();
+    portController.text = SystemSettings.defaultDevicesPort.toString();
     macController.clear();
   }
 }
@@ -135,8 +135,8 @@ class EditDeviceController {
   static TextEditingController descriptionController = TextEditingController();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController ipController = TextEditingController();
-  static TextEditingController portController = TextEditingController(
-      text: NetworkController.defaultDevicesPort.toString());
+  static TextEditingController portController =
+      TextEditingController(text: SystemSettings.defaultDevicesPort.toString());
   static String mac = "";
 
   static Future<bool?> updateDevice(GlobalKey<FormState> formKey) async {
@@ -148,7 +148,7 @@ class EditDeviceController {
         location: locationController.text,
         ipAddress: ipController.text,
         port: int.tryParse(portController.text) ??
-            NetworkController.defaultDevicesPort,
+            SystemSettings.defaultDevicesPort,
         macAddress: mac,
       );
 
@@ -166,7 +166,7 @@ class EditDeviceController {
         location: locationController.text,
         ipAddress: ipController.text,
         port: int.tryParse(portController.text) ??
-            NetworkController.defaultDevicesPort,
+            SystemSettings.defaultDevicesPort,
         macAddress: mac,
       );
 
@@ -180,7 +180,7 @@ class EditDeviceController {
     descriptionController.clear();
     locationController.clear();
     ipController.clear();
-    portController.text = NetworkController.defaultDevicesPort.toString();
+    portController.text = SystemSettings.defaultDevicesPort.toString();
     mac = "";
   }
 

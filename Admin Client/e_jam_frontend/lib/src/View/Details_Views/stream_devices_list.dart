@@ -29,7 +29,8 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: MediaQuery.of(context).orientation == Orientation.landscape
+      padding: MediaQuery.of(context).orientation == Orientation.landscape &&
+              MediaQuery.of(context).size.width > 800
           ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
           : const EdgeInsets.all(20),
       child: ClipRRect(

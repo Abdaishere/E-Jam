@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,15 @@ class _LineChartStreamState extends State<LineChartStream> {
   get id => widget.id;
   @override
   Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: () {
+        // TODO: Implement Pinned Charts
+      },
+      child: _lineChart(),
+    );
+  }
+
+  SfCartesianChart _lineChart() {
     return SfCartesianChart(
       trackballBehavior: TrackballBehavior(
         enable: true,
@@ -28,15 +38,21 @@ class _LineChartStreamState extends State<LineChartStream> {
         edgeLabelPlacement: EdgeLabelPlacement.shift,
         labelStyle: const TextStyle(fontSize: 10),
         majorTickLines: const MajorTickLines(size: 1),
-        labelIntersectAction: AxisLabelIntersectAction.trim,
+        labelIntersectAction: SystemSettings.fullChartsDetails
+            ? AxisLabelIntersectAction.trim
+            : AxisLabelIntersectAction.hide,
         labelFormat: '{value} Sec',
       ),
       primaryYAxis: NumericAxis(
-        labelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w400),
+        labelStyle: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w400,
+            color:
+                SystemSettings.fullChartsDetails ? null : Colors.transparent),
         majorTickLines: const MajorTickLines(size: 1),
-        labelIntersectAction: AxisLabelIntersectAction.trim,
+        labelIntersectAction: AxisLabelIntersectAction.hide,
         // TODO: Make this show the Packets per second not the size of the packets
-        labelFormat: '{value} MB',
+        labelFormat: '{value}MB',
         labelRotation: 90,
       ),
       zoomPanBehavior: ZoomPanBehavior(
@@ -54,7 +70,7 @@ class _LineChartStreamState extends State<LineChartStream> {
         // Renders Upload area chart
         SplineAreaSeries<ChartData, int>(
           name: 'Upload',
-          // animationDelay: 100,
+          animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           borderColor: uploadColor,
           borderWidth: 1,
           markerSettings: const MarkerSettings(
@@ -65,10 +81,11 @@ class _LineChartStreamState extends State<LineChartStream> {
             height: 3,
             width: 3,
           ),
-          // TODO: add Settings for the SplineType to the Settings Page and make them changeable by the user
-          splineType: SplineType.monotonic,
-          // cardinalSplineTension: 0.5,
-          dataSource: chartData,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource: chartData(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: uploadColor.withOpacity(0.2),
@@ -77,9 +94,8 @@ class _LineChartStreamState extends State<LineChartStream> {
         // Renders Download area chart
         SplineAreaSeries<ChartData, int>(
           name: 'Download',
+          animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           borderColor: downloadColor,
-
-          // animationDelay: 100,
           borderWidth: 1,
           markerSettings: const MarkerSettings(
             isVisible: true,
@@ -89,9 +105,11 @@ class _LineChartStreamState extends State<LineChartStream> {
             height: 3,
             width: 3,
           ),
-          splineType: SplineType.monotonic,
-          // cardinalSplineTension: 0.3,
-          dataSource: chartData2,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource: chartData2(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: downloadColor.withOpacity(0.2),
@@ -100,7 +118,8 @@ class _LineChartStreamState extends State<LineChartStream> {
         // Renders Error line chart
         SplineSeries<ChartData, int>(
           name: 'Error',
-          animationDelay: 1000,
+          animationDelay: SystemSettings.showChartsAnimation ? 1000 : 0,
+          animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           color: packetErrorColor,
           markerSettings: const MarkerSettings(
             isVisible: true,
@@ -111,9 +130,11 @@ class _LineChartStreamState extends State<LineChartStream> {
             width: 3,
           ),
           width: 2,
-          splineType: SplineType.monotonic,
-          // cardinalSplineTension: 0.3,
-          dataSource: chartData3,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource: chartData3(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
         ),

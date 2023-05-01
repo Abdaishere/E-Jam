@@ -1,25 +1,31 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class DynamicLineChartStream extends StatefulWidget {
-  const DynamicLineChartStream(this.index, {super.key});
+  const DynamicLineChartStream(this.id, {super.key});
 
-  final int index;
+  final String id;
   @override
   State<DynamicLineChartStream> createState() => _DynamicLineChartStreamState();
 }
 
 class _DynamicLineChartStreamState extends State<DynamicLineChartStream> {
-  get index => widget.index;
+  get id => widget.id;
   @override
   Widget build(BuildContext context) {
-    return _buildDynamicLineChartStream();
-  }
-
-  SfCartesianChart _buildDynamicLineChartStream() {
     return SfCartesianChart(
+      legend: Legend(
+        title: LegendTitle(
+          text: id,
+          textStyle: const TextStyle(fontSize: 12),
+        ),
+        textStyle: const TextStyle(fontSize: 12),
+        iconHeight: 12,
+        iconWidth: 12,
+      ),
       trackballBehavior: TrackballBehavior(
         enable: true,
         activationMode: ActivationMode.singleTap,
@@ -29,16 +35,24 @@ class _DynamicLineChartStreamState extends State<DynamicLineChartStream> {
       ),
       plotAreaBorderWidth: 0,
       primaryXAxis: NumericAxis(
+        edgeLabelPlacement: EdgeLabelPlacement.shift,
         labelStyle: const TextStyle(fontSize: 10),
         majorTickLines: const MajorTickLines(size: 1),
-        labelIntersectAction: AxisLabelIntersectAction.multipleRows,
+        labelIntersectAction: SystemSettings.fullChartsDetails
+            ? AxisLabelIntersectAction.trim
+            : AxisLabelIntersectAction.hide,
         labelFormat: '{value} Sec',
       ),
       primaryYAxis: NumericAxis(
-        labelStyle: const TextStyle(fontSize: 9, fontWeight: FontWeight.w400),
+        labelStyle: TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w400,
+            color:
+                SystemSettings.fullChartsDetails ? null : Colors.transparent),
         majorTickLines: const MajorTickLines(size: 1),
-        labelIntersectAction: AxisLabelIntersectAction.multipleRows,
-        labelFormat: '{value} MB',
+        labelIntersectAction: AxisLabelIntersectAction.hide,
+        // TODO: Make this show the Packets per second not the size of the packets
+        labelFormat: '{value}MB',
         labelRotation: 90,
       ),
       zoomPanBehavior: ZoomPanBehavior(
@@ -56,7 +70,7 @@ class _DynamicLineChartStreamState extends State<DynamicLineChartStream> {
         // Renders Upload area chart
         SplineAreaSeries<ChartData, int>(
           name: 'Upload',
-          // animationDelay: 100,
+          animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           borderColor: uploadColor,
           borderWidth: 1,
           markerSettings: const MarkerSettings(
@@ -67,17 +81,21 @@ class _DynamicLineChartStreamState extends State<DynamicLineChartStream> {
             height: 3,
             width: 3,
           ),
-          dataSource: chartData,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource: chartData(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: uploadColor.withOpacity(0.2),
         ),
 
-        // Renders spline area chart
+        // Renders Download area chart
         SplineAreaSeries<ChartData, int>(
           name: 'Download',
+          animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           borderColor: downloadColor,
-          // animationDelay: 100,
           borderWidth: 1,
           markerSettings: const MarkerSettings(
             isVisible: true,
@@ -87,10 +105,38 @@ class _DynamicLineChartStreamState extends State<DynamicLineChartStream> {
             height: 3,
             width: 3,
           ),
-          dataSource: chartData2,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource: chartData2(),
           xValueMapper: (ChartData chartData, _) => chartData.date,
           yValueMapper: (ChartData chartData, _) => chartData.value,
           color: downloadColor.withOpacity(0.2),
+        ),
+
+        // Renders Error line chart
+        SplineSeries<ChartData, int>(
+          name: 'Error',
+          animationDelay: SystemSettings.showChartsAnimation ? 1000 : 0,
+          animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
+          color: packetErrorColor,
+          markerSettings: const MarkerSettings(
+            isVisible: true,
+            color: packetErrorColor,
+            borderColor: packetErrorColor,
+            borderWidth: 1,
+            height: 3,
+            width: 3,
+          ),
+          width: 2,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource: chartData3(),
+          xValueMapper: (ChartData chartData, _) => chartData.date,
+          yValueMapper: (ChartData chartData, _) => chartData.value,
         ),
       ],
     );

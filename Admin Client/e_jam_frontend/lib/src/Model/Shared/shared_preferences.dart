@@ -62,6 +62,39 @@ class NetworkController {
   }
 
   static var client = http.Client();
+}
+
+class SystemSettings {
+  static bool showChartsAnimation = true;
+  static bool lineGraphCurveSmooth = true;
+  static bool fullChartsDetails = true;
+  static bool showHomeAnimations = true;
+  static bool fullTreeMap = true;
+  static List<String> homeExtensionsOrder = [
+    "1Progress",
+    "1Elements",
+    "1Performance"
+  ];
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";
+
+  static bool showTooltip = true;
+  static bool showExplode = true;
+  static bool showExplodeOffset = true;
+
+  static init() async {
+    final pref = await SharedPreferences.getInstance();
+
+    showChartsAnimation = pref.getBool('showChartsAnimation') ?? true;
+    lineGraphCurveSmooth = pref.getBool('lineGraphCurveSmooth') ?? true;
+    fullChartsDetails = pref.getBool('fullChartsDetails') ?? true;
+    showHomeAnimations = pref.getBool('showHomeAnimations') ?? true;
+    fullTreeMap = pref.getBool('fullTreeMap') ?? true;
+    homeExtensionsOrder = pref.getStringList('homeExtensionsOrder') ??
+        ["1Progress", "1Elements", "1Performance"];
+
+    defaultDevicesPort = pref.getInt('defaultDevicesPort') ?? 8000;
+    defaultSystemApiSubnet =
+        pref.getString('defaultSystemApiSubnet') ?? "192.168.0";
+  }
 }

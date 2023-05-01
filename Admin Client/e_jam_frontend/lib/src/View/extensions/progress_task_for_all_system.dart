@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -27,7 +28,7 @@ class _GaugeTotalProgressForSystemState
           title: const GaugeTitle(
             text: 'Progress',
           ),
-          enableLoadingAnimation: true,
+          enableLoadingAnimation: SystemSettings.showHomeAnimations,
           animationDuration: 1500,
           axes: [
             RadialAxis(
@@ -41,14 +42,14 @@ class _GaugeTotalProgressForSystemState
                 thicknessUnit: GaugeSizeUnit.factor,
                 cornerStyle: CornerStyle.bothCurve,
               ),
-              pointers: const [
+              pointers: [
                 RangePointer(
                   value: 60,
                   width: 0.1,
                   sizeUnit: GaugeSizeUnit.factor,
                   cornerStyle: CornerStyle.bothCurve,
-                  enableAnimation: true,
-                  gradient: SweepGradient(
+                  enableAnimation: SystemSettings.showHomeAnimations,
+                  gradient: const SweepGradient(
                     colors: <Color>[
                       Color(0xFF4FC3F7),
                       Color(0xFF00A8B5),
@@ -61,8 +62,8 @@ class _GaugeTotalProgressForSystemState
                   markerType: MarkerType.circle,
                   markerHeight: 15,
                   markerWidth: 15,
-                  enableAnimation: true,
-                  color: Color(0xFF00A8B5),
+                  enableAnimation: SystemSettings.showHomeAnimations,
+                  color: const Color(0xFF00A8B5),
                 ),
               ],
               annotations: const [
