@@ -67,6 +67,8 @@ class NetworkController {
 class SystemSettings {
   static bool showChartsAnimation = true;
   static bool lineGraphCurveSmooth = true;
+  static bool showBottomLineChart = true;
+  static bool showBackgroundBall = true;
   static bool fullChartsDetails = true;
   static bool showHomeAnimations = true;
   static bool fullTreeMap = true;
@@ -77,16 +79,15 @@ class SystemSettings {
   ];
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";
-
-  static bool showTooltip = true;
-  static bool showExplode = true;
-  static bool showExplodeOffset = true;
+  static bool streamsAreRunning = false;
+  static bool chartsAreRunning = true;
 
   static init() async {
     final pref = await SharedPreferences.getInstance();
-
     showChartsAnimation = pref.getBool('showChartsAnimation') ?? true;
     lineGraphCurveSmooth = pref.getBool('lineGraphCurveSmooth') ?? true;
+    showBottomLineChart = pref.getBool('showBottomLineChart') ?? true;
+    showBackgroundBall = pref.getBool('showBackgroundBall') ?? true;
     fullChartsDetails = pref.getBool('fullChartsDetails') ?? true;
     showHomeAnimations = pref.getBool('showHomeAnimations') ?? true;
     fullTreeMap = pref.getBool('fullTreeMap') ?? true;
@@ -96,5 +97,8 @@ class SystemSettings {
     defaultDevicesPort = pref.getInt('defaultDevicesPort') ?? 8000;
     defaultSystemApiSubnet =
         pref.getString('defaultSystemApiSubnet') ?? "192.168.0";
+
+    streamsAreRunning = pref.getBool('streamsAreRunning') ?? false;
+    chartsAreRunning = pref.getBool('chartsAreRunning') ?? true;
   }
 }

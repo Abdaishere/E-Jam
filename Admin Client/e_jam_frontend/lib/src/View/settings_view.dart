@@ -49,6 +49,9 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
+  bool _changedShowBackgroundBallValue = false;
+  bool _changedShowBottomLineChartValue = false;
+
   List<Widget> get _chartsSettings {
     return [
       const ListTile(
@@ -83,6 +86,49 @@ class _SettingsViewState extends State<SettingsView> {
         ),
       ),
       ListTile(
+        leading: _changedShowBackgroundBallValue
+            ? IconButton(
+                icon: const Icon(Icons.restart_alt_outlined),
+                color: Colors.amber,
+                tooltip: 'Restart app to apply changes',
+                onPressed: () {},
+              )
+            : null,
+        title: const Text('Background ball animation'),
+        trailing: CupertinoSwitch(
+          value: SystemSettings.showBackgroundBall,
+          onChanged: (value) async {
+            SystemSettings.showBackgroundBall = value;
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setBool('showBackgroundBall', value);
+            _changedShowBackgroundBallValue = !_changedShowBackgroundBallValue;
+            setState(() {});
+          },
+        ),
+      ),
+      ListTile(
+        leading: _changedShowBottomLineChartValue
+            ? IconButton(
+                icon: const Icon(Icons.restart_alt_outlined),
+                color: Colors.amber,
+                tooltip: 'Restart app to apply changes',
+                onPressed: () {},
+              )
+            : null,
+        title: const Text('Bottom line chart'),
+        trailing: CupertinoSwitch(
+          value: SystemSettings.showBottomLineChart,
+          onChanged: (value) async {
+            SystemSettings.showBottomLineChart = value;
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setBool('showBottomLineChart', value);
+            _changedShowBottomLineChartValue =
+                !_changedShowBottomLineChartValue;
+            setState(() {});
+          },
+        ),
+      ),
+      ListTile(
         title: const Text('Dense charts'),
         trailing: CupertinoSwitch(
           value: !SystemSettings.fullChartsDetails,
@@ -105,7 +151,7 @@ class _SettingsViewState extends State<SettingsView> {
   List<Widget> get _homeSettings {
     return [
       const ListTile(
-        leading: FaIcon(FontAwesome.home),
+        leading: FaIcon(FontAwesome.dashboard),
         title: Text(
           'Home',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -137,7 +183,7 @@ class _SettingsViewState extends State<SettingsView> {
       ),
       const SizedBox(height: 10),
       _homeExtensionsOrder(),
-      const SizedBox(height: 10),
+      const SizedBox(height: 15),
       const Divider(
         height: 15,
         indent: 10,
@@ -160,12 +206,12 @@ class _SettingsViewState extends State<SettingsView> {
         ),
         child: ReorderableListView(
           header: const Text(
-            'Home Extensions Order',
+            'Home Extensions',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             textAlign: TextAlign.center,
           ),
           footer: const Text(
-            'Drag and drop to reorder, click icon to enable/disable',
+            'Drag and drop to reorder, click icon to enable/disable.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12),
           ),
@@ -253,28 +299,6 @@ class _SettingsViewState extends State<SettingsView> {
                 TextFormField(
                   enableIMEPersonalizedLearning: false,
                   decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: 'Devices Port',
-                    hintText: SystemSettings.defaultDevicesPort.toString(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a port';
-                    } else if (int.parse(value) > 65535) {
-                      return 'Please enter a valid port';
-                    }
-                    return null;
-                  },
-                  controller: _defaultDevicesPortController,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  enableIMEPersonalizedLearning: false,
-                  decoration: InputDecoration(
                     labelText: 'Devices Subnet IP',
                     border: const OutlineInputBorder(),
                     hintText: SystemSettings.defaultSystemApiSubnet.toString(),
@@ -294,6 +318,28 @@ class _SettingsViewState extends State<SettingsView> {
                     return null;
                   },
                   controller: _defaultSystemApiSubnetController,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  enableIMEPersonalizedLearning: false,
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: 'Devices Port',
+                    hintText: SystemSettings.defaultDevicesPort.toString(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a port';
+                    } else if (int.parse(value) > 65535) {
+                      return 'Please enter a valid port';
+                    }
+                    return null;
+                  },
+                  controller: _defaultDevicesPortController,
                 ),
                 ButtonBar(
                   children: [

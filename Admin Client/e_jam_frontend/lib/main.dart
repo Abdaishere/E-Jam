@@ -6,6 +6,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -16,6 +17,7 @@ import 'package:e_jam/src/View/home_view.dart';
 import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/View/settings_view.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -94,7 +96,7 @@ class _HomeState extends State<Home> {
         return Stack(
           children: [
             const GradientBackground(),
-            const BouncingBall(),
+            if (SystemSettings.showBackgroundBall) const BouncingBall(),
             const BottomLineChartScaffold(),
             frontBody(theme.isDark
                 ? const Color.fromARGB(183, 255, 197, 117)
@@ -140,7 +142,8 @@ class BottomLineChartScaffold extends StatelessWidget {
         elevation: 0,
         padding: const EdgeInsets.only(left: 200),
         height: 100,
-        child: MediaQuery.of(context).orientation == Orientation.landscape
+        child: MediaQuery.of(context).orientation == Orientation.landscape &&
+                SystemSettings.showBottomLineChart
             ? const BottomLineChart()
             : const SizedBox.shrink(),
       ),
@@ -231,9 +234,9 @@ class _MenuScreenState extends State<MenuScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 25),
               ListTile(
-                leading: const FaIcon(FontAwesome.home),
+                leading: const FaIcon(FontAwesome.dashboard),
                 iconColor: Colors.white,
                 title: const Text('Home'),
                 onTap: () {
@@ -345,21 +348,41 @@ class StreamsControllerButton extends StatefulWidget {
 }
 
 class _StreamsControllerButtonState extends State<StreamsControllerButton> {
-  bool isSwitched = true;
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ThemeModel theme, child) {
       return IconButton(
-        tooltip: isSwitched ? 'Pause' : 'Start',
-        onPressed: () {
-          setState(() {
-            isSwitched = !isSwitched;
-          });
-        },
-        color:
-            !isSwitched ? theme.colorScheme.error : theme.colorScheme.secondary,
+        tooltip: SystemSettings.streamsAreRunning ? 'Pause' : 'Start',
+        onPressed: () => SystemSettings.streamsAreRunning
+            ? StreamsController.stopAllStreams().then((value) async {
+                if (value && mounted) {
+                  setState(() {
+                    SystemSettings.streamsAreRunning =
+                        !SystemSettings.streamsAreRunning;
+                  });
+                  final pref = await SharedPreferences.getInstance();
+                  pref.setBool(
+                      'streamsAreRunning', SystemSettings.streamsAreRunning);
+                }
+              })
+            : StreamsController.startAllStreams().then((value) async {
+                if (value && mounted) {
+                  setState(() {
+                    SystemSettings.streamsAreRunning =
+                        !SystemSettings.streamsAreRunning;
+                  });
+                  final pref = await SharedPreferences.getInstance();
+                  pref.setBool(
+                      'streamsAreRunning', SystemSettings.streamsAreRunning);
+                }
+              }),
+        color: SystemSettings.streamsAreRunning
+            ? theme.colorScheme.secondary
+            : theme.colorScheme.error,
         icon: FaIcon(
-          isSwitched ? FontAwesomeIcons.play : FontAwesomeIcons.pause,
+          SystemSettings.streamsAreRunning
+              ? FontAwesomeIcons.play
+              : FontAwesomeIcons.pause,
           size: 21,
         ),
       );
@@ -375,24 +398,25 @@ class GraphsControllerButton extends StatefulWidget {
 }
 
 class _GraphsControllerButtonState extends State<GraphsControllerButton> {
-  bool isFrozen = false;
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ThemeModel theme, child) {
       return IconButton(
-        tooltip: isFrozen ? 'Unfreeze Graphs' : 'Freeze Graphs',
+        tooltip: SystemSettings.chartsAreRunning
+            ? 'Freeze Graphs'
+            : 'Unfreeze Graphs',
         onPressed: () {
           setState(() {
-            isFrozen = !isFrozen;
+            SystemSettings.chartsAreRunning = !SystemSettings.chartsAreRunning;
           });
         },
-        color: isFrozen
-            ? theme.colorScheme.surfaceTint
-            : theme.colorScheme.secondary,
+        color: SystemSettings.chartsAreRunning
+            ? theme.colorScheme.secondary
+            : theme.colorScheme.surfaceTint,
         icon: FaIcon(
-            isFrozen
-                ? FontAwesomeIcons.solidSnowflake
-                : FontAwesomeIcons.camera,
+            SystemSettings.chartsAreRunning
+                ? FontAwesomeIcons.camera
+                : FontAwesomeIcons.solidSnowflake,
             size: 21),
       );
     });

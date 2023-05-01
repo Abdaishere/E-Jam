@@ -15,7 +15,11 @@ class _IconsElementsSystemState extends State<IconsElementsSystem> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 350,
+      width: MediaQuery.of(context).orientation == Orientation.portrait
+          ? MediaQuery.of(context).size.width > 450
+              ? 340
+              : MediaQuery.of(context).size.width
+          : 340,
       height: 280,
       child: Card(
         shape: const RoundedRectangleBorder(

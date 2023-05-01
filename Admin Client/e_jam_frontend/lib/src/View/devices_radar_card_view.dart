@@ -145,7 +145,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
         children: [
           IconButton(
             icon: const Icon(Icons.device_hub_rounded),
-            iconSize: 50,
+            iconSize: 75,
             color: deviceIdleColor,
             tooltip:
                 'Add ${devices.elementAt(index)}:${SystemSettings.defaultDevicesPort}',

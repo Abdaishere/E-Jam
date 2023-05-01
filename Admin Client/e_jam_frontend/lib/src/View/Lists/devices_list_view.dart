@@ -212,13 +212,12 @@ class _DevicesListViewState extends State<DevicesListView> {
           ),
         ),
         IconButton(
-          icon: FaIcon(
+          icon: const FaIcon(
             FontAwesomeIcons.arrowsRotate,
-            color: _isDeviceListLoading ? Colors.blueGrey : null,
             size: 20.0,
           ),
           tooltip: 'Refresh',
-          onPressed: () {
+          onPressed: () async {
             loadDevicesListView();
           },
         ),

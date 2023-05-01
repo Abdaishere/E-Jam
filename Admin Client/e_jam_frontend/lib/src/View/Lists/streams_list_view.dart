@@ -147,15 +147,8 @@ class _StreamsListViewState extends State<StreamsListView> {
         // refresh icon for refreshing the streams list view
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
-          onPressed: () {
+          onPressed: () async {
             loadStreamView();
-          },
-        ),
-        // gear icon for settings and preferences related to the streams list view (sort by, filter by, etc.)
-        IconButton(
-          icon: const FaIcon(FontAwesomeIcons.gear, size: 20.0),
-          onPressed: () {
-            // TODO: go to the settings page or add a dialog with the settings and preferences for the streams list view only
           },
         ),
         // Explanation icon for details about how the stream card works and what the icons mean and what the colors mean
