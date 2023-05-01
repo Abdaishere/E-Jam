@@ -101,13 +101,13 @@ public class InstanceController implements Runnable {
     private void startGateway(int numGen, int numVer) {
         if (numGen > 0) {
             String command = "sudo";
-            String[] genArgs = {"../Executables/Gateway", "0", Integer.toString(numGen)};
+            String[] genArgs = {"../Executables/Gateway", "0", Integer.toString(numGen), globalVariables.GATEWAY_INTERFACE};
             executeCommand(command, false, genArgs);
         }
 
         if (numVer > 0) {
             String command = "sudo";
-            String[] verArgs = {"../Executables/Gateway", "1 ", Integer.toString(numVer)};
+            String[] verArgs = {"../Executables/Gateway", "1 ", Integer.toString(numVer), globalVariables.GATEWAY_INTERFACE};
             executeCommand(command, false, verArgs);
         }
     }
@@ -128,6 +128,9 @@ public class InstanceController implements Runnable {
                     break;
                 case 3:
                     processBuilder.command(command, args[0], args[1], args[2]);
+                    break;
+                case 4:
+                    processBuilder.command(command, args[0], args[1], args[2], args[3]);
                     break;
             }
 

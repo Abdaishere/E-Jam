@@ -8,10 +8,10 @@ import java.io.IOException;
 
 @Component
 public class GlobalVariables {
-    public String ADMIN_ADDRESS = "localhost";
+    public String ADMIN_ADDRESS = "192.168.1.3";
     public int ADMIN_PORT = 8080;
-    public String GATEWAY_INTERFACE = "br-b27af1121dcf";
-    public String ADMIN_CLIENT_INTERFACE = "br-b27af1121dcf";
+    public String GATEWAY_INTERFACE = "eno1";
+    public String ADMIN_CLIENT_INTERFACE = "eno1";
 
     public GlobalVariables() {
         readInterfaces();

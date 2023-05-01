@@ -50,7 +50,7 @@ std::string exec(const char * command)
 
 void writeToFile(std::string line)
 {
-    std::ofstream outfile("/home/mostafa/Desktop/E-Jam/Prototype/Executables/debug.txt", std::ios::app);
+    std::ofstream outfile("../Executables/debug.txt", std::ios::app);
     outfile << line << std::endl;
     outfile.close();
 }
