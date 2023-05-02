@@ -45,7 +45,9 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 800
-          ? const EdgeInsets.symmetric(horizontal: 280, vertical: 100)
+          ? EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.28,
+              vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: device.macAddress,

@@ -35,7 +35,9 @@ class _AddDeviceViewState extends State<AddDeviceView> {
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 900
-          ? const EdgeInsets.symmetric(horizontal: 300, vertical: 100)
+          ? EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.3,
+              vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: 'addDevice',

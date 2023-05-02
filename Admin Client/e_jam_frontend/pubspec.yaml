@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_zoom_drawer: 3.0.3
+  flutter_zoom_drawer: ^3.0.4+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -39,12 +39,12 @@ dependencies:
   shared_preferences: ^2.0.17
   provider: ^6.0.5
   font_awesome_flutter: ^10.4.0
-  syncfusion_flutter_charts: ^20.4.51
+  syncfusion_flutter_charts: ^21.1.41
   percent_indicator: ^4.2.2
   flutter_vector_icons: ^2.0.0
-  syncfusion_flutter_gauges: ^20.4.51
+  syncfusion_flutter_gauges: ^21.1.41
   rename: ^2.1.1
-  syncfusion_flutter_treemap: ^20.4.52-beta
+  syncfusion_flutter_treemap: ^21.1.41
   http: ^0.13.5
   loading_animation_widget: ^1.2.0+4
   awesome_snackbar_content: ^0.1.2
@@ -58,7 +58,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.11.0
+  flutter_launcher_icons: ^0.13.1
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

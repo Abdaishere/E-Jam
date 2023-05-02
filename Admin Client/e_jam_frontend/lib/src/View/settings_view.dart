@@ -74,7 +74,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
       ),
       ListTile(
-        title: const Text(' Line charts curve smooth'),
+        title: const Text('Line charts curve smooth'),
         trailing: CupertinoSwitch(
           value: SystemSettings.lineGraphCurveSmooth,
           onChanged: (value) async {

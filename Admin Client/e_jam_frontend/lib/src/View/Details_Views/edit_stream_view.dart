@@ -79,7 +79,9 @@ class _EditStreamViewState extends State<EditStreamView>
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 800
-          ? const EdgeInsets.symmetric(horizontal: 200, vertical: 100)
+          ? EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.2,
+              vertical: 100)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: widget.id,

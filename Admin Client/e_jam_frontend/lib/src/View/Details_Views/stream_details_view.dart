@@ -59,7 +59,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 800
-          ? const EdgeInsets.all(80)
+          ? EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.08,
+              vertical: MediaQuery.of(context).size.height * 0.08)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: id,

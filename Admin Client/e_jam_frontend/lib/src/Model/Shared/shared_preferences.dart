@@ -45,7 +45,9 @@ class ThemePreferences {
 
 class NetworkController {
   static Uri serverIpAddress = Uri.parse('http://127.0.0.1:8080');
-  static changeServerIpAddress(String newIpAddress, String newPort) {
+  static var client = http.Client();
+
+  static changeServerIpAddress(String newIpAddress, String newPort) async {
     if (newIpAddress == "") {
       newIpAddress = "127.0.0.1";
     }
@@ -57,11 +59,13 @@ class NetworkController {
         scheme: serverIpAddress.scheme,
         host: serverIpAddress.host,
         port: serverIpAddress.port);
+
     DevicesServices.uri = Uri.parse('$serverIpAddress/devices');
     StreamServices.uri = Uri.parse('$serverIpAddress/streams');
+    final pref = await SharedPreferences.getInstance();
+    pref.setString('serverIpAddress', serverIpAddress.toString());
+    pref.setInt('serverPort', serverIpAddress.port);
   }
-
-  static var client = http.Client();
 }
 
 class SystemSettings {
@@ -100,5 +104,9 @@ class SystemSettings {
 
     streamsAreRunning = pref.getBool('streamsAreRunning') ?? false;
     chartsAreRunning = pref.getBool('chartsAreRunning') ?? true;
+
+    NetworkController.changeServerIpAddress(
+        pref.getString('serverIpAddress') ?? "",
+        pref.getInt('serverPort')?.toString() ?? "");
   }
 }

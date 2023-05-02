@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -219,18 +217,10 @@ class _MenuScreenState extends State<MenuScreen> {
                     top: 1, left: 20, right: 20, bottom: 1),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const StreamsControllerButton(),
-                    const GraphsControllerButton(),
-                    IconButton(
-                      tooltip: 'Save as CSV or PDF',
-                      onPressed: () {},
-                      color: theme.colorScheme.secondary,
-                      icon: const FaIcon(
-                        FontAwesomeIcons.solidFloppyDisk,
-                        size: 21,
-                      ),
-                    ),
+                  children: const [
+                    StreamsControllerButton(),
+                    GraphsControllerButton(),
+                    ExportButton(),
                   ],
                 ),
               ),
@@ -299,14 +289,14 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               const Spacer(),
               Container(
-                margin: const EdgeInsets.only(right: 50),
+                margin: const EdgeInsets.only(right: 60),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
                       tooltip: 'Change Server',
-                      icon: const Icon(Icons.logout),
+                      icon: const Icon(MaterialCommunityIcons.server_network),
                       onPressed: () {
                         Navigator.of(context).push(
                           HeroDialogRoute(
@@ -336,6 +326,27 @@ class _MenuScreenState extends State<MenuScreen> {
         );
       },
     );
+  }
+}
+
+class ExportButton extends StatelessWidget {
+  const ExportButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(builder: (context, ThemeModel theme, child) {
+      return IconButton(
+        tooltip: 'Export as CSV or PDF',
+        onPressed: () {},
+        color: theme.colorScheme.secondary,
+        icon: const FaIcon(
+          FontAwesomeIcons.solidFloppyDisk,
+          size: 21,
+        ),
+      );
+    });
   }
 }
 
