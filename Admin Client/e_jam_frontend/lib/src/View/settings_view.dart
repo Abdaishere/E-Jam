@@ -1,7 +1,6 @@
 import 'package:e_jam/main.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -9,9 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // should include but not limited to:
-// TODO: Disable animation for system button
-// TODO: Change Line charts curve to smooth
-// TODO: Change Order and types of extensions in main screen
+// TODO: dense drawer view
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
 
@@ -49,8 +46,8 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  bool _changedShowBackgroundBallValue = false;
-  bool _changedShowBottomLineChartValue = false;
+  static bool _changedShowBackgroundBallValue = false;
+  static bool _changedShowBottomLineChartValue = false;
 
   List<Widget> get _chartsSettings {
     return [
@@ -85,6 +82,7 @@ class _SettingsViewState extends State<SettingsView> {
           },
         ),
       ),
+      // TODO: remove restart to apply changes action and make it apply on the fly
       ListTile(
         leading: _changedShowBackgroundBallValue
             ? IconButton(

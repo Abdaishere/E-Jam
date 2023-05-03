@@ -61,15 +61,9 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                     height: 120,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_serverPortController.text.isEmpty) {
-                          _serverPortController.text = "8080";
-                        }
-                        if (_serverIpAddressController.text.isEmpty) {
-                          _serverIpAddressController.text = "127.0.0.1";
-                        }
                         formKey.currentState!.save();
                         NetworkController.changeServerIpAddress(
-                            "localhost", _serverPortController.text);
+                            "", _serverPortController.text);
 
                         Navigator.pop(context);
                       },

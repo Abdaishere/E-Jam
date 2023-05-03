@@ -7,11 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 const double ballWidth = 160, ballHeight = 150;
-const int minimumSpeed = 20,
-    speedIncrement = 15,
-    speedDecrement = 5,
-    speedLimit = 100,
-    duration = 150;
 
 class BouncingBall extends StatefulWidget {
   const BouncingBall({Key? key}) : super(key: key);
@@ -21,61 +16,72 @@ class BouncingBall extends StatefulWidget {
 }
 
 class _BouncingBallState extends State<BouncingBall> {
-  double x = 90, y = 30, xSpeed = 20, ySpeed = 20;
+  static const int minimumSpeed = 20,
+      speedIncrement = 15,
+      speedDecrement = 5,
+      speedLimit = 100,
+      duration = 150;
+  static double x = 90, y = 30, xSpeed = 20, ySpeed = 20;
+  Timer? timer;
 
   @override
   initState() {
     super.initState();
-    update();
+    timer = Timer.periodic(
+        const Duration(milliseconds: duration), (Timer t) => update());
   }
 
-  update() {
-    Timer.periodic(const Duration(milliseconds: duration), (timer) {
-      final double screenWidth = MediaQuery.of(context).size.width;
-      final double screenHeight = MediaQuery.of(context).size.height;
-      x += xSpeed;
-      y += ySpeed;
+  update() async {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    x += xSpeed;
+    y += ySpeed;
 
-      if (x + ballWidth >= screenWidth) {
-        xSpeed += xSpeed < minimumSpeed
-            ? Random().nextInt(speedIncrement)
-            : -Random().nextInt(speedDecrement);
+    if (x + ballWidth >= screenWidth) {
+      xSpeed += xSpeed < minimumSpeed
+          ? Random().nextInt(speedIncrement)
+          : -Random().nextInt(speedDecrement);
 
-        xSpeed += xSpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
+      xSpeed += xSpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
 
-        xSpeed = -xSpeed;
-        x = screenWidth - ballWidth;
-      } else if (x <= 0) {
-        xSpeed += xSpeed < minimumSpeed
-            ? Random().nextInt(speedIncrement)
-            : -Random().nextInt(speedDecrement);
+      xSpeed = -xSpeed;
+      x = screenWidth - ballWidth;
+    } else if (x <= 0) {
+      xSpeed += xSpeed < minimumSpeed
+          ? Random().nextInt(speedIncrement)
+          : -Random().nextInt(speedDecrement);
 
-        xSpeed += xSpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
-        xSpeed = -xSpeed;
-        x = 0;
-      }
+      xSpeed += xSpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
+      xSpeed = -xSpeed;
+      x = 0;
+    }
 
-      if (y + ballHeight >= screenHeight) {
-        ySpeed += ySpeed < minimumSpeed
-            ? Random().nextInt(speedIncrement)
-            : -Random().nextInt(speedDecrement);
+    if (y + ballHeight >= screenHeight) {
+      ySpeed += ySpeed < minimumSpeed
+          ? Random().nextInt(speedIncrement)
+          : -Random().nextInt(speedDecrement);
 
-        ySpeed += ySpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
-        ySpeed = -ySpeed;
-        y = screenHeight - ballHeight;
-      } else if (y <= 0) {
-        ySpeed += ySpeed < minimumSpeed
-            ? Random().nextInt(speedIncrement)
-            : -Random().nextInt(speedDecrement);
+      ySpeed += ySpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
+      ySpeed = -ySpeed;
+      y = screenHeight - ballHeight;
+    } else if (y <= 0) {
+      ySpeed += ySpeed < minimumSpeed
+          ? Random().nextInt(speedIncrement)
+          : -Random().nextInt(speedDecrement);
 
-        ySpeed += ySpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
+      ySpeed += ySpeed > speedLimit ? -Random().nextInt(speedDecrement) : 0;
 
-        ySpeed = -ySpeed;
-        y = 0;
-      }
+      ySpeed = -ySpeed;
+      y = 0;
+    }
 
-      setState(() {});
-    });
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override

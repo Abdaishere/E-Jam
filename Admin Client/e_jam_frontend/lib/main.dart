@@ -205,7 +205,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // TODO: control panel with icons start and camera icon and save icon
+              // TODO: control panel with icons start and camera icon and export button
               Container(
                 margin: const EdgeInsets.only(left: 5),
                 decoration: BoxDecoration(
@@ -304,7 +304,7 @@ class _MenuScreenState extends State<MenuScreen> {
                               child: ChangeServerIPScreen(),
                             ),
                             settings:
-                                const RouteSettings(name: 'AddStreamView'),
+                                const RouteSettings(name: 'ChangeServerView'),
                           ),
                         );
                       },
@@ -313,7 +313,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     IconButton(
                       icon: Icon(
                           theme.isDark ? Icons.dark_mode : Icons.light_mode),
-                      onPressed: () {
+                      onPressed: () async {
                         theme.toggleTheme();
                       },
                     ),
@@ -339,7 +339,7 @@ class ExportButton extends StatelessWidget {
     return Consumer(builder: (context, ThemeModel theme, child) {
       return IconButton(
         tooltip: 'Export as CSV or PDF',
-        onPressed: () {},
+        onPressed: () async {},
         color: theme.colorScheme.secondary,
         icon: const FaIcon(
           FontAwesomeIcons.solidFloppyDisk,
@@ -364,7 +364,7 @@ class _StreamsControllerButtonState extends State<StreamsControllerButton> {
     return Consumer(builder: (context, ThemeModel theme, child) {
       return IconButton(
         tooltip: SystemSettings.streamsAreRunning ? 'Pause' : 'Start',
-        onPressed: () => SystemSettings.streamsAreRunning
+        onPressed: () async => SystemSettings.streamsAreRunning
             ? StreamsController.stopAllStreams().then((value) async {
                 if (value && mounted) {
                   setState(() {

@@ -63,7 +63,7 @@ class NetworkController {
     DevicesServices.uri = Uri.parse('$serverIpAddress/devices');
     StreamServices.uri = Uri.parse('$serverIpAddress/streams');
     final pref = await SharedPreferences.getInstance();
-    pref.setString('serverIpAddress', serverIpAddress.toString());
+    pref.setString('serverIpAddress', serverIpAddress.host);
     pref.setInt('serverPort', serverIpAddress.port);
   }
 }
@@ -88,6 +88,7 @@ class SystemSettings {
 
   static init() async {
     final pref = await SharedPreferences.getInstance();
+
     showChartsAnimation = pref.getBool('showChartsAnimation') ?? true;
     lineGraphCurveSmooth = pref.getBool('lineGraphCurveSmooth') ?? true;
     showBottomLineChart = pref.getBool('showBottomLineChart') ?? true;
