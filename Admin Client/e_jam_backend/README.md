@@ -29,7 +29,7 @@ The API is hosted on port 8080.
 - all endpoints are now asynchronous
 - added pinging to the devices
 - added Synchronization to the streams
-- tested All endpoints and fixed all bugs
+- tested All endpoints and fixed most bugs
 - tested All Communication between the System API and the Admin Client Center Point
 - Status of the streams and devices are now updated accordingly
 - if failure accrued in any thread the system will send a message to the admin client.
@@ -37,6 +37,7 @@ The API is hosted on port 8080.
 ### To Do
 
 - System testing of the Whole System at once
+- Implementation of Pre-Set Streams.
 - Validation of the data sent to the API (mac address, stream id, etc...) (only needs activation)
 
 ## The E-Jam System

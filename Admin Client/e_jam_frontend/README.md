@@ -29,13 +29,13 @@ Any usage instructions will be added to the E-Jam API directory which is respons
 - All routes are working and the app is ready for use.
 - Added the ability to add new devices with a radar view to show the devices in the area.
 - A Lot of Optimizations and bug fixes to make the app more stable and faster and more reliable to run on all platforms.
-- Tested on Android, Web, Linux, and Windows.
+- Add the Settings page with multiple settings for the app including controlling the graphs and the extensions in the home screen (Adding or Removing each one of them) and the default values.
 
 ### To Do
 
-- Add the Settings page with multiple settings for the app including controlling the graphs and the extensions in the home screen (Adding or Removing each one of them) and the default values for the input fields.
-- Implement Feedback in a better way other than snackbar and use monads to handle the errors and the success messages.
-- Binding the Charts to the data from the API Using Kafka (Waiting for the API to be ready).
+- Implement Feedback in a better way other than snackbar and use monads to handle errors and success messages.
+- Binding the Charts to the data from the API Using Kafka.
 - Add Tutorial PDFs for the app with step by step instructions on how to use the app.
 - Add the ability to export the data from the app to a CSV file or PDF file.
+- Testing on Android, Web, Linux, and Windows (Mostly done).
 - Release the app on Snapcraft and on Github with exe installers for Windows and Linux and Android.
