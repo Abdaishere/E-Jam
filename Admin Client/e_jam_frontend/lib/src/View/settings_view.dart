@@ -1,10 +1,12 @@
 import 'package:e_jam/main.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // should include but not limited to:
@@ -37,7 +39,7 @@ class _SettingsViewState extends State<SettingsView> {
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _chartsSettings + _homeSettings + _defaults,
+                children: _chartsSettings + _dashboardSettings + _defaults,
               ),
             ),
           ),
@@ -45,9 +47,6 @@ class _SettingsViewState extends State<SettingsView> {
       ),
     );
   }
-
-  static bool _changedShowBackgroundBallValue = false;
-  static bool _changedShowBottomLineChartValue = false;
 
   List<Widget> get _chartsSettings {
     return [
@@ -66,6 +65,7 @@ class _SettingsViewState extends State<SettingsView> {
             SystemSettings.showChartsAnimation = value;
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setBool('showChartsAnimation', value);
+
             setState(() {});
           },
         ),
@@ -82,46 +82,30 @@ class _SettingsViewState extends State<SettingsView> {
           },
         ),
       ),
-      // TODO: remove restart to apply changes action and make it apply on the fly
       ListTile(
-        leading: _changedShowBackgroundBallValue
-            ? IconButton(
-                icon: const Icon(Icons.restart_alt_outlined),
-                color: Colors.amber,
-                tooltip: 'Restart app to apply changes',
-                onPressed: () {},
-              )
-            : null,
         title: const Text('Background ball animation'),
         trailing: CupertinoSwitch(
           value: SystemSettings.showBackgroundBall,
           onChanged: (value) async {
-            SystemSettings.showBackgroundBall = value;
+            context
+                .read<BackgroundBallNotifier>()
+                .changeShowBackgroundBall(value);
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setBool('showBackgroundBall', value);
-            _changedShowBackgroundBallValue = !_changedShowBackgroundBallValue;
             setState(() {});
           },
         ),
       ),
       ListTile(
-        leading: _changedShowBottomLineChartValue
-            ? IconButton(
-                icon: const Icon(Icons.restart_alt_outlined),
-                color: Colors.amber,
-                tooltip: 'Restart app to apply changes',
-                onPressed: () {},
-              )
-            : null,
         title: const Text('Bottom line chart'),
         trailing: CupertinoSwitch(
           value: SystemSettings.showBottomLineChart,
           onChanged: (value) async {
-            SystemSettings.showBottomLineChart = value;
+            context
+                .read<BottomLineChartNotifier>()
+                .changeShowBottomLineChart(value);
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setBool('showBottomLineChart', value);
-            _changedShowBottomLineChartValue =
-                !_changedShowBottomLineChartValue;
             setState(() {});
           },
         ),
@@ -146,23 +130,23 @@ class _SettingsViewState extends State<SettingsView> {
     ];
   }
 
-  List<Widget> get _homeSettings {
+  List<Widget> get _dashboardSettings {
     return [
       const ListTile(
         leading: FaIcon(FontAwesome.dashboard),
         title: Text(
-          'Home',
+          'Dashboard',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       ListTile(
-        title: const Text('Home Animations'),
+        title: const Text('Dashboard Animations'),
         trailing: CupertinoSwitch(
-          value: SystemSettings.showHomeAnimations,
+          value: SystemSettings.showDashboardAnimations,
           onChanged: (value) async {
-            SystemSettings.showHomeAnimations = value;
+            SystemSettings.showDashboardAnimations = value;
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('showHomeAnimations', value);
+            prefs.setBool('showDashboardAnimations', value);
             setState(() {});
           },
         ),
@@ -180,7 +164,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
       ),
       const SizedBox(height: 10),
-      _homeExtensionsOrder(),
+      _dashboardExtensionsOrder(),
       const SizedBox(height: 15),
       const Divider(
         height: 15,
@@ -190,7 +174,7 @@ class _SettingsViewState extends State<SettingsView> {
     ];
   }
 
-  Center _homeExtensionsOrder() {
+  Center _dashboardExtensionsOrder() {
     return Center(
       child: Container(
         height: 190,
@@ -204,7 +188,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
         child: ReorderableListView(
           header: const Text(
-            'Home Extensions',
+            'Dashboard Extensions',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             textAlign: TextAlign.center,
           ),
@@ -213,7 +197,7 @@ class _SettingsViewState extends State<SettingsView> {
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12),
           ),
-          children: SystemSettings.homeExtensionsOrder
+          children: SystemSettings.dashboardExtensionsOrder
               .map(
                 (e) => _extensionTile(e),
               )
@@ -224,12 +208,12 @@ class _SettingsViewState extends State<SettingsView> {
                 newIndex -= 1;
               }
               final String item =
-                  SystemSettings.homeExtensionsOrder.removeAt(oldIndex);
-              SystemSettings.homeExtensionsOrder.insert(newIndex, item);
+                  SystemSettings.dashboardExtensionsOrder.removeAt(oldIndex);
+              SystemSettings.dashboardExtensionsOrder.insert(newIndex, item);
             });
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setStringList(
-                'homeExtensionsOrder', SystemSettings.homeExtensionsOrder);
+            prefs.setStringList('dashboardExtensionsOrder',
+                SystemSettings.dashboardExtensionsOrder);
           },
         ),
       ),
@@ -243,20 +227,20 @@ class _SettingsViewState extends State<SettingsView> {
         color: e[0] == '1' ? Colors.green : Colors.red,
         onPressed: () async {
           setState(() {
-            int index = SystemSettings.homeExtensionsOrder.indexOf(e);
+            int index = SystemSettings.dashboardExtensionsOrder.indexOf(e);
             if (e[0] == '1') {
-              SystemSettings.homeExtensionsOrder.removeAt(index);
+              SystemSettings.dashboardExtensionsOrder.removeAt(index);
               e = '0${e.substring(1)}';
-              SystemSettings.homeExtensionsOrder.insert(index, e);
+              SystemSettings.dashboardExtensionsOrder.insert(index, e);
             } else {
-              SystemSettings.homeExtensionsOrder.removeAt(index);
+              SystemSettings.dashboardExtensionsOrder.removeAt(index);
               e = '1${e.substring(1)}';
-              SystemSettings.homeExtensionsOrder.insert(index, e);
+              SystemSettings.dashboardExtensionsOrder.insert(index, e);
             }
           });
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setStringList(
-              'homeExtensionsOrder', SystemSettings.homeExtensionsOrder);
+          prefs.setStringList('dashboardExtensionsOrder',
+              SystemSettings.dashboardExtensionsOrder);
         },
       ),
       key: Key(e),

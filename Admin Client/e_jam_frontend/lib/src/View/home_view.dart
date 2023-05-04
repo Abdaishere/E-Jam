@@ -9,20 +9,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/extensions/treemap_drilldown_devices_load.dart';
 
 // should not be scrollable
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class DashBoardView extends StatefulWidget {
+  const DashBoardView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  State<DashBoardView> createState() => _DashBoardViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _DashBoardViewState extends State<DashBoardView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Home',
+          'Dashboard',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -52,7 +52,7 @@ class _HomeViewState extends State<HomeView> {
           children: [
             const SizedBox(height: 350, child: TreeMapDrillDownDevicesLoad()),
             Wrap(
-              children: SystemSettings.homeExtensionsOrder
+              children: SystemSettings.dashboardExtensionsOrder
                   .map(
                     (e) => widgetFilter(e),
                   )

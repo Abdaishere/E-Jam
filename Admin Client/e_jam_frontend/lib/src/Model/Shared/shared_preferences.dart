@@ -74,9 +74,9 @@ class SystemSettings {
   static bool showBottomLineChart = true;
   static bool showBackgroundBall = true;
   static bool fullChartsDetails = true;
-  static bool showHomeAnimations = true;
+  static bool showDashboardAnimations = true;
   static bool fullTreeMap = true;
-  static List<String> homeExtensionsOrder = [
+  static List<String> dashboardExtensionsOrder = [
     "1Progress",
     "1Elements",
     "1Performance"
@@ -94,9 +94,9 @@ class SystemSettings {
     showBottomLineChart = pref.getBool('showBottomLineChart') ?? true;
     showBackgroundBall = pref.getBool('showBackgroundBall') ?? true;
     fullChartsDetails = pref.getBool('fullChartsDetails') ?? true;
-    showHomeAnimations = pref.getBool('showHomeAnimations') ?? true;
+    showDashboardAnimations = pref.getBool('showDashboardAnimations') ?? true;
     fullTreeMap = pref.getBool('fullTreeMap') ?? true;
-    homeExtensionsOrder = pref.getStringList('homeExtensionsOrder') ??
+    dashboardExtensionsOrder = pref.getStringList('dashboardExtensionsOrder') ??
         ["1Progress", "1Elements", "1Performance"];
 
     defaultDevicesPort = pref.getInt('defaultDevicesPort') ?? 8000;
@@ -109,5 +109,30 @@ class SystemSettings {
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",
         pref.getInt('serverPort')?.toString() ?? "");
+  }
+
+  static backgroundBall() {
+    showBackgroundBall = !showBackgroundBall;
+    SharedPreferences.getInstance().then((pref) {
+      pref.setBool('showBackgroundBall', showBackgroundBall);
+    });
+  }
+}
+
+class BackgroundBallNotifier extends ChangeNotifier {
+  get showBackgroundBall => SystemSettings.showBackgroundBall;
+
+  void changeShowBackgroundBall(bool value) {
+    SystemSettings.showBackgroundBall = value;
+    notifyListeners();
+  }
+}
+
+class BottomLineChartNotifier extends ChangeNotifier {
+  get showBottomLineChart => SystemSettings.showBottomLineChart;
+
+  void changeShowBottomLineChart(bool value) {
+    SystemSettings.showBottomLineChart = value;
+    notifyListeners();
   }
 }

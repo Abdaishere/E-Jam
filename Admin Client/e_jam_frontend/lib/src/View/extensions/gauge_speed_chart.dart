@@ -33,7 +33,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
               title: const GaugeTitle(
                 text: 'Performance',
               ),
-              enableLoadingAnimation: SystemSettings.showHomeAnimations,
+              enableLoadingAnimation: SystemSettings.showDashboardAnimations,
               animationDuration: 1500,
               axes: <RadialAxis>[
                 // Acceptence rate for packets in the system
@@ -60,7 +60,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   pointers: <GaugePointer>[
                     MarkerPointer(
                       value: 90,
-                      enableAnimation: SystemSettings.showHomeAnimations,
+                      enableAnimation: SystemSettings.showDashboardAnimations,
                     ),
                   ],
                   ranges: <GaugeRange>[
@@ -115,7 +115,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                     NeedlePointer(
                       needleColor: theme.colorScheme.secondary,
                       value: 90,
-                      enableAnimation: SystemSettings.showHomeAnimations,
+                      enableAnimation: SystemSettings.showDashboardAnimations,
                       needleStartWidth: 1,
                       needleEndWidth: 5,
                       needleLength: 0.8,
@@ -179,7 +179,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                     NeedlePointer(
                       needleColor: theme.colorScheme.secondary,
                       value: 90,
-                      enableAnimation: SystemSettings.showHomeAnimations,
+                      enableAnimation: SystemSettings.showDashboardAnimations,
                       needleStartWidth: 1,
                       needleEndWidth: 5,
                       needleLength: 0.8,
@@ -241,7 +241,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   pointers: <GaugePointer>[
                     MarkerPointer(
                       value: 10,
-                      enableAnimation: SystemSettings.showHomeAnimations,
+                      enableAnimation: SystemSettings.showDashboardAnimations,
                     ),
                   ],
                   ranges: <GaugeRange>[

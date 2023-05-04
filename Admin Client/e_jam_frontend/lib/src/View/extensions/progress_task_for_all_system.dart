@@ -32,7 +32,7 @@ class _GaugeTotalProgressForSystemState
           title: const GaugeTitle(
             text: 'Progress',
           ),
-          enableLoadingAnimation: SystemSettings.showHomeAnimations,
+          enableLoadingAnimation: SystemSettings.showDashboardAnimations,
           animationDuration: 1500,
           axes: [
             RadialAxis(
@@ -52,7 +52,7 @@ class _GaugeTotalProgressForSystemState
                   width: 0.1,
                   sizeUnit: GaugeSizeUnit.factor,
                   cornerStyle: CornerStyle.bothCurve,
-                  enableAnimation: SystemSettings.showHomeAnimations,
+                  enableAnimation: SystemSettings.showDashboardAnimations,
                   gradient: const SweepGradient(
                     colors: <Color>[
                       Color(0xFF4FC3F7),
@@ -66,7 +66,7 @@ class _GaugeTotalProgressForSystemState
                   markerType: MarkerType.circle,
                   markerHeight: 15,
                   markerWidth: 15,
-                  enableAnimation: SystemSettings.showHomeAnimations,
+                  enableAnimation: SystemSettings.showDashboardAnimations,
                   color: const Color(0xFF00A8B5),
                 ),
               ],
