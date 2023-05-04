@@ -149,36 +149,30 @@ void StatsManager::buildMsg(std::string& msg)
 
 void StatsManager::writeStatFile()
 {
-    // Create an output file stream object and open the file
-    writeToFile("Building the msg.");
 	//build the msg
 	std::string msg;
 	buildMsg(msg);
-
-    writeToFile("Opening the pipe.");
     //open pipe
-	std::string dir;
+	std::string dir = STAT_DIR;
 	if(is_gen)
 	{
-		dir = "./genStats/sgen_";
+		dir += "/genStats/sgen_";
 	}
 	else
 	{
-		dir = "./verStats/sver_";
+		dir += "/verStats/sver_";
 	}
-	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
-    fd = open((dir+ std::to_string(instanceID)).c_str(), O_RDWR);
 
-    writeToFile("Opened the pipe." + std::to_string(fd));
+ 	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
+    fd = open((dir+ std::to_string(instanceID)).c_str(), O_RDWR);
 
     if(fd == -1)
 	{
-        writeToFile("Start of if");
         if (errno != EEXIST) //if the error was more than the file already existing
         {
             writeToFile("Error in creating the FIFO file sgen_id");
             printf("Error in creating the FIFO file sgen_id\n");
-			return;
+            return;
         } else {
             writeToFile("File already exists sgen_id, skipping creation...");
             printf("File already exists sgen_id, skipping creation...\n");
@@ -187,8 +181,10 @@ void StatsManager::writeStatFile()
 
     writeToFile("before writing to pipe.");
 	//Write on pipe
+    writeToFile("message is: " + msg);
+    std::cerr << "message is: " + msg << "\n";
 	write(fd, msg.c_str(), sizeof(char)*msg.size());
-
+    close(fd);
     writeToFile("after writing to pipe.");
 }
 
