@@ -17,10 +17,10 @@ class BouncingBall extends StatefulWidget {
 
 class _BouncingBallState extends State<BouncingBall> {
   static const int minimumSpeed = 20,
-      speedIncrement = 15,
+      speedIncrement = 10,
       speedDecrement = 5,
-      speedLimit = 100,
-      duration = 150;
+      speedLimit = 90,
+      duration = 140;
   static double x = 90, y = 30, xSpeed = 20, ySpeed = 20;
   Timer? timer;
 

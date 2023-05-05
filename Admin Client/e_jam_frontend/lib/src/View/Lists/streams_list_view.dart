@@ -13,6 +13,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class StreamsListView extends StatefulWidget {
@@ -23,29 +24,10 @@ class StreamsListView extends StatefulWidget {
 }
 
 class _StreamsListViewState extends State<StreamsListView> {
-  get scaffoldMessenger => ScaffoldMessenger.of(context);
-
-  List<StreamStatusDetails>? streams;
-  bool isStreamListLoading = true;
-
-  // load the status of all streams from the server and update the UI with the list of streams status accordingly
-  void loadStreamView() async {
-    isStreamListLoading = true;
-    setState(() {});
-
-    await StreamsController.loadAllStreamStatus();
-
-    streams = StreamsController.streamsStatusDetails;
-    isStreamListLoading = StreamsController.isLoading;
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () => loadStreamView());
+    context.read<StreamsController>().loadAllStreamStatus();
   }
 
   @override
@@ -55,7 +37,7 @@ class _StreamsListViewState extends State<StreamsListView> {
       body: Stack(
         children: [
           Visibility(
-            visible: !isStreamListLoading,
+            visible: !context.watch<StreamsController>().getIsLoading,
             replacement: Center(
               child: LoadingAnimationWidget.threeArchedCircle(
                 color: Colors.grey,
@@ -63,9 +45,22 @@ class _StreamsListViewState extends State<StreamsListView> {
               ),
             ),
             child: Visibility(
-              visible: streams != null && streams!.isNotEmpty,
+              visible:
+                  context.watch<StreamsController>().getStreamsStatusDetails !=
+                          null &&
+                      context
+                          .watch<StreamsController>()
+                          .getStreamsStatusDetails!
+                          .isNotEmpty,
               replacement: Visibility(
-                visible: streams != null && streams!.isEmpty,
+                visible: context
+                            .watch<StreamsController>()
+                            .getStreamsStatusDetails !=
+                        null &&
+                    context
+                        .watch<StreamsController>()
+                        .getStreamsStatusDetails!
+                        .isEmpty,
                 replacement: Stack(
                   children: const [
                     Center(
@@ -101,7 +96,10 @@ class _StreamsListViewState extends State<StreamsListView> {
               child: GridView.builder(
                 padding: const EdgeInsets.all(8.0),
                 shrinkWrap: true,
-                itemCount: streams?.length,
+                itemCount: context
+                    .watch<StreamsController>()
+                    .getStreamsStatusDetails
+                    ?.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount:
                       max(MediaQuery.of(context).size.width ~/ 280.0, 1),
@@ -111,10 +109,12 @@ class _StreamsListViewState extends State<StreamsListView> {
                 ),
                 itemBuilder: (BuildContext context, int index) {
                   return StreamCard(
-                      stream: streams![index],
-                      loadStreamView: () {
-                        loadStreamView();
-                      });
+                    stream: context
+                        .watch<StreamsController>()
+                        .getStreamsStatusDetails![index],
+                    loadStreamView: () =>
+                        context.read<StreamsController>().loadAllStreamStatus(),
+                  );
                 },
               ),
             ),
@@ -124,9 +124,8 @@ class _StreamsListViewState extends State<StreamsListView> {
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
               child: AddStreamButton(
-                loadStreamView: () {
-                  loadStreamView();
-                },
+                loadStreamView: () =>
+                    context.read<StreamsController>().loadAllStreamStatus(),
               ),
             ),
           ),
@@ -147,9 +146,8 @@ class _StreamsListViewState extends State<StreamsListView> {
         // refresh icon for refreshing the streams list view
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
-          onPressed: () async {
-            loadStreamView();
-          },
+          onPressed: () async =>
+              context.read<StreamsController>().loadAllStreamStatus(),
         ),
         // Explanation icon for details about how the stream card works and what the icons mean and what the colors mean
         IconButton(
@@ -205,11 +203,14 @@ class _StreamCardState extends State<StreamCard> {
   StreamStatusDetails? updatedStream;
 
   void refreshCard() {
-    StreamsController.loadStreamStatusDetails(widget.stream.streamId).then(
-      (value) => {
-        if (mounted) {updatedStream = value, setState(() {})}
-      },
-    );
+    context
+        .read<StreamsController>()
+        .loadStreamStatusDetails(widget.stream.streamId)
+        .then(
+          (value) => {
+            if (mounted) {updatedStream = value, setState(() {})}
+          },
+        );
   }
 
   @override
@@ -354,7 +355,9 @@ class _StreamCardState extends State<StreamCard> {
                 ),
                 TextButton(
                   onPressed: () {
-                    StreamsController.deleteStream(stream.streamId)
+                    context
+                        .read<StreamsController>()
+                        .deleteStream(stream.streamId)
                         .then((success) => {
                               if (success) {widget.loadStreamView()}
                             });
@@ -369,47 +372,51 @@ class _StreamCardState extends State<StreamCard> {
             ),
           );
         } else if (value == 'Edit') {
-          StreamsController.loadStreamDetails(stream.streamId).then(
-            (value) => {
-              if (mounted)
-                {
-                  if (value != null)
+          context
+              .read<StreamsController>()
+              .loadStreamDetails(stream.streamId)
+              .then(
+                (value) => {
+                  if (mounted)
                     {
-                      Navigator.of(context).push(
-                        HeroDialogRoute(
-                          builder: (BuildContext context) => Center(
-                              child: EditStreamView(
-                                  stream: value,
-                                  reload: refreshCard,
-                                  id: stream.streamId)),
-                          settings: const RouteSettings(name: 'EditStreamView'),
-                        ),
-                      ),
-                    }
-                  else
-                    {
-                      showDialog<void>(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Error'),
-                          content: const Text('Error loading stream'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('OK'),
+                      if (value != null)
+                        {
+                          Navigator.of(context).push(
+                            HeroDialogRoute(
+                              builder: (BuildContext context) => Center(
+                                  child: EditStreamView(
+                                      stream: value,
+                                      reload: refreshCard,
+                                      id: stream.streamId)),
+                              settings:
+                                  const RouteSettings(name: 'EditStreamView'),
                             ),
-                          ],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0),
                           ),
-                        ),
-                      ),
-                    }
+                        }
+                      else
+                        {
+                          showDialog<void>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Error'),
+                              content: const Text('Error loading stream'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                              ),
+                            ),
+                          ),
+                        }
+                    },
                 },
-            },
-          );
+              );
         }
       },
       itemBuilder: (BuildContext context) {
@@ -466,7 +473,10 @@ class _StreamCardState extends State<StreamCard> {
                     status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Start",
                 onPressed: () {
-                  StreamsController.startStream(id).then((success) {
+                  context
+                      .read<StreamsController>()
+                      .startStream(id)
+                      .then((success) {
                     refreshCard();
                   });
                 },
@@ -477,7 +487,10 @@ class _StreamCardState extends State<StreamCard> {
                     status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Pause",
                 onPressed: () {
-                  StreamsController.pauseStream(id).then((success) {
+                  context
+                      .read<StreamsController>()
+                      .pauseStream(id)
+                      .then((success) {
                     refreshCard();
                   });
                 },
@@ -487,7 +500,7 @@ class _StreamCardState extends State<StreamCard> {
           color: status == StreamStatus.queued ? streamQueuedColor : null,
           tooltip: "Delay",
           onPressed: () {
-            StreamsController.queueStream(id).then((success) {
+            context.read<StreamsController>().queueStream(id).then((success) {
               refreshCard();
             });
           },
@@ -497,7 +510,7 @@ class _StreamCardState extends State<StreamCard> {
           color: status == StreamStatus.stopped ? streamStoppedColor : null,
           tooltip: "Stop",
           onPressed: () {
-            StreamsController.stopStream(id).then((success) {
+            context.read<StreamsController>().stopStream(id).then((success) {
               refreshCard();
             });
           },
@@ -637,7 +650,7 @@ class StatusIconButton extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              StreamsController.startStream(id).then((success) {
+              context.read<StreamsController>().startStream(id).then((success) {
                 refresh();
               });
               Navigator.of(context).pop();

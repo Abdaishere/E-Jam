@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DevicesDetailsView extends StatefulWidget {
@@ -29,8 +30,9 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
   Device? updateDevice;
 
   void refresh() async {
-    Device? value =
-        await DevicesController.loadDeviceDetails(widget.device.macAddress);
+    Device? value = await context
+        .read<DevicesController>()
+        .loadDeviceDetails(widget.device.macAddress);
 
     widget.loadDevicesListView();
     updateDevice = value;
@@ -107,7 +109,9 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                           ),
                           TextButton(
                             onPressed: () {
-                              DevicesController.deleteDevice(device.macAddress)
+                              context
+                                  .read<DevicesController>()
+                                  .deleteDevice(device.macAddress)
                                   .then(
                                 (value) {
                                   if (value) {
@@ -441,7 +445,8 @@ class _DevicePingerState extends State<DevicePinger> {
       _isPinging = true;
     });
 
-    bool? success = await DevicesController.pingDevice(widget.mac);
+    bool? success =
+        await context.read<DevicesController>().pingDevice(widget.mac, context);
     _isPinged = success;
     _isPinging = false;
     if (mounted) {

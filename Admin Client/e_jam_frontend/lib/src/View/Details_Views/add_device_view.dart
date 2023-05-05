@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 
 final formKey = GlobalKey<FormState>();
 
@@ -26,7 +27,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
   void initState() {
     super.initState();
     if (widget.ip != null) {
-      AddDeviceController.ipController.text = widget.ip!;
+      context.read<AddDeviceController>().getIpController.text = widget.ip!;
     }
   }
 
@@ -104,7 +105,9 @@ class BottomOptionsBar extends StatefulWidget {
 
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
   Future<bool?> _addDevice() async {
-    int? code = await AddDeviceController.createNewDevice(formKey);
+    int? code = await context
+        .read<AddDeviceController>()
+        .createNewDevice(formKey, context);
     if (code == null) return null;
 
     bool result = _analyzeCode(code);
@@ -162,7 +165,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             color: Colors.redAccent,
             onPressed: () {
               if (formKey.currentState != null) formKey.currentState!.reset();
-              AddDeviceController.clearAllFields();
+              context.read<AddDeviceController>().clearAllFields();
             },
           ),
           const Divider(),
@@ -229,7 +232,7 @@ class ConnectionIpAndPort extends StatelessWidget {
               }
               return null;
             },
-            controller: AddDeviceController.ipController,
+            controller: context.read<AddDeviceController>().getIpController,
           ),
         ),
         const Text(" : ", style: TextStyle(fontSize: 30)),
@@ -253,7 +256,7 @@ class ConnectionIpAndPort extends StatelessWidget {
               }
               return null;
             },
-            controller: AddDeviceController.portController,
+            controller: context.read<AddDeviceController>().getPortController,
           ),
         ),
       ],
@@ -282,7 +285,7 @@ class LocationField extends StatelessWidget {
         }
         return null;
       },
-      controller: AddDeviceController.locationController,
+      controller: context.read<AddDeviceController>().getLocationController,
     );
   }
 }
@@ -309,7 +312,7 @@ class DescriptionField extends StatelessWidget {
         }
         return null;
       },
-      controller: AddDeviceController.descriptionController,
+      controller: context.read<AddDeviceController>().getDescriptionController,
     );
   }
 }
@@ -328,7 +331,8 @@ class _NameFieldState extends State<NameField> {
       decoration: InputDecoration(
         labelText: 'Name',
         hintText: 'Name of the Device',
-        icon: Icon(getDeviceIcon(AddDeviceController.nameController.text)),
+        icon: Icon(getDeviceIcon(
+            context.read<AddDeviceController>().getNameController.text)),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -338,7 +342,7 @@ class _NameFieldState extends State<NameField> {
         }
         return null;
       },
-      controller: AddDeviceController.nameController,
+      controller: context.read<AddDeviceController>().getNameController,
       onChanged: (value) {
         setState(() {});
       },
@@ -372,10 +376,10 @@ class _MacAddressFieldState extends State<MacAddressField> {
 
         return null;
       },
-      controller: AddDeviceController.macController,
+      controller: context.read<AddDeviceController>().getMacController,
       onSaved: (value) {
-        AddDeviceController.macController.text = value?.toUpperCase() ?? '';
-        setState(() {});
+        context.read<AddDeviceController>().getMacController.text =
+            value!.toUpperCase();
       },
     );
   }
@@ -397,7 +401,10 @@ class _DevicePingerState extends State<DevicePinger> {
       formKey.currentState!.save();
       _isPinging = true;
       setState(() {});
-      bool result = await AddDeviceController.pingDevice(formKey) ?? false;
+      bool result = await context
+              .read<AddDeviceController>()
+              .pingDevice(formKey, context) ??
+          false;
 
       _isPinged = result;
       _isPinging = false;

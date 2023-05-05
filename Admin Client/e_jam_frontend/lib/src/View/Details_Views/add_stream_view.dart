@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
+import 'package:provider/provider.dart';
 
 final formKey = GlobalKey<FormState>();
 
@@ -24,51 +25,38 @@ class AddStreamView extends StatefulWidget {
 class _AddStreamViewState extends State<AddStreamView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _numberOfGenerators = 0;
+  int _numberOfVerifiers = 0;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    AddStreamController.syncDevicesList();
-
-    AddStreamController.pickedGenerators.forEach((key, value) {
-      if (value) numberOfGenerators++;
-    });
-
-    AddStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) numberOfVerifiers++;
-    });
+    context.read<AddStreamController>().syncDevicesList();
   }
 
-  int numberOfGenerators = 0;
-  int numberOfVerifiers = 0;
+  void updateDevicesCounter() {
+    _numberOfGenerators = 0;
+    _numberOfVerifiers = 0;
 
-  updateDevicesCounter() {
-    int counter1 = 0;
-    AddStreamController.pickedGenerators.forEach((key, value) {
-      if (value) counter1++;
+    context
+        .watch<AddStreamController>()
+        .getPickedGenerators
+        .forEach((key, value) {
+      if (value) _numberOfGenerators++;
     });
 
-    int counter2 = 0;
-    AddStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) counter2++;
+    context
+        .watch<AddStreamController>()
+        .getPickedVerifiers
+        .forEach((key, value) {
+      if (value) _numberOfVerifiers++;
     });
-
-    if (mounted &&
-        (counter1 != numberOfGenerators || counter2 != numberOfVerifiers)) {
-      setState(() {
-        numberOfVerifiers = counter2;
-        numberOfGenerators = counter1;
-      });
-    }
-  }
-
-  void checkContentSwitch() {
-    AddStreamController.checkContent = !AddStreamController.checkContent;
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    updateDevicesCounter();
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 900
@@ -137,19 +125,16 @@ class _AddStreamViewState extends State<AddStreamView>
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          CheckContentButton(reload: checkContentSwitch),
+          const CheckContentButton(),
           const IDNameFields(),
           const StreamDescriptionField(),
           const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
           StreamDevicesLists(
-            updateDevicesCounter: updateDevicesCounter,
-            numberOfGenerators: numberOfGenerators,
-            numberOfVerifiers: numberOfVerifiers,
+            numberOfGenerators: _numberOfGenerators,
+            numberOfVerifiers: _numberOfVerifiers,
           ),
-          PacketsBroadcastFramesSizes(
-            checkContent: AddStreamController.checkContent,
-          ),
+          const PacketsBroadcastFramesSizes(),
           const GenerationSeed(),
           const PayloadLengthAndType(),
           const BurstLengthAndDelay(),
@@ -171,10 +156,10 @@ class _AddStreamViewState extends State<AddStreamView>
             tooltip: 'Clear',
             color: Colors.redAccent,
             onPressed: () {
-              numberOfGenerators = 0;
-              numberOfVerifiers = 0;
+              _numberOfGenerators = 0;
+              _numberOfVerifiers = 0;
               if (formKey.currentState != null) formKey.currentState!.reset();
-              AddStreamController.clearAllFields();
+              context.read<AddStreamController>().clearAllFields();
               setState(() {});
             },
           ),
@@ -184,7 +169,9 @@ class _AddStreamViewState extends State<AddStreamView>
             color: Colors.blueAccent,
             tooltip: 'OK',
             onPressed: () async {
-              bool? success = await AddStreamController.addStream(formKey);
+              bool? success = await context
+                  .watch<AddStreamController>()
+                  .addStream(formKey, context);
 
               if (success != null) {
                 if (success) {
@@ -207,7 +194,9 @@ class _AddStreamViewState extends State<AddStreamView>
             color: Colors.greenAccent.shade700,
             tooltip: 'Apply',
             onPressed: () async {
-              bool? success = await AddStreamController.addStream(formKey);
+              bool? success = await context
+                  .read<AddStreamController>()
+                  .addStream(formKey, context);
               if (success != null) {
                 if (success) {
                   widget.reload();
@@ -225,10 +214,7 @@ class _AddStreamViewState extends State<AddStreamView>
 class CheckContentButton extends StatelessWidget {
   const CheckContentButton({
     super.key,
-    required this.reload,
   });
-
-  final VoidCallback reload;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -238,20 +224,19 @@ class CheckContentButton extends StatelessWidget {
           padding: const EdgeInsets.only(top: 5, right: 20),
           child: IconButton(
             icon: Icon(
-              AddStreamController.checkContent
+              context.watch<AddStreamController>().getCheckContent
                   ? FontAwesomeIcons.eye
                   : FontAwesomeIcons.eyeSlash,
               size: 30,
             ),
-            color: AddStreamController.checkContent
+            color: context.watch<AddStreamController>().getCheckContent
                 ? Colors.greenAccent.shade700
                 : Colors.grey,
-            tooltip: AddStreamController.checkContent
+            tooltip: context.watch<AddStreamController>().getCheckContent
                 ? 'Check content'
                 : 'Do not check content',
-            onPressed: () {
-              reload();
-            },
+            onPressed: () =>
+                context.read<AddStreamController>().checkContentSwitch(),
           ),
         ),
       ],
@@ -289,7 +274,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
               }
               return null;
             },
-            controller: AddStreamController.delayController,
+            controller: context.read<AddStreamController>().getDelayController,
           ),
         ),
         const VerticalDivider(),
@@ -312,7 +297,8 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
               }
               return null;
             },
-            controller: AddStreamController.timeToLiveController,
+            controller:
+                context.read<AddStreamController>().getTimeToLiveController,
           ),
         ),
         const VerticalDivider(),
@@ -335,7 +321,8 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
               }
               return null;
             },
-            controller: AddStreamController.interFrameGapController,
+            controller:
+                context.read<AddStreamController>().getInterFrameGapController,
           ),
         ),
       ],
@@ -362,7 +349,7 @@ class GenerationSeed extends StatelessWidget {
       ],
       validator: (value) {
         if (value == null || value.isEmpty || value == '0') {
-          if (AddStreamController.payloadType == 2) {
+          if (context.read<AddStreamController>().getPayloadType == 2) {
             return 'Please enter a Generation Seed for Random Payload';
           }
           return null;
@@ -371,7 +358,7 @@ class GenerationSeed extends StatelessWidget {
         }
         return null;
       },
-      controller: AddStreamController.seedController,
+      controller: context.read<AddStreamController>().getSeedController,
     );
   }
 }
@@ -405,7 +392,8 @@ class BurstLengthAndDelay extends StatelessWidget {
               }
               return null;
             },
-            controller: AddStreamController.burstLengthController,
+            controller:
+                context.read<AddStreamController>().getBurstLengthController,
           ),
         ),
         const VerticalDivider(),
@@ -428,7 +416,8 @@ class BurstLengthAndDelay extends StatelessWidget {
               }
               return null;
             },
-            controller: AddStreamController.burstDelayController,
+            controller:
+                context.read<AddStreamController>().getBurstDelayController,
           ),
         ),
       ],
@@ -453,7 +442,7 @@ class FlowAndTLPTypes extends StatelessWidget {
               hintText: 'Flow Type',
               icon: Icon(MaterialCommunityIcons.transit_connection_variant),
             ),
-            value: AddStreamController.flowType,
+            value: context.watch<AddStreamController>().getFlowType,
             items: const [
               DropdownMenuItem(
                 value: FlowType.backToBack,
@@ -470,9 +459,8 @@ class FlowAndTLPTypes extends StatelessWidget {
               }
               return null;
             },
-            onChanged: (value) {
-              AddStreamController.flowType = value!;
-            },
+            onChanged: (value) =>
+                context.read<AddStreamController>().setFlowType(value!),
           ),
         ),
         const VerticalDivider(),
@@ -483,7 +471,8 @@ class FlowAndTLPTypes extends StatelessWidget {
               labelText: 'Transport Layer Protocol',
               hintText: 'TLP Type',
             ),
-            value: AddStreamController.transportLayerProtocol,
+            value:
+                context.watch<AddStreamController>().getTransportLayerProtocol,
             items: const [
               DropdownMenuItem(
                 value: TransportLayerProtocol.tcp,
@@ -494,9 +483,9 @@ class FlowAndTLPTypes extends StatelessWidget {
                 child: Text('UDP'),
               ),
             ],
-            onChanged: (value) {
-              AddStreamController.transportLayerProtocol = value!;
-            },
+            onChanged: (value) => context
+                .read<AddStreamController>()
+                .setTransportLayerProtocol(value!),
           ),
         ),
       ],
@@ -520,7 +509,7 @@ class StreamDescriptionField extends StatelessWidget {
         icon: Icon(Icons.description, size: 25),
         isDense: true,
       ),
-      controller: AddStreamController.descriptionController,
+      controller: context.read<AddStreamController>().getDescriptionController,
     );
   }
 }
@@ -556,7 +545,7 @@ class IDNameFields extends StatelessWidget {
               }
               return null;
             },
-            controller: AddStreamController.idController,
+            controller: context.read<AddStreamController>().getIdController,
           ),
         ),
         const VerticalDivider(),
@@ -569,7 +558,7 @@ class IDNameFields extends StatelessWidget {
               hintText: 'Name of the stream',
               isDense: true,
             ),
-            controller: AddStreamController.nameController,
+            controller: context.read<AddStreamController>().getNameController,
           ),
         ),
       ],
@@ -613,7 +602,8 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
               }
               return null;
             },
-            controller: AddStreamController.payloadLengthController,
+            controller:
+                context.read<AddStreamController>().getPayloadLengthController,
           ),
         ),
         const VerticalDivider(),
@@ -624,7 +614,7 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
               labelText: 'Type',
               hintText: 'Type of the payload',
             ),
-            value: AddStreamController.payloadType,
+            value: context.watch<AddStreamController>().getPayloadType,
             items: const [
               DropdownMenuItem(
                 value: 0,
@@ -639,10 +629,8 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
                 child: Text('Random'),
               ),
             ],
-            onChanged: (value) {
-              AddStreamController.payloadType = value!;
-              setState(() {});
-            },
+            onChanged: (value) =>
+                context.read<AddStreamController>().setPayloadType(value!),
           ),
         ),
       ],
@@ -651,9 +639,7 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
 }
 
 class PacketsBroadcastFramesSizes extends StatefulWidget {
-  const PacketsBroadcastFramesSizes({super.key, required this.checkContent});
-
-  final bool checkContent;
+  const PacketsBroadcastFramesSizes({super.key});
 
   @override
   State<PacketsBroadcastFramesSizes> createState() =>
@@ -673,7 +659,7 @@ class _PacketsBroadcastFramesSizesState
               labelText: 'Number of Packets',
               hintText: 'Number of Packets to be sent',
               icon: Icon(
-                widget.checkContent
+                context.watch<AddStreamController>().getCheckContent
                     ? MaterialCommunityIcons.package_variant
                     : MaterialCommunityIcons.package_variant_closed,
               ),
@@ -690,7 +676,8 @@ class _PacketsBroadcastFramesSizesState
               }
               return null;
             },
-            controller: AddStreamController.packetsController,
+            controller:
+                context.read<AddStreamController>().getPacketsController,
           ),
         ),
         const VerticalDivider(),
@@ -713,7 +700,9 @@ class _PacketsBroadcastFramesSizesState
               }
               return null;
             },
-            controller: AddStreamController.broadcastFramesController,
+            controller: context
+                .read<AddStreamController>()
+                .getBroadcastFramesController,
           ),
         ),
       ],
@@ -726,12 +715,10 @@ class StreamDevicesLists extends StatefulWidget {
     super.key,
     required this.numberOfGenerators,
     required this.numberOfVerifiers,
-    required this.updateDevicesCounter,
   });
 
   final int numberOfGenerators;
   final int numberOfVerifiers;
-  final Function updateDevicesCounter;
 
   @override
   State<StreamDevicesLists> createState() => _StreamDevicesListsState();
@@ -780,11 +767,9 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                   builder: (BuildContext context) => Center(
                     child: DevicesCheckListPicker(
                       areGenerators: true,
-                      saveChanges: () => widget.updateDevicesCounter(),
-                      devicesReloader: () => {
-                        DevicesController.loadAllDevices(),
-                        widget.updateDevicesCounter(),
-                      },
+                      devicesReloader: () => context
+                          .read<DevicesController>()
+                          .loadAllDevices(context),
                       isStateless: false,
                     ),
                   ),
@@ -828,11 +813,9 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                   builder: (BuildContext context) => Center(
                     child: DevicesCheckListPicker(
                       areGenerators: false,
-                      saveChanges: () => widget.updateDevicesCounter(),
-                      devicesReloader: () => {
-                        DevicesController.loadAllDevices(),
-                        widget.updateDevicesCounter(),
-                      },
+                      devicesReloader: () => context
+                          .read<DevicesController>()
+                          .loadAllDevices(context),
                       isStateless: false,
                     ),
                   ),

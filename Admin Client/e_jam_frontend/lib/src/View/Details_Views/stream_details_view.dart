@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
@@ -18,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 
 class StreamDetailsView extends StatefulWidget {
   const StreamDetailsView(
@@ -45,7 +47,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
 
   _loadStream() async {
     isLoading = true;
-    StreamsController.loadStreamDetails(id).then((value) {
+    context.read<StreamsController>().loadStreamDetails(id).then((value) {
       if (mounted) {
         isLoading = false;
         stream = value;
@@ -126,8 +128,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    StreamsController.deleteStream(
-                                            stream?.streamId ?? '___')
+                                    context
+                                        .read<StreamsController>()
+                                        .deleteStream(stream?.streamId ?? '___')
                                         .then((success) => {
                                               if (mounted)
                                                 {
@@ -616,7 +619,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                     status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Start",
                 onPressed: () {
-                  StreamsController.startStream(id).then((success) {
+                  context
+                      .read<StreamsController>()
+                      .startStream(id)
+                      .then((success) {
                     if (mounted) {
                       _loadStream();
                       widget.refreshCard();
@@ -630,7 +636,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                     status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Pause",
                 onPressed: () {
-                  StreamsController.pauseStream(id).then((success) {
+                  context
+                      .read<StreamsController>()
+                      .pauseStream(id)
+                      .then((success) {
                     if (mounted) {
                       _loadStream();
                       widget.refreshCard();
@@ -643,7 +652,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           color: status == StreamStatus.queued ? streamQueuedColor : null,
           tooltip: "Delay",
           onPressed: () {
-            StreamsController.queueStream(id).then((success) {
+            context.read<StreamsController>().queueStream(id).then((success) {
               if (mounted) {
                 _loadStream();
                 widget.refreshCard();
@@ -656,7 +665,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           color: status == StreamStatus.stopped ? streamStoppedColor : null,
           tooltip: "Stop",
           onPressed: () {
-            StreamsController.stopStream(id).then((success) {
+            context.read<StreamsController>().stopStream(id).then((success) {
               if (mounted) {
                 _loadStream();
               }

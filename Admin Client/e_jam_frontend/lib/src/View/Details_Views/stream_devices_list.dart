@@ -34,7 +34,7 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
           ? EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.3,
               vertical: 100)
-          : const EdgeInsets.all(20),
+          : const EdgeInsets.all(100),
       child: ClipRRect(
         borderRadius: const BorderRadius.all(
           Radius.circular(15),

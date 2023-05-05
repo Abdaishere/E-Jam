@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DevicesListView extends StatefulWidget {
@@ -34,7 +35,7 @@ class _DevicesListViewState extends State<DevicesListView> {
     _isDeviceListLoading = true;
     setState(() {});
 
-    await DevicesController.loadAllDevices();
+    await context.read<DevicesController>().loadAllDevices(context);
     devices = DevicesController.devices;
     _isDeviceListLoading = DevicesController.isLoading;
     if (mounted) {
@@ -45,13 +46,13 @@ class _DevicesListViewState extends State<DevicesListView> {
   void _pingAll() async {
     _isPinging = true;
     setState(() {});
-    await DevicesController.pingAllDevices().then(
-      (value) => {
-        _isPinging = false,
-        _isPinged = value,
-        loadDevicesListView(),
-      },
-    );
+    await context.read<DevicesController>().pingAllDevices().then(
+          (value) => {
+            _isPinging = false,
+            _isPinged = value,
+            loadDevicesListView(),
+          },
+        );
   }
 
   @override
@@ -275,11 +276,14 @@ class _DeviceCardState extends State<DeviceCard> {
   Device? updateDevice;
 
   void refresh() {
-    DevicesController.loadDeviceDetails(widget.device.macAddress).then(
-      (value) => {
-        if (mounted) {updateDevice = value, setState(() {})}
-      },
-    );
+    context
+        .read<DevicesController>()
+        .loadDeviceDetails(widget.device.macAddress)
+        .then(
+          (value) => {
+            if (mounted) {updateDevice = value, setState(() {})}
+          },
+        );
   }
 
   @override
@@ -454,8 +458,10 @@ class _DeviceCardState extends State<DeviceCard> {
                 ),
                 TextButton(
                   onPressed: () {
-                    DevicesController.deleteDevice(device.macAddress).then(
-                        (success) =>
+                    context
+                        .read<DevicesController>()
+                        .deleteDevice(device.macAddress)
+                        .then((success) =>
                             {if (success) widget.loadDevicesListView()});
                     Navigator.of(context).pop();
                   },

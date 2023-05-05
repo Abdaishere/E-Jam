@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:provider/provider.dart';
 
 final formKey = GlobalKey<FormState>();
 
@@ -30,40 +31,27 @@ class _EditDeviceViewState extends State<EditDeviceView> {
   @override
   void initState() {
     super.initState();
-    EditDeviceController.updateFields(widget.device, widget.mac);
+    context
+        .read<EditDeviceController>()
+        .updateFields(widget.device, widget.mac);
   }
 
   Future<bool?> _editDevice() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      Device device = Device(
-        name: EditDeviceController.nameController.text,
-        description: EditDeviceController.descriptionController.text,
-        location: EditDeviceController.locationController.text,
-        ipAddress: EditDeviceController.ipController.text,
-        port: int.parse(EditDeviceController.portController.text),
-        macAddress: widget.mac,
-      );
+    bool result = await context
+        .read<EditDeviceController>()
+        .updateDevice(formKey, context);
 
-      bool? result = await DevicesController.updateDevice(device);
-      if (mounted) {
-        widget.refresh();
-        setState(() {});
-        if (result ?? false) {
-          return true;
-        } else {
-          return false;
-        }
+    if (mounted) {
+      widget.refresh();
+      if (result) {
+        Navigator.pop(context);
+        return true;
+      } else {
+        Navigator.pop(context);
+        return false;
       }
-      return null;
     }
     return null;
-  }
-
-  @override
-  void dispose() {
-    EditDeviceController.clearAllFields();
-    super.dispose();
   }
 
   @override
@@ -124,13 +112,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blue,
             tooltip: 'Save',
-            onPressed: () async {
-              _editDevice().then(
-                (value) => {
-                  if (mounted && (value ?? false)) {Navigator.pop(context)}
-                },
-              );
-            },
+            onPressed: () => _editDevice(),
           ),
         ],
       ),
@@ -164,26 +146,16 @@ class _DevicePingerState extends State<DevicePinger> {
   bool _isPinging = false;
 
   _pingDevice() async {
-    if (formKey.currentState!.validate()) {
-      formKey.currentState!.save();
-      Device device = Device(
-        name: EditDeviceController.nameController.text,
-        description: EditDeviceController.descriptionController.text,
-        location: EditDeviceController.locationController.text,
-        ipAddress: EditDeviceController.ipController.text,
-        port: int.parse(EditDeviceController.portController.text),
-        macAddress: EditDeviceController.mac,
-      );
-      _isPinging = true;
+    _isPinging = true;
+    setState(() {});
+    bool value =
+        await context.read<EditDeviceController>().pingDevice(formKey, context);
+
+    _isPinged = value;
+    _isPinging = false;
+
+    if (mounted) {
       setState(() {});
-      bool value = await DevicesController.pingNewDevice(device);
-
-      _isPinged = value;
-      _isPinging = false;
-
-      if (mounted) {
-        setState(() {});
-      }
     }
   }
 
@@ -243,7 +215,7 @@ class Location extends StatelessWidget {
         }
         return null;
       },
-      controller: EditDeviceController.locationController,
+      controller: context.read<EditDeviceController>().getLocationController,
     );
   }
 }
@@ -270,7 +242,7 @@ class Description extends StatelessWidget {
         }
         return null;
       },
-      controller: EditDeviceController.descriptionController,
+      controller: context.read<EditDeviceController>().getDescriptionController,
     );
   }
 }
@@ -308,7 +280,7 @@ class ConnectionIpAndPort extends StatelessWidget {
               }
               return null;
             },
-            controller: EditDeviceController.ipController,
+            controller: context.read<EditDeviceController>().getIpController,
           ),
         ),
         const Text(" : ", style: TextStyle(fontSize: 30)),
@@ -330,7 +302,7 @@ class ConnectionIpAndPort extends StatelessWidget {
               }
               return null;
             },
-            controller: EditDeviceController.portController,
+            controller: context.read<EditDeviceController>().getPortController,
           ),
         ),
       ],
@@ -352,7 +324,8 @@ class _NameFieldState extends State<NameField> {
       decoration: InputDecoration(
         labelText: 'Name',
         hintText: 'Name of the Device',
-        icon: Icon(getDeviceIcon(EditDeviceController.nameController.text)),
+        icon: Icon(getDeviceIcon(
+            context.read<EditDeviceController>().getNameController.text)),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -362,7 +335,7 @@ class _NameFieldState extends State<NameField> {
         }
         return null;
       },
-      controller: EditDeviceController.nameController,
+      controller: context.read<EditDeviceController>().getNameController,
       onChanged: (value) {
         setState(() {});
       },

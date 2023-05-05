@@ -4,6 +4,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';
+import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -51,6 +52,24 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => BottomLineChartNotifier(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DevicesController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AddDeviceController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => EditDeviceController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => StreamsController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AddStreamController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => EditStreamController(),
         ),
       ],
       child: Consumer(
@@ -365,7 +384,10 @@ class _StreamsControllerButtonState extends State<StreamsControllerButton> {
     return IconButton(
       tooltip: SystemSettings.streamsAreRunning ? 'Pause' : 'Start',
       onPressed: () async => SystemSettings.streamsAreRunning
-          ? StreamsController.stopAllStreams().then((value) async {
+          ? context
+              .read<StreamsController>()
+              .stopAllStreams()
+              .then((value) async {
               if (value && mounted) {
                 setState(() {
                   SystemSettings.streamsAreRunning =
@@ -376,7 +398,10 @@ class _StreamsControllerButtonState extends State<StreamsControllerButton> {
                     'streamsAreRunning', SystemSettings.streamsAreRunning);
               }
             })
-          : StreamsController.startAllStreams().then((value) async {
+          : context
+              .read<StreamsController>()
+              .startAllStreams()
+              .then((value) async {
               if (value && mounted) {
                 setState(() {
                   SystemSettings.streamsAreRunning =
@@ -389,7 +414,7 @@ class _StreamsControllerButtonState extends State<StreamsControllerButton> {
             }),
       color: SystemSettings.streamsAreRunning
           ? context.watch<ThemeModel>().colorScheme.secondary
-          : context.watch<ThemeModel>().colorScheme.error, // toDO:
+          : context.watch<ThemeModel>().colorScheme.error,
       icon: FaIcon(
         SystemSettings.streamsAreRunning
             ? FontAwesomeIcons.play

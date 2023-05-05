@@ -5,376 +5,495 @@ import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/controller/devices_controller.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class StreamsController {
-  static List<StreamEntry>? streams;
-  static List<StreamStatusDetails>? streamsStatusDetails;
-  static bool isLoading = true;
-  static StreamServices streamServices = StreamServices();
+class StreamsController extends ChangeNotifier {
+  static List<StreamEntry>? _streams;
+  static List<StreamStatusDetails>? _streamsStatusDetails;
+  static bool _isLoading = true;
+  static final StreamServices _streamServices = StreamServices();
 
-  static Future loadAllStreamsWithDetails() async {
-    isLoading = true;
-    return streamServices.getStreams().then((value) {
-      streams = value;
-      isLoading = false;
+  get getStreams => _streams;
+  get getStreamsStatusDetails => _streamsStatusDetails;
+  get getIsLoading => _isLoading;
+  get getStreamServices => _streamServices;
+
+  Future loadAllStreamsWithDetails() async {
+    _isLoading = true;
+    return _streamServices.getStreams().then((value) {
+      _streams = value;
+      _isLoading = false;
     });
   }
 
-  static Future<StreamEntry?> loadStreamDetails(String id) async {
-    return streamServices.getStream(id).then((value) {
+  Future<StreamEntry?> loadStreamDetails(String id) async {
+    return _streamServices.getStream(id).then((value) {
       return value;
     });
   }
 
-  static Future<bool?> createNewStream(StreamEntry stream) async {
-    isLoading = true;
-    return streamServices.createStream(stream).then((value) {
-      isLoading = false;
+  Future<bool?> createNewStream(StreamEntry stream) async {
+    _isLoading = true;
+    return _streamServices.createStream(stream).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool?> updateStream(String id, StreamEntry stream) async {
-    isLoading = true;
-    return streamServices.updateStream(id, stream).then((value) {
-      isLoading = false;
+  Future<bool?> updateStream(String id, StreamEntry stream) async {
+    _isLoading = true;
+    return _streamServices.updateStream(id, stream).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> deleteStream(String id) async {
-    isLoading = true;
-    return streamServices.deleteStream(id).then((value) {
-      isLoading = false;
+  Future<bool> deleteStream(String id) async {
+    _isLoading = true;
+    return _streamServices.deleteStream(id).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> queueStream(String id) async {
-    isLoading = true;
-    return streamServices.startStream(id).then((value) {
-      isLoading = false;
+  Future<bool> queueStream(String id) async {
+    _isLoading = true;
+    return _streamServices.startStream(id).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> pauseStream(String id) async {
-    isLoading = true;
-    return streamServices.stopStream(id).then((value) {
-      isLoading = false;
+  Future<bool> pauseStream(String id) async {
+    _isLoading = true;
+    return _streamServices.stopStream(id).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> startAllStreams() async {
-    isLoading = true;
-    return streamServices.startAllStreams().then((value) {
-      isLoading = false;
+  Future<bool> startAllStreams() async {
+    _isLoading = true;
+    return _streamServices.startAllStreams().then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> stopAllStreams() async {
-    isLoading = true;
-    return streamServices.stopAllStreams().then((value) {
-      isLoading = false;
+  Future<bool> stopAllStreams() async {
+    _isLoading = true;
+    return _streamServices.stopAllStreams().then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> startStream(String id) async {
-    isLoading = true;
-    return streamServices.forceStartStream(id).then((value) {
-      isLoading = false;
+  Future<bool> startStream(String id) async {
+    _isLoading = true;
+    return _streamServices.forceStartStream(id).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<bool> stopStream(String id) async {
-    isLoading = true;
-    return streamServices.forceStopStream(id).then((value) {
-      isLoading = false;
+  Future<bool> stopStream(String id) async {
+    _isLoading = true;
+    return _streamServices.forceStopStream(id).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future<StreamStatusDetails?> loadStreamStatusDetails(String id) async {
-    isLoading = true;
-    return streamServices.getStreamStatus(id).then((value) {
-      isLoading = false;
+  Future<StreamStatusDetails?> loadStreamStatusDetails(String id) async {
+    _isLoading = true;
+    return _streamServices.getStreamStatus(id).then((value) {
+      _isLoading = false;
       return value;
     });
   }
 
-  static Future loadAllStreamStatus() async {
-    isLoading = true;
-    return await streamServices.getAllStreamStatus().then((value) {
-      streamsStatusDetails = value;
-      isLoading = false;
+  Future loadAllStreamStatus() async {
+    _isLoading = true;
+    return await _streamServices.getAllStreamStatus().then((value) {
+      _streamsStatusDetails = value;
+      _isLoading = false;
+      notifyListeners();
     });
   }
 }
 
-class AddStreamController {
-  static TextEditingController idController = TextEditingController();
-  static TextEditingController nameController = TextEditingController();
-  static TextEditingController descriptionController = TextEditingController();
-  static TextEditingController delayController = TextEditingController();
-  static TextEditingController timeToLiveController = TextEditingController();
-  static TextEditingController interFrameGapController =
+class AddStreamController extends ChangeNotifier {
+  static final TextEditingController _idController = TextEditingController();
+  static final TextEditingController _nameController = TextEditingController();
+  static final TextEditingController _descriptionController =
       TextEditingController();
-  static TextEditingController payloadLengthController =
+  static final TextEditingController _delayController = TextEditingController();
+  static final TextEditingController _timeToLiveController =
       TextEditingController();
-  static TextEditingController burstLengthController = TextEditingController();
-  static TextEditingController burstDelayController = TextEditingController();
-  static TextEditingController broadcastFramesController =
+  static final TextEditingController _interFrameGapController =
       TextEditingController();
-  static TextEditingController packetsController = TextEditingController();
-  static TextEditingController seedController = TextEditingController();
-  static FlowType flowType = FlowType.bursts;
-  static int payloadType = 2;
-  static TransportLayerProtocol transportLayerProtocol =
+  static final TextEditingController _payloadLengthController =
+      TextEditingController();
+  static final TextEditingController _burstLengthController =
+      TextEditingController();
+  static final TextEditingController _burstDelayController =
+      TextEditingController();
+  static final TextEditingController _broadcastFramesController =
+      TextEditingController();
+  static final TextEditingController _packetsController =
+      TextEditingController();
+  static final TextEditingController _seedController = TextEditingController();
+  static FlowType _flowType = FlowType.bursts;
+  static int _payloadType = 2;
+  static TransportLayerProtocol _transportLayerProtocol =
       TransportLayerProtocol.tcp;
-  static bool checkContent = false;
-  static Map<String, bool> pickedGenerators = {};
-  static Map<String, bool> pickedVerifiers = {};
+  static bool _checkContent = false;
+  static Map<String, bool> _pickedGenerators = {};
+  static Map<String, bool> _pickedVerifiers = {};
 
-  static Future<bool?> addStream(GlobalKey<FormState> formKey) async {
+  get getIdController => _idController;
+  get getNameController => _nameController;
+  get getDescriptionController => _descriptionController;
+  get getDelayController => _delayController;
+  get getTimeToLiveController => _timeToLiveController;
+  get getInterFrameGapController => _interFrameGapController;
+  get getPayloadLengthController => _payloadLengthController;
+  get getBurstLengthController => _burstLengthController;
+  get getBurstDelayController => _burstDelayController;
+  get getBroadcastFramesController => _broadcastFramesController;
+  get getPacketsController => _packetsController;
+  get getSeedController => _seedController;
+  get getFlowType => _flowType;
+  get getPayloadType => _payloadType;
+  get getTransportLayerProtocol => _transportLayerProtocol;
+  get getCheckContent => _checkContent;
+  get getPickedGenerators => _pickedGenerators;
+  get getPickedVerifiers => _pickedVerifiers;
+
+  void checkContentSwitch() {
+    _checkContent = !_checkContent;
+    notifyListeners();
+  }
+
+  void setPayloadType(int value) {
+    _payloadType = value;
+    notifyListeners();
+  }
+
+  void setFlowType(FlowType value) {
+    _flowType = value;
+    notifyListeners();
+  }
+
+  void setTransportLayerProtocol(TransportLayerProtocol value) {
+    _transportLayerProtocol = value;
+    notifyListeners();
+  }
+
+  void setPickedGenerators(Map<String, bool> value) {
+    _pickedGenerators = value;
+    notifyListeners();
+  }
+
+  void setPickedVerifiers(Map<String, bool> value) {
+    _pickedVerifiers = value;
+    notifyListeners();
+  }
+
+  Future<bool?> addStream(
+      GlobalKey<FormState> formKey, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
       List<String> generators = [];
       List<String> verifiers = [];
-      pickedGenerators.forEach((key, value) {
+      _pickedGenerators.forEach((key, value) {
         if (value) {
           generators.add(key);
         }
       });
 
-      pickedVerifiers.forEach((key, value) {
+      _pickedVerifiers.forEach((key, value) {
         if (value) {
           verifiers.add(key);
         }
       });
 
-      return StreamsController.createNewStream(
-        StreamEntry(
-          name: nameController.text,
-          description: descriptionController.text,
-          delay: (int.tryParse(delayController.text) ?? 0),
-          streamId: idController.text,
-          generatorsIds: generators,
-          verifiersIds: verifiers,
-          payloadType: payloadType,
-          burstLength: (int.tryParse(burstLengthController.text) ?? 0),
-          burstDelay: (int.tryParse(burstDelayController.text) ?? 0),
-          numberOfPackets: (int.tryParse(packetsController.text) ?? 0),
-          payloadLength: (int.tryParse(payloadLengthController.text) ?? 0),
-          seed: (int.tryParse(seedController.text) ?? 0),
-          broadcastFrames: (int.tryParse(broadcastFramesController.text) ?? 0),
-          interFrameGap: (int.tryParse(interFrameGapController.text) ?? 0),
-          timeToLive: (int.tryParse(timeToLiveController.text) ?? 0),
-          transportLayerProtocol: transportLayerProtocol,
-          flowType: flowType,
-          checkContent: checkContent,
-        ),
-      );
+      return context.read<StreamsController>().createNewStream(
+            StreamEntry(
+              name: _nameController.text,
+              description: _descriptionController.text,
+              delay: (int.tryParse(_delayController.text) ?? 0),
+              streamId: _idController.text,
+              generatorsIds: generators,
+              verifiersIds: verifiers,
+              payloadType: _payloadType,
+              burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
+              burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
+              numberOfPackets: (int.tryParse(_packetsController.text) ?? 0),
+              payloadLength: (int.tryParse(_payloadLengthController.text) ?? 0),
+              seed: (int.tryParse(_seedController.text) ?? 0),
+              broadcastFrames:
+                  (int.tryParse(_broadcastFramesController.text) ?? 0),
+              interFrameGap: (int.tryParse(_interFrameGapController.text) ?? 0),
+              timeToLive: (int.tryParse(_timeToLiveController.text) ?? 0),
+              transportLayerProtocol: _transportLayerProtocol,
+              flowType: _flowType,
+              checkContent: _checkContent,
+            ),
+          );
     }
     return null;
   }
 
-  static syncDevicesList() {
+  syncDevicesList() {
     if (DevicesController.devices == null) return;
 
-    AddStreamController.pickedGenerators = {
+    AddStreamController._pickedGenerators = {
       for (final Device device in DevicesController.devices!)
-        device.macAddress: pickedGenerators[device.macAddress] ?? false
+        device.macAddress: _pickedGenerators[device.macAddress] ?? false
     };
 
-    pickedVerifiers = {
+    _pickedVerifiers = {
       for (final Device device in DevicesController.devices!)
-        device.macAddress: pickedVerifiers[device.macAddress] ?? false
+        device.macAddress: _pickedVerifiers[device.macAddress] ?? false
     };
   }
 
-  static clearAllFields() {
-    idController.clear();
-    nameController.clear();
-    descriptionController.clear();
-    delayController.clear();
-    timeToLiveController.clear();
-    interFrameGapController.clear();
-    payloadLengthController.clear();
-    burstLengthController.clear();
-    burstDelayController.clear();
-    broadcastFramesController.clear();
-    packetsController.clear();
-    seedController.clear();
-    flowType = FlowType.bursts;
-    payloadType = 2;
-    transportLayerProtocol = TransportLayerProtocol.tcp;
-    checkContent = false;
-    pickedGenerators =
-        pickedGenerators.map((key, value) => MapEntry(key, false));
-    pickedVerifiers = pickedVerifiers.map((key, value) => MapEntry(key, false));
+  clearAllFields() {
+    _idController.clear();
+    _nameController.clear();
+    _descriptionController.clear();
+    _delayController.clear();
+    _timeToLiveController.clear();
+    _interFrameGapController.clear();
+    _payloadLengthController.clear();
+    _burstLengthController.clear();
+    _burstDelayController.clear();
+    _broadcastFramesController.clear();
+    _packetsController.clear();
+    _seedController.clear();
+    _flowType = FlowType.bursts;
+    _payloadType = 2;
+    _transportLayerProtocol = TransportLayerProtocol.tcp;
+    _checkContent = false;
+    _pickedGenerators =
+        _pickedGenerators.map((key, value) => MapEntry(key, false));
+    _pickedVerifiers =
+        _pickedVerifiers.map((key, value) => MapEntry(key, false));
   }
 }
 
-class EditStreamController {
-  static TextEditingController idController = TextEditingController();
-  static TextEditingController nameController = TextEditingController();
-  static TextEditingController descriptionController = TextEditingController();
-  static TextEditingController delayController = TextEditingController();
-  static TextEditingController timeToLiveController = TextEditingController();
-  static TextEditingController interFrameGapController =
+class EditStreamController extends ChangeNotifier {
+  static final TextEditingController _idController = TextEditingController();
+  static final TextEditingController _nameController = TextEditingController();
+  static final TextEditingController _descriptionController =
       TextEditingController();
-  static TextEditingController payloadLengthController =
+  static final TextEditingController _delayController = TextEditingController();
+  static final TextEditingController _timeToLiveController =
       TextEditingController();
-  static TextEditingController burstLengthController = TextEditingController();
-  static TextEditingController burstDelayController = TextEditingController();
-  static TextEditingController broadcastFramesController =
+  static final TextEditingController _interFrameGapController =
       TextEditingController();
-  static TextEditingController packetsController = TextEditingController();
-  static TextEditingController seedController = TextEditingController();
-  static FlowType flowType = FlowType.bursts;
-  static int payloadType = 2;
-  static TransportLayerProtocol transportLayerProtocol =
+  static final TextEditingController _payloadLengthController =
+      TextEditingController();
+  static final TextEditingController _burstLengthController =
+      TextEditingController();
+  static final TextEditingController _burstDelayController =
+      TextEditingController();
+  static final TextEditingController _broadcastFramesController =
+      TextEditingController();
+  static final TextEditingController _packetsController =
+      TextEditingController();
+  static final TextEditingController _seedController = TextEditingController();
+  static FlowType _flowType = FlowType.bursts;
+  static int _payloadType = 2;
+  static TransportLayerProtocol _transportLayerProtocol =
       TransportLayerProtocol.tcp;
-  static bool checkContent = false;
-  static Map<String, bool> pickedGenerators = {};
-  static Map<String, bool> pickedVerifiers = {};
+  static bool _checkContent = false;
+  static Map<String, bool> _pickedGenerators = {};
+  static Map<String, bool> _pickedVerifiers = {};
 
-  static syncGeneratorsDevicesList(
-      List<String> generators, bool showDeleted) async {
+  get getIdController => _idController;
+  get getNameController => _nameController;
+  get getDescriptionController => _descriptionController;
+  get getDelayController => _delayController;
+  get getTimeToLiveController => _timeToLiveController;
+  get getInterFrameGapController => _interFrameGapController;
+  get getPayloadLengthController => _payloadLengthController;
+  get getBurstLengthController => _burstLengthController;
+  get getBurstDelayController => _burstDelayController;
+  get getBroadcastFramesController => _broadcastFramesController;
+  get getPacketsController => _packetsController;
+  get getSeedController => _seedController;
+  get getFlowType => _flowType;
+  get getPayloadType => _payloadType;
+  get getTransportLayerProtocol => _transportLayerProtocol;
+  get getCheckContent => _checkContent;
+  Map<String, bool> get getPickedGenerators => _pickedGenerators;
+  Map<String, bool> get getPickedVerifiers => _pickedVerifiers;
+
+  void checkContentSwitch() {
+    _checkContent = !_checkContent;
+    notifyListeners();
+  }
+
+  void setPayloadType(int value) {
+    _payloadType = value;
+    notifyListeners();
+  }
+
+  void setFlowType(FlowType value) {
+    _flowType = value;
+    notifyListeners();
+  }
+
+  void setTransportLayerProtocol(TransportLayerProtocol value) {
+    _transportLayerProtocol = value;
+    notifyListeners();
+  }
+
+  void setPickedGenerators(Map<String, bool> value) {
+    _pickedGenerators = value;
+    notifyListeners();
+  }
+
+  void setPickedVerifiers(Map<String, bool> value) {
+    _pickedVerifiers = value;
+    notifyListeners();
+  }
+
+  syncGeneratorsDevicesList(
+      List<String> generators, bool showDeleted, BuildContext context) async {
     if (DevicesController.devices == null) {
-      await DevicesController.loadAllDevices();
+      await context.read<DevicesController>().loadAllDevices(context);
       if (DevicesController.devices == null) {
         return;
       }
     }
 
-    pickedGenerators = {
+    _pickedGenerators = {
       for (final Device device in DevicesController.devices!)
         device.macAddress: false
     };
 
     for (final String mac in generators) {
-      if (pickedGenerators[mac] == null) {
-        if (showDeleted) pickedGenerators[mac] = true;
+      if (_pickedGenerators[mac] == null) {
+        if (showDeleted) _pickedGenerators[mac] = true;
       } else {
-        pickedGenerators[mac] = true;
+        _pickedGenerators[mac] = true;
       }
     }
   }
 
-  static syncVerifiersDevicesList(
-      List<String> verifiers, bool showDeleted) async {
+  syncVerifiersDevicesList(
+      List<String> verifiers, bool showDeleted, BuildContext context) async {
     if (DevicesController.devices == null) {
-      await DevicesController.loadAllDevices();
+      await context.read<DevicesController>().loadAllDevices(context);
       if (DevicesController.devices == null) {
         return;
       }
     }
 
-    pickedVerifiers = {
+    _pickedVerifiers = {
       for (final Device device in DevicesController.devices!)
         device.macAddress: false
     };
 
     for (final String mac in verifiers) {
-      if (pickedVerifiers[mac] == null) {
-        if (showDeleted) pickedVerifiers[mac] = true;
+      if (_pickedVerifiers[mac] == null) {
+        if (showDeleted) _pickedVerifiers[mac] = true;
       } else {
-        pickedVerifiers[mac] = true;
+        _pickedVerifiers[mac] = true;
       }
     }
   }
 
-  static Future<bool?> updateStream(
-      GlobalKey<FormState> formKey, String id) async {
+  Future<bool?> updateStream(
+      GlobalKey<FormState> formKey, String id, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
       List<String> generators = [];
       List<String> verifiers = [];
-      pickedGenerators.forEach((key, value) {
+      _pickedGenerators.forEach((key, value) {
         if (value) {
           generators.add(key);
         }
       });
 
-      pickedVerifiers.forEach((key, value) {
+      _pickedVerifiers.forEach((key, value) {
         if (value) {
           verifiers.add(key);
         }
       });
 
-      return StreamsController.updateStream(
-        id,
-        StreamEntry(
-          name: nameController.text,
-          description: descriptionController.text,
-          delay: (int.tryParse(delayController.text) ?? 0),
-          streamId: idController.text,
-          generatorsIds: generators,
-          verifiersIds: verifiers,
-          payloadType: payloadType,
-          burstLength: (int.tryParse(burstLengthController.text) ?? 0),
-          burstDelay: (int.tryParse(burstDelayController.text) ?? 0),
-          numberOfPackets: (int.tryParse(packetsController.text) ?? 0),
-          payloadLength: (int.tryParse(payloadLengthController.text) ?? 0),
-          seed: (int.tryParse(seedController.text) ?? 0),
-          broadcastFrames: (int.tryParse(broadcastFramesController.text) ?? 0),
-          interFrameGap: (int.tryParse(interFrameGapController.text) ?? 0),
-          timeToLive: (int.tryParse(timeToLiveController.text) ?? 0),
-          transportLayerProtocol: transportLayerProtocol,
-          flowType: flowType,
-          checkContent: checkContent,
-        ),
-      );
+      return context.read<StreamsController>().updateStream(
+            id,
+            StreamEntry(
+              name: _nameController.text,
+              description: _descriptionController.text,
+              delay: (int.tryParse(_delayController.text) ?? 0),
+              streamId: _idController.text,
+              generatorsIds: generators,
+              verifiersIds: verifiers,
+              payloadType: _payloadType,
+              burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
+              burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
+              numberOfPackets: (int.tryParse(_packetsController.text) ?? 0),
+              payloadLength: (int.tryParse(_payloadLengthController.text) ?? 0),
+              seed: (int.tryParse(_seedController.text) ?? 0),
+              broadcastFrames:
+                  (int.tryParse(_broadcastFramesController.text) ?? 0),
+              interFrameGap: (int.tryParse(_interFrameGapController.text) ?? 0),
+              timeToLive: (int.tryParse(_timeToLiveController.text) ?? 0),
+              transportLayerProtocol: _transportLayerProtocol,
+              flowType: _flowType,
+              checkContent: _checkContent,
+            ),
+          );
     }
     return null;
   }
 
-  static updateAllFields(StreamEntry stream) {
-    idController.text = stream.streamId;
-    nameController.text = stream.name;
-    descriptionController.text = stream.description;
-    delayController.text = stream.delay.toString();
-    timeToLiveController.text = stream.timeToLive.toString();
-    interFrameGapController.text = stream.interFrameGap.toString();
-    payloadLengthController.text = stream.payloadLength.toString();
-    burstLengthController.text = stream.burstLength.toString();
-    burstDelayController.text = stream.burstDelay.toString();
-    broadcastFramesController.text = stream.broadcastFrames.toString();
-    packetsController.text = stream.numberOfPackets.toString();
-    seedController.text = stream.seed.toString();
-    flowType = stream.flowType;
-    payloadType = stream.payloadType;
-    transportLayerProtocol = stream.transportLayerProtocol;
-    checkContent = stream.checkContent;
-    syncGeneratorsDevicesList(stream.generatorsIds, true);
-    syncVerifiersDevicesList(stream.verifiersIds, true);
+  updateAllFields(StreamEntry stream, BuildContext context) {
+    _idController.text = stream.streamId;
+    _nameController.text = stream.name;
+    _descriptionController.text = stream.description;
+    _delayController.text = stream.delay.toString();
+    _timeToLiveController.text = stream.timeToLive.toString();
+    _interFrameGapController.text = stream.interFrameGap.toString();
+    _payloadLengthController.text = stream.payloadLength.toString();
+    _burstLengthController.text = stream.burstLength.toString();
+    _burstDelayController.text = stream.burstDelay.toString();
+    _broadcastFramesController.text = stream.broadcastFrames.toString();
+    _packetsController.text = stream.numberOfPackets.toString();
+    _seedController.text = stream.seed.toString();
+    _flowType = stream.flowType;
+    _payloadType = stream.payloadType;
+    _transportLayerProtocol = stream.transportLayerProtocol;
+    _checkContent = stream.checkContent;
+    syncGeneratorsDevicesList(stream.generatorsIds, true, context);
+    syncVerifiersDevicesList(stream.verifiersIds, true, context);
   }
 
-  static clearAllFields() {
-    idController.clear();
-    nameController.clear();
-    descriptionController.clear();
-    delayController.clear();
-    timeToLiveController.clear();
-    interFrameGapController.clear();
-    payloadLengthController.clear();
-    burstLengthController.clear();
-    burstDelayController.clear();
-    broadcastFramesController.clear();
-    packetsController.clear();
-    seedController.clear();
-    flowType = FlowType.bursts;
-    payloadType = 2;
-    transportLayerProtocol = TransportLayerProtocol.tcp;
-    checkContent = false;
-    pickedGenerators = {};
-    pickedVerifiers = {};
+  clearAllFields() {
+    _idController.clear();
+    _nameController.clear();
+    _descriptionController.clear();
+    _delayController.clear();
+    _timeToLiveController.clear();
+    _interFrameGapController.clear();
+    _payloadLengthController.clear();
+    _burstLengthController.clear();
+    _burstDelayController.clear();
+    _broadcastFramesController.clear();
+    _packetsController.clear();
+    _seedController.clear();
+    _flowType = FlowType.bursts;
+    _payloadType = 2;
+    _transportLayerProtocol = TransportLayerProtocol.tcp;
+    _checkContent = false;
+    _pickedGenerators = {};
+    _pickedVerifiers = {};
   }
 }

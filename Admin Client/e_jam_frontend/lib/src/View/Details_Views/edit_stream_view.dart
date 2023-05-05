@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
+import 'package:provider/provider.dart';
 
 class EditStreamView extends StatefulWidget {
   const EditStreamView(
@@ -37,45 +38,44 @@ class _EditStreamViewState extends State<EditStreamView>
   @override
   void initState() {
     super.initState();
-    EditStreamController.updateAllFields(stream);
+    context.read<EditStreamController>().updateAllFields(stream, context);
     _numberOfVerifiers = stream.verifiersIds.length;
     _numberOfGenerators = stream.generatorsIds.length;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    EditStreamController.clearAllFields();
-  }
-
-  _updateDevicesCounter() {
-    int counter1 = 0;
-    EditStreamController.pickedGenerators.forEach((key, value) {
-      if (value) counter1++;
-    });
-
-    int counter2 = 0;
-    EditStreamController.pickedVerifiers.forEach((key, value) {
-      if (value) counter2++;
-    });
-    _numberOfGenerators = counter1;
-    _numberOfVerifiers = counter2;
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   _editStream() async {
-    bool success =
-        await EditStreamController.updateStream(formKey, widget.id) ?? false;
+    bool success = await context
+            .read<EditStreamController>()
+            .updateStream(formKey, widget.id, context) ??
+        false;
     if (success && mounted) {
       widget.reload();
       Navigator.pop(context);
     }
   }
 
+  void updateDevicesCounter() {
+    _numberOfGenerators = 0;
+    _numberOfVerifiers = 0;
+
+    context
+        .watch<EditStreamController>()
+        .getPickedGenerators
+        .forEach((key, value) {
+      if (value) _numberOfGenerators++;
+    });
+
+    context
+        .watch<EditStreamController>()
+        .getPickedVerifiers
+        .forEach((key, value) {
+      if (value) _numberOfVerifiers++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    updateDevicesCounter();
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 800
@@ -117,9 +117,7 @@ class _EditStreamViewState extends State<EditStreamView>
           const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
           _streamDevicesLists(),
-          PacketsBroadcastFramesSizes(
-            checkContent: EditStreamController.checkContent,
-          ),
+          const PacketsBroadcastFramesSizes(),
           const GenerationSeed(),
           const PayloadLengthAndType(),
           const BurstLengthAndDelay(),
@@ -169,12 +167,10 @@ class _EditStreamViewState extends State<EditStreamView>
                   builder: (BuildContext context) => Center(
                     child: DevicesCheckListPicker(
                       areGenerators: true,
-                      saveChanges: () => _updateDevicesCounter(),
-                      devicesReloader: () => {
-                        EditStreamController.syncGeneratorsDevicesList(
-                            stream.generatorsIds, false),
-                        _updateDevicesCounter(),
-                      },
+                      devicesReloader: () => context
+                          .read<EditStreamController>()
+                          .syncGeneratorsDevicesList(
+                              stream.generatorsIds, false, context),
                       isStateless: true,
                     ),
                   ),
@@ -217,12 +213,10 @@ class _EditStreamViewState extends State<EditStreamView>
                   builder: (BuildContext context) => Center(
                     child: DevicesCheckListPicker(
                       areGenerators: false,
-                      saveChanges: () => _updateDevicesCounter(),
-                      devicesReloader: () => {
-                        EditStreamController.syncVerifiersDevicesList(
-                            stream.verifiersIds, false),
-                        _updateDevicesCounter(),
-                      },
+                      devicesReloader: () => context
+                          .read<EditStreamController>()
+                          .syncVerifiersDevicesList(
+                              stream.verifiersIds, false, context),
                       isStateless: true,
                     ),
                   ),
@@ -250,28 +244,25 @@ class _EditStreamViewState extends State<EditStreamView>
               icon: Icon(MaterialCommunityIcons.id_card, size: 25),
               isDense: true,
             ),
-            controller: EditStreamController.nameController,
+            controller: context.watch<EditStreamController>().getNameController,
           ),
         ),
         const VerticalDivider(),
         IconButton(
           icon: Icon(
-            EditStreamController.checkContent
+            context.watch<EditStreamController>().getCheckContent
                 ? FontAwesomeIcons.eye
                 : FontAwesomeIcons.eyeSlash,
             size: 30,
           ),
-          color: EditStreamController.checkContent
+          color: context.watch<EditStreamController>().getCheckContent
               ? Colors.greenAccent.shade700
               : Colors.grey,
-          tooltip: EditStreamController.checkContent
+          tooltip: context.watch<EditStreamController>().getCheckContent
               ? 'Check content'
               : 'Do not check content',
-          onPressed: () {
-            EditStreamController.checkContent =
-                !EditStreamController.checkContent;
-            setState(() {});
-          },
+          onPressed: () =>
+              context.read<EditStreamController>().checkContentSwitch(),
         ),
         const VerticalDivider(),
       ],
@@ -305,9 +296,8 @@ class _EditStreamViewState extends State<EditStreamView>
 }
 
 class PacketsBroadcastFramesSizes extends StatefulWidget {
-  const PacketsBroadcastFramesSizes({super.key, required this.checkContent});
+  const PacketsBroadcastFramesSizes({super.key});
 
-  final bool checkContent;
   @override
   State<PacketsBroadcastFramesSizes> createState() =>
       _PacketsBroadcastFramesSizesState();
@@ -326,7 +316,7 @@ class _PacketsBroadcastFramesSizesState
               labelText: 'Number of Packets',
               hintText: 'Number of Packets to be sent',
               icon: Icon(
-                widget.checkContent
+                context.watch<EditStreamController>().getCheckContent
                     ? MaterialCommunityIcons.package_variant
                     : MaterialCommunityIcons.package_variant_closed,
               ),
@@ -343,7 +333,8 @@ class _PacketsBroadcastFramesSizesState
               }
               return null;
             },
-            controller: EditStreamController.packetsController,
+            controller:
+                context.watch<EditStreamController>().getPacketsController,
           ),
         ),
         const VerticalDivider(),
@@ -366,7 +357,9 @@ class _PacketsBroadcastFramesSizesState
               }
               return null;
             },
-            controller: EditStreamController.broadcastFramesController,
+            controller: context
+                .watch<EditStreamController>()
+                .getBroadcastFramesController,
           ),
         ),
       ],
@@ -408,7 +401,9 @@ class PayloadLengthAndType extends StatelessWidget {
               }
               return null;
             },
-            controller: EditStreamController.payloadLengthController,
+            controller: context
+                .watch<EditStreamController>()
+                .getPayloadLengthController,
           ),
         ),
         const VerticalDivider(),
@@ -419,7 +414,7 @@ class PayloadLengthAndType extends StatelessWidget {
               labelText: 'Type',
               hintText: 'Type of the payload',
             ),
-            value: EditStreamController.payloadType,
+            value: context.watch<EditStreamController>().getPayloadType,
             items: const [
               DropdownMenuItem(
                 value: 0,
@@ -434,9 +429,8 @@ class PayloadLengthAndType extends StatelessWidget {
                 child: Text('Random'),
               ),
             ],
-            onChanged: (value) {
-              EditStreamController.payloadType = value!;
-            },
+            onChanged: (value) =>
+                context.read<EditStreamController>().setPayloadType(value!),
           ),
         ),
       ],
@@ -463,7 +457,7 @@ class FlowAndTLPTypes extends StatelessWidget {
               labelText: 'Flow Type',
               hintText: 'Flow Type',
             ),
-            value: EditStreamController.flowType,
+            value: context.watch<EditStreamController>().getFlowType,
             items: const [
               DropdownMenuItem(
                 value: FlowType.backToBack,
@@ -480,9 +474,8 @@ class FlowAndTLPTypes extends StatelessWidget {
               }
               return null;
             },
-            onChanged: (value) {
-              EditStreamController.flowType = value!;
-            },
+            onChanged: (value) =>
+                context.read<EditStreamController>().setFlowType(value!),
           ),
         ),
         const VerticalDivider(),
@@ -493,7 +486,8 @@ class FlowAndTLPTypes extends StatelessWidget {
               labelText: 'Transport Layer Protocol',
               hintText: 'TLP Type',
             ),
-            value: EditStreamController.transportLayerProtocol,
+            value:
+                context.watch<EditStreamController>().getTransportLayerProtocol,
             items: const [
               DropdownMenuItem(
                 value: TransportLayerProtocol.tcp,
@@ -504,9 +498,9 @@ class FlowAndTLPTypes extends StatelessWidget {
                 child: Text('UDP'),
               ),
             ],
-            onChanged: (value) {
-              EditStreamController.transportLayerProtocol = value!;
-            },
+            onChanged: (value) => context
+                .read<EditStreamController>()
+                .setTransportLayerProtocol(value!),
           ),
         ),
       ],
@@ -544,7 +538,8 @@ class BurstLengthAndDelay extends StatelessWidget {
               }
               return null;
             },
-            controller: EditStreamController.burstLengthController,
+            controller:
+                context.watch<EditStreamController>().getBurstLengthController,
           ),
         ),
         const VerticalDivider(),
@@ -567,7 +562,8 @@ class BurstLengthAndDelay extends StatelessWidget {
               }
               return null;
             },
-            controller: EditStreamController.burstDelayController,
+            controller:
+                context.watch<EditStreamController>().getBurstDelayController,
           ),
         ),
       ],
@@ -594,7 +590,7 @@ class GenerationSeed extends StatelessWidget {
       ],
       validator: (value) {
         if (value == null || value.isEmpty || value == '0') {
-          if (EditStreamController.payloadType == 2) {
+          if (context.read<EditStreamController>().getPayloadType == 2) {
             return 'Please enter a Generation Seed for Random Payload';
           }
           return null;
@@ -603,7 +599,7 @@ class GenerationSeed extends StatelessWidget {
         }
         return null;
       },
-      controller: EditStreamController.seedController,
+      controller: context.watch<EditStreamController>().getSeedController,
     );
   }
 }
@@ -638,7 +634,8 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
               }
               return null;
             },
-            controller: EditStreamController.delayController,
+            controller:
+                context.watch<EditStreamController>().getDelayController,
           ),
         ),
         const VerticalDivider(),
@@ -661,7 +658,8 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
               }
               return null;
             },
-            controller: EditStreamController.timeToLiveController,
+            controller:
+                context.watch<EditStreamController>().getTimeToLiveController,
           ),
         ),
         const VerticalDivider(),
@@ -684,7 +682,9 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
               }
               return null;
             },
-            controller: EditStreamController.interFrameGapController,
+            controller: context
+                .watch<EditStreamController>()
+                .getInterFrameGapController,
           ),
         ),
       ],
@@ -708,7 +708,8 @@ class StreamDescriptionField extends StatelessWidget {
         icon: Icon(Icons.description, size: 25),
         isDense: true,
       ),
-      controller: EditStreamController.descriptionController,
+      controller:
+          context.watch<EditStreamController>().getDescriptionController,
     );
   }
 }
