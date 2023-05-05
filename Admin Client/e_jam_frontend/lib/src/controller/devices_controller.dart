@@ -8,7 +8,13 @@ import 'package:provider/provider.dart';
 class DevicesController extends ChangeNotifier {
   static List<Device>? devices;
   static bool isLoading = true;
+  static bool isPinging = false;
   static DevicesServices devicesServices = DevicesServices();
+
+  get getDevices => devices;
+  get getIsLoading => isLoading;
+  get getIsPinging => isPinging;
+  get getDevicesServices => devicesServices;
 
   Future loadAllDevices(BuildContext context) async {
     isLoading = true;
@@ -37,26 +43,26 @@ class DevicesController extends ChangeNotifier {
   }
 
   Future<bool> pingDevice(String deviceMac, BuildContext context) {
-    isLoading = true;
+    isPinging = true;
     return devicesServices.pingDevice(deviceMac).then((value) {
       loadAllDevices(context);
-      isLoading = false;
+      isPinging = false;
       return value;
     });
   }
 
   Future<bool> pingNewDevice(Device device) {
-    isLoading = true;
+    isPinging = true;
     return devicesServices.checkNewDevice(device).then((value) {
-      isLoading = false;
+      isPinging = false;
       return value;
     });
   }
 
   Future<bool?> pingAllDevices() {
-    isLoading = true;
+    isPinging = true;
     return devicesServices.pingAllDevices().then((value) {
-      isLoading = false;
+      isPinging = false;
       return value;
     });
   }

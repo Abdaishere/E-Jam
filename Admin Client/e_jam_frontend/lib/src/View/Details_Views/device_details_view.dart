@@ -17,11 +17,9 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DevicesDetailsView extends StatefulWidget {
-  const DevicesDetailsView(
-      {super.key, required this.device, required this.loadDevicesListView});
+  const DevicesDetailsView({super.key, required this.device});
 
   final Device device;
-  final Function loadDevicesListView;
   @override
   State<DevicesDetailsView> createState() => _DevicesDetailsViewState();
 }
@@ -34,10 +32,10 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
         .read<DevicesController>()
         .loadDeviceDetails(widget.device.macAddress);
 
-    widget.loadDevicesListView();
     updateDevice = value;
     if (mounted) {
       setState(() {});
+      context.read<DevicesController>().loadAllDevices(context);
     }
   }
 
@@ -118,7 +116,9 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                                     if (mounted) {
                                       Navigator.of(context).pop();
                                       Navigator.of(context).pop();
-                                      widget.loadDevicesListView();
+                                      context
+                                          .read<DevicesController>()
+                                          .loadAllDevices(context);
                                     }
                                   }
                                 },

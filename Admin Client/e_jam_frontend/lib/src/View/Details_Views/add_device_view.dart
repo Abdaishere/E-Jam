@@ -13,9 +13,8 @@ import 'package:provider/provider.dart';
 final formKey = GlobalKey<FormState>();
 
 class AddDeviceView extends StatefulWidget {
-  const AddDeviceView({super.key, required this.refresh, this.ip, this.delete});
+  const AddDeviceView({super.key, this.ip, this.delete});
 
-  final Function refresh;
   final String? ip;
   final Function()? delete;
   @override
@@ -61,8 +60,7 @@ class _AddDeviceViewState extends State<AddDeviceView> {
               child: const AddDeviceFields(),
             ),
             bottomNavigationBar: BottomOptionsBar(
-              refresh: widget.refresh,
-              delete: widget.delete ?? () {},
+              delete: widget.delete,
             ),
           ),
         ),
@@ -94,11 +92,9 @@ class AddDeviceFields extends StatelessWidget {
 }
 
 class BottomOptionsBar extends StatefulWidget {
-  const BottomOptionsBar(
-      {super.key, required this.refresh, required this.delete});
+  const BottomOptionsBar({super.key, this.delete});
 
-  final Function refresh;
-  final Function() delete;
+  final Function()? delete;
   @override
   State<BottomOptionsBar> createState() => _BottomOptionsBarState();
 }
@@ -113,9 +109,8 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
     bool result = _analyzeCode(code);
     if (mounted) {
       if (result) {
-        widget.refresh();
-
-        widget.delete();
+        context.read<DevicesController>().loadAllDevices(context);
+        if (widget.delete != null) widget.delete!();
         return true;
       } else {
         return false;

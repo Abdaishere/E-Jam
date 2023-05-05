@@ -14,9 +14,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
 class DevicesRadarCardView extends StatefulWidget {
-  const DevicesRadarCardView({super.key, required this.loadDevicesListView});
+  const DevicesRadarCardView({super.key});
 
-  final Function loadDevicesListView;
   @override
   State<DevicesRadarCardView> createState() => _DevicesRadarCardViewState();
 }
@@ -154,7 +153,6 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                 HeroDialogRoute(
                   builder: (BuildContext context) => Center(
                     child: AddDeviceView(
-                      refresh: () => widget.loadDevicesListView(),
                       ip: devices.elementAt(index),
                       delete: () => {
                         if (mounted)

@@ -15,9 +15,8 @@ import 'package:provider/provider.dart';
 final formKey = GlobalKey<FormState>();
 
 class AddStreamView extends StatefulWidget {
-  const AddStreamView({super.key, required this.reload});
+  const AddStreamView({super.key});
 
-  final Function() reload;
   @override
   State<AddStreamView> createState() => _AddStreamViewState();
 }
@@ -169,16 +168,21 @@ class _AddStreamViewState extends State<AddStreamView>
             color: Colors.blueAccent,
             tooltip: 'OK',
             onPressed: () async {
-              bool? success = await context
+              context
                   .watch<AddStreamController>()
-                  .addStream(formKey, context);
-
-              if (success != null) {
-                if (success) {
-                  widget.reload();
-                  if (mounted) Navigator.pop(context);
-                }
-              }
+                  .addStream(formKey, context)
+                  .then((success) => {
+                        if (success != null)
+                          {
+                            if (success)
+                              {
+                                context
+                                    .read<StreamsController>()
+                                    .loadAllStreamStatus(),
+                                if (mounted) Navigator.pop(context),
+                              }
+                          }
+                      });
             },
           ),
           IconButton(
@@ -194,15 +198,20 @@ class _AddStreamViewState extends State<AddStreamView>
             color: Colors.greenAccent.shade700,
             tooltip: 'Apply',
             onPressed: () async {
-              bool? success = await context
+              context
                   .read<AddStreamController>()
-                  .addStream(formKey, context);
-              if (success != null) {
-                if (success) {
-                  widget.reload();
-                }
-                // TODO: Add an icon to show the result
-              }
+                  .addStream(formKey, context)
+                  .then((success) => {
+                        if (success != null)
+                          {
+                            if (success)
+                              {
+                                context
+                                    .read<StreamsController>()
+                                    .loadAllStreamStatus(),
+                              }
+                          }
+                      });
             },
           ),
         ],

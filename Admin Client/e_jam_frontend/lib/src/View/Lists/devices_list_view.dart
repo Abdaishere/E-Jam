@@ -28,21 +28,6 @@ class _DevicesListViewState extends State<DevicesListView> {
   bool _isPinging = false;
   bool? _isPinged;
 
-  List<Device>? devices;
-  bool _isDeviceListLoading = true;
-
-  void loadDevicesListView() async {
-    _isDeviceListLoading = true;
-    setState(() {});
-
-    await context.read<DevicesController>().loadAllDevices(context);
-    devices = DevicesController.devices;
-    _isDeviceListLoading = DevicesController.isLoading;
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   void _pingAll() async {
     _isPinging = true;
     setState(() {});
@@ -50,7 +35,7 @@ class _DevicesListViewState extends State<DevicesListView> {
           (value) => {
             _isPinging = false,
             _isPinged = value,
-            loadDevicesListView(),
+            context.read<DevicesController>().loadAllDevices(context),
           },
         );
   }
@@ -58,7 +43,7 @@ class _DevicesListViewState extends State<DevicesListView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () => loadDevicesListView());
+    context.read<DevicesController>().loadAllDevices(context);
   }
 
   @override
@@ -68,7 +53,7 @@ class _DevicesListViewState extends State<DevicesListView> {
       body: Stack(
         children: [
           Visibility(
-            visible: !_isDeviceListLoading,
+            visible: !context.watch<DevicesController>().getIsLoading,
             replacement: Center(
               child: LoadingAnimationWidget.threeArchedCircle(
                 color: Colors.grey,
@@ -77,9 +62,13 @@ class _DevicesListViewState extends State<DevicesListView> {
             ),
             child: Visibility(
               child: Visibility(
-                visible: devices != null && devices!.isNotEmpty,
+                visible: context.watch<DevicesController>().getDevices !=
+                        null &&
+                    context.watch<DevicesController>().getDevices!.isNotEmpty,
                 replacement: Visibility(
-                  visible: devices != null && devices!.isEmpty,
+                  visible: context.watch<DevicesController>().getDevices !=
+                          null &&
+                      context.watch<DevicesController>().getDevices!.isEmpty,
                   replacement: const Center(
                     child: Icon(
                       Icons.warning_amber_rounded,
@@ -111,7 +100,8 @@ class _DevicesListViewState extends State<DevicesListView> {
                 child: GridView.builder(
                   padding: const EdgeInsets.all(8.0),
                   shrinkWrap: true,
-                  itemCount: devices?.length,
+                  itemCount:
+                      context.watch<DevicesController>().getDevices?.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: max(
                         MediaQuery.of(context).copyWith().size.width ~/ 200.0,
@@ -122,10 +112,9 @@ class _DevicesListViewState extends State<DevicesListView> {
                   ),
                   itemBuilder: (BuildContext context, int index) {
                     return DeviceCard(
-                        device: devices![index],
-                        loadDevicesListView: () {
-                          loadDevicesListView();
-                        });
+                      device:
+                          context.watch<DevicesController>().getDevices![index],
+                    );
                   },
                 ),
               ),
@@ -136,9 +125,8 @@ class _DevicesListViewState extends State<DevicesListView> {
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
               child: AddDeviceButton(
-                loadDevicesListView: () {
-                  loadDevicesListView();
-                },
+                loadDevicesListView: () =>
+                    context.read<DevicesController>().loadAllDevices(context),
               ),
             ),
           ),
@@ -171,10 +159,8 @@ class _DevicesListViewState extends State<DevicesListView> {
             onPressed: () {
               Navigator.of(context).push(
                 HeroDialogRoute(
-                  builder: (BuildContext context) => Center(
-                    child: DevicesRadarCardView(
-                      loadDevicesListView: loadDevicesListView,
-                    ),
+                  builder: (BuildContext context) => const Center(
+                    child: DevicesRadarCardView(),
                   ),
                   settings: const RouteSettings(name: 'radar'),
                 ),
@@ -218,9 +204,8 @@ class _DevicesListViewState extends State<DevicesListView> {
             size: 20.0,
           ),
           tooltip: 'Refresh',
-          onPressed: () async {
-            loadDevicesListView();
-          },
+          onPressed: () =>
+              context.read<DevicesController>().loadAllDevices(context),
         ),
         // Explanation icon for details about how the Device card works and what the icons mean and what the colors mean
         IconButton(
@@ -250,8 +235,8 @@ class AddDeviceButton extends StatelessWidget {
         Navigator.of(context).push(
           // Center from here not from the card
           HeroDialogRoute(
-            builder: (BuildContext context) => Center(
-                child: AddDeviceView(refresh: () => loadDevicesListView())),
+            builder: (BuildContext context) =>
+                const Center(child: AddDeviceView()),
             settings: const RouteSettings(name: 'AddDeviceView'),
           ),
         );
@@ -262,11 +247,9 @@ class AddDeviceButton extends StatelessWidget {
 }
 
 class DeviceCard extends StatefulWidget {
-  const DeviceCard(
-      {super.key, required this.device, required this.loadDevicesListView});
+  const DeviceCard({super.key, required this.device});
 
   final Device device;
-  final Function() loadDevicesListView;
 
   @override
   State<DeviceCard> createState() => _DeviceCardState();
@@ -297,7 +280,6 @@ class _DeviceCardState extends State<DeviceCard> {
             builder: (BuildContext context) => Center(
                 child: DevicesDetailsView(
               device: device,
-              loadDevicesListView: () => widget.loadDevicesListView(),
             )),
             settings: const RouteSettings(name: 'DevicesDetailsView'),
           ),
@@ -436,7 +418,6 @@ class _DeviceCardState extends State<DeviceCard> {
               builder: (BuildContext context) => Center(
                 child: DevicesDetailsView(
                   device: device,
-                  loadDevicesListView: () => widget.loadDevicesListView(),
                 ),
               ),
               settings: const RouteSettings(name: 'DevicesDetailsView'),
@@ -461,8 +442,12 @@ class _DeviceCardState extends State<DeviceCard> {
                     context
                         .read<DevicesController>()
                         .deleteDevice(device.macAddress)
-                        .then((success) =>
-                            {if (success) widget.loadDevicesListView()});
+                        .then((success) => {
+                              if (success)
+                                context
+                                    .read<DevicesController>()
+                                    .loadAllDevices(context)
+                            });
                     Navigator.of(context).pop();
                   },
                   child: const Text('Delete'),
