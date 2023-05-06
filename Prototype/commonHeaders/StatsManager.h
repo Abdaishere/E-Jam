@@ -28,7 +28,7 @@ private:
 	ull sentPckts;
 	ull sentErrorPckts;
 
-    clock_t timer;
+    std::chrono::time_point<std::chrono::steady_clock> timer;
     StatsManager(const Configuration& config, int, bool);
     void resetStats();
 	void buildMsg(std::string&);

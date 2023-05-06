@@ -1,7 +1,7 @@
 #ifndef SEGMENTVERIFIER_H
 #define SEGMENTVERIFIER_H
 
-#include "../commonHeaders/Byte.h"
+#include "../../commonHeaders/Byte.h"
 
 class SegmentVerifier
 {

@@ -5,6 +5,7 @@
 #include <string>
 #include <time.h>
 #include <chrono>
+#include <fstream>
 #include "StatsManager.h"
 #include "ConfigurationManager.h"
 
@@ -146,6 +147,7 @@ void createTimeBased (std::shared_ptr<PacketCreator> pc, ull duration, Configura
 //thread function to send the stats
 void sendStatsFunction(std::shared_ptr<StatsManager> sm)
 {
+    writeToFile("Start of the thread.");
     while (true)
         sm->sendStats();
 }
@@ -174,6 +176,7 @@ int main(int argc, char** argv)
 
 
     std::thread creator, sender;
+    writeToFile(std::to_string(sm == nullptr));
     std::thread statWriter(sendStatsFunction, sm);
     ull gap = currConfig.getInterFrameGap();
     FlowType flowType = currConfig.getFlowType();

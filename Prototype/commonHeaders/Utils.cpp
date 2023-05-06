@@ -2,6 +2,7 @@
 // Created by mohamedelhagry on 3/13/23.
 //
 
+#include <fstream>
 #include "Utils.h"
 ByteArray convertLLToStr(unsigned long long number) {
     ByteArray result(8,'a');
@@ -45,4 +46,11 @@ std::string exec(const char * command)
     }
     pclose(pipe);
     return result;
+}
+
+void writeToFile(std::string line)
+{
+    std::ofstream outfile("../Executables/debug.txt", std::ios::app);
+    outfile << line << std::endl;
+    outfile.close();
 }

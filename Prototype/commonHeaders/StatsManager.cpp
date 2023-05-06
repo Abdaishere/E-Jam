@@ -1,5 +1,9 @@
 #include <cstdio>
 #include "StatsManager.h"
+#include <iostream>
+#include <fstream>
+#include <thread>
+#include "Utils.h"
 
 //initialize the unique instance
 std::shared_ptr<StatsManager> StatsManager::instance;
@@ -37,14 +41,14 @@ void StatsManager::resetStats()
 	sentPckts = 0;
 	sentErrorPckts = 0;
 
-    timer = clock(); //start time of stats 
+
+    timer = std::chrono::steady_clock::now();
 }
 
 void StatsManager::sendStats()
 {
-    clock_t now = clock(); //end time of stats
-    clock_t delta_t = (now - timer) / CLOCKS_PER_SEC; //delta: total time to do stats
-    if((double) delta_t > SEND_DELAY )
+    auto now = std::chrono::steady_clock::now();
+    if (now - timer > std::chrono::seconds(SEND_DELAY))
     {
         writeStatFile();
         resetStats(); //to reset variables
@@ -148,31 +152,39 @@ void StatsManager::writeStatFile()
 	//build the msg
 	std::string msg;
 	buildMsg(msg);
-
-	//open pipe
-	std::string dir;
+    //open pipe
+	std::string dir = STAT_DIR;
 	if(is_gen)
 	{
-		dir = "./genStats/sgen_";
+		dir += "/genStats/sgen_";
 	}
 	else
 	{
-		dir = "./verStats/sver_";
+		dir += "/verStats/sver_";
 	}
-	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
+
+ 	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
     fd = open((dir+ std::to_string(instanceID)).c_str(), O_RDWR);
-	if(fd == -1)
+
+    if(fd == -1)
 	{
         if (errno != EEXIST) //if the error was more than the file already existing
         {
+            writeToFile("Error in creating the FIFO file sgen_id");
             printf("Error in creating the FIFO file sgen_id\n");
-			return;
+            return;
         } else {
+            writeToFile("File already exists sgen_id, skipping creation...");
             printf("File already exists sgen_id, skipping creation...\n");
         }
     }
 
+    writeToFile("before writing to pipe.");
 	//Write on pipe
+    writeToFile("message is: " + msg);
+    std::cerr << "message is: " + msg << "\n";
 	write(fd, msg.c_str(), sizeof(char)*msg.size());
+    close(fd);
+    writeToFile("after writing to pipe.");
 }
 

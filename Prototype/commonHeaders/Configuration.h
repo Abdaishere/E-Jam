@@ -74,6 +74,22 @@ public:
         return filePath != nullptr;
     }
 
+
+
+	//DEBUG FUNCTIONS
+	//#######################################
+	void setMacAddress(ByteArray newAdd)
+	{
+		myMacAddress = newAdd;
+	}
+	void setFilePath(char* path)
+	{
+		filePath = path;
+	}
+	//##############################################
+
+
+
     //Discover the mac address of this machine
     ByteArray discoverMyMac()
     {

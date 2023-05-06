@@ -1,7 +1,8 @@
 #ifndef PACKETUNPACKER_H
 #define PACKETUNPACKER_H
 
-#include "../commonHeaders/Byte.h"
+#include "../../commonHeaders/StatsManager.h"
+#include "../../commonHeaders/Byte.h"
 #include "FramVerifier.h"
 #include "PayloadVerifier.h"
 #include "PacketReceiver.h"
@@ -9,7 +10,6 @@
 #include <mutex>
 #include "SeqChecker.h"
 #include <memory>
-#include "../commonHeaders/StatsManager.h"
 #include <algorithm>
 
 // we dedicate frameVerifiers and payloadVerifiers and seqCheckers for each generator in the stream
