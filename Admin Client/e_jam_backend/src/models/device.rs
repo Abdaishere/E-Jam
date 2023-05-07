@@ -370,15 +370,22 @@ this is used to set the device to reachable or unreachable and update the last u
         let prev_status = self.status.clone();
         self.status = if reachable {
             info!(
-                "Device {} is reachable after {:?} since {} UTC",
+                "Device {} is reachable after being {:?} since {} UTC",
                 self.get_device_mac(),
                 &self.status,
                 self.last_updated
             );
-            DeviceStatus::Online
+            // if the device is reachable after being offline for more than 60 seconds then set the status to online
+            if (Utc::now() - self.last_updated).num_seconds() > 60
+                || self.status == DeviceStatus::Offline
+            {
+                DeviceStatus::Online
+            } else {
+                self.status.clone()
+            }
         } else {
             info!(
-                "Device {} is not reachable after {:?} since {} UTC",
+                "Device {} is not reachable after being {:?} since {} UTC",
                 self.get_device_mac(),
                 &self.status,
                 self.last_updated

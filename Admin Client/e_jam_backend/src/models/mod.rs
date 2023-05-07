@@ -620,8 +620,8 @@ The send_stream function is used to send the stream to the devices that will gen
 
         for receivers in devices_received {
             for receiver in receivers.1 {
-                let process_type = receiver .1;
-                let device_index = receiver .0;
+                let process_type = receiver.1;
+                let device_index = receiver.0;
 
                 let response = device_list
                     .lock()
@@ -747,7 +747,7 @@ The send_stream function is used to send the stream to the devices that will gen
                                 );
                             }
                         }
-                    },
+                    }
                 }
             }
         }
@@ -854,6 +854,7 @@ if the request fails, the device status will be set to Offline
                         StatusCode::OK => {
                             receiver.update_device_status(&ProcessStatus::Stopped, &device.1 .1);
 
+                            // remove the device from the running devices list
                             match device.1 .1 {
                                 ProcessType::Generation => {
                                     self.running_generators.insert(
@@ -888,6 +889,7 @@ if the request fails, the device status will be set to Offline
                         }
                         _ => {
                             error!("Generators: {}", _response.text().await.unwrap());
+
                             // set the receiver status to offline (generic error)
                             receiver.update_device_status(
                                 &ProcessStatus::Failed,
@@ -923,12 +925,10 @@ if the request fails, the device status will be set to Offline
                     }
                 }
                 Err(_error) => {
+                    // set the receiver status to offline (generic error)
                     error!("Connection {}", _error);
 
-                    receiver.update_device_status(
-                        &ProcessStatus::Failed,
-                        &ProcessType::Generation,
-                    );
+                    receiver.update_device_status(&ProcessStatus::Failed, &ProcessType::Generation);
 
                     match device.1 .1 {
                         ProcessType::Generation => {
@@ -954,9 +954,8 @@ if the request fails, the device status will be set to Offline
                                 ProcessStatus::Failed,
                             );
                         }
-                    
                     }
-                },
+                }
             }
         }
 
@@ -1040,21 +1039,24 @@ and the last updated time is set to the current time all the time
 ## Arguments
 * `status` - the new stream status"]
     fn update_stream_status(&mut self, status: StreamStatus) {
-        if status != self.stream_status {
-            self.stream_status = status;
-            self.last_updated = Utc::now();
+        if status == self.stream_status {
+            return;
         }
-        if self.stream_status == StreamStatus::Running {
-            if self.start_time.is_none() {
+        self.stream_status = status;
+        self.last_updated = Utc::now();
+
+        // update the start and end times (you can add a message about the stream and append it to the description field but this not needed for now)
+        match self.stream_status {
+            StreamStatus::Running => {
                 self.start_time = Some(Utc::now());
             }
-        } else if self.stream_status == StreamStatus::Finished {
-            if self.end_time.is_none() {
+            StreamStatus::Finished => {
                 self.end_time = Some(Utc::now());
             }
-        } else {
-            self.start_time = None;
-            self.end_time = None;
+            _ => {
+                self.start_time = None;
+                self.end_time = None;
+            }
         }
     }
 
@@ -1070,7 +1072,8 @@ this is used to check if the stream status is the same as the status passed
         &self.stream_status
     }
 
-    // TODO: Document
+    #[doc = r" ## Get Stream Status Card
+    this is used to get the stream status card for the stream which contains simple details about the stream (stream id, stream status, start time, end time, last updated, name)"]
     pub fn get_stream_status_card(&self) -> StreamStatusDetails {
         StreamStatusDetails {
             stream_id: self.stream_id.clone(),
@@ -1082,7 +1085,9 @@ this is used to check if the stream status is the same as the status passed
         }
     }
 
-    // TODO: Document
+    #[doc = r" ## Get Stream Details
+this is used to get the stream details for the stream which contains all the details about the stream (stream id, delay, generators, verifiers, payload type, number of packets, payload length, burst delay, burst length, seed, broadcast frames, inter frame gap, time to live, transport layer protocol, name).
+The Details are required and used by the systemAPI to be executed on the targeted devices"]
     pub fn get_stream_details(
         &self,
         delayed: bool,
@@ -1109,10 +1114,12 @@ this is used to check if the stream status is the same as the status passed
         }
     }
 
-    pub fn get_stream_delay_seconds(&self) -> u64 {
-        self.delay / 1000
+    pub fn get_stream_delay_seconds(&self) -> f64 {
+        self.delay as f64 / 1000.0
     }
 
+    #[doc = r" ## Update Stream
+this is used to update the stream with the new details passed in the stream entry, ignoring the stream id and the stream status as they are not allowed to be changed by the user"]
     pub fn update(&mut self, stream: &StreamEntry) {
         self.name = stream.name.clone();
         self.description = stream.description.clone();
