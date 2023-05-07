@@ -46,8 +46,8 @@ The configuration file for the stream is stored in the directory /etc/EJam/ unde
 It contains the following fields each on a single line sequentially:
 
 - Stream ID
-- Generation Number
-- Verifier Number
+- Generator Number (follwed by a list of generators)
+- Verifier Number (followed by a list of verifiers)
 - Payload Type
 - Number of Packets
 - Payload Length
