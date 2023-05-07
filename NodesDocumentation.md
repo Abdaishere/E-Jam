@@ -32,7 +32,8 @@ So it would not make sense to have multiple verifiers.
 The verifier will use an *in-memory database* which holds the configurations of all streams this node is involved in. This is to speed up the verification process and save memory as not all verifiers have to load the configuration table locally to them.
 
 
-#**Program Arguments Passed to the different Executables**
+# **Program Arguments Passed to the different Executables**
+
 Genertor: generator ID, stream config folder directory
 
 Verifier: verifier ID, stream config folder directory
@@ -41,7 +42,9 @@ Gateway: mode gateway for sending or verifiying, # of generators of verifiers, i
 
 
 Note: each verifier instance is only responsible for verifier the packets belonging to a single stream
-#**Configuration file structure**
+
+# **Configuration file structure**
+
 The configuration file for the stream is stored in the directory /etc/EJam/ under the name config_xxx where xxx represents the streamID
 It contains the following fields each on a single line sequentially:
 
