@@ -52,7 +52,7 @@ It contains the following fields each on a single line sequentially:
 - Number of Packets
 - Payload Length
 - PRNG Seed
-- # of broadcast frames to send (per 100 frames of normal frames) (might be changed later)
+- number of broadcast frames to send (per 100 frames of normal frames) (might be changed later)
 - interframe gap (in milliseconds)
 - lifetime
 - type of transport protocol to use
