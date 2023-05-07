@@ -288,8 +288,8 @@ this is used to get the device MAC address
 this is used to get the device IP address
 # Returns
 * `String` - the device IP address with Regex for IP address"]
-    pub fn clone_ip_address(&self) -> String {
-        self.ip_address.clone()
+    pub fn clone_ip_address(&self) -> &String {
+        &self.ip_address
     }
 
     #[doc = r"Get the device port
@@ -395,7 +395,7 @@ this is used to set the device to reachable or unreachable and update the last u
         if prev_status != self.status {
             self.last_updated = Utc::now();
         }
-        return reachable;
+        reachable
     }
 
     pub async fn ping_device(&self) -> bool {
@@ -408,10 +408,7 @@ this is used to set the device to reachable or unreachable and update the last u
             .send()
             .await;
 
-        match response {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        response.is_ok()
     }
 
     pub fn update(&mut self, device: &Device) {

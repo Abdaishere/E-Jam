@@ -1,4 +1,5 @@
-use log::{ info, debug};
+
+use log::{ info, debug, error};
 use super::AppState;
 use crate::models::device::Device;
 use actix_web::Responder;
@@ -44,7 +45,9 @@ async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) ->
     let devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in get device {}", device_mac).as_str());
+        .unwrap_or_else(|_|{ error!("failed to lock device list in get device {}", device_mac);
+        panic!("failed to lock device list in get device {}", device_mac)
+    });
 
     let device = devices
         .iter()
@@ -70,13 +73,11 @@ if the device is not in the list, add it and return a 201 Created
 * `failed to lock device list in add device {device_mac}` - if the device list is not found in the mutex lock"]
 #[post("/devices")]
 async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
-    let mut devices = data.device_list.lock().expect(
-        format!(
-            "failed to lock device list in add device {}",
-            new_device.get_device_mac()
-        )
-        .as_str(),
-    );
+    let mut devices = data.device_list.lock().unwrap_or_else(|_| { error!("failed to lock device list in add device {}",
+            new_device.get_device_mac());
+        panic!("failed to lock device list in add device {}",
+            new_device.get_device_mac())
+        });
     let device_index = devices
         .iter()
         .position(|device| device.get_device_mac() == new_device.get_device_mac());
@@ -101,29 +102,39 @@ if the device is found, ping it and return the result and update the device in t
 #[get("/devices/{device_mac}/ping")]
 async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_mac = device_mac.into_inner();
-    let mut devices = data
+        
+
+        let mut devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in ping device {}", device_mac).as_str());
-
+        .unwrap_or_else(|_| {
+            error!("failed to lock device list in ping device {}", device_mac);
+            panic!("failed to lock device list in ping device {}", device_mac);
+    
+    });
+    
     let device_index = devices
-        .iter()
-        .position(|device| device.get_device_mac() == &device_mac);
+    .iter()
+    .position(|device| device.get_device_mac() == &device_mac);
+    
+    
 
-    match device_index {
-        Some(device_index) => {
-            let response = devices[device_index].is_reachable().await;
-            match response {
-                true => HttpResponse::Ok().body("Device is reachable and online in the network"),
-                false => HttpResponse::InternalServerError()
-                    .body("Could not reach the device, please check the device's metadata and try again"),
-            }
-        }
-        None => HttpResponse::NotFound().body(format!(
+    let device_index = devices.get_mut(device_index.unwrap());
+
+    let device = match device_index {
+        Some(device) => device,
+        None => return HttpResponse::NotFound().body(format!(
             "Device {} not found, please check the device mac address and try again",
             device_mac
         )),
-    }
+    };
+   
+            let response =  device.is_reachable();
+            match response.await {
+                true => HttpResponse::Ok().body(format!("Device {} is reachable and online in the network", device_mac)),
+                false => HttpResponse::InternalServerError().body(format!("Device {} is not reachable, please check the device and try again", device_mac)),
+            }
+   
 }
 
 #[doc = r"# Check a new device
@@ -159,6 +170,8 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[get("/devices/ping_all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
+
+
     let mut devices = data
         .device_list
         .lock()
@@ -208,7 +221,9 @@ async fn update_device(
     let mut devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in update device {}", device_mac).as_str());
+        .unwrap_or_else(|_| { error!("failed to lock device list in update device {}", device_mac);
+        panic!("failed to lock device list in update device {}", device_mac);
+    } );
 
     let device_entry = devices
         .iter_mut()
@@ -249,7 +264,9 @@ async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>)
     let mut devices = data
         .device_list
         .lock()
-        .expect(format!("failed to lock device list in delete device {}", device_mac).as_str());
+        .unwrap_or_else(|_|{ error!("failed to lock device list in delete device {}", device_mac);
+        panic!("failed to lock device list in delete device {}", device_mac);
+    });
     let device_index = devices
         .iter()
         .position(|device| device.get_device_mac() == &device_mac);
@@ -287,16 +304,14 @@ async fn stream_finished(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in stream finished {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {error!("Failed to lock streams_entries in stream finished {}",
+            stream_id);
+        panic!("Failed to lock streams_entries in stream finished {}",
+            stream_id);
+        });
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -336,17 +351,16 @@ async fn stream_started(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in stream started {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {error!("Failed to lock streams_entries in stream started {}",
+            stream_id);
+        panic!("Failed to lock streams_entries in stream started {}",
+            stream_id);
+            
+        });
 
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
     
     match stream_entry {
         Some(stream_entry) => {

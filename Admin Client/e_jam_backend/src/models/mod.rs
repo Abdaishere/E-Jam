@@ -576,13 +576,15 @@ The send_stream function is used to send the stream to the devices that will gen
 
             verifiers_macs.push(mac);
 
-            if devices_received.contains_key(&ip_address) {
+            if let std::collections::hash_map::Entry::Vacant(e) =
+                devices_received.entry(ip_address.clone())
+            {
+                e.insert(vec![(receiver, ProcessType::Verification)]);
+            } else {
                 devices_received
                     .get_mut(&ip_address)
                     .unwrap()
                     .push((receiver, ProcessType::Verification));
-            } else {
-                devices_received.insert(ip_address, vec![(receiver, ProcessType::Verification)]);
             }
         }
 
@@ -606,13 +608,15 @@ The send_stream function is used to send the stream to the devices that will gen
             generators_macs.push(mac);
 
             // add the device to the list of devices that need to receive the request if it already exists, it will be overwritten
-            if devices_received.contains_key(&ip_address) {
+            if let std::collections::hash_map::Entry::Vacant(e) =
+                devices_received.entry(ip_address.clone())
+            {
+                e.insert(vec![(receiver, ProcessType::Generation)]);
+            } else {
                 devices_received
                     .get_mut(&ip_address)
                     .unwrap()
                     .push((receiver, ProcessType::Generation));
-            } else {
-                devices_received.insert(ip_address, vec![(receiver, ProcessType::Generation)]);
             }
         }
 
@@ -623,18 +627,26 @@ The send_stream function is used to send the stream to the devices that will gen
                 let process_type = receiver.1;
                 let device_index = receiver.0;
 
-                let response = device_list
-                    .lock()
-                    .unwrap()
-                    .get_mut(device_index)
-                    .unwrap()
-                    .send_stream(&stream_details, self.get_stream_id(), &process_type)
-                    .await;
+                let send_handler = || async {
+                    let mut devices = device_list.lock().unwrap();
+                    let device = devices.get_mut(device_index).unwrap();
+
+                    device
+                        .send_stream(&stream_details, self.get_stream_id(), &process_type)
+                        .await
+                };
+
+                let response = send_handler().await;
                 // check if the request was successful
                 match response {
                     Ok(_response) => {
-                        let mut list = device_list.lock().unwrap();
-                        let device = list.get_mut(device_index).unwrap();
+                        let get_device_mut = || async {
+                            let mut list = device_list.lock().unwrap();
+
+                            list.get_mut(device_index).unwrap().to_owned()
+                        };
+
+                        let mut device = get_device_mut().await;
 
                         match _response.status() {
                             StatusCode::OK => {
@@ -840,9 +852,13 @@ if the request fails, the device status will be set to Offline
         }
 
         for device in target_devices {
-            let mut list = device_list.lock().unwrap();
-            // send the stop request
-            let receiver = list.get_mut(device.1 .0).unwrap();
+            let get_receiver = || async {
+                let mut list = device_list.lock().unwrap();
+                list.get_mut(device.1 .0).unwrap().to_owned()
+            };
+
+            let mut receiver = get_receiver().await;
+
             let response = receiver
                 .stop_stream(self.get_stream_id(), &device.1 .1)
                 .await;
@@ -996,7 +1012,13 @@ this will add the stream to the queue
             self.update_stream_status(StreamStatus::Queued);
             queued_streams
             .lock()
-            .expect(format!("Error: Failed to lock the queued streams list for adding stream {} to the queue", self.get_stream_id()).as_str())
+            .unwrap_or_else(|_| {
+                error!("Error: Failed to lock the queued streams list for adding stream {} to the queue", self.get_stream_id());
+                panic!(
+                    "Error: Failed to lock the queued streams list for adding stream {} to the queue",
+                    self.get_stream_id()
+                )
+        })
             .push(self.get_stream_id().clone());
         }
         connections
@@ -1023,7 +1045,13 @@ this will remove the stream from the queue
         // remove the stream from the queued streams list
         let mut queue = queued_streams
             .lock()
-            .expect(format!("Error: Failed to lock the queued streams list for removing the stream from the queue {}", self.get_stream_id()).as_str());
+            .unwrap_or_else(|_| {
+                error!("Error: Failed to lock the queued streams list for removing the stream from the queue {}", self.get_stream_id());
+                panic!(
+                    "Error: Failed to lock the queued streams list for removing the stream from the queue {}",
+                    self.get_stream_id()
+                )
+        });
 
         // remove the stream from the queued streams vector
         let index = queue.iter().position(|x| x == self.get_stream_id());
@@ -1078,9 +1106,9 @@ this is used to check if the stream status is the same as the status passed
         StreamStatusDetails {
             stream_id: self.stream_id.clone(),
             stream_status: self.stream_status.clone(),
-            start_time: self.start_time.clone(),
-            end_time: self.end_time.clone(),
-            last_updated: self.last_updated.clone(),
+            start_time: self.start_time,
+            end_time: self.end_time,
+            last_updated: self.last_updated,
             name: self.name.clone(),
         }
     }
@@ -1192,9 +1220,9 @@ this enum represents the transport layer protocol type
 enum TransportLayerProtocol {
     #[default]
     #[serde(rename = "TCP")]
-    TCP,
+    Tcp,
     #[serde(rename = "UDP")]
-    UDP,
+    Udp,
 }
 
 #[doc = r"# Flow Type

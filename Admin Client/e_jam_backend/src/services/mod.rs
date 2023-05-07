@@ -71,11 +71,13 @@ async fn get_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> 
     let streams_entries = data
         .streams_entries
         .lock()
-        .expect(format!("Failed to lock streams_entries in get stream {}", stream_id).as_str());
+        .unwrap_or_else(|_| {
+            error! ("Failed to lock streams_entries in get stream {}", stream_id);
+            panic!("Failed to lock streams_entries in get stream {}", stream_id)});
 
     let stream_entry = streams_entries
         .iter()
-        .find(|&stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|&stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => HttpResponse::Ok().json(stream_entry),
@@ -104,19 +106,18 @@ async fn post_stream(
     new_stream_entry: web::Json<StreamEntry>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in post stream {}",
-            new_stream_entry.get_stream_id()
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {
+        error! {"Failed to lock streams_entries in post stream {}",
+            new_stream_entry.get_stream_id()}
+        panic!("Failed to lock streams_entries in post stream {}",
+            new_stream_entry.get_stream_id())}
+        );
 
     let stream_id = new_stream_entry.get_stream_id().to_string();
 
     let stream_entry_check = streams_entries
         .iter()
-        .find(|&stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|&stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry_check {
         Some(duplicate_stream) => HttpResponse::Conflict().body(format!(
@@ -162,13 +163,10 @@ async fn update_stream(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in update stream {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {
+        error!("Failed to lock streams_entries in update stream {}", stream_id);
+        panic!("Failed to lock streams_entries in update stream {}",
+            stream_id)});
 
     let stream_entry = streams_entries
         .iter_mut()
@@ -225,17 +223,14 @@ if the stream is found, delete it and return a 200 OK
 async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in delete stream {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {
+        error!("Failed to lock streams_entries in delete stream {}", stream_id);
+        panic!("Failed to lock streams_entries in delete stream {}",
+            stream_id)});
 
     let stream_entry = streams_entries
         .iter()
-        .position(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .position(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -270,17 +265,14 @@ if the stream is found, start it and return a 200 OK
 async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in start stream {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {
+            error!("Failed to lock streams_entries in start stream {}", stream_id);
+        panic!("Failed to lock streams_entries in start stream {}",
+            stream_id)});
 
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -357,17 +349,14 @@ if the stream is found, stop it and return a 200 OK
 async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in stop stream {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {
+            error!("Failed to lock streams_entries in stop stream {}", stream_id);
+         panic!("Failed to lock streams_entries in stop stream {}",
+            stream_id)});
 
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -520,17 +509,14 @@ async fn force_start_stream(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in force start stream {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {error!("Failed to lock streams_entries in force start stream {}",
+            stream_id);
+        panic!("Failed to lock streams_entries in force start stream {}", stream_id)
+        });
 
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -607,17 +593,14 @@ async fn force_stop_stream(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let mut streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in force stop stream, stream_id: {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {error!("Failed to lock streams_entries in force stop stream, stream_id: {}",
+            stream_id);
+            panic!("Failed to lock streams_entries in force stop stream {}", stream_id)
+        });
 
     let stream_entry = streams_entries
         .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -657,17 +640,15 @@ async fn get_stream_status(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
 
-    let streams_entries = data.streams_entries.lock().expect(
-        format!(
-            "Failed to lock streams_entries in get stream status for {}",
-            stream_id
-        )
-        .as_str(),
-    );
+    let streams_entries = data.streams_entries.lock().unwrap_or_else(|_|{ error!("Failed to lock streams_entries in get stream status for {}",
+            stream_id);
+        panic!("Failed to lock streams_entries in get stream status for {}", stream_id)
+        
+        });
 
     let stream_entry = streams_entries
         .iter()
-        .find(|stream_entry| stream_entry.get_stream_id().to_string() == stream_id);
+        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
 
     match stream_entry {
         Some(stream_entry) => HttpResponse::Ok().json(stream_entry.get_stream_status_card()),
