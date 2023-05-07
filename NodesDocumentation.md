@@ -30,3 +30,16 @@ Each generator sequences packets incrementally according to the the generator-st
 All the verifier instance on the pc are identical. This is because the verifier has the task of parsing which stream the received packet belongs to, and the rest of the parsing process depends on the configuration of the stream. 
 So it would not make sense to have multiple verifiers.
 The verifier will use an *in-memory database* which holds the configurations of all streams this node is involved in. This is to speed up the verification process and save memory as not all verifiers have to load the configuration table locally to them.
+
+
+#**Program Arguments Passed to the different Executables**
+Genertor: 
+
+Verifier:
+
+Gateway:
+
+#**Configuration file structure**
+The configuration file for the stream is stored in the directory /etc/EJam/ under the name config_xxx where xxx represents the streamID
+It contains the following fields each on a single line sequentially:
+
