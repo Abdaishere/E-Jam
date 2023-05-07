@@ -264,7 +264,7 @@ public:
     }
 
     //getters and setters
-    
+
     std::vector<ByteArray>& getSenders()
     {
         return senders;
@@ -275,7 +275,7 @@ public:
         Configuration::senders = inSenders;
     }
 
-    std::vector<ByteArray>& getReceivers() 
+    std::vector<ByteArray>& getReceivers()
     {
         return receivers;
     }
@@ -378,6 +378,14 @@ public:
     }
 
 
+    ull getBurstLength()
+    {
+        return burstLen;
+    }
+    ull getBurstDelay()
+    {
+        return burstDelay;
+    }
     //Printing for debugging only
     void print()
     {
@@ -413,6 +421,8 @@ public:
         printf("bcFramesNum: %llu\n", bcFramesNum);
         printf("interFrameGap: %llu\n", interFrameGap);
         printf("lifeTime: %llu\n", lifeTime);
+        printf("BurstDelay: %llu\n", burstDelay);
+        printf("BurstLength: %llu\n", burstLen);
 
         switch (transportProtocol)
         {

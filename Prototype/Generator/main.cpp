@@ -60,9 +60,11 @@ void sendTimeBasedBurst(std::shared_ptr<PacketCreator> pc, ull duration, ull del
 
     while (duration_cast<milliseconds>(endTime- beginTime).count() <= duration)
     {
+        std::cout << "here\n";
         int remaining = burstSize;
         while(remaining--)
         {
+            std::cout << "there\n";
             pc->sendHead();
             std::this_thread::sleep_for(milliseconds(IFG));
         }
@@ -181,6 +183,7 @@ int main(int argc, char** argv)
     ull gap = currConfig.getInterFrameGap();
     FlowType flowType = currConfig.getFlowType();
     int packetNumber = currConfig.getNumberOfPackets();
+    currConfig.print();
     if(packetNumber > 0)
     {
         creator = std::thread(createNumBased, pc, packetNumber, currConfig,15);
@@ -193,10 +196,15 @@ int main(int argc, char** argv)
     else
     {
         ull sendTime = currConfig.getLifeTime();
+        ull burstDelay = currConfig.getBurstDelay();
+        ull burstLength = currConfig.getBurstLength();
         creator = std::thread(createTimeBased, pc, sendTime, currConfig,10);
         //TODO add burst delay and burst size from stream configuration
         if(flowType == BURSTY)
-            sender = std::thread(sendTimeBasedBurst, pc, sendTime, (ull)20,30,gap);
+        {
+            std::cout << "time based bursty\n";
+            sender = std::thread(sendTimeBasedBurst, pc, sendTime, burstDelay,burstLength,gap);
+        }
         else
             sender = std::thread(sendTimeBasedB2B, pc, sendTime, gap);
     }
