@@ -61,3 +61,23 @@ It contains the following fields each on a single line sequentially:
 - burst delay
 - check content
 
+Example Configuration:
+```
+abc
+1
+8CB87EB05FEA
+1
+00D861A86FDA
+0
+0
+13
+17
+1
+2
+60000
+0
+1
+600
+20
+0
+```
