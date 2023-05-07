@@ -1,4 +1,3 @@
-This documentation is meant to explain how the generators and verifiers work on executing streams and ensuring proper sequencing. It is not meant to explain the structure of the stream.
 
 # **Packet Structure**
 
@@ -27,9 +26,7 @@ Before the test, the configuration of all streams in the system is sent by the a
 # **Packet Sequencing**
 Each generator sequences packets incrementally according to the the generator-streamID pair it belongs to.
 
-All the verifier instance on the pc are identical. This is because the verifier has the task of parsing which stream the received packet belongs to, and the rest of the parsing process depends on the configuration of the stream. 
-So it would not make sense to have multiple verifiers.
-The verifier will use an *in-memory database* which holds the configurations of all streams this node is involved in. This is to speed up the verification process and save memory as not all verifiers have to load the configuration table locally to them.
+The gateway has the task of parsing each packet to decide which stream it belongs to and forwarding it to the correct verifier.
 
 
 # **Program Arguments Passed to the different Executables**
