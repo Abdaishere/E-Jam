@@ -33,13 +33,31 @@ The verifier will use an *in-memory database* which holds the configurations of 
 
 
 #**Program Arguments Passed to the different Executables**
-Genertor: 
+Genertor: generator ID, stream config folder directory
 
-Verifier:
+Verifier: verifier ID, stream config folder directory
 
-Gateway:
+Gateway: mode gateway for sending or verifiying, # of generators of verifiers, interface on which to send and receive from the switch
 
+
+Note: each verifier instance is only responsible for verifier the packets belonging to a single stream
 #**Configuration file structure**
 The configuration file for the stream is stored in the directory /etc/EJam/ under the name config_xxx where xxx represents the streamID
 It contains the following fields each on a single line sequentially:
+
+- Stream ID
+- Generation Number
+- Verifier Number
+- Payload Type
+- Number of Packets
+- Payload Length
+- PRNG Seed
+- # of broadcast frames to send (per 100 frames of normal frames) (might be changed later)
+- interframe gap (in milliseconds)
+- lifetime
+- type of transport protocol to use
+- flow type (back to back, bursty)
+- burst length
+- burst delay
+- check content
 
