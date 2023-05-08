@@ -17,8 +17,8 @@
 // while r - l > 1:
 //     let mid = l + r / 2
 //   construct the stream with the overall throughput mid mbps for one minute
-//    riceve stats from stream
-//    if outOfOrderRacio == 0
+//    receive stats from stream
+//    if outOfOrderRatio == 0
 //        l = mid
 //     else
 //        r = mid

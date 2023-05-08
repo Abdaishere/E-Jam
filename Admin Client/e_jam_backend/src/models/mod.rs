@@ -13,6 +13,7 @@ use nanoid::nanoid;
 use regex::Regex;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
+use std::sync::MutexGuard;
 use std::{collections::HashMap, sync::Mutex};
 use validator::Validate;
 
@@ -348,21 +349,29 @@ changes the stream_id of the stream to a new id"]
     pub fn generate_new_stream_id(
         &mut self,
         stream_id_counter: &Mutex<usize>,
-        streams_entries: &Mutex<Vec<StreamEntry>>,
+        streams_entries: &MutexGuard<Vec<StreamEntry>>,
     ) {
+        info!("Generating stream id");
         loop {
             let id = nanoid!(3);
-            let list = streams_entries.lock().unwrap();
-            let checker = list.iter().find(|stream| stream.stream_id == id);
-
+            info!("Checking if stream id {} is unique", id);
+            let checker = streams_entries.iter().find(|stream| stream.stream_id == id);
             match checker {
-                Some(_) => continue,
+                Some(_) => {
+                    info!("Stream ID {} already used,  generating new one", id);
+                    continue;
+                }
                 None => {
-                    let mut stream_id_counter = stream_id_counter.lock().unwrap();
-                    debug!("{}{}", id, *stream_id_counter);
-                    *stream_id_counter += 1;
+                    info!("Stream ID {} is unique", id);
+                    let mut generated_stream_ids_counter = stream_id_counter.lock().unwrap();
+                    
+                    *generated_stream_ids_counter += 1;
+                    debug!(
+                        "generated id {}, total ids generated {}",
+                        id, *generated_stream_ids_counter
+                    );
                     self.stream_id = id;
-                    return;
+                    break;
                 }
             }
         }

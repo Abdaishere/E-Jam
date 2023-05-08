@@ -7,7 +7,7 @@
 ![Flutter](https://img.shields.io/badge/Flutter-Latest-blue)
 ![Dart](https://img.shields.io/badge/dart-Latest-blue)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Linux%20%7C%20Windows%20%7C%20MacOS-greenlight)
-![Version](https://img.shields.io/badge/version-1.0.1-Green)
+![Version](https://img.shields.io/badge/version-1.0.0+4-Green)
 ![Status](https://img.shields.io/badge/status-Testing-orange)
 
 ### About

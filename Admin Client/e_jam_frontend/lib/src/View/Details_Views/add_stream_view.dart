@@ -548,7 +548,7 @@ class IDNameFields extends StatelessWidget {
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter an ID';
+                return null;
               } else if (!RegExp(r'^\w{3}$').hasMatch(value)) {
                 return 'Please enter a valid ID';
               }
