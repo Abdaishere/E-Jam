@@ -1,5 +1,5 @@
-use log::info;
 use actix_web::{web, App, HttpServer};
+use log::info;
 mod models;
 mod services;
 
@@ -16,7 +16,7 @@ The Host and Port are defined as constants at the top of the file and are used t
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let app_state = web::Data::new(models::AppState::default());
-    
+
     log4rs::init_file("logger.yml", Default::default()).unwrap();
     info!(target: "system_level_logs","running on http://{}:{}", HOST, PORT);
 

@@ -13,8 +13,9 @@ use nanoid::nanoid;
 use regex::Regex;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use std::sync::MutexGuard;
-use std::{collections::HashMap, sync::Mutex};
+use std::collections::HashMap;
+use tokio::sync::Mutex;
+use tokio::sync::MutexGuard;
 use validator::Validate;
 
 lazy_static! {
@@ -111,6 +112,7 @@ pub struct StreamEntry {
         max = 50,
         message = "Name must be between 1 and 50 characters long"
     ))]
+    #[serde(default)]
     name: String,
 
     #[doc = r" ## Description
@@ -124,6 +126,7 @@ pub struct StreamEntry {
         max = 255,
         message = "Description must be between 1 and 255 characters long"
     ))]
+    #[serde(default)]
     description: String,
 
     #[doc = r" ## Last Updated
@@ -346,10 +349,10 @@ This function is used to generate a new id for the stream and check if the id is
 * `streams_entries` - A reference to a Mutex for Vec of StreamEntry that is used to check if the id of the stream is unique
 ## Returns
 changes the stream_id of the stream to a new id"]
-    pub fn generate_new_stream_id(
+    pub async fn generate_new_stream_id(
         &mut self,
         stream_id_counter: &Mutex<usize>,
-        streams_entries: &MutexGuard<Vec<StreamEntry>>,
+        streams_entries: &MutexGuard<'_, Vec<StreamEntry>>,
     ) {
         info!("Generating stream id");
         loop {
@@ -363,8 +366,8 @@ changes the stream_id of the stream to a new id"]
                 }
                 None => {
                     info!("Stream ID {} is unique", id);
-                    let mut generated_stream_ids_counter = stream_id_counter.lock().unwrap();
-                    
+                    let mut generated_stream_ids_counter = stream_id_counter.lock().await;
+
                     *generated_stream_ids_counter += 1;
                     debug!(
                         "generated id {}, total ids generated {}",
@@ -385,11 +388,16 @@ The Device notifies once if it was both a generator and verifier in the specifie
 * `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server
 ## Returns
 changes the stream_status to Running and updates the device status to Running"]
-    pub fn notify_process_running(&mut self, card_mac: &str, device_list: &Mutex<Vec<Device>>) {
+    pub async fn notify_process_running(
+        &mut self,
+        card_mac: &str,
+        device_list: &mut MutexGuard<'_, Vec<Device>>,
+    ) {
         /*
         check if the device is a generator
         if it is, mark the generator as Running
         */
+
         let device = Device::find_device(card_mac, device_list);
         match device {
             Some(device) => {
@@ -402,8 +410,6 @@ changes the stream_status to Running and updates the device status to Running"]
 
                     // then update the device status to Running
                     device_list
-                        .lock()
-                        .unwrap()
                         .get_mut(device)
                         .unwrap()
                         .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
@@ -422,8 +428,6 @@ changes the stream_status to Running and updates the device status to Running"]
 
                     // then update the device status to Running
                     device_list
-                        .lock()
-                        .unwrap()
                         .get_mut(device)
                         .unwrap()
                         .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
@@ -449,7 +453,11 @@ if there are devices left, the stream status will be set to finished
 * `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server
 ## Panics
 * `Error: Failed to lock the device list` - if the device list is locked"]
-    pub fn notify_process_completed(&mut self, card_mac: &str, device_list: &Mutex<Vec<Device>>) {
+    pub async fn notify_process_completed(
+        &mut self,
+        card_mac: &str,
+        device_list: &Mutex<Vec<Device>>,
+    ) {
         /*
         check if there are any devices left in the running streams list for this stream id
         if there are no devices left, remove the stream from the running streams list and set the stream status to stopped
@@ -458,8 +466,9 @@ if there are devices left, the stream status will be set to finished
         check if the device is a generator
         if it is, mark the generator as completed
         */
+        let mut device_list = device_list.lock().await;
 
-        let device = Device::find_device(card_mac, device_list);
+        let device = Device::find_device(card_mac, &device_list);
 
         match device {
             Some(device) => {
@@ -473,8 +482,6 @@ if there are devices left, the stream status will be set to finished
                     // then check if there are any other process running in the device
                     // if there are no other generators running, set the DeviceStatus to Idle
                     device_list
-                        .lock()
-                        .unwrap()
                         .get_mut(device)
                         .unwrap()
                         .update_device_status(&ProcessStatus::Completed, &ProcessType::Generation);
@@ -493,15 +500,10 @@ if there are devices left, the stream status will be set to finished
 
                     // then check if there are any other process running in the device
                     // if there are no other generators running, set the DeviceStatus to Idle
-                    device_list
-                        .lock()
-                        .unwrap()
-                        .get_mut(device)
-                        .unwrap()
-                        .update_device_status(
-                            &ProcessStatus::Completed,
-                            &ProcessType::Verification,
-                        );
+                    device_list.get_mut(device).unwrap().update_device_status(
+                        &ProcessStatus::Completed,
+                        &ProcessType::Verification,
+                    );
                 } else {
                     warn!("Verifier not found");
                 }
@@ -558,7 +560,11 @@ The send_stream function is used to send the stream to the devices that will gen
 * `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
 ## Errors
 * `reqwest::Error` - An error that is returned if the request failed"]
-    pub async fn send_stream(&mut self, delayed: bool, device_list: &Mutex<Vec<Device>>) -> usize {
+    pub async fn send_stream(
+        &mut self,
+        delayed: bool,
+        device_list: &mut MutexGuard<'_, Vec<Device>>,
+    ) -> usize {
         /*
             send the start request to all the senders and receivers
             if the request is successful, add the device to the running devices list
@@ -576,12 +582,7 @@ The send_stream function is used to send the stream to the devices that will gen
             }
             let receiver = receiver.unwrap();
 
-            let (ip_address, _, mac) = device_list
-                .lock()
-                .unwrap()
-                .get(receiver)
-                .unwrap()
-                .get_device_info_tuple();
+            let (ip_address, _, mac) = device_list.get(receiver).unwrap().get_device_info_tuple();
 
             verifiers_macs.push(mac);
 
@@ -607,12 +608,7 @@ The send_stream function is used to send the stream to the devices that will gen
 
             let receiver = receiver.unwrap();
 
-            let (ip_address, _, mac) = device_list
-                .lock()
-                .unwrap()
-                .get(receiver)
-                .unwrap()
-                .get_device_info_tuple();
+            let (ip_address, _, mac) = device_list.get(receiver).unwrap().get_device_info_tuple();
 
             generators_macs.push(mac);
 
@@ -636,26 +632,15 @@ The send_stream function is used to send the stream to the devices that will gen
                 let process_type = receiver.1;
                 let device_index = receiver.0;
 
-                let send_handler = || async {
-                    let mut devices = device_list.lock().unwrap();
-                    let device = devices.get_mut(device_index).unwrap();
+                let device = device_list.get_mut(device_index).unwrap();
 
-                    device
-                        .send_stream(&stream_details, self.get_stream_id(), &process_type)
-                        .await
-                };
-
-                let response = send_handler().await;
+                let response = device
+                    .send_stream(&stream_details, self.get_stream_id(), &process_type)
+                    .await;
                 // check if the request was successful
                 match response {
                     Ok(_response) => {
-                        let get_device_mut = || async {
-                            let mut list = device_list.lock().unwrap();
-
-                            list.get_mut(device_index).unwrap().to_owned()
-                        };
-
-                        let mut device = get_device_mut().await;
+                        let mut device = device_list.get_mut(device_index).unwrap().to_owned();
 
                         match _response.status() {
                             StatusCode::OK => {
@@ -736,8 +721,7 @@ The send_stream function is used to send the stream to the devices that will gen
                     Err(_error) => {
                         error!("Connection {}", _error);
 
-                        let mut list = device_list.lock().unwrap();
-                        let device = list.get_mut(device_index).unwrap();
+                        let device = device_list.get_mut(device_index).unwrap();
 
                         // set the receiver status to offline (generic error)
                         device.update_device_status(&ProcessStatus::Failed, &process_type);
@@ -812,7 +796,7 @@ if the request fails, the device status will be set to Offline
 * `generators error: {}` - if the request to the generator fails
 * `verifiers error: {}` - if the request to the verifier fails
 * `stream {} stopped` - the stream id"]
-    pub async fn stop_stream(&mut self, device_list: &Mutex<Vec<Device>>) {
+    pub async fn stop_stream(&mut self, device_list: &mut MutexGuard<'_, Vec<Device>>) {
         /*
         send the stop request to all the devices that are running the stream
         if the request is successful, set the device status to idle
@@ -861,12 +845,7 @@ if the request fails, the device status will be set to Offline
         }
 
         for device in target_devices {
-            let get_receiver = || async {
-                let mut list = device_list.lock().unwrap();
-                list.get_mut(device.1 .0).unwrap().to_owned()
-            };
-
-            let mut receiver = get_receiver().await;
+            let mut receiver = device_list.get_mut(device.1 .0).unwrap().to_owned();
 
             let response = receiver
                 .stop_stream(self.get_stream_id(), &device.1 .1)
@@ -1014,21 +993,15 @@ this will add the stream to the queue
         info!("Stream queued to start in {} seconds", self.delay / 1000);
 
         // send the stream to the client to update the stream status to queued
-        let connections = self.send_stream(true, device_list).await;
+        let connections = self.send_stream(true, &mut device_list.lock().await).await;
 
         // add the thread to the queued streams list
         if self.stream_status == StreamStatus::Sent {
             self.update_stream_status(StreamStatus::Queued);
             queued_streams
-            .lock()
-            .unwrap_or_else(|_| {
-                error!("Error: Failed to lock the queued streams list for adding stream {} to the queue", self.get_stream_id());
-                panic!(
-                    "Error: Failed to lock the queued streams list for adding stream {} to the queue",
-                    self.get_stream_id()
-                )
-        })
-            .push(self.get_stream_id().clone());
+                .lock()
+                .await
+                .push(self.get_stream_id().clone());
         }
         connections
     }
@@ -1049,18 +1022,10 @@ this will remove the stream from the queue
         device_list: &Mutex<Vec<Device>>,
     ) {
         // stop the stream
-        self.stop_stream(device_list).await;
+        self.stop_stream(&mut device_list.lock().await).await;
 
         // remove the stream from the queued streams list
-        let mut queue = queued_streams
-            .lock()
-            .unwrap_or_else(|_| {
-                error!("Error: Failed to lock the queued streams list for removing the stream from the queue {}", self.get_stream_id());
-                panic!(
-                    "Error: Failed to lock the queued streams list for removing the stream from the queue {}",
-                    self.get_stream_id()
-                )
-        });
+        let mut queue = queued_streams.lock().await;
 
         // remove the stream from the queued streams vector
         let index = queue.iter().position(|x| x == self.get_stream_id());

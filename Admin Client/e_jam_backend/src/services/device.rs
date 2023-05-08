@@ -1,9 +1,10 @@
 
-use log::{ info, debug, error};
+use log::{ info, debug};
 use super::AppState;
 use crate::models::device::Device;
 use actix_web::Responder;
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
+
 
 #[doc = r"# Get all devices
 get all devices in the list of devices
@@ -18,8 +19,7 @@ if the list is not found, return a 500 Internal Server Error
 async fn get_devices(data: web::Data<AppState>) -> impl Responder {
     let devices = data
         .device_list
-        .lock()
-        .expect("failed to lock device list in get all devices")
+        .lock().await
         .clone();
 
     match devices.len() {
@@ -45,9 +45,7 @@ async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) ->
     let devices = data
         .device_list
         .lock()
-        .unwrap_or_else(|_|{ error!("failed to lock device list in get device {}", device_mac);
-        panic!("failed to lock device list in get device {}", device_mac)
-    });
+    .await;
 
     let device = devices
         .iter()
@@ -73,11 +71,7 @@ if the device is not in the list, add it and return a 201 Created
 * `failed to lock device list in add device {device_mac}` - if the device list is not found in the mutex lock"]
 #[post("/devices")]
 async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
-    let mut devices = data.device_list.lock().unwrap_or_else(|_| { error!("failed to lock device list in add device {}",
-            new_device.get_device_mac());
-        panic!("failed to lock device list in add device {}",
-            new_device.get_device_mac())
-        });
+    let mut devices = data.device_list.lock().await;
     let device_index = devices
         .iter()
         .position(|device| device.get_device_mac() == new_device.get_device_mac());
@@ -107,11 +101,7 @@ async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -
         let mut devices = data
         .device_list
         .lock()
-        .unwrap_or_else(|_| {
-            error!("failed to lock device list in ping device {}", device_mac);
-            panic!("failed to lock device list in ping device {}", device_mac);
-    
-    });
+        .await;
     
     let device_index = devices
     .iter()
@@ -174,8 +164,7 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
 
     let mut devices = data
         .device_list
-        .lock()
-        .expect("failed to lock device list in ping all devices");
+        .lock().await;
 
     match devices.len() {
         0 => HttpResponse::NoContent().body("No devices in the system, please add some devices and try again"),
@@ -221,9 +210,7 @@ async fn update_device(
     let mut devices = data
         .device_list
         .lock()
-        .unwrap_or_else(|_| { error!("failed to lock device list in update device {}", device_mac);
-        panic!("failed to lock device list in update device {}", device_mac);
-    } );
+        .await;
 
     let device_entry = devices
         .iter_mut()
@@ -264,9 +251,7 @@ async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>)
     let mut devices = data
         .device_list
         .lock()
-        .unwrap_or_else(|_|{ error!("failed to lock device list in delete device {}", device_mac);
-        panic!("failed to lock device list in delete device {}", device_mac);
-    });
+        .await;
     let device_index = devices
         .iter()
         .position(|device| device.get_device_mac() == &device_mac);
@@ -304,11 +289,7 @@ async fn stream_finished(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
-    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {error!("Failed to lock streams_entries in stream finished {}",
-            stream_id);
-        panic!("Failed to lock streams_entries in stream finished {}",
-            stream_id);
-        });
+    let mut streams_entries = data.streams_entries.lock().await;
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
@@ -319,7 +300,7 @@ async fn stream_finished(
                 // get the ip address of the client
                 let ip = val.ip().to_string();
 
-                stream_entry.notify_process_completed(mac_address, &data.device_list);
+                stream_entry.notify_process_completed(mac_address, &data.device_list).await;
                 info!("stream finished {} by {}", stream_id, ip);
             };
 
@@ -351,12 +332,7 @@ async fn stream_started(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
-    let mut streams_entries = data.streams_entries.lock().unwrap_or_else(|_| {error!("Failed to lock streams_entries in stream started {}",
-            stream_id);
-        panic!("Failed to lock streams_entries in stream started {}",
-            stream_id);
-            
-        });
+    let mut streams_entries = data.streams_entries.lock().await;
 
     let stream_entry = streams_entries
         .iter_mut()
@@ -366,7 +342,7 @@ async fn stream_started(
         Some(stream_entry) => {
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
-                stream_entry.notify_process_running(mac_address, &data.device_list);
+                stream_entry.notify_process_running(mac_address, &mut data.device_list.lock().await).await;
                 info!(
                     "Address {} notified of starting the stream {}",
                     val.ip(),

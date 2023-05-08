@@ -1,8 +1,8 @@
-use std::{sync::Mutex, time::Duration};
-
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
+use tokio::sync::MutexGuard;
 use validator::Validate;
 
 use super::{
@@ -247,11 +247,7 @@ this is also done to mimic the behavior of another device by changing the name o
 * `Option of Device` - the device if found else None
 # Panics
 * `Error: Failed to find the device` - if the device list is locked"]
-    pub fn find_device(name: &str, device_list: &Mutex<Vec<Device>>) -> Option<usize> {
-        let device_list = device_list
-            .lock()
-            .expect("Error: Failed to find the device");
-
+    pub fn find_device(name: &str, device_list: &MutexGuard<'_, Vec<Device>>) -> Option<usize> {
         // find in all mac addresses
         for (index, device) in device_list.iter().enumerate() {
             if device.mac_address == name {
