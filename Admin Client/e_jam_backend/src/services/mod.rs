@@ -280,10 +280,10 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                     StreamStatus::Queued => HttpResponse::Ok().body(format!(
                         "Stream is queued to start after {} seconds for {} devices",
                         stream_entry.get_stream_delay_seconds(),
-                        connections.unwrap()
+                        connections
                     )),
                     StreamStatus::Error => {
-                        match connections.unwrap() {
+                        match connections {
                             0 => {
                                 HttpResponse::InternalServerError().body("No devices are running the stream".to_string())
                             }
@@ -301,7 +301,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                     _ => HttpResponse::Ok().body(format!(
                         "Stream {} is sent for {} devices with status {}",
                         stream_entry.get_stream_id(),
-                        connections.unwrap(),
+                        connections,
                         stream_entry.get_stream_status().to_string()
                     )),
                 }
@@ -390,20 +390,15 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
 
-    let connections = streams_entries
+    let queues = streams_entries
         .iter_mut()
         .map(|stream_entry| stream_entry.queue_stream(&data.queued_streams, &data.device_list))
         .collect::<Vec<_>>();
 
-    let mut counter = 0;
-    for connection in connections {
-        match connection.await {
-            Ok(connections) => {
-                counter += connections;
-            }
-            Err(e) => {
-                error!("Failed to queue stream to start: {}", e);
-            }
+    let mut counter:usize = 0;
+    for connections in queues {
+        if connections.await > 1 {
+            counter += 1;
         }
     }
 

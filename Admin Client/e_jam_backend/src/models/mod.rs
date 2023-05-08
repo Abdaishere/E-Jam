@@ -11,7 +11,7 @@ use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
 use nanoid::nanoid;
 use regex::Regex;
-use reqwest::{StatusCode, Error};
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
@@ -987,10 +987,10 @@ this will add the stream to the queue
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
         device_list: &Mutex<Vec<Device>>,
-    ) -> Result<usize, Error> {
+    ) -> usize {
         if self.stream_status == StreamStatus::Running
             || self.stream_status == StreamStatus::Queued {
-                return Ok(0);
+                return 0;
             }
         // log the start time
         info!("Stream queued to start in {} seconds", self.delay / 1000);
@@ -1006,7 +1006,7 @@ this will add the stream to the queue
                 .await
                 .push(self.get_stream_id().clone());
         }
-        Ok(connections)
+        connections
     }
 
     #[doc = r" ## Remove Stream From Queue

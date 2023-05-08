@@ -21,4 +21,3 @@ apache-avro = "0.14.0"
 nanoid = "0.4.0"
 log4rs = { version = "1.2.0", features = ["gzip"] }
 log = "0.4.17"
-futures = "0.3.28"
