@@ -1,6 +1,6 @@
 use super::models::{AppState, StreamEntry, StreamStatus};
 use crate::models::{device::get_devices_table, stream_details::StreamStatusDetails};
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use actix_web::{delete, get,post, put, web, HttpResponse, Responder};
 use log::{debug, error, info, warn};
 
 pub(crate) mod consumer;
@@ -280,25 +280,28 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                     StreamStatus::Queued => HttpResponse::Ok().body(format!(
                         "Stream is queued to start after {} seconds for {} devices",
                         stream_entry.get_stream_delay_seconds(),
-                        connections
+                        connections.unwrap()
                     )),
                     StreamStatus::Error => {
-                        if connections == 0 {
-                            HttpResponse::InternalServerError()
-                                .body("No devices are running the stream")
-                        } else if connections == 1 {
-                            HttpResponse::InternalServerError()
-                                .body("Only one Process type is running the stream")
-                        } else {
-                            HttpResponse::InternalServerError()
-                                .body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
+                        match connections.unwrap() {
+                            0 => {
+                                HttpResponse::InternalServerError().body("No devices are running the stream".to_string())
+                            }
+                            1 => {
+                                HttpResponse::InternalServerError().body("Only one Process type is running the stream".to_string())
+                            }
+                            _ => {
+                                HttpResponse::InternalServerError().body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
                                 stream_entry.get_stream_status().to_string()))
+                            }
+                            
                         }
+                       
                     }
                     _ => HttpResponse::Ok().body(format!(
                         "Stream {} is sent for {} devices with status {}",
                         stream_entry.get_stream_id(),
-                        connections,
+                        connections.unwrap(),
                         stream_entry.get_stream_status().to_string()
                     )),
                 }
@@ -387,22 +390,25 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
 
+    let connections = streams_entries
+        .iter_mut()
+        .map(|stream_entry| stream_entry.queue_stream(&data.queued_streams, &data.device_list))
+        .collect::<Vec<_>>();
+
     let mut counter = 0;
-    for stream_entry in streams_entries.iter_mut() {
-        if !(stream_entry.check_stream_status(StreamStatus::Running)
-            || stream_entry.check_stream_status(StreamStatus::Queued))
-        {
-            stream_entry
-                .queue_stream(&data.queued_streams, &data.device_list)
-                .await;
-            if stream_entry.get_stream_status() == &StreamStatus::Queued {
-                counter += 1;
+    for connection in connections {
+        match connection.await {
+            Ok(connections) => {
+                counter += connections;
+            }
+            Err(e) => {
+                error!("Failed to queue stream to start: {}", e);
             }
         }
     }
 
     info!("Queued all streams to start");
-    HttpResponse::Ok().body(format!("Queued {} streams to start", counter))
+    HttpResponse::Ok().body(format!("Queued {} streams to start successfully", counter))
 }
 
 #[doc = r"# Stop All Streams
@@ -441,13 +447,13 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             stream_entry
                 .stop_stream(&mut data.device_list.lock().await)
                 .await;
-
-            if stream_entry.check_stream_status(StreamStatus::Stopped) {
-                counter += 1;
-                info!("Stopped stream {}", stream_entry.get_stream_id());
-            } else {
-                error!("Failed to stop stream {}", stream_entry.get_stream_id());
-            }
+            
+        if stream_entry.check_stream_status(StreamStatus::Stopped) {
+            counter += 1;
+            info!("Stopped stream {}", stream_entry.get_stream_id());
+        } else {
+            error!("Failed to stop stream {}", stream_entry.get_stream_id());
+        }
         }
     }
 

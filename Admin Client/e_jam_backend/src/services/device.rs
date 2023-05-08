@@ -1,10 +1,8 @@
-
-use log::{ info, debug};
 use super::AppState;
 use crate::models::device::Device;
 use actix_web::Responder;
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
-
+use log::{debug, info};
 
 #[doc = r"# Get all devices
 get all devices in the list of devices
@@ -17,10 +15,7 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[get("/devices")]
 async fn get_devices(data: web::Data<AppState>) -> impl Responder {
-    let devices = data
-        .device_list
-        .lock().await
-        .clone();
+    let devices = data.device_list.lock().await.clone();
 
     match devices.len() {
         0 => HttpResponse::NoContent()
@@ -42,10 +37,7 @@ if the device is found, return a 200 OK
 #[get("/devices/{device_mac}")]
 async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_mac = device_mac.into_inner();
-    let devices = data
-        .device_list
-        .lock()
-    .await;
+    let devices = data.device_list.lock().await;
 
     let device = devices
         .iter()
@@ -96,35 +88,36 @@ if the device is found, ping it and return the result and update the device in t
 #[get("/devices/{device_mac}/ping")]
 async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_mac = device_mac.into_inner();
-        
 
-        let mut devices = data
-        .device_list
-        .lock()
-        .await;
-    
+    let mut devices = data.device_list.lock().await;
+
     let device_index = devices
-    .iter()
-    .position(|device| device.get_device_mac() == &device_mac);
-    
-    
+        .iter()
+        .position(|device| device.get_device_mac() == &device_mac);
 
     let device_index = devices.get_mut(device_index.unwrap());
 
     let device = match device_index {
         Some(device) => device,
-        None => return HttpResponse::NotFound().body(format!(
-            "Device {} not found, please check the device mac address and try again",
+        None => {
+            return HttpResponse::NotFound().body(format!(
+                "Device {} not found, please check the device mac address and try again",
+                device_mac
+            ))
+        }
+    };
+
+    let response = device.is_reachable();
+    match response.await {
+        true => HttpResponse::Ok().body(format!(
+            "Device {} is reachable and online in the network",
             device_mac
         )),
-    };
-   
-            let response =  device.is_reachable();
-            match response.await {
-                true => HttpResponse::Ok().body(format!("Device {} is reachable and online in the network", device_mac)),
-                false => HttpResponse::InternalServerError().body(format!("Device {} is not reachable, please check the device and try again", device_mac)),
-            }
-   
+        false => HttpResponse::InternalServerError().body(format!(
+            "Device {} is not reachable, please check the device and try again",
+            device_mac
+        )),
+    }
 }
 
 #[doc = r"# Check a new device
@@ -160,27 +153,28 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[get("/devices/ping_all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
-
-
-    let mut devices = data
-        .device_list
-        .lock().await;
+    let mut devices = data.device_list.lock().await;
 
     match devices.len() {
-        0 => HttpResponse::NoContent().body("No devices in the system, please add some devices and try again"),
+        0 => HttpResponse::NoContent()
+            .body("No devices in the system, please add some devices and try again"),
         _ => {
+            let handles = devices.iter_mut().map(|device| device.is_reachable());
+
             let mut counter = 0;
-            for device in devices.iter_mut() {
-                let online = device.is_reachable().await;
-                if online { counter += 1};
+            for handle in handles {
+                if handle.await {
+                    counter += 1;
+                }
             }
+
             match counter {
-                0 => HttpResponse::InternalServerError().body("Could not reach any device, please check the devices and try again"),
+                0 => HttpResponse::InternalServerError()
+                    .body("Could not reach any device, please check the devices and try again"),
                 _ => HttpResponse::Ok().body(format!(
-                    "Ping all devices completed, {} devices are reachable and online in the network",
-                    counter
-                ))
-                
+            "Ping all devices completed, {} devices are reachable and online in the network",
+            counter
+                )),
             }
         }
     }
@@ -207,10 +201,7 @@ async fn update_device(
 ) -> impl Responder {
     let device_mac = device_mac.into_inner();
 
-    let mut devices = data
-        .device_list
-        .lock()
-        .await;
+    let mut devices = data.device_list.lock().await;
 
     let device_entry = devices
         .iter_mut()
@@ -248,17 +239,17 @@ if the device is found, delete it and return a 200 OK
 #[delete("/devices/{device_mac}")]
 async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_mac = device_mac.into_inner();
-    let mut devices = data
-        .device_list
-        .lock()
-        .await;
+    let mut devices = data.device_list.lock().await;
     let device_index = devices
         .iter()
         .position(|device| device.get_device_mac() == &device_mac);
     match device_index {
         Some(device_index) => {
             devices.remove(device_index);
-            HttpResponse::Ok().body(format!("Device {} deleted successfully and will not be reachable in the system", device_mac))
+            HttpResponse::Ok().body(format!(
+                "Device {} deleted successfully and will not be reachable in the system",
+                device_mac
+            ))
         }
         None => HttpResponse::NotFound().body(format!(
             "Device {} not found, please check the device mac address and try again",
@@ -300,7 +291,9 @@ async fn stream_finished(
                 // get the ip address of the client
                 let ip = val.ip().to_string();
 
-                stream_entry.notify_process_completed(mac_address, &data.device_list).await;
+                stream_entry
+                    .notify_process_completed(mac_address, &mut data.device_list.lock().await)
+                    .await;
                 info!("stream finished {} by {}", stream_id, ip);
             };
 
@@ -337,12 +330,14 @@ async fn stream_started(
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
-    
+
     match stream_entry {
         Some(stream_entry) => {
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
-                stream_entry.notify_process_running(mac_address, &mut data.device_list.lock().await).await;
+                stream_entry
+                    .notify_process_running(mac_address, &mut data.device_list.lock().await)
+                    .await;
                 info!(
                     "Address {} notified of starting the stream {}",
                     val.ip(),

@@ -11,7 +11,7 @@ use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
 use nanoid::nanoid;
 use regex::Regex;
-use reqwest::StatusCode;
+use reqwest::{StatusCode, Error};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
@@ -456,7 +456,7 @@ if there are devices left, the stream status will be set to finished
     pub async fn notify_process_completed(
         &mut self,
         card_mac: &str,
-        device_list: &Mutex<Vec<Device>>,
+        device_list: &mut MutexGuard<'_,Vec<Device>>,
     ) {
         /*
         check if there are any devices left in the running streams list for this stream id
@@ -466,9 +466,8 @@ if there are devices left, the stream status will be set to finished
         check if the device is a generator
         if it is, mark the generator as completed
         */
-        let mut device_list = device_list.lock().await;
 
-        let device = Device::find_device(card_mac, &device_list);
+        let device = Device::find_device(card_mac, device_list);
 
         match device {
             Some(device) => {
@@ -988,7 +987,11 @@ this will add the stream to the queue
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
         device_list: &Mutex<Vec<Device>>,
-    ) -> usize {
+    ) -> Result<usize, Error> {
+        if self.stream_status == StreamStatus::Running
+            || self.stream_status == StreamStatus::Queued {
+                return Ok(0);
+            }
         // log the start time
         info!("Stream queued to start in {} seconds", self.delay / 1000);
 
@@ -1003,7 +1006,7 @@ this will add the stream to the queue
                 .await
                 .push(self.get_stream_id().clone());
         }
-        connections
+        Ok(connections)
     }
 
     #[doc = r" ## Remove Stream From Queue
