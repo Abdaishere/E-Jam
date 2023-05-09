@@ -162,7 +162,7 @@ this function is used to update the device status according to the status of the
 ## Panics
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
-    pub fn update_device_status(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
+    pub fn update_device_status(&mut self, status: ProcessStatus, type_of_process: &ProcessType) {
         let prev_status = self.status.clone();
 
         // update the number of processes that are running on the device
@@ -200,7 +200,7 @@ this function is used to update the device status according to the status of the
         // The device is offline if the status of the process is failed (the process failed to start)
         match self.gen_processes + self.ver_processes {
             0 => {
-                self.status = if status == &ProcessStatus::Failed {
+                self.status = if status == ProcessStatus::Failed {
                     DeviceStatus::Offline
                 } else {
                     DeviceStatus::Online

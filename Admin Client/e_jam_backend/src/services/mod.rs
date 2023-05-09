@@ -429,26 +429,33 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
 
-    let mut counter = 0;
-    let mut unqueued = 0;
-    for stream_entry in streams_entries.iter_mut() {
+
+    let tasks = streams_entries
+        .iter_mut().map(|stream_entry| async {
         // if the stream is queued, remove it from the queue
         if stream_entry.check_stream_status(StreamStatus::Queued) {
-            stream_entry
+            return stream_entry
                 .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                 .await;
-            unqueued += 1;
         } else if stream_entry.check_stream_status(StreamStatus::Running) {
-            stream_entry
+            return stream_entry
                 .stop_stream(&mut data.device_list.lock().await)
                 .await;
-            
-        if stream_entry.check_stream_status(StreamStatus::Stopped) {
-            counter += 1;
-            info!("Stopped stream {}", stream_entry.get_stream_id());
-        } else {
-            error!("Failed to stop stream {}", stream_entry.get_stream_id());
         }
+        stream_entry.get_stream_status().clone()
+    }).collect::<Vec<_>>();
+
+    let mut counter = 0;
+    let mut unqueued = 0;
+
+    for task in tasks {
+        match task.await {
+            StreamStatus::Queued => unqueued += 1,
+            StreamStatus::Stopped => 
+                    counter+=1,
+                StreamStatus::Running=> 
+                    error!("Failed to stop some streams"),
+            _=> info!("stream already stopped"),
         }
     }
 
