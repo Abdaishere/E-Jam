@@ -1,7 +1,10 @@
-use chrono::{Utc, DateTime, serde::{ts_seconds_option, ts_seconds}};
+use super::{StreamStatus, STREAM_ID};
+use chrono::{
+    serde::{ts_seconds, ts_seconds_option},
+    DateTime, Utc,
+};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-use super::{STREAM_ID, StreamStatus};
 
 #[doc = r" # Stream Details
 The StreamDetails struct is used to store the information about the stream that is sent to the device to start or queue the stream
@@ -33,7 +36,7 @@ pub struct StreamDetails {
     pub number_of_packets: u64,
     pub payload_length: u64,
     pub burst_length: u64,
-    pub burst_delay: u64, 
+    pub burst_delay: u64,
     pub seed: u64,
     pub broadcast_frames: u64,
     pub inter_frame_gap: u64,
@@ -58,7 +61,6 @@ pub struct StreamStatusDetails {
         message = "Name must be between 1 and 50 characters long"
     ))]
     pub name: String,
-
 
     #[doc = r" ## Stream ID
     This is the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 characters

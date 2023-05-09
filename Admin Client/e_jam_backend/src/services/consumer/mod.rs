@@ -15,7 +15,6 @@ const FETCH_OFFSET: FetchOffset = FetchOffset::Earliest;
 const GENERATOR_TOPIC: &str = "Generator";
 const VERIFIER_TOPIC: &str = "Verifier";
 
-
 pub fn run_generator_consumer() {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
     let sr_settings = SrSettings::new(schema_registry_url);

@@ -1,6 +1,6 @@
 use super::models::{AppState, StreamEntry, StreamStatus};
 use crate::models::{device::get_devices_table, stream_details::StreamStatusDetails};
-use actix_web::{delete, get,post, put, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use log::{debug, error, info, warn};
 
 pub(crate) mod consumer;
@@ -293,10 +293,8 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                             _ => {
                                 HttpResponse::InternalServerError().body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
                                 stream_entry.get_stream_status().to_string()))
-                            }
-                            
+                            },
                         }
-                       
                     }
                     _ => HttpResponse::Ok().body(format!(
                         "Stream {} is sent for {} devices with status {}",
@@ -395,7 +393,7 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         .map(|stream_entry| stream_entry.queue_stream(&data.queued_streams, &data.device_list))
         .collect::<Vec<_>>();
 
-    let mut counter:usize = 0;
+    let mut counter: usize = 0;
     for connections in queues {
         if connections.await > 1 {
             counter += 1;
@@ -429,21 +427,22 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
 
-
     let tasks = streams_entries
-        .iter_mut().map(|stream_entry| async {
-        // if the stream is queued, remove it from the queue
-        if stream_entry.check_stream_status(StreamStatus::Queued) {
-            return stream_entry
-                .remove_stream_from_queue(&data.queued_streams, &data.device_list)
-                .await;
-        } else if stream_entry.check_stream_status(StreamStatus::Running) {
-            return stream_entry
-                .stop_stream(&mut data.device_list.lock().await)
-                .await;
-        }
-        stream_entry.get_stream_status().clone()
-    }).collect::<Vec<_>>();
+        .iter_mut()
+        .map(|stream_entry| async {
+            // if the stream is queued, remove it from the queue
+            if stream_entry.check_stream_status(StreamStatus::Queued) {
+                return stream_entry
+                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
+                    .await;
+            } else if stream_entry.check_stream_status(StreamStatus::Running) {
+                return stream_entry
+                    .stop_stream(&mut data.device_list.lock().await)
+                    .await;
+            }
+            stream_entry.get_stream_status().clone()
+        })
+        .collect::<Vec<_>>();
 
     let mut counter = 0;
     let mut unqueued = 0;
@@ -451,11 +450,9 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
     for task in tasks {
         match task.await {
             StreamStatus::Queued => unqueued += 1,
-            StreamStatus::Stopped => 
-                    counter+=1,
-                StreamStatus::Running=> 
-                    error!("Failed to stop some streams"),
-            _=> info!("stream already stopped"),
+            StreamStatus::Stopped => counter += 1,
+            StreamStatus::Running => error!("Failed to stop some streams"),
+            _ => info!("stream already stopped"),
         }
     }
 

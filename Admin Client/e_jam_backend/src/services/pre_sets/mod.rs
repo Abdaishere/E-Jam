@@ -24,7 +24,7 @@
 //        r = mid
 //     endWhile
 // return l
-//    
+//
 //
 // finales kafka broker
 // conditionals

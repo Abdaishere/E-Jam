@@ -689,7 +689,10 @@ if the request fails, the device status will be set to Offline
 * `generators error: {}` - if the request to the generator fails
 * `verifiers error: {}` - if the request to the verifier fails
 * `stream {} stopped` - the stream id"]
-    pub async fn stop_stream(&mut self, device_list: &mut MutexGuard<'_, Vec<Device>>) -> StreamStatus {
+    pub async fn stop_stream(
+        &mut self,
+        device_list: &mut MutexGuard<'_, Vec<Device>>,
+    ) -> StreamStatus {
         /*
         send the stop request to all the devices that are running the stream
         if the request is successful, set the device status to idle
