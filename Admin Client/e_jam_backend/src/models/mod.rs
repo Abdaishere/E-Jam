@@ -1,4 +1,5 @@
 use log::{debug, error, info, warn};
+use tokio::task::JoinHandle;
 pub(crate) mod device;
 pub(crate) mod process;
 pub(crate) mod statistics;
@@ -19,10 +20,9 @@ use tokio::sync::MutexGuard;
 use validator::Validate;
 
 lazy_static! {
-    #[doc = r"Regex for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 characters
+    #[doc = r"Regex for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters
     example of a valid stream id: 123, abc, 1a2, 1A2, 1aB, 1Ab, 1AB, _1A, _1a, _1_, _1a2, _1A2, _1aB, _1Ab, _1AB"]
-    static ref STREAM_ID : Regex = Regex::new(r"^\w{3}$").unwrap();
-
+    static ref STREAM_ID : Regex = Regex::new(r"^[A-Za-z0-9_~]{3}$").unwrap();
 
     #[doc = r"Regex for the mac address of the device's mac address
     example of a valid mac address: 00:00:00:00:00:00, 00-00-00-00-00-00"]
@@ -36,15 +36,15 @@ lazy_static! {
 #[doc = r" # App State
 The state of the Server that is shared between all the threads of the server
 This is used to store the list of all the devices that are connected to the server and the list of all the streams and the list of all the streams that are currently Queued to be started on the devices
-This is also used to store the counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 characters
+This is also used to store the counter for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters
 All the values are wrapped in a Mutex to allow for thread safe access to the values from all the threads of the server.
 ## Values
 * `streams_entries` - A Vec of StreamEntry struct that represents the list of all the streams that are currently running on the devices
 * `queued_streams` - A Vec of Strings that represents the list of all the streams that are currently Queued to be started on the devices
 * `device_list` - A Vec of Device struct that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
-* `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be 3 alphanumeric characters"]
+* `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be 3 URL-friendly characters"]
 pub struct AppState {
-    pub streams_entries: Mutex<Vec<StreamEntry>>,
+    pub stream_entries: Mutex<Vec<StreamEntry>>,
 
     #[doc = r"List of all the streams that are currently Queued to be started on the devices"]
     pub queued_streams: Mutex<Vec<String>>,
@@ -52,14 +52,14 @@ pub struct AppState {
     #[doc = r"List of all the devices that are currently connected to the server (mac address, device name and ip address)"]
     pub device_list: Mutex<Vec<Device>>,
 
-    #[doc = r"Counter for the stream id that is used to identify the stream in the device must be alphanumeric max is 3 characters"]
+    #[doc = r"Counter for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters"]
     pub stream_id_counter: Mutex<usize>,
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
-            streams_entries: Mutex::new(Vec::new()),
+            stream_entries: Mutex::new(Vec::new()),
             device_list: Mutex::new(Vec::new()),
             queued_streams: Mutex::new(Vec::new()),
             stream_id_counter: Mutex::new(0),
@@ -73,7 +73,7 @@ Notice: The stream Data is sent in camelCase naming style
 
 ## Values
 
-- `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 bytes (36^3 = 46656)
+- `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be URL-friendly, max is 3 bytes (36^3 = 46656)
 - `name` - A String that represents the name of the stream (used for clarification)
 - `description` - A String that represents the description of the stream (used for clarification)
 - `last_updated` - A DateTime in Utc that represents the last time that the stream was updated (used for clarification)
@@ -108,9 +108,9 @@ pub struct StreamEntry {
     * The name must be less than 50 characters long
     "]
     #[validate(length(
-        min = 1,
+        min = 0,
         max = 50,
-        message = "Name must be between 1 and 50 characters long"
+        message = "Name must be between 0 and 50 characters long"
     ))]
     #[serde(default)]
     name: String,
@@ -122,9 +122,9 @@ pub struct StreamEntry {
     * The description must be less than 255 characters long
     "]
     #[validate(length(
-        min = 1,
+        min = 0,
         max = 255,
-        message = "Description must be between 1 and 255 characters long"
+        message = "Description must be between 0 and 255 characters long"
     ))]
     #[serde(default)]
     description: String,
@@ -164,16 +164,16 @@ pub struct StreamEntry {
     delay: u64,
 
     #[doc = r" ## Stream ID
-    This is the id of the stream that is used to identify the stream in the device, must be alphanumeric, max is 3 characters
+    This is the id of the stream that is used to identify the stream in the device, must be URL-friendly, max is 3 characters
     The stream id is generated by the server and is unique or can be given by the user (if the user gives the id it must be unique)
     ## Constraints
     * Must be given (length is 3)
-    * Must be alphanumeric (a-z (only by user), A-Z, 0-9)
+    * Must be URL-friendly ((\w) by user, (A-Za-z0-9_~) by the server)
     * check the regex `STREAM_ID` for more details
     "]
     #[validate(regex(
         path = "STREAM_ID",
-        message = "Stream ID must be alphanumeric and 3 characters long"
+        message = "Stream ID must be URL-friendly and 3 characters long"
     ))]
     #[serde(default)]
     stream_id: String,
@@ -349,7 +349,7 @@ This function is used to generate a new id for the stream and check if the id is
 * `streams_entries` - A reference to a Mutex for Vec of StreamEntry that is used to check if the id of the stream is unique
 ## Returns
 changes the stream_id of the stream to a new id"]
-    pub async fn generate_new_stream_id(
+    pub async fn generate_stream_id(
         &mut self,
         stream_id_counter: &Mutex<usize>,
         streams_entries: &MutexGuard<'_, Vec<StreamEntry>>,
@@ -396,14 +396,13 @@ changes the stream_status to Running and updates the device status to Running"]
         card_mac: &str,
         device_list: &mut MutexGuard<'_, Vec<Device>>,
     ) {
-        /*
-        check if the device is a generator
-        if it is, mark the generator as Running
-        */
-
         let device = Device::find_device(card_mac, device_list);
         match device {
             Some(device) => {
+                /*
+                check if the device is a generator
+                if it is, mark the generator as Running
+                */
                 let process = self.running_generators.get(card_mac);
                 if process.is_some() {
                     self.running_generators
@@ -571,7 +570,7 @@ The send_stream function is used to send the stream to the devices that will gen
             send the start request to all the senders and receivers
             if the request is successful, add the device to the running devices list
             if the request fails, set the device status to offline
-            NOTE: if the device has multiple cards, the request will be sent to all the cards in the device and the device will be added to the running devices list
+            NOTE: if the device has multiple MACs, the request will be sent to all the MACs in the device and the device will be added to the running devices list
         */
         let mut target_devices_pool: HashMap<String, Vec<(usize, ProcessType)>> = HashMap::new();
 
@@ -628,25 +627,28 @@ The send_stream function is used to send the stream to the devices that will gen
         }
 
         let stream_details = self.get_stream_details(delayed, generators_macs, verifiers_macs);
+        let handles =
+            self.send_stream_to_devices(&target_devices_pool, device_list, &stream_details);
 
-        for receivers in target_devices_pool {
-            for receiver in receivers.1 {
-                let process_type = receiver.1;
-                let device_index = receiver.0;
+        for (i, (ip, handle)) in handles.into_iter().enumerate() {
+            match handle.await {
+                Ok(response) => {
+                    info!("Stream sent to device {}", i);
+                    let processes = target_devices_pool.get(&ip).unwrap();
 
-                let device = device_list.get_mut(device_index).unwrap();
-
-                let response = device
-                    .send_stream(&stream_details, self.get_stream_id(), &process_type)
-                    .await;
-                // check if the request was successful
-                self.analyze_response(
-                    response,
-                    process_type,
-                    device_list.get_mut(device_index).unwrap(),
-                    true,
-                )
-                .await;
+                    for (device_index, process_type) in processes {
+                        self.analyze_response(
+                            &response,
+                            process_type,
+                            device_list.get_mut(device_index.to_owned()).unwrap(),
+                            false,
+                        )
+                        .await
+                    }
+                }
+                Err(e) => {
+                    error!("Error sending stream to device {}: {}", i, e);
+                }
             }
         }
 
@@ -675,6 +677,40 @@ The send_stream function is used to send the stream to the devices that will gen
             self.update_stream_status(StreamStatus::Sent);
         }
         devices_received
+    }
+
+    #[doc = r" ## Send Stream To Devices
+The send_stream_to_devices function is used to send the stream to the devices that will generate and verify the stream and return a list of JoinHandles
+## Arguments
+* `target_devices_pool` - A HashMap that contains the IP address of the devices as keys and a Vec of tuples that contain the index of the device in the device list and the ProcessType as values
+* `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
+* `stream_details` - A StreamDetails struct that contains the details of the stream
+## Returns
+* `Vec<JoinHandle<()>>` - A list of JoinHandles that can be used to wait for the threads to finish"]
+    pub fn send_stream_to_devices(
+        &self,
+        target_devices_pool: &HashMap<String, Vec<(usize, ProcessType)>>,
+        device_list: &MutexGuard<'_, Vec<Device>>,
+        stream_details: &StreamDetails,
+    ) -> Vec<(
+        String,
+        JoinHandle<Result<reqwest::Response, reqwest::Error>>,
+    )> {
+        let mut handles: Vec<(
+            String,
+            JoinHandle<Result<reqwest::Response, reqwest::Error>>,
+        )> = Vec::new();
+
+        for receivers in target_devices_pool {
+            let receiver = receivers.1.first().unwrap();
+            let device = device_list.get(receiver.0).unwrap().clone();
+            let stream_details = stream_details.clone();
+
+            let handle = tokio::spawn(async move { device.send_stream(&stream_details).await });
+
+            handles.push((receivers.0.clone(), handle));
+        }
+        handles
     }
 
     #[doc = r" ## Stop Stream
@@ -740,16 +776,22 @@ if the request fails, the device status will be set to Offline
             }
         }
 
-        for device_info in target_devices_pool {
-            let mut device = device_list.get_mut(device_info.1 .0).unwrap().to_owned();
+        let handles = self.stop_stream_on_devices(&target_devices_pool, device_list);
 
-            let response = device
-                .stop_stream(self.get_stream_id(), &device_info.1 .1)
-                .await;
+        for (i, handle) in handles {
+            match handle.await {
+                Ok(response) => {
+                    let device_info = target_devices_pool.get(&i).unwrap();
+                    let device = device_list.get_mut(device_info.0).unwrap();
 
-            // set the device status according to the response status
-            self.analyze_response(response, device_info.1 .1, &mut device, false)
-                .await;
+                    // set the device status according to the response status
+                    self.analyze_response(&response, &device_info.1, device, false)
+                        .await;
+                }
+                Err(e) => {
+                    error!("{} error: {}", i, e);
+                }
+            }
         }
 
         // set the stream status to stopped
@@ -757,6 +799,38 @@ if the request fails, the device status will be set to Offline
         info!("Stream {} stopped", self.get_stream_id());
         self.sync_stream_status();
         self.stream_status.clone()
+    }
+
+    #[doc = r" ## Stop Stream On Devices
+The stop_stream_on_devices function is used to send the stop request to the devices that are running the stream and return a list of JoinHandles
+## Arguments
+* `target_devices_pool` - A HashMap that contains the IP address of the devices as keys and a tuple that contain the index of the device in the device list and the ProcessType as values
+* `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
+## Returns
+* `Vec<JoinHandle<()>>` - A list of JoinHandles that can be used to wait for the threads to finish"]
+    pub fn stop_stream_on_devices(
+        &self,
+        target_devices_pool: &HashMap<String, (usize, ProcessType)>,
+        device_list: &MutexGuard<'_, Vec<Device>>,
+    ) -> Vec<(
+        String,
+        JoinHandle<Result<reqwest::Response, reqwest::Error>>,
+    )> {
+        let mut handles: Vec<(
+            String,
+            JoinHandle<Result<reqwest::Response, reqwest::Error>>,
+        )> = Vec::new();
+
+        for receivers in target_devices_pool {
+            let receiver = receivers.1;
+            let device = device_list.get(receiver.0).unwrap().clone();
+            let stream_id = self.get_stream_id().clone();
+
+            let handle = tokio::spawn(async move { device.stop_stream(&stream_id).await });
+
+            handles.push((receivers.0.clone(), handle));
+        }
+        handles
     }
 
     #[doc = r" ## Get the Stream ID
@@ -777,8 +851,8 @@ this is used to identify the stream"]
     * `reqwest::Error` - An error that is returned if the request failed (will set the device status to offline)"]
     async fn analyze_response(
         &mut self,
-        response: Result<Response, reqwest::Error>,
-        process_type: ProcessType,
+        response: &Result<Response, reqwest::Error>,
+        process_type: &ProcessType,
         device: &mut Device,
         sending: bool,
     ) {
@@ -793,7 +867,7 @@ this is used to identify the stream"]
                 match _response.status() {
                     StatusCode::OK => {
                         // set the receiver status to running
-                        device.update_device_status(process_status.clone(), &process_type);
+                        device.update_device_status(process_status.clone(), process_type);
 
                         match process_type {
                             ProcessType::Generation => {
@@ -830,7 +904,7 @@ this is used to identify the stream"]
                     }
                     _ => {
                         // set the receiver status to offline (generic error)
-                        device.update_device_status(ProcessStatus::Failed, &process_type);
+                        device.update_device_status(ProcessStatus::Failed, process_type);
 
                         // add the device to the running devices list with a failed status
                         match process_type {
@@ -872,7 +946,6 @@ this is used to identify the stream"]
                                 self.get_stream_id()
                             );
                         }
-                        error!("{}", _response.text().await.unwrap())
                     }
                 }
             }
@@ -881,7 +954,7 @@ this is used to identify the stream"]
                 error!("Connection {}", _error);
 
                 // set the receiver status to offline (generic error)
-                device.update_device_status(ProcessStatus::Failed, &process_type);
+                device.update_device_status(ProcessStatus::Failed, process_type);
 
                 // add the device to the running devices list with a failed status
                 match process_type {

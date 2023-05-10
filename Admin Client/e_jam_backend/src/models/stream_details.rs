@@ -25,7 +25,7 @@ The StreamDetails struct is used to store the information about the stream that 
 - `flow_type` - A u8 that represents the flow type that will be used for the stream (0 = BtB, 1 = Bursts)
 - `transport_layer_protocol` - A u8 that represents the transport layer protocol that will be used for the stream (0 = TCP, 1 = UDP)
 - `check_content` - A bool that represents if the content of the packets will be checked"]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamDetails {
     pub stream_id: String,

@@ -2,7 +2,8 @@ use super::AppState;
 use crate::models::device::Device;
 use actix_web::Responder;
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
-use log::{debug, info};
+use log::{debug, error, info};
+use validator::Validate;
 
 #[doc = r"# Get all devices
 get all devices in the list of devices
@@ -63,6 +64,14 @@ if the device is not in the list, add it and return a 201 Created
 * `failed to lock device list in add device {device_mac}` - if the device list is not found in the mutex lock"]
 #[post("/devices")]
 async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) -> impl Responder {
+    match new_device.validate() {
+        Ok(_) => (),
+        Err(e) => {
+            error!("Validation error: {}", e);
+            return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
+        }
+    }
+
     let mut devices = data.device_list.lock().await;
     let device_index = devices
         .iter()
@@ -107,8 +116,10 @@ async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -
         }
     };
 
-    let response = device.is_reachable();
-    match response.await {
+    let response = device.is_reachable().await;
+    device.set_reachable(response);
+
+    match response {
         true => HttpResponse::Ok().body(format!(
             "Device {} is reachable and online in the network",
             device_mac
@@ -131,9 +142,17 @@ if the device is reachable, return a 200 OK
 * `HttpResponse` - the http response"]
 #[post("/devices/ping")]
 async fn check_new_device(device: web::Json<Device>) -> impl Responder {
+    match device.validate() {
+        Ok(_) => (),
+        Err(e) => {
+            error!("Validation error: {}", e);
+            return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
+        }
+    }
+
     let mut device = device.into_inner();
     let response = device.is_reachable().await;
-
+    device.set_reachable(response);
     match response {
         true => HttpResponse::Ok()
             .body("Device is reachable and online in the network and can be added to the system"),
@@ -159,11 +178,29 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
         0 => HttpResponse::NoContent()
             .body("No devices in the system, please add some devices and try again"),
         _ => {
-            let handles = devices.iter_mut().map(|device| device.is_reachable());
+            let handles = devices
+                .iter()
+                .map(|device| {
+                    let device = device.clone();
+                    tokio::spawn(async move { device.is_reachable().await })
+                })
+                .collect::<Vec<_>>();
 
             let mut counter = 0;
-            for handle in handles {
-                if handle.await {
+            for (i, handle) in handles.into_iter().enumerate() {
+                let response = match handle.await {
+                    Ok(response) => response,
+                    Err(_) => {
+                        error!(
+                            "Could not reach device {}, please check the device and try again",
+                            devices[i].get_device_mac()
+                        );
+                        false
+                    }
+                };
+
+                devices[i].set_reachable(response);
+                if response {
                     counter += 1;
                 }
             }
@@ -196,9 +233,16 @@ if the device is found, update it and return a 200 OK
 #[put("/devices/{device_mac}")]
 async fn update_device(
     device_mac: web::Path<String>,
-    device: web::Json<Device>,
+    new_device: web::Json<Device>,
     data: web::Data<AppState>,
 ) -> impl Responder {
+    match new_device.validate() {
+        Ok(_) => (),
+        Err(e) => {
+            error!("Validation error: {}", e);
+            return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
+        }
+    }
     let device_mac = device_mac.into_inner();
 
     let mut devices = data.device_list.lock().await;
@@ -211,12 +255,12 @@ async fn update_device(
         Some(device_entry) => {
             // this is used to prevent the user from changing the mac address of the device in the update request without deleting and adding the device again to the list
             // to ensure that the user is not changing the mac address accidentally
-            if device_entry.get_device_mac() != device.get_device_mac() {
+            if device_entry.get_device_mac() != new_device.get_device_mac() {
                 return HttpResponse::BadRequest().body("The mac address of the device cannot be changed in the update request, please delete the device and add it again with the new mac address");
             }
 
-            device_entry.update(&device);
-            debug!("updated device: {:#?}", device);
+            device_entry.update(&new_device);
+            debug!("updated device: {:#?}", new_device);
             HttpResponse::Ok().body(format!("Device {} updated successfully", device_mac))
         }
         None => HttpResponse::NotFound().body(format!(
@@ -240,9 +284,11 @@ if the device is found, delete it and return a 200 OK
 async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let device_mac = device_mac.into_inner();
     let mut devices = data.device_list.lock().await;
+
     let device_index = devices
         .iter()
         .position(|device| device.get_device_mac() == &device_mac);
+
     match device_index {
         Some(device_index) => {
             devices.remove(device_index);
@@ -280,7 +326,7 @@ async fn stream_finished(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
-    let mut streams_entries = data.streams_entries.lock().await;
+    let mut streams_entries = data.stream_entries.lock().await;
     let stream_entry = streams_entries
         .iter_mut()
         .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
@@ -325,7 +371,7 @@ async fn stream_started(
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
-    let mut streams_entries = data.streams_entries.lock().await;
+    let mut streams_entries = data.stream_entries.lock().await;
 
     let stream_entry = streams_entries
         .iter_mut()

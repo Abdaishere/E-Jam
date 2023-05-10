@@ -284,7 +284,7 @@ this is used to get the device MAC address
 this is used to get the device IP address
 # Returns
 * `String` - the device IP address with Regex for IP address"]
-    pub fn clone_ip_address(&self) -> &String {
+    pub fn get_ip_address(&self) -> &String {
         &self.ip_address
     }
 
@@ -302,7 +302,7 @@ this is used to get the device connection address
 * `(String, u16, String)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
     pub fn get_device_info_tuple(&self) -> (String, u16, String) {
         (
-            self.clone_ip_address().to_string(),
+            self.get_ip_address().to_string(),
             self.get_port(),
             self.get_device_mac().to_string(),
         )
@@ -311,46 +311,32 @@ this is used to get the device connection address
     pub async fn send_stream(
         &self,
         stream_details: &StreamDetails,
-        stream_id: &String,
-        process_type: &ProcessType,
     ) -> Result<reqwest::Response, reqwest::Error> {
         reqwest::Client::new()
             .post(&format!(
                 "http://{}:{}/start",
-                self.clone_ip_address(),
+                self.get_ip_address(),
                 self.get_port()
             ))
+            .header("mac-address", self.get_device_mac())
+            .header("stream-id", &stream_details.stream_id)
             .body(
                 serde_json::to_string(&stream_details).expect("Failed to serialize stream details"),
-            )
-            .header("mac-address", self.get_device_mac())
-            .header("stream-id", stream_id)
-            .header(
-                "process-type",
-                serde_json::to_string(&process_type).unwrap(),
             )
             .timeout(Duration::from_secs(5))
             .send()
             .await
     }
 
-    pub async fn stop_stream(
-        &self,
-        stream_id: &String,
-        process_type: &ProcessType,
-    ) -> Result<reqwest::Response, reqwest::Error> {
+    pub async fn stop_stream(&self, stream_id: &str) -> Result<reqwest::Response, reqwest::Error> {
         reqwest::Client::new()
             .post(&format!(
                 "http://{}:{}/stop",
-                self.clone_ip_address(),
+                self.get_ip_address(),
                 self.get_port()
             ))
             .header("mac-address", self.get_device_mac())
             .header("stream-id", stream_id)
-            .header(
-                "process-type",
-                serde_json::to_string(&process_type).unwrap(),
-            )
             .timeout(Duration::from_secs(5))
             .send()
             .await
@@ -361,24 +347,15 @@ this is used to set the device to reachable or unreachable and update the last u
 # Returns
 * `bool` - true if the device is reachable else false
 "]
-    pub async fn is_reachable(&mut self) -> bool {
+    pub async fn is_reachable(&self) -> bool {
         let reachable = self.ping_device().await;
-        let prev_status = self.status.clone();
-        self.status = if reachable {
+        if reachable {
             info!(
                 "Device {} is reachable after being {:?} since {} UTC",
                 self.get_device_mac(),
                 &self.status,
                 self.last_updated
             );
-            // if the device is reachable after being offline for more than 60 seconds then set the status to online
-            if (Utc::now() - self.last_updated).num_seconds() > 60
-                || self.status == DeviceStatus::Offline
-            {
-                DeviceStatus::Online
-            } else {
-                self.status.clone()
-            }
         } else {
             info!(
                 "Device {} is not reachable after being {:?} since {} UTC",
@@ -386,12 +363,16 @@ this is used to set the device to reachable or unreachable and update the last u
                 &self.status,
                 self.last_updated
             );
-            DeviceStatus::Offline
         };
-        if prev_status != self.status {
-            self.last_updated = Utc::now();
-        }
         reachable
+    }
+
+    pub fn set_reachable(&mut self, is_online: bool) {
+        self.status = if is_online {
+            DeviceStatus::Online
+        } else {
+            DeviceStatus::Offline
+        }
     }
 
     pub async fn ping_device(&self) -> bool {
@@ -440,42 +421,39 @@ pub enum DeviceStatus {
     Idle,
 }
 
+impl ToString for DeviceStatus {
+    fn to_string(&self) -> String {
+        match self {
+            DeviceStatus::Offline => "Offline".to_string(),
+            DeviceStatus::Online => "Online".to_string(),
+            DeviceStatus::Running => "Running".to_string(),
+            DeviceStatus::Idle => "Idle".to_string(),
+        }
+    }
+}
+
 #[doc = r"## Get Devices Table
 This is used to get the devices html table in the form of a string that can be used to display in the web interface
 # Arguments
 * `DEVICE_LIST` - the list of devices that are added to the system"]
 pub fn get_devices_table(device_list: Vec<Device>) -> String {
     let mut data = String::from(
-        "<table>
-    <tr>
-        <th>Device name</th>
-        <th>Device ip</th>
-        <th>Device mac</th>
-        <th>Device status</th>
-        <th>Generation processes</th>
-        <th>Verification processes</th>
-    </tr>
+        "| Device name | Device ip | Device mac | Device status | Generation processes | Verification processes |
+        | --- | --- | --- | --- | --- | --- |
+        
     ",
     );
     for device in device_list.iter() {
         let row = format!(
-            "<tr>
-            <td>{}</td>
-            <td>{}</td>
-            <td>{}</td>
-            <td>{:#?}</td>
-            <td>{}</td>
-            <td>{}</td>
-        </tr>",
+            "| {} | {} | {} | {} | {} | {} |",
             &device.name,
             &device.ip_address,
             &device.mac_address,
-            &device.status,
+            &device.status.to_string(),
             &device.gen_processes,
             &device.ver_processes
         );
         data.push_str(&row);
     }
-    data.push_str("</table>");
     data
 }
