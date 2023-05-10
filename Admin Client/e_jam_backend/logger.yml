@@ -40,7 +40,6 @@ root:
   appenders:
     - stdout
     - step_ap
-    -
 
 loggers:
   step:
@@ -49,7 +48,7 @@ loggers:
       - step_ap
       
   strong_level:
-    level: debug
+    level: Error
     appenders:
       - strong_level_ap
     additive: false

@@ -403,7 +403,8 @@ if not running or queued, queue the stream
 #[post("/streams/start_all")]
 async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
     let mut streams_entries = data.stream_entries.lock().await;
-    if streams_entries.len() == 0 {
+
+    if streams_entries.is_empty() {
         warn!("No streams to start");
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
@@ -442,7 +443,7 @@ if the stream is running, stop it
 async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
     let mut streams_entries = data.stream_entries.lock().await;
 
-    if streams_entries.len() == 0 {
+    if streams_entries.is_empty() {
         warn!("No streams to stop");
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
