@@ -21,11 +21,11 @@ async fn main() -> std::io::Result<()> {
     info!(target: "system_level_logs","running on http://{}:{}", HOST, PORT);
 
     // run consume on a separate thread
-    tokio::spawn(async {
+    std::thread::spawn(|| {
         services::consumer::run_generator_consumer();
     });
 
-    tokio::spawn(async {
+    std::thread::spawn(|| {
         services::consumer::run_verifier_consumer();
     });
 
