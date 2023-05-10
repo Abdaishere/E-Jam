@@ -1,9 +1,7 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:e_jam/src/services/devices_services.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class DevicesController extends ChangeNotifier {
   static List<Device>? devices;
@@ -16,11 +14,10 @@ class DevicesController extends ChangeNotifier {
   get getIsPinging => isPinging;
   get getDevicesServices => devicesServices;
 
-  Future loadAllDevices(BuildContext context) async {
+  Future loadAllDevices() async {
     isLoading = true;
     return await devicesServices.getDevices().then((value) {
       devices = value;
-      context.read<AddStreamController>().syncDevicesList();
       isLoading = false;
       notifyListeners();
     });
@@ -34,7 +31,7 @@ class DevicesController extends ChangeNotifier {
     });
   }
 
-  Future<int> createNewDevice(Device device) async {
+  Future<int> addNewDevice(Device device) async {
     isLoading = true;
     return devicesServices.createDevice(device).then((value) {
       isLoading = false;
@@ -42,10 +39,10 @@ class DevicesController extends ChangeNotifier {
     });
   }
 
-  Future<bool> pingDevice(String deviceMac, BuildContext context) {
+  Future<bool> pingDevice(String deviceMac) {
     isPinging = true;
     return devicesServices.pingDevice(deviceMac).then((value) {
-      loadAllDevices(context);
+      loadAllDevices();
       isPinging = false;
       return value;
     });
@@ -102,8 +99,7 @@ class AddDeviceController extends ChangeNotifier {
   get getPortController => _portController;
   get getMacController => _macController;
 
-  Future<int?> createNewDevice(
-      GlobalKey<FormState> formKey, BuildContext context) async {
+  Future<Device?> createNewDevice(GlobalKey<FormState> formKey) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       Device device = Device(
@@ -116,13 +112,12 @@ class AddDeviceController extends ChangeNotifier {
         macAddress: _macController.text,
       );
 
-      return await context.read<DevicesController>().createNewDevice(device);
+      return device;
     }
     return null;
   }
 
-  Future<bool?> pingDevice(
-      GlobalKey<FormState> formKey, BuildContext context) async {
+  Future<Device?> pingDevice(GlobalKey<FormState> formKey) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       Device device = Device(
@@ -135,7 +130,7 @@ class AddDeviceController extends ChangeNotifier {
         macAddress: _macController.text,
       );
 
-      return await context.read<DevicesController>().pingNewDevice(device);
+      return device;
     }
     return null;
   }
@@ -168,8 +163,7 @@ class EditDeviceController extends ChangeNotifier {
   get getPortController => _portController;
   get getMac => _mac;
 
-  Future<bool> updateDevice(
-      GlobalKey<FormState> formKey, BuildContext context) async {
+  Future<Device?> updateDevice(GlobalKey<FormState> formKey) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       Device device = Device(
@@ -181,14 +175,12 @@ class EditDeviceController extends ChangeNotifier {
             SystemSettings.defaultDevicesPort,
         macAddress: _mac,
       );
-      return await context.read<DevicesController>().updateDevice(device) ??
-          false;
+      return device;
     }
-    return false;
+    return null;
   }
 
-  Future<bool> pingDevice(
-      GlobalKey<FormState> formKey, BuildContext context) async {
+  Future<Device?> pingDevice(GlobalKey<FormState> formKey) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
       Device device = Device(
@@ -201,9 +193,9 @@ class EditDeviceController extends ChangeNotifier {
         macAddress: _mac,
       );
 
-      return await context.read<DevicesController>().pingNewDevice(device);
+      return device;
     }
-    return false;
+    return null;
   }
 
   clearAllFields() {

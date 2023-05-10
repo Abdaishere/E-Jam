@@ -38,7 +38,7 @@ class _EditStreamViewState extends State<EditStreamView>
   @override
   void initState() {
     super.initState();
-    context.read<EditStreamController>().updateAllFields(stream, context);
+    context.read<EditStreamController>().loadAllFields(stream, context);
     _numberOfVerifiers = stream.verifiersIds.length;
     _numberOfGenerators = stream.generatorsIds.length;
   }

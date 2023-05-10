@@ -133,8 +133,7 @@ pub struct StreamEntry {
     Last time that the stream was updated
     this is updated when the stream Status is updated by the server
     "]
-    #[serde(with = "ts_seconds")]
-    #[serde(default, skip_deserializing)]
+    #[serde(with = "ts_seconds", default = "Utc::now", skip_deserializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = r" ## Start Time
@@ -414,7 +413,7 @@ changes the stream_status to Running and updates the device status to Running"]
                     device_list
                         .get_mut(device)
                         .unwrap()
-                        .update_device_status(ProcessStatus::Running, &ProcessType::Generation);
+                        .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
                 } else {
                     warn!("Generator not found")
                 }
@@ -432,7 +431,7 @@ changes the stream_status to Running and updates the device status to Running"]
                     device_list
                         .get_mut(device)
                         .unwrap()
-                        .update_device_status(ProcessStatus::Running, &ProcessType::Verification);
+                        .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
                 } else {
                     warn!("Verifier not found")
                 }
@@ -485,7 +484,7 @@ if there are devices left, the stream status will be set to finished
                     device_list
                         .get_mut(device)
                         .unwrap()
-                        .update_device_status(ProcessStatus::Completed, &ProcessType::Generation);
+                        .update_device_status(&ProcessStatus::Completed, &ProcessType::Generation);
                 } else {
                     warn!("Generator not found");
                 }
@@ -501,10 +500,10 @@ if there are devices left, the stream status will be set to finished
 
                     // then check if there are any other process running in the device
                     // if there are no other generators running, set the DeviceStatus to Idle
-                    device_list
-                        .get_mut(device)
-                        .unwrap()
-                        .update_device_status(ProcessStatus::Completed, &ProcessType::Verification);
+                    device_list.get_mut(device).unwrap().update_device_status(
+                        &ProcessStatus::Completed,
+                        &ProcessType::Verification,
+                    );
                 } else {
                     warn!("Verifier not found");
                 }
@@ -641,7 +640,7 @@ The send_stream function is used to send the stream to the devices that will gen
                             &response,
                             process_type,
                             device_list.get_mut(device_index.to_owned()).unwrap(),
-                            false,
+                            true,
                         )
                         .await
                     }
@@ -867,7 +866,7 @@ this is used to identify the stream"]
                 match _response.status() {
                     StatusCode::OK => {
                         // set the receiver status to running
-                        device.update_device_status(process_status.clone(), process_type);
+                        device.update_device_status(&process_status, process_type);
 
                         match process_type {
                             ProcessType::Generation => {
@@ -904,7 +903,7 @@ this is used to identify the stream"]
                     }
                     _ => {
                         // set the receiver status to offline (generic error)
-                        device.update_device_status(ProcessStatus::Failed, process_type);
+                        device.update_device_status(&ProcessStatus::Failed, process_type);
 
                         // add the device to the running devices list with a failed status
                         match process_type {
@@ -954,7 +953,7 @@ this is used to identify the stream"]
                 error!("Connection {}", _error);
 
                 // set the receiver status to offline (generic error)
-                device.update_device_status(ProcessStatus::Failed, process_type);
+                device.update_device_status(&ProcessStatus::Failed, process_type);
 
                 // add the device to the running devices list with a failed status
                 match process_type {
@@ -983,8 +982,6 @@ this will add the stream to the queue
 ## Arguments
 * `queued_streams` - the list of queued streams by stream id
 * `device_list` - the list of devices that are in the system
-## Panics
-* `Error: Failed to lock the queued streams list for adding stream {} to the queue` - if the queued streams list is locked
 ## Logs
 * `Stream queued to start in {} seconds` - the delay in seconds before the stream starts (the delay is set by the user)"]
     pub async fn queue_stream(

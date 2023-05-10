@@ -33,9 +33,12 @@ class _DevicesListViewState extends State<DevicesListView> {
     setState(() {});
     await context.read<DevicesController>().pingAllDevices().then(
           (value) => {
-            _isPinging = false,
-            _isPinged = value,
-            context.read<DevicesController>().loadAllDevices(context),
+            if (mounted)
+              {
+                _isPinging = false,
+                _isPinged = value,
+                context.read<DevicesController>().loadAllDevices(),
+              }
           },
         );
   }
@@ -43,7 +46,7 @@ class _DevicesListViewState extends State<DevicesListView> {
   @override
   void initState() {
     super.initState();
-    context.read<DevicesController>().loadAllDevices(context);
+    context.read<DevicesController>().loadAllDevices();
   }
 
   @override
@@ -124,10 +127,7 @@ class _DevicesListViewState extends State<DevicesListView> {
             child: Container(
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
-              child: AddDeviceButton(
-                loadDevicesListView: () =>
-                    context.read<DevicesController>().loadAllDevices(context),
-              ),
+              child: AddDeviceButton(),
             ),
           ),
         ],
@@ -204,8 +204,7 @@ class _DevicesListViewState extends State<DevicesListView> {
             size: 20.0,
           ),
           tooltip: 'Refresh',
-          onPressed: () =>
-              context.read<DevicesController>().loadAllDevices(context),
+          onPressed: () => context.read<DevicesController>().loadAllDevices(),
         ),
         // Explanation icon for details about how the Device card works and what the icons mean and what the colors mean
         IconButton(
@@ -221,9 +220,8 @@ class _DevicesListViewState extends State<DevicesListView> {
 }
 
 class AddDeviceButton extends StatelessWidget {
-  const AddDeviceButton({super.key, required this.loadDevicesListView});
+  const AddDeviceButton({super.key});
 
-  final Function() loadDevicesListView;
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -443,10 +441,10 @@ class _DeviceCardState extends State<DeviceCard> {
                         .read<DevicesController>()
                         .deleteDevice(device.macAddress)
                         .then((success) => {
-                              if (success)
+                              if (success && mounted)
                                 context
                                     .read<DevicesController>()
-                                    .loadAllDevices(context)
+                                    .loadAllDevices()
                             });
                     Navigator.of(context).pop();
                   },

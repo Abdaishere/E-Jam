@@ -37,9 +37,11 @@ class _EditDeviceViewState extends State<EditDeviceView> {
   }
 
   Future<bool?> _editDevice() async {
-    bool result = await context
-        .read<EditDeviceController>()
-        .updateDevice(formKey, context);
+    Device? device =
+        await context.read<EditDeviceController>().updateDevice(formKey);
+    if (!mounted || device == null) return null;
+    bool result =
+        await context.read<DevicesController>().updateDevice(device) ?? false;
 
     if (mounted) {
       widget.refresh();
@@ -148,8 +150,10 @@ class _DevicePingerState extends State<DevicePinger> {
   _pingDevice() async {
     _isPinging = true;
     setState(() {});
-    bool value =
-        await context.read<EditDeviceController>().pingDevice(formKey, context);
+    Device? device =
+        await context.read<EditDeviceController>().pingDevice(formKey);
+    if (!mounted || device == null) return;
+    bool value = await context.read<DevicesController>().pingNewDevice(device);
 
     _isPinged = value;
     _isPinging = false;

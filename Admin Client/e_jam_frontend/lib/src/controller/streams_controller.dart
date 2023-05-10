@@ -365,7 +365,10 @@ class EditStreamController extends ChangeNotifier {
   syncGeneratorsDevicesList(
       List<String> generators, bool showDeleted, BuildContext context) async {
     if (DevicesController.devices == null) {
-      await context.read<DevicesController>().loadAllDevices(context);
+      await context.read<DevicesController>().loadAllDevices().then((value) => {
+            if (context.mounted)
+              context.read<AddStreamController>().syncDevicesList()
+          });
       if (DevicesController.devices == null) {
         return;
       }
@@ -388,7 +391,10 @@ class EditStreamController extends ChangeNotifier {
   syncVerifiersDevicesList(
       List<String> verifiers, bool showDeleted, BuildContext context) async {
     if (DevicesController.devices == null) {
-      await context.read<DevicesController>().loadAllDevices(context);
+      await context.read<DevicesController>().loadAllDevices().then((value) => {
+            if (context.mounted)
+              context.read<AddStreamController>().syncDevicesList()
+          });
       if (DevicesController.devices == null) {
         return;
       }
@@ -455,7 +461,7 @@ class EditStreamController extends ChangeNotifier {
     return null;
   }
 
-  updateAllFields(StreamEntry stream, BuildContext context) {
+  loadAllFields(StreamEntry stream, BuildContext context) {
     _idController.text = stream.streamId;
     _nameController.text = stream.name;
     _descriptionController.text = stream.description;

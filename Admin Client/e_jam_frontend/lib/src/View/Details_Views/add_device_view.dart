@@ -1,8 +1,10 @@
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
 import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -101,22 +103,26 @@ class BottomOptionsBar extends StatefulWidget {
 
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
   Future<bool?> _addDevice() async {
-    int? code = await context
-        .read<AddDeviceController>()
-        .createNewDevice(formKey, context);
-    if (code == null) return null;
+    Device? device =
+        await context.read<AddDeviceController>().createNewDevice(formKey);
+
+    if (!mounted || device == null) return null;
+    int? code = await context.read<DevicesController>().addNewDevice(device);
 
     bool result = _analyzeCode(code);
-    if (mounted) {
-      if (result) {
-        context.read<DevicesController>().loadAllDevices(context);
-        if (widget.delete != null) widget.delete!();
-        return true;
-      } else {
-        return false;
+
+    if (result) {
+      if (mounted) {
+        await context.read<DevicesController>().loadAllDevices();
       }
+      if (mounted) {
+        await context.read<AddStreamController>().syncDevicesList();
+      }
+      if (widget.delete != null) widget.delete!();
+      return true;
+    } else {
+      return false;
     }
-    return null;
   }
 
   bool _analyzeCode(int code) {
@@ -396,10 +402,11 @@ class _DevicePingerState extends State<DevicePinger> {
       formKey.currentState!.save();
       _isPinging = true;
       setState(() {});
-      bool result = await context
-              .read<AddDeviceController>()
-              .pingDevice(formKey, context) ??
-          false;
+      Device? device =
+          await context.read<AddDeviceController>().pingDevice(formKey);
+      if (!mounted || device == null) return;
+      bool result =
+          await context.read<DevicesController>().pingNewDevice(device);
 
       _isPinged = result;
       _isPinging = false;

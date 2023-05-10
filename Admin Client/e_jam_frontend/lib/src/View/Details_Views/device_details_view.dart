@@ -35,7 +35,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
     updateDevice = value;
     if (mounted) {
       setState(() {});
-      context.read<DevicesController>().loadAllDevices(context);
+      context.read<DevicesController>().loadAllDevices();
     }
   }
 
@@ -112,14 +112,12 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                                   .deleteDevice(device.macAddress)
                                   .then(
                                 (value) {
-                                  if (value) {
-                                    if (mounted) {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop();
-                                      context
-                                          .read<DevicesController>()
-                                          .loadAllDevices(context);
-                                    }
+                                  if (value && mounted) {
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                    context
+                                        .read<DevicesController>()
+                                        .loadAllDevices();
                                   }
                                 },
                               );
@@ -446,7 +444,7 @@ class _DevicePingerState extends State<DevicePinger> {
     });
 
     bool? success =
-        await context.read<DevicesController>().pingDevice(widget.mac, context);
+        await context.read<DevicesController>().pingDevice(widget.mac);
     _isPinged = success;
     _isPinging = false;
     if (mounted) {

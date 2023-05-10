@@ -354,7 +354,7 @@ class _StreamCardState extends State<StreamCard> {
                         .read<StreamsController>()
                         .deleteStream(stream.streamId)
                         .then((success) => {
-                              if (success) {widget.loadStreamView()}
+                              if (success && mounted) {widget.loadStreamView()}
                             });
                     Navigator.of(context).pop();
                   },
@@ -374,7 +374,7 @@ class _StreamCardState extends State<StreamCard> {
                 (value) => {
                   if (mounted)
                     {
-                      if (value != null)
+                      if (value != null && mounted)
                         {
                           Navigator.of(context).push(
                             HeroDialogRoute(

@@ -84,7 +84,7 @@ pub struct Device {
     ## Default Value
     * The default value is the current DateTime
     "]
-    #[serde(with = "ts_seconds", default, skip_deserializing)]
+    #[serde(with = "ts_seconds", default = "Utc::now", skip_deserializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = " ## Device IP Address
@@ -162,45 +162,17 @@ this function is used to update the device status according to the status of the
 ## Panics
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
-    pub fn update_device_status(&mut self, status: ProcessStatus, type_of_process: &ProcessType) {
+    pub fn update_device_status(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
         let prev_status = self.status.clone();
 
         // update the number of processes that are running on the device
-        match type_of_process {
-            ProcessType::Generation => match status {
-                ProcessStatus::Queued => self.gen_processes += 1,
-                ProcessStatus::Completed => self.gen_processes -= 1,
-                ProcessStatus::Stopped => self.gen_processes -= 1,
-                _ => (),
-            },
-            ProcessType::Verification => match status {
-                ProcessStatus::Queued => self.ver_processes += 1,
-                ProcessStatus::Completed => self.ver_processes -= 1,
-                ProcessStatus::Stopped => self.ver_processes -= 1,
-                _ => (),
-            },
-            ProcessType::GeneratingAndVerification => match status {
-                ProcessStatus::Queued => {
-                    self.gen_processes += 1;
-                    self.ver_processes += 1;
-                }
-                ProcessStatus::Completed => {
-                    self.gen_processes -= 1;
-                    self.ver_processes -= 1;
-                }
-                ProcessStatus::Stopped => {
-                    self.gen_processes -= 1;
-                    self.ver_processes -= 1;
-                }
-                _ => (),
-            },
-        }
+        self.update_device_processes(status, type_of_process);
 
         // update the status of the device according to the number of processes that are running on the device
         // The device is offline if the status of the process is failed (the process failed to start)
         match self.gen_processes + self.ver_processes {
             0 => {
-                self.status = if status == ProcessStatus::Failed {
+                self.status = if status == &ProcessStatus::Failed {
                     DeviceStatus::Offline
                 } else {
                     DeviceStatus::Online
@@ -220,20 +192,76 @@ this function is used to update the device status according to the status of the
 
         if prev_status != self.status {
             info!(
-                "Device {} status changed from {:?} to {:?}",
+                "Device {} status changed from {} to {}",
                 self.get_device_mac(),
-                prev_status,
-                self.status
+                prev_status.to_string(),
+                self.status.to_string()
             );
             self.last_updated = Utc::now();
+        } else {
+            info!(
+                "Device {} notified status is {} since {}",
+                self.get_device_mac(),
+                &self.status.to_string(),
+                self.last_updated.format("%Y-%m-%d %H:%M:%S")
+            );
         }
+    }
 
-        info!(
-            "Device {} notified status is {:?} since {}",
-            self.get_device_mac(),
-            &self.status,
-            Utc::now() - self.last_updated
-        );
+    fn update_device_processes(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
+        match type_of_process {
+            ProcessType::Generation => match status {
+                ProcessStatus::Queued => self.gen_processes += 1,
+                ProcessStatus::Completed => {
+                    if self.gen_processes > 0 {
+                        self.gen_processes -= 1
+                    }
+                }
+                ProcessStatus::Stopped => {
+                    if self.gen_processes > 0 {
+                        self.gen_processes -= 1
+                    }
+                }
+                _ => (),
+            },
+            ProcessType::Verification => match status {
+                ProcessStatus::Queued => self.ver_processes += 1,
+                ProcessStatus::Completed => {
+                    if self.ver_processes > 0 {
+                        self.ver_processes -= 1
+                    }
+                }
+                ProcessStatus::Stopped => {
+                    if self.ver_processes > 0 {
+                        self.ver_processes -= 1
+                    }
+                }
+                _ => (),
+            },
+            ProcessType::GeneratingAndVerification => match status {
+                ProcessStatus::Queued => {
+                    self.gen_processes += 1;
+                    self.ver_processes += 1;
+                }
+                ProcessStatus::Completed => {
+                    if self.gen_processes > 0 {
+                        self.gen_processes -= 1
+                    };
+                    if self.ver_processes > 0 {
+                        self.ver_processes -= 1
+                    }
+                }
+                ProcessStatus::Stopped => {
+                    if self.gen_processes > 0 {
+                        self.gen_processes -= 1
+                    };
+                    if self.ver_processes > 0 {
+                        self.ver_processes -= 1
+                    }
+                }
+                _ => (),
+            },
+        }
     }
 
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
@@ -351,16 +379,16 @@ this is used to set the device to reachable or unreachable and update the last u
         let reachable = self.ping_device().await;
         if reachable {
             info!(
-                "Device {} is reachable after being {:?} since {} UTC",
+                "Device {} is reachable after being {} since {} UTC",
                 self.get_device_mac(),
-                &self.status,
+                &self.status.to_string(),
                 self.last_updated
             );
         } else {
             info!(
-                "Device {} is not reachable after being {:?} since {} UTC",
+                "Device {} is not reachable after being {} since {} UTC",
                 self.get_device_mac(),
-                &self.status,
+                &self.status.to_string(),
                 self.last_updated
             );
         };

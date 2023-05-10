@@ -46,6 +46,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
   }
 
   _loadStream() async {
+    if (mounted) {
+      setState(() {});
+    }
     isLoading = true;
     context.read<StreamsController>().loadStreamDetails(id).then((value) {
       if (mounted) {

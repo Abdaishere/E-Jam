@@ -172,7 +172,7 @@ class _AddStreamViewState extends State<AddStreamView>
                   .watch<AddStreamController>()
                   .addStream(formKey, context)
                   .then((success) => {
-                        if (success != null)
+                        if (success != null && mounted)
                           {
                             if (success)
                               {
@@ -204,7 +204,7 @@ class _AddStreamViewState extends State<AddStreamView>
                   .then((success) => {
                         if (success != null)
                           {
-                            if (success)
+                            if (success && mounted)
                               {
                                 context
                                     .read<StreamsController>()
@@ -778,7 +778,13 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                       areGenerators: true,
                       devicesReloader: () => context
                           .read<DevicesController>()
-                          .loadAllDevices(context),
+                          .loadAllDevices()
+                          .then((value) => {
+                                if (mounted)
+                                  context
+                                      .read<AddStreamController>()
+                                      .syncDevicesList()
+                              }),
                       isStateless: false,
                     ),
                   ),
@@ -824,7 +830,13 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                       areGenerators: false,
                       devicesReloader: () => context
                           .read<DevicesController>()
-                          .loadAllDevices(context),
+                          .loadAllDevices()
+                          .then((value) => {
+                                if (mounted)
+                                  context
+                                      .read<AddStreamController>()
+                                      .syncDevicesList()
+                              }),
                       isStateless: false,
                     ),
                   ),
