@@ -41,8 +41,11 @@ void PacketCreator::createPacket(int rcvInd)
     mtx.unlock();
 }
 
-PacketCreator::PacketCreator(Configuration configuration): payloadGenerator(configuration), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
+PacketCreator::PacketCreator(Configuration configuration, int id): payloadGenerator(configuration), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
     sender = PacketSender::getInstance();
+    global_id = id;
+    rng.setSeed(configuration.getSeed());
+    for(int i=0; i<global_id; i++)rng.long_jump();
     this->configuration = configuration;
 }
 

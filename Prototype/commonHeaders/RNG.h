@@ -1,6 +1,7 @@
 #ifndef GENERATOR_RNG_H
 #define GENERATOR_RNG_H
 #include <random>
+#include <xoshiro512+.cpp>
 //masks used to genetare a random number
 const unsigned long long masks[] = {255,
                                     65280,
@@ -15,13 +16,14 @@ private:
     int index;
     unsigned long long currRandomNumber;
     int seed;
-    std::mt19937_64 rng; //random device
+    //random device
+    XOSHIRO_PRNG rng;
 public:
     RNG(int seed = 0) //set the initial seed by defult to zero
     {
         index = 8;
         this->seed = seed;
-        rng.seed(seed);
+        setSeed(seed);
     }
 
     unsigned long long getR()
@@ -29,16 +31,23 @@ public:
         return currRandomNumber;
     }
 
-    void setSeed (int s)
+    void setSeed (u_int64_t seed)
     {
-        rng.seed(s);
+        this->seed = seed;
+        rng.setSeed(seed);
+    }
+
+    void jump(){
+    }
+
+    void long_jump(){
     }
 
     unsigned char gen()
     {
         if(index == 8)
         {
-            currRandomNumber = rng();
+            currRandomNumber = rng.next();
             index = 0;
         }
 

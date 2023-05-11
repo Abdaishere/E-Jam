@@ -91,7 +91,8 @@ public class InstanceController implements Runnable {
         for (String receiver : stream.verifiers) {
             if (receiver.equals(myMacAddress)) {
                 String command = "../Executables/verifier";
-                String[] args = {Integer.toString(verID++)};
+                String path = configDir + "/config_" + stream.streamID + ".txt";
+                String[] args = {Integer.toString(verID++), path};
                 executeCommand(command, false, args);
             }
         }

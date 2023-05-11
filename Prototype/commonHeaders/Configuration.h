@@ -263,6 +263,16 @@ public:
         }
     }
 
+    //get my global id for generator (amongst all generators in the stream)
+    int getID(ByteArray mac){
+        int sendersSize = senders.size();
+        for(int i=0; i<sendersSize; i++){
+            if(senders[i] == mac)
+                return i;
+        }
+        return -1;
+    }
+
     //getters and setters
 
     std::vector<ByteArray>& getSenders()
