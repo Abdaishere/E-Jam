@@ -10,8 +10,9 @@ class StreamsController extends ChangeNotifier {
   static bool _isLoading = true;
   static final StreamServices _streamServices = StreamServices();
 
-  get getStreams => _streams;
-  get getStreamsStatusDetails => _streamsStatusDetails;
+  List<StreamEntry>? get getStreams => _streams;
+  List<StreamStatusDetails>? get getStreamsStatusDetails =>
+      _streamsStatusDetails;
   get getIsLoading => _isLoading;
   get getStreamServices => _streamServices;
 

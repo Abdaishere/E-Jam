@@ -8,10 +8,10 @@ class DevicesController extends ChangeNotifier {
   static bool isPinging = false;
   static DevicesServices devicesServices = DevicesServices();
 
-  get getDevices => devices;
-  get getIsLoading => isLoading;
-  get getIsPinging => isPinging;
-  get getDevicesServices => devicesServices;
+  List<Device>? get getDevices => devices;
+  bool get getIsLoading => isLoading;
+  bool get getIsPinging => isPinging;
+  DevicesServices get getDevicesServices => devicesServices;
 
   Future loadAllDevices() async {
     isLoading = true;

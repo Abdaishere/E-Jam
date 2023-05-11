@@ -1,5 +1,8 @@
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
@@ -14,8 +17,29 @@ class GaugeTotalProgressForSystem extends StatefulWidget {
 
 class _GaugeTotalProgressForSystemState
     extends State<GaugeTotalProgressForSystem> {
+  double getProgress() {
+    final List<StreamEntry>? streams =
+        Provider.of<StreamsController>(context, listen: false).getStreams;
+    if (streams == null) {
+      return 0;
+    }
+    int totalProgress = 0;
+    int totalTasks = 0;
+    for (final StreamEntry stream in streams) {
+      totalProgress += stream.runningGenerators?.progress ?? 0;
+      totalTasks += stream.runningGenerators?.total ?? 0;
+      totalProgress += stream.runningVerifiers?.progress ?? 0;
+      totalTasks += stream.runningVerifiers?.total ?? 0;
+    }
+    if (totalTasks == 0) {
+      return 0;
+    }
+    return totalProgress / totalTasks;
+  }
+
   @override
   Widget build(BuildContext context) {
+    double totalProgress = getProgress();
     return SizedBox(
       width: MediaQuery.of(context).orientation == Orientation.portrait
           ? MediaQuery.of(context).size.width > 450
@@ -48,7 +72,7 @@ class _GaugeTotalProgressForSystemState
               ),
               pointers: [
                 RangePointer(
-                  value: 60,
+                  value: totalProgress,
                   width: 0.1,
                   sizeUnit: GaugeSizeUnit.factor,
                   cornerStyle: CornerStyle.bothCurve,
@@ -62,7 +86,7 @@ class _GaugeTotalProgressForSystemState
                   ),
                 ),
                 MarkerPointer(
-                  value: 60,
+                  value: totalProgress,
                   markerType: MarkerType.circle,
                   markerHeight: 15,
                   markerWidth: 15,
@@ -70,13 +94,17 @@ class _GaugeTotalProgressForSystemState
                   color: const Color(0xFF00A8B5),
                 ),
               ],
-              annotations: const [
+              annotations: [
                 GaugeAnnotation(
                   angle: 90,
                   positionFactor: 0.1,
                   widget: Text(
-                    '60%',
-                    style: TextStyle(
+                    totalProgress == 0
+                        ? 'No Tasks'
+                        : totalProgress == 100
+                            ? 'Done'
+                            : '${(getProgress() * 100).toStringAsFixed(2)}%',
+                    style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),

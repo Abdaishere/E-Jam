@@ -139,9 +139,10 @@ class _HomeState extends State<Home> {
     return ZoomDrawer(
       menuScreen: MenuScreen(
         setIndex: (index) {
-          setState(() {
-            currentIndex = index;
-          });
+          if (mounted)
+            setState(() {
+              currentIndex = index;
+            });
         },
       ),
       mainScreen: mainScreen(),

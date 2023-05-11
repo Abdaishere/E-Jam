@@ -197,15 +197,14 @@ class StreamCard extends StatefulWidget {
 class _StreamCardState extends State<StreamCard> {
   StreamStatusDetails? updatedStream;
 
-  void refreshCard() {
-    context
+  Future<void> refreshCard() async {
+    StreamStatusDetails? value = await context
         .read<StreamsController>()
-        .loadStreamStatusDetails(widget.stream.streamId)
-        .then(
-          (value) => {
-            if (mounted) {updatedStream = value, setState(() {})}
-          },
-        );
+        .loadStreamStatusDetails(widget.stream.streamId);
+    if (mounted) {
+      updatedStream = value;
+      setState(() {});
+    }
   }
 
   @override
@@ -467,13 +466,9 @@ class _StreamCardState extends State<StreamCard> {
                 color:
                     status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Start",
-                onPressed: () {
-                  context
-                      .read<StreamsController>()
-                      .startStream(id)
-                      .then((success) {
-                    refreshCard();
-                  });
+                onPressed: () async {
+                  await context.read<StreamsController>().startStream(id);
+                  if (mounted) refreshCard();
                 },
               )
             : IconButton(
@@ -481,33 +476,27 @@ class _StreamCardState extends State<StreamCard> {
                 color:
                     status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Pause",
-                onPressed: () {
-                  context
-                      .read<StreamsController>()
-                      .pauseStream(id)
-                      .then((success) {
-                    refreshCard();
-                  });
+                onPressed: () async {
+                  await context.read<StreamsController>().pauseStream(id);
+                  if (mounted) refreshCard();
                 },
               ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.hourglassStart),
           color: status == StreamStatus.queued ? streamQueuedColor : null,
           tooltip: "Delay",
-          onPressed: () {
-            context.read<StreamsController>().queueStream(id).then((success) {
-              refreshCard();
-            });
+          onPressed: () async {
+            await context.read<StreamsController>().queueStream(id);
+            if (mounted) refreshCard();
           },
         ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.stop),
           color: status == StreamStatus.stopped ? streamStoppedColor : null,
           tooltip: "Stop",
-          onPressed: () {
-            context.read<StreamsController>().stopStream(id).then((success) {
-              refreshCard();
-            });
+          onPressed: () async {
+            await context.read<StreamsController>().stopStream(id);
+            if (mounted) refreshCard();
           },
         ),
       ],

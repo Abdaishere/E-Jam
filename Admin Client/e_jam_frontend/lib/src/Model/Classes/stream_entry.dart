@@ -132,6 +132,11 @@ class Process {
 
   final Map<String, ProcessStatus> processes;
 
+  int get total => processes.length;
+  int get progress => processes.values
+      .where((element) => element == ProcessStatus.completed)
+      .length;
+
   factory Process.fromRawJson(String str) => Process.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());

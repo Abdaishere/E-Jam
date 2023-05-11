@@ -132,16 +132,18 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
     }
   }
 
-  _addDevice() async {
+  Future<bool?> _addDevice() async {
     Device? device =
         await context.read<AddDeviceController>().createNewDevice(formKey);
 
-    if (!mounted || device == null) return;
+    if (!mounted || device == null) return null;
     int? code = await context.read<DevicesController>().addNewDevice(device);
 
-    if (!mounted) return;
+    if (!mounted) return null;
     _status = code;
     setState(() {});
+    context.read<DevicesController>().loadAllDevices();
+    return _status != null && _status! <= 300;
   }
 
   @override

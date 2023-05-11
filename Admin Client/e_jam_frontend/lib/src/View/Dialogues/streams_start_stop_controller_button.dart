@@ -20,9 +20,9 @@ class _StreamsStartStopControllerButtonState
   bool _success = true;
 
   void _toggleStreams() async {
-    SystemSettings.streamsAreRunning = null;
-    setState(() {});
     if (SystemSettings.streamsAreRunning ?? false) {
+      SystemSettings.streamsAreRunning = null;
+      setState(() {});
       context.read<StreamsController>().stopAllStreams().then(
         (value) async {
           if (mounted) {
@@ -35,6 +35,8 @@ class _StreamsStartStopControllerButtonState
         },
       );
     } else {
+      SystemSettings.streamsAreRunning = null;
+      setState(() {});
       context.read<StreamsController>().startAllStreams().then(
         (value) async {
           if (mounted) {
@@ -103,13 +105,13 @@ class _StreamsStartStopControllerButtonState
             ),
           ),
         },
-        color: !_success
+        color: !_success || SystemSettings.streamsAreRunning == null
             ? Colors.red
             : SystemSettings.streamsAreRunning ?? false
                 ? Colors.green
                 : context.watch<ThemeModel>().colorScheme.secondary,
         icon: FaIcon(
-          !_success
+          !_success || SystemSettings.streamsAreRunning == null
               ? FontAwesomeIcons.question
               : SystemSettings.streamsAreRunning ?? false
                   ? FontAwesomeIcons.play
