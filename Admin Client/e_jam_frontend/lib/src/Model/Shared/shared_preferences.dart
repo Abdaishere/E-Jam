@@ -24,13 +24,12 @@ class ThemePreferences {
   Future<bool> isDarkMode() async {
     final themeMode = await getThemeMode();
     switch (themeMode) {
-      case ThemeMode.system:
-        return WidgetsBinding.instance.window.platformBrightness ==
-            Brightness.dark;
       case ThemeMode.dark:
         return true;
       case ThemeMode.light:
         return false;
+      default:
+        return true;
     }
   }
 

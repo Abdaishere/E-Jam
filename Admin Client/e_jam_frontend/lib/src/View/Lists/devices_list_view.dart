@@ -9,7 +9,7 @@ import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_device_view.dart';
 import 'package:e_jam/src/View/devices_radar_card_view.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -79,10 +79,10 @@ class _DevicesListViewState extends State<DevicesListView> {
                       size: 100.0,
                     ),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         FaIcon(
                           FontAwesomeIcons.computer,
                           size: 100.0,
@@ -127,7 +127,7 @@ class _DevicesListViewState extends State<DevicesListView> {
             child: Container(
               alignment: Alignment.bottomRight,
               padding: const EdgeInsets.only(right: 35.0, bottom: 30.0),
-              child: AddDeviceButton(),
+              child: const AddDeviceButton(),
             ),
           ),
         ],
@@ -473,10 +473,10 @@ class _DeviceCardState extends State<DeviceCard> {
       },
       itemBuilder: (BuildContext context) {
         return [
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 'View',
             child: Row(
-              children: const [
+              children: [
                 Icon(MaterialCommunityIcons.view_carousel,
                     color: Colors.blueAccent),
                 SizedBox(width: 10.0),
@@ -484,20 +484,20 @@ class _DeviceCardState extends State<DeviceCard> {
               ],
             ),
           ),
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 'Edit',
             child: Row(
-              children: const [
+              children: [
                 Icon(MaterialCommunityIcons.pencil, color: Colors.green),
                 SizedBox(width: 10.0),
                 Text('Edit'),
               ],
             ),
           ),
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 'Delete',
             child: Row(
-              children: const [
+              children: [
                 FaIcon(MaterialCommunityIcons.trash_can, color: Colors.red),
                 SizedBox(width: 10.0),
                 Text('Delete'),

@@ -4,8 +4,12 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:e_jam/src/controller/Devices/add_device_controller.dart';
+import 'package:e_jam/src/controller/Devices/edit_device_controller.dart';
+import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
+import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -238,9 +242,9 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
             padding:
                 const EdgeInsets.only(top: 1, left: 20, right: 20, bottom: 1),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children: [
                 StreamsControllerButton(),
                 GraphsControllerButton(),
                 ExportButton(),

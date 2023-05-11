@@ -7,7 +7,7 @@ import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
@@ -61,8 +61,8 @@ class _StreamsListViewState extends State<StreamsListView> {
                         .watch<StreamsController>()
                         .getStreamsStatusDetails!
                         .isEmpty,
-                replacement: Stack(
-                  children: const [
+                replacement: const Stack(
+                  children: [
                     Center(
                       child: Icon(
                         Icons.warning_amber_rounded,
@@ -72,10 +72,10 @@ class _StreamsListViewState extends State<StreamsListView> {
                     ),
                   ],
                 ),
-                child: Center(
+                child: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       FaIcon(
                         FontAwesomeIcons.barsStaggered,
                         size: 100.0,
@@ -431,20 +431,20 @@ class _StreamCardState extends State<StreamCard> {
               ],
             ),
           ),
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 'Edit',
             child: Row(
-              children: const [
+              children: [
                 Icon(MaterialCommunityIcons.pencil, color: Colors.green),
                 SizedBox(width: 10.0),
                 Text('Edit'),
               ],
             ),
           ),
-          PopupMenuItem(
+          const PopupMenuItem(
             value: 'Delete',
             child: Row(
-              children: const [
+              children: [
                 FaIcon(MaterialCommunityIcons.trash_can, color: Colors.red),
                 SizedBox(width: 10.0),
                 Text('Delete'),
@@ -689,12 +689,12 @@ class SpeedMonitor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Expanded(
           child: Column(
-            children: const <Widget>[
+            children: <Widget>[
               FaIcon(FontAwesomeIcons.caretUp, color: uploadColor, size: 35.0),
               SizedBox(
                 child: Text(
@@ -711,10 +711,10 @@ class SpeedMonitor extends StatelessWidget {
             ],
           ),
         ),
-        const VerticalDivider(),
+        VerticalDivider(),
         Expanded(
           child: Column(
-            children: const <Widget>[
+            children: <Widget>[
               FaIcon(FontAwesomeIcons.caretDown,
                   color: downloadColor, size: 35.0),
               SizedBox(

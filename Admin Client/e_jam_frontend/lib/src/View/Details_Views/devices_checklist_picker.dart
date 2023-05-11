@@ -2,8 +2,9 @@ import 'dart:math';
 
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
+import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -134,7 +135,10 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                         MaterialCommunityIcons.sync_icon,
                         size: 20,
                       ),
-                tooltip: 'Sync Devices',
+                tooltip:
+                    _devicesMap.isEmpty || DevicesController.devices == null
+                        ? 'Sync Devices'
+                        : 'Undo Changes',
                 onPressed: () => _syncDevices(),
               ),
             ],

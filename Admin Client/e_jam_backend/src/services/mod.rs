@@ -184,7 +184,10 @@ async fn update_stream(
             // if the stream is queued, remove it from the queue
             if stream_entry.check_stream_status(StreamStatus::Queued) {
                 stream_entry
-                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
+                    .remove_stream_from_queue(
+                        &data.queued_streams,
+                        &mut data.device_list.lock().await,
+                    )
                     .await;
             }
 
@@ -234,7 +237,10 @@ async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) 
                     .await;
             } else if streams_entries[stream_entry].check_stream_status(StreamStatus::Queued) {
                 streams_entries[stream_entry]
-                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
+                    .remove_stream_from_queue(
+                        &data.queued_streams,
+                        &mut data.device_list.lock().await,
+                    )
                     .await;
             }
 
@@ -289,7 +295,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
             } else {
                 // queue the stream in a different thread
                 let connections = stream_entry
-                    .queue_stream(&data.queued_streams, &data.device_list)
+                    .queue_stream(&data.queued_streams, &mut data.device_list.lock().await)
                     .await;
                 debug!(
                     "{} stream {}",
@@ -411,7 +417,11 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
 
     let queues = streams_entries
         .iter_mut()
-        .map(|stream_entry| stream_entry.queue_stream(&data.queued_streams, &data.device_list))
+        .map(|stream_entry| async {
+            stream_entry
+                .queue_stream(&data.queued_streams, &mut data.device_list.lock().await)
+                .await
+        })
         .collect::<Vec<_>>();
 
     let mut counter: usize = 0;
@@ -454,7 +464,10 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             // if the stream is queued, remove it from the queue
             if stream_entry.check_stream_status(StreamStatus::Queued) {
                 return stream_entry
-                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
+                    .remove_stream_from_queue(
+                        &data.queued_streams,
+                        &mut data.device_list.lock().await,
+                    )
                     .await;
             } else if stream_entry.check_stream_status(StreamStatus::Running) {
                 return stream_entry
@@ -533,7 +546,10 @@ async fn force_start_stream(
             if stream_entry.check_stream_status(StreamStatus::Queued) {
                 warn!("Stream {} is already queued", stream_id);
                 stream_entry
-                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
+                    .remove_stream_from_queue(
+                        &data.queued_streams,
+                        &mut data.device_list.lock().await,
+                    )
                     .await;
                 body += "removed from queue ";
             }

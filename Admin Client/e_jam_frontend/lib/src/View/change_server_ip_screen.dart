@@ -72,8 +72,8 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      child: Column(
-                        children: const [
+                      child: const Column(
+                        children: [
                           SizedBox(height: 10),
                           Icon(FontAwesome.download,
                               size: 50, color: Colors.green),
@@ -105,8 +105,8 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      child: Column(
-                        children: const [
+                      child: const Column(
+                        children: [
                           SizedBox(height: 10),
                           Icon(MaterialCommunityIcons.server_network,
                               size: 50, color: Colors.orange),

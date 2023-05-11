@@ -3,7 +3,8 @@ import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/Devices/edit_device_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -122,10 +123,10 @@ class _EditDeviceViewState extends State<EditDeviceView> {
   }
 
   SingleChildScrollView _addDeviceFields() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    return const SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
-        children: const [
+        children: [
           NameField(),
           Description(),
           Location(),

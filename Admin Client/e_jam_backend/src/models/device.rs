@@ -351,7 +351,7 @@ this is used to get the device connection address
             .body(
                 serde_json::to_string(&stream_details).expect("Failed to serialize stream details"),
             )
-            .timeout(Duration::from_millis(500))
+            .timeout(Duration::from_millis(2500))
             .send()
             .await
     }
@@ -365,7 +365,7 @@ this is used to get the device connection address
             ))
             .header("mac-address", self.get_device_mac())
             .header("stream-id", stream_id)
-            .timeout(Duration::from_millis(500))
+            .timeout(Duration::from_millis(2500))
             .send()
             .await
     }
@@ -409,7 +409,7 @@ this is used to set the device to reachable or unreachable and update the last u
         let response = reqwest::Client::new()
             .post(url)
             .header("mac-address", &self.mac_address)
-            .timeout(Duration::from_secs(1))
+            .timeout(Duration::from_secs(5))
             .send()
             .await;
 

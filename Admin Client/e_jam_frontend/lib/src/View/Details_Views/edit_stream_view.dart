@@ -4,7 +4,7 @@ import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -32,15 +32,11 @@ class _EditStreamViewState extends State<EditStreamView>
   bool pickedGeneratorsFirstTime = true;
   final formKey = GlobalKey<FormState>();
   StreamEntry get stream => widget.stream;
-  late int _numberOfGenerators;
-  late int _numberOfVerifiers;
 
   @override
   void initState() {
     super.initState();
     context.read<EditStreamController>().loadAllFields(stream, context);
-    _numberOfVerifiers = stream.verifiersIds.length;
-    _numberOfGenerators = stream.generatorsIds.length;
   }
 
   _editStream() async {
@@ -54,28 +50,8 @@ class _EditStreamViewState extends State<EditStreamView>
     }
   }
 
-  void updateDevicesCounter() {
-    _numberOfGenerators = 0;
-    _numberOfVerifiers = 0;
-
-    context
-        .watch<EditStreamController>()
-        .getPickedGenerators
-        .forEach((key, value) {
-      if (value) _numberOfGenerators++;
-    });
-
-    context
-        .watch<EditStreamController>()
-        .getPickedVerifiers
-        .forEach((key, value) {
-      if (value) _numberOfVerifiers++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    updateDevicesCounter();
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 800
@@ -112,11 +88,14 @@ class _EditStreamViewState extends State<EditStreamView>
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          _nameCheckContentButtonFields(),
+          const NameCheckContentButtonFields(),
           const StreamDescriptionField(),
           const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
-          _streamDevicesLists(),
+          StreamDevicesLists(
+            generatorsIds: stream.generatorsIds,
+            verifiersIds: stream.verifiersIds,
+          ),
           const PacketsBroadcastFramesSizes(),
           const GenerationSeed(),
           const PayloadLengthAndType(),
@@ -127,110 +106,39 @@ class _EditStreamViewState extends State<EditStreamView>
     );
   }
 
-  Row _streamDevicesLists() {
-    return Row(
-      children: [
-        Expanded(
-          child: ListTile(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            title: Row(
-              children: [
-                Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.rotationY(pi),
-                  child: const Icon(
-                    MaterialCommunityIcons.progress_upload,
-                    semanticLabel: 'Generators',
-                    color: uploadColor,
-                  ),
-                ),
-                const VerticalDivider(),
-                const Text(
-                  'Generators',
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-            trailing: Text(
-              _numberOfGenerators.toString(),
-              style: TextStyle(
-                color: _numberOfGenerators == 0 ? Colors.red : null,
-                fontSize: 20,
-              ),
-            ),
-            onTap: () {
-              Navigator.of(context).push(
-                DialogRoute(
-                  context: context,
-                  builder: (BuildContext context) => Center(
-                    child: DevicesCheckListPicker(
-                      areGenerators: true,
-                      devicesReloader: () => context
-                          .read<EditStreamController>()
-                          .syncGeneratorsDevicesList(
-                              stream.generatorsIds, false, context),
-                      isStateless: true,
-                    ),
-                  ),
-                  settings: const RouteSettings(name: 'EditGenerators'),
-                ),
-              );
+  BottomAppBar _bottomOptionsBar(BuildContext context) {
+    return BottomAppBar(
+      elevation: 0,
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.xmark),
+            color: Colors.red,
+            onPressed: () {
+              Navigator.pop(context);
             },
           ),
-        ),
-        const VerticalDivider(),
-        Expanded(
-          child: ListTile(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            title: Row(
-              children: const [
-                Icon(
-                  MaterialCommunityIcons.progress_check,
-                  semanticLabel: 'Verifiers',
-                  color: downloadColor,
-                ),
-                VerticalDivider(),
-                Text(
-                  'Verifiers',
-                  overflow: TextOverflow.clip,
-                ),
-              ],
-            ),
-            trailing: Text(
-              _numberOfVerifiers.toString(),
-              style: TextStyle(
-                  color: _numberOfVerifiers == 0 ? Colors.red : null,
-                  fontSize: 20),
-            ),
-            onTap: () {
-              Navigator.of(context).push(
-                DialogRoute(
-                  context: context,
-                  builder: (BuildContext context) => Center(
-                    child: DevicesCheckListPicker(
-                      areGenerators: false,
-                      devicesReloader: () => context
-                          .read<EditStreamController>()
-                          .syncVerifiersDevicesList(
-                              stream.verifiersIds, false, context),
-                      isStateless: true,
-                    ),
-                  ),
-                  settings: const RouteSettings(name: 'EditVerifiers'),
-                ),
-              );
-            },
+          const Divider(),
+          IconButton(
+            icon: const FaIcon(FontAwesomeIcons.check),
+            color: Colors.blueAccent,
+            onPressed: () => _editStream(),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
+}
 
-  Row _nameCheckContentButtonFields() {
+class NameCheckContentButtonFields extends StatelessWidget {
+  const NameCheckContentButtonFields({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -266,31 +174,6 @@ class _EditStreamViewState extends State<EditStreamView>
         ),
         const VerticalDivider(),
       ],
-    );
-  }
-
-  BottomAppBar _bottomOptionsBar(BuildContext context) {
-    return BottomAppBar(
-      elevation: 0,
-      height: 60,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.xmark),
-            color: Colors.red,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          const Divider(),
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.check),
-            color: Colors.blueAccent,
-            onPressed: () => _editStream(),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -710,6 +593,139 @@ class StreamDescriptionField extends StatelessWidget {
       ),
       controller:
           context.watch<EditStreamController>().getDescriptionController,
+    );
+  }
+}
+
+class StreamDevicesLists extends StatefulWidget {
+  const StreamDevicesLists(
+      {super.key, required this.generatorsIds, required this.verifiersIds});
+
+  final List<String> generatorsIds;
+  final List<String> verifiersIds;
+
+  @override
+  State<StreamDevicesLists> createState() => _StreamDevicesListsState();
+}
+
+class _StreamDevicesListsState extends State<StreamDevicesLists> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ListTile(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            title: Row(
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(pi),
+                  child: const Icon(
+                    MaterialCommunityIcons.progress_upload,
+                    semanticLabel: 'Generators',
+                    color: uploadColor,
+                  ),
+                ),
+                const VerticalDivider(),
+                const Text(
+                  'Generators',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            trailing: Text(
+              context
+                  .watch<EditStreamController>()
+                  .getNumberOfGenerators
+                  .toString(),
+              style: TextStyle(
+                color: context
+                            .watch<EditStreamController>()
+                            .getNumberOfGenerators ==
+                        0
+                    ? Colors.red
+                    : null,
+                fontSize: 20,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                DialogRoute(
+                  context: context,
+                  builder: (BuildContext context) => Center(
+                    child: DevicesCheckListPicker(
+                      areGenerators: true,
+                      devicesReloader: () => context
+                          .read<EditStreamController>()
+                          .syncGeneratorsDevicesList(
+                              widget.generatorsIds, false, context),
+                      isStateless: true,
+                    ),
+                  ),
+                  settings: const RouteSettings(name: 'EditGenerators'),
+                ),
+              );
+            },
+          ),
+        ),
+        const VerticalDivider(),
+        Expanded(
+          child: ListTile(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+            ),
+            title: const Row(
+              children: [
+                Icon(
+                  MaterialCommunityIcons.progress_check,
+                  semanticLabel: 'Verifiers',
+                  color: downloadColor,
+                ),
+                VerticalDivider(),
+                Text(
+                  'Verifiers',
+                  overflow: TextOverflow.clip,
+                ),
+              ],
+            ),
+            trailing: Text(
+              context
+                  .watch<EditStreamController>()
+                  .getNumberOfVerifiers
+                  .toString(),
+              style: TextStyle(
+                  color: context
+                              .watch<EditStreamController>()
+                              .getNumberOfVerifiers ==
+                          0
+                      ? Colors.red
+                      : null,
+                  fontSize: 20),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                DialogRoute(
+                  context: context,
+                  builder: (BuildContext context) => Center(
+                    child: DevicesCheckListPicker(
+                      areGenerators: false,
+                      devicesReloader: () => context
+                          .read<EditStreamController>()
+                          .syncVerifiersDevicesList(
+                              widget.verifiersIds, false, context),
+                      isStateless: true,
+                    ),
+                  ),
+                  settings: const RouteSettings(name: 'EditVerifiers'),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

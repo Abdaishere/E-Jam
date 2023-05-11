@@ -8,7 +8,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:e_jam/src/View/Details_Views/edit_device_view.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -386,12 +386,12 @@ class ProgressDeviceDetails extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Row(
+  Widget build(BuildContext context) => const Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           Expanded(
             child: Column(
-              children: const <Widget>[
+              children: <Widget>[
                 FaIcon(FontAwesomeIcons.caretUp, color: uploadColor),
                 Text(
                   '987654321MB/s',
@@ -408,7 +408,7 @@ class ProgressDeviceDetails extends StatelessWidget {
           ),
           Expanded(
             child: Column(
-              children: const <Widget>[
+              children: <Widget>[
                 FaIcon(FontAwesomeIcons.caretDown, color: downloadColor),
                 Text(
                   '987654321MB/s',

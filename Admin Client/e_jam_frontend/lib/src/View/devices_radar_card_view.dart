@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:circular_motion/circular_motion.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
@@ -7,7 +6,7 @@ import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_ripple/flutter_ripple.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';

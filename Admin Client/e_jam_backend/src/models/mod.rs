@@ -987,7 +987,7 @@ this will add the stream to the queue
     pub async fn queue_stream(
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
-        device_list: &Mutex<Vec<Device>>,
+        device_list: &mut MutexGuard<'_,Vec<Device>>,
     ) -> i32 {
         if self.stream_status == StreamStatus::Running || self.stream_status == StreamStatus::Queued
         {
@@ -997,7 +997,7 @@ this will add the stream to the queue
         info!("Stream queued to start in {} seconds", self.delay / 1000);
 
         // send the stream to the client to update the stream status to queued
-        let connections = self.send_stream(true, &mut device_list.lock().await).await;
+        let connections = self.send_stream(true, device_list).await;
 
         // add the thread to the queued streams list
         if self.stream_status == StreamStatus::Sent {
@@ -1023,10 +1023,10 @@ this will remove the stream from the queue
     pub async fn remove_stream_from_queue(
         &mut self,
         queued_streams: &Mutex<Vec<String>>,
-        device_list: &Mutex<Vec<Device>>,
+        device_list: &mut MutexGuard<'_,Vec<Device>>,
     ) -> StreamStatus {
         // stop the stream
-        self.stop_stream(&mut device_list.lock().await).await;
+        self.stop_stream(device_list).await;
 
         // remove the stream from the queued streams list
         let mut queue = queued_streams.lock().await;

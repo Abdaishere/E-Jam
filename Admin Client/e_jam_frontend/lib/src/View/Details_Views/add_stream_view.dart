@@ -3,8 +3,9 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
-import 'package:e_jam/src/controller/devices_controller.dart';
-import 'package:e_jam/src/controller/streams_controller.dart';
+import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -24,38 +25,18 @@ class AddStreamView extends StatefulWidget {
 class _AddStreamViewState extends State<AddStreamView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  int _numberOfGenerators = 0;
-  int _numberOfVerifiers = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    context.read<AddStreamController>().syncDevicesList();
-  }
-
-  void updateDevicesCounter() {
-    _numberOfGenerators = 0;
-    _numberOfVerifiers = 0;
-
-    context
-        .watch<AddStreamController>()
-        .getPickedGenerators
-        .forEach((key, value) {
-      if (value) _numberOfGenerators++;
-    });
-
-    context
-        .watch<AddStreamController>()
-        .getPickedVerifiers
-        .forEach((key, value) {
-      if (value) _numberOfVerifiers++;
+    Future.delayed(Duration.zero, () {
+      context.read<AddStreamController>().syncDevicesList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    updateDevicesCounter();
     return Padding(
       padding: MediaQuery.of(context).orientation == Orientation.landscape &&
               MediaQuery.of(context).size.width > 900
@@ -118,26 +99,23 @@ class _AddStreamViewState extends State<AddStreamView>
   }
 
   SingleChildScrollView _addStreamFields() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    return const SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CheckContentButton(),
-          const IDNameFields(),
-          const StreamDescriptionField(),
-          const DelayTimeToLiveInterFrameGapFields(),
-          const SizedBox(height: 20),
-          StreamDevicesLists(
-            numberOfGenerators: _numberOfGenerators,
-            numberOfVerifiers: _numberOfVerifiers,
-          ),
-          const PacketsBroadcastFramesSizes(),
-          const GenerationSeed(),
-          const PayloadLengthAndType(),
-          const BurstLengthAndDelay(),
-          const FlowAndTLPTypes(),
+          CheckContentButton(),
+          IDNameFields(),
+          StreamDescriptionField(),
+          DelayTimeToLiveInterFrameGapFields(),
+          SizedBox(height: 20),
+          StreamDevicesLists(),
+          PacketsBroadcastFramesSizes(),
+          GenerationSeed(),
+          PayloadLengthAndType(),
+          BurstLengthAndDelay(),
+          FlowAndTLPTypes(),
         ],
       ),
     );
@@ -155,11 +133,8 @@ class _AddStreamViewState extends State<AddStreamView>
             tooltip: 'Clear',
             color: Colors.redAccent,
             onPressed: () {
-              _numberOfGenerators = 0;
-              _numberOfVerifiers = 0;
               if (formKey.currentState != null) formKey.currentState!.reset();
               context.read<AddStreamController>().clearAllFields();
-              setState(() {});
             },
           ),
           const Divider(),
@@ -722,12 +697,7 @@ class _PacketsBroadcastFramesSizesState
 class StreamDevicesLists extends StatefulWidget {
   const StreamDevicesLists({
     super.key,
-    required this.numberOfGenerators,
-    required this.numberOfVerifiers,
   });
-
-  final int numberOfGenerators;
-  final int numberOfVerifiers;
 
   @override
   State<StreamDevicesLists> createState() => _StreamDevicesListsState();
@@ -763,9 +733,17 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
               ],
             ),
             trailing: Text(
-              widget.numberOfGenerators.toString(),
+              context
+                  .watch<AddStreamController>()
+                  .getNumberOfGenerators
+                  .toString(),
               style: TextStyle(
-                color: widget.numberOfGenerators == 0 ? Colors.red : null,
+                color: context
+                            .watch<AddStreamController>()
+                            .getNumberOfGenerators ==
+                        0
+                    ? Colors.red
+                    : null,
                 fontSize: 20,
               ),
             ),
@@ -800,8 +778,8 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
-            title: Row(
-              children: const [
+            title: const Row(
+              children: [
                 Icon(
                   MaterialCommunityIcons.progress_check,
                   semanticLabel: 'Verifiers',
@@ -816,9 +794,17 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
               ],
             ),
             trailing: Text(
-              widget.numberOfVerifiers.toString(),
+              context
+                  .watch<AddStreamController>()
+                  .getNumberOfVerifiers
+                  .toString(),
               style: TextStyle(
-                  color: widget.numberOfVerifiers == 0 ? Colors.red : null,
+                  color: context
+                              .watch<AddStreamController>()
+                              .getNumberOfVerifiers ==
+                          0
+                      ? Colors.red
+                      : null,
                   fontSize: 20),
             ),
             onTap: () {
