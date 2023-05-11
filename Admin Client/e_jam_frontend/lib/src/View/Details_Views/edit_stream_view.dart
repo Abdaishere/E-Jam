@@ -661,7 +661,7 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                       devicesReloader: () => context
                           .read<EditStreamController>()
                           .syncGeneratorsDevicesList(
-                              widget.generatorsIds, false, context),
+                              widget.generatorsIds, true, context),
                       isStateless: true,
                     ),
                   ),
@@ -715,7 +715,7 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                       devicesReloader: () => context
                           .read<EditStreamController>()
                           .syncVerifiersDevicesList(
-                              widget.verifiersIds, false, context),
+                              widget.verifiersIds, true, context),
                       isStateless: true,
                     ),
                   ),

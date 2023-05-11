@@ -30,7 +30,7 @@ class DevicesController extends ChangeNotifier {
     });
   }
 
-  Future<int> addNewDevice(Device device) async {
+  Future<int?> addNewDevice(Device device) async {
     isLoading = true;
     return devicesServices.createDevice(device).then((value) {
       isLoading = false;

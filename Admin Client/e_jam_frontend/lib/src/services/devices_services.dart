@@ -40,14 +40,14 @@ class DevicesServices {
     }
   }
 
-  Future<int> createDevice(Device device) async {
+  Future<int?> createDevice(Device device) async {
     try {
       final response = await client.post(uri,
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
       return response.statusCode;
     } catch (e) {
-      return -1;
+      return null;
     }
   }
 

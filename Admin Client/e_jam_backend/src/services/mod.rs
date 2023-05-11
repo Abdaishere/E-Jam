@@ -110,7 +110,10 @@ async fn add_stream(
 
     match stream_entry.validate() {
         Ok(_) => (),
-        Err(e) => return HttpResponse::BadRequest().body(format!("Validation error: {}", e)),
+        Err(e) => {
+            warn!("Validation error: {}", e);
+            return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
+        }
     }
 
     let stream_id = stream_entry.get_stream_id().to_string();
@@ -156,7 +159,10 @@ async fn update_stream(
 ) -> impl Responder {
     match new_stream_entry.validate() {
         Ok(_) => (),
-        Err(e) => return HttpResponse::BadRequest().body(format!("Validation error: {}", e)),
+        Err(e) => {
+            warn!("Validation error: {}", e);
+            return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
+        }
     }
 
     let stream_id = stream_id.into_inner();

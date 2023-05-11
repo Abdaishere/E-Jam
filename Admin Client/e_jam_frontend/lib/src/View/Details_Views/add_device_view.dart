@@ -2,9 +2,9 @@ import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
-import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:e_jam/src/View/Dialogues/device_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues/request_status_icon.dart';
 import 'package:e_jam/src/controller/Devices/add_device_controller.dart';
-import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,54 +103,45 @@ class BottomOptionsBar extends StatefulWidget {
 }
 
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
-  Future<bool?> _addDevice() async {
-    Device? device =
-        await context.read<AddDeviceController>().createNewDevice(formKey);
+  int? _status;
 
-    if (!mounted || device == null) return null;
-    int? code = await context.read<DevicesController>().addNewDevice(device);
-
-    bool result = _analyzeCode(code);
-
-    if (result) {
-      if (mounted) {
-        await context.read<DevicesController>().loadAllDevices();
-      }
-      if (mounted) {
-        await context.read<AddStreamController>().syncDevicesList();
-      }
-      if (widget.delete != null) widget.delete!();
-      return true;
-    } else {
-      return false;
+  String _statusToMessage(int? status) {
+    switch (status) {
+      case 200:
+        return 'OK';
+      case 201:
+        return 'Created Successfully';
+      case 400:
+        return 'Bad Request: Please fill all the required fields correctly';
+      case 401:
+        return 'Unauthorized';
+      case 403:
+        return 'Forbidden';
+      case 404:
+        return 'Not Found';
+      case 408:
+        return 'Request Timeout';
+      case 409:
+        return 'Conflict: Device with mac address already exists';
+      case 500:
+        return 'Internal Server Error';
+      case 503:
+        return 'Service Unavailable';
+      default:
+        return 'Unknown State';
     }
   }
 
-  bool _analyzeCode(int code) {
-    if (code == 201) {
-      return true;
-    } else if (code == 409) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Device already exists'),
-          content: const Text(
-              'The device you are trying to add already exists, please check the MAC address and try again.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-        ),
-      );
-      return false;
-    } else {
-      return false;
-    }
+  _addDevice() async {
+    Device? device =
+        await context.read<AddDeviceController>().createNewDevice(formKey);
+
+    if (!mounted || device == null) return;
+    int? code = await context.read<DevicesController>().addNewDevice(device);
+
+    if (!mounted) return;
+    _status = code;
+    setState(() {});
   }
 
   @override
@@ -170,7 +161,14 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
               context.read<AddDeviceController>().clearAllFields();
             },
           ),
-          const Divider(),
+          _status != null && _status! >= 300
+              ? RequestStatusIcon(
+                  status: _status!,
+                  message: _statusToMessage(_status),
+                )
+              : const SizedBox(
+                  width: 40,
+                ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,

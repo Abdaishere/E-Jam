@@ -1,6 +1,7 @@
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
+import 'package:e_jam/src/View/Dialogues/streams_start_stop_controller_button.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';
@@ -20,7 +21,6 @@ import 'package:e_jam/src/View/home_view.dart';
 import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/View/settings_view.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -245,7 +245,7 @@ class _MenuScreenState extends State<MenuScreen> {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                StreamsControllerButton(),
+                StreamsStartStopControllerButton(),
                 GraphsControllerButton(),
                 ExportButton(),
               ],
@@ -368,61 +368,6 @@ class ExportButton extends StatelessWidget {
       color: context.watch<ThemeModel>().colorScheme.secondary,
       icon: const FaIcon(
         FontAwesomeIcons.solidFloppyDisk,
-        size: 21,
-      ),
-    );
-  }
-}
-
-class StreamsControllerButton extends StatefulWidget {
-  const StreamsControllerButton({super.key});
-
-  @override
-  State<StreamsControllerButton> createState() =>
-      _StreamsControllerButtonState();
-}
-
-class _StreamsControllerButtonState extends State<StreamsControllerButton> {
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: SystemSettings.streamsAreRunning ? 'Pause' : 'Start',
-      onPressed: () async => SystemSettings.streamsAreRunning
-          ? context
-              .read<StreamsController>()
-              .stopAllStreams()
-              .then((value) async {
-              if (value && mounted) {
-                setState(() {
-                  SystemSettings.streamsAreRunning =
-                      !SystemSettings.streamsAreRunning;
-                });
-                final pref = await SharedPreferences.getInstance();
-                pref.setBool(
-                    'streamsAreRunning', SystemSettings.streamsAreRunning);
-              }
-            })
-          : context
-              .read<StreamsController>()
-              .startAllStreams()
-              .then((value) async {
-              if (value && mounted) {
-                setState(() {
-                  SystemSettings.streamsAreRunning =
-                      !SystemSettings.streamsAreRunning;
-                });
-                final pref = await SharedPreferences.getInstance();
-                pref.setBool(
-                    'streamsAreRunning', SystemSettings.streamsAreRunning);
-              }
-            }),
-      color: SystemSettings.streamsAreRunning
-          ? context.watch<ThemeModel>().colorScheme.secondary
-          : context.watch<ThemeModel>().colorScheme.error,
-      icon: FaIcon(
-        SystemSettings.streamsAreRunning
-            ? FontAwesomeIcons.play
-            : FontAwesomeIcons.pause,
         size: 21,
       ),
     );

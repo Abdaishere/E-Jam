@@ -22,7 +22,7 @@ use validator::Validate;
 lazy_static! {
     #[doc = r"Regex for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters
     example of a valid stream id: 123, abc, 1a2, 1A2, 1aB, 1Ab, 1AB, _1A, _1a, _1_, _1a2, _1A2, _1aB, _1Ab, _1AB"]
-    static ref STREAM_ID : Regex = Regex::new(r"^[A-Za-z0-9_~]{3}$").unwrap();
+    static ref STREAM_ID : Regex = Regex::new(r"^[A-Za-z0-9_~-]{3}$").unwrap();
 
     #[doc = r"Regex for the mac address of the device's mac address
     example of a valid mac address: 00:00:00:00:00:00, 00-00-00-00-00-00"]

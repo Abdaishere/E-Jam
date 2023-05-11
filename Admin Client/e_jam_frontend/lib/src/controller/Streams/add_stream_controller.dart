@@ -103,7 +103,7 @@ class AddStreamController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool?> addStream(
+  Future<int?> addStream(
       GlobalKey<FormState> formKey, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();

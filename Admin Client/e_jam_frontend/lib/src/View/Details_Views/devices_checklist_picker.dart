@@ -1,7 +1,8 @@
+import 'dart:developer';
 import 'dart:math';
 
 import 'package:e_jam/src/Theme/color_schemes.dart';
-import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:e_jam/src/View/Dialogues/device_status_icon_button.dart';
 import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
@@ -19,16 +20,16 @@ class DevicesCheckListPicker extends StatefulWidget {
   });
 
   final bool areGenerators;
-  final Function devicesReloader;
+  final TimelineAsyncFunction devicesReloader;
   final bool isStateless;
   @override
   State<DevicesCheckListPicker> createState() => _DevicesCheckListPickerState();
 }
 
 class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
-  late Map<String, bool> _devicesMap;
-  _syncDevices() {
-    widget.devicesReloader();
+  Map<String, bool> _devicesMap = {};
+
+  _syncDevices() async {
     if (widget.isStateless) {
       if (widget.areGenerators) {
         _devicesMap = Map<String, bool>.from(
@@ -38,6 +39,8 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
             context.read<EditStreamController>().getPickedVerifiers);
       }
     } else {
+      await widget.devicesReloader();
+      if (!mounted) return;
       if (widget.areGenerators) {
         _devicesMap = Map<String, bool>.from(
             context.read<AddStreamController>().getPickedGenerators);
@@ -162,11 +165,11 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
                     ),
                     value: true,
                     secondary: const Icon(
-                      MaterialCommunityIcons.alert,
+                      MaterialCommunityIcons.alert_box_outline,
                       color: Colors.red,
                     ),
                     onChanged: (value) {
-                      _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
+                      _devicesMap.remove(_devicesMap.keys.elementAt(index));
                       setState(() {});
                     },
                   );

@@ -82,7 +82,7 @@ class SystemSettings {
   ];
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";
-  static bool streamsAreRunning = false;
+  static bool? streamsAreRunning = false;
   static bool chartsAreRunning = true;
 
   static init() async {
@@ -108,13 +108,6 @@ class SystemSettings {
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",
         pref.getInt('serverPort')?.toString() ?? "");
-  }
-
-  static backgroundBall() {
-    showBackgroundBall = !showBackgroundBall;
-    SharedPreferences.getInstance().then((pref) {
-      pref.setBool('showBackgroundBall', showBackgroundBall);
-    });
   }
 }
 

@@ -43,7 +43,7 @@ class StreamServices {
     }
   }
 
-  Future<bool?> createStream(StreamEntry stream) async {
+  Future<int?> createStream(StreamEntry stream) async {
     try {
       final response = await client.post(
         uri,
@@ -52,13 +52,7 @@ class StreamServices {
         },
         body: json.encode(stream.toJson()),
       );
-      if (201 == response.statusCode) {
-        return true;
-      } else if (409 == response.statusCode) {
-        return false;
-      } else {
-        return false;
-      }
+      return response.statusCode;
     } catch (e) {
       return null;
     }

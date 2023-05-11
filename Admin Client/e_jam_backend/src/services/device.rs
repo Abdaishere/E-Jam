@@ -2,7 +2,7 @@ use super::AppState;
 use crate::models::device::Device;
 use actix_web::Responder;
 use actix_web::{delete, get, post, put, web, HttpRequest, HttpResponse};
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 use validator::Validate;
 
 #[doc = r"# Get all devices
@@ -67,7 +67,7 @@ async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) ->
     match new_device.validate() {
         Ok(_) => (),
         Err(e) => {
-            error!("Validation error: {}", e);
+            warn!("Validation error: {}", e);
             return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
         }
     }
@@ -145,7 +145,7 @@ async fn check_new_device(device: web::Json<Device>) -> impl Responder {
     match device.validate() {
         Ok(_) => (),
         Err(e) => {
-            error!("Validation error: {}", e);
+            warn!("Validation error: {}", e);
             return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
         }
     }
@@ -239,7 +239,7 @@ async fn update_device(
     match new_device.validate() {
         Ok(_) => (),
         Err(e) => {
-            error!("Validation error: {}", e);
+            warn!("Validation error: {}", e);
             return HttpResponse::BadRequest().body(format!("Validation error: {}", e));
         }
     }

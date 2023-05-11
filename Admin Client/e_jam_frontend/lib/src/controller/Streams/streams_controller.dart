@@ -1,5 +1,6 @@
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,7 @@ class StreamsController extends ChangeNotifier {
     });
   }
 
-  Future<bool?> createNewStream(StreamEntry stream) async {
+  Future<int?> createNewStream(StreamEntry stream) async {
     _isLoading = true;
     return _streamServices.createStream(stream).then((value) {
       _isLoading = false;
@@ -70,17 +71,19 @@ class StreamsController extends ChangeNotifier {
 
   Future<bool> startAllStreams() async {
     _isLoading = true;
-    return _streamServices.startAllStreams().then((value) {
+    return _streamServices.startAllStreams().then((success) {
       _isLoading = false;
-      return value;
+      SystemSettings.streamsAreRunning = true;
+      return success;
     });
   }
 
   Future<bool> stopAllStreams() async {
     _isLoading = true;
-    return _streamServices.stopAllStreams().then((value) {
+    return _streamServices.stopAllStreams().then((success) {
       _isLoading = false;
-      return value;
+      SystemSettings.streamsAreRunning = false;
+      return success;
     });
   }
 

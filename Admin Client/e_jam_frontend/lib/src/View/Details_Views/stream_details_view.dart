@@ -11,7 +11,7 @@ import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
 import 'package:e_jam/src/View/Charts/stream_progress_bar.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_devices_list.dart';
-import 'package:e_jam/src/View/Lists/streams_list_view.dart';
+import 'package:e_jam/src/View/Dialogues/stream_status_icon_button.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -322,9 +322,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   child: StreamDevicesList(
                     areGenerators: true,
                     process: stream?.runningGenerators,
-                    reloadStream: () => {
-                      _loadStream(),
-                    },
+                    reloadStream: () => _loadStream(),
                   ),
                 ),
                 settings: const RouteSettings(name: 'Generators'),
@@ -354,9 +352,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   child: StreamDevicesList(
                     areGenerators: false,
                     process: stream?.runningVerifiers,
-                    reloadStream: () => {
-                      _loadStream(),
-                    },
+                    reloadStream: () => _loadStream(),
                   ),
                 ),
                 settings: const RouteSettings(name: 'Verifiers'),
@@ -532,7 +528,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
 
   ListTile _idCheckContentDetails() {
     return ListTile(
-      leading: StatusIconButton(
+      leading: StreamStatusIconButton(
           status: stream?.streamStatus ?? StreamStatus.error,
           id: stream?.streamId ?? '___',
           lastUpdated: stream?.lastUpdated ?? DateTime.now(),

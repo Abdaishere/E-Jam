@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
+import 'package:e_jam/src/View/Dialogues/request_status_icon.dart';
 import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
@@ -91,7 +92,7 @@ class _AddStreamViewState extends State<AddStreamView>
                 const AddPresetStream(),
               ],
             ),
-            bottomNavigationBar: _bottomOptionsBar(),
+            bottomNavigationBar: const BottomOptionsBar(),
           ),
         ),
       ),
@@ -120,8 +121,49 @@ class _AddStreamViewState extends State<AddStreamView>
       ),
     );
   }
+}
 
-  BottomAppBar _bottomOptionsBar() {
+class BottomOptionsBar extends StatefulWidget {
+  const BottomOptionsBar({
+    super.key,
+  });
+
+  @override
+  State<BottomOptionsBar> createState() => _BottomOptionsBarState();
+}
+
+class _BottomOptionsBarState extends State<BottomOptionsBar> {
+  int? _status;
+
+  String _statusToMessage(int? status) {
+    switch (status) {
+      case 200:
+        return 'OK';
+      case 201:
+        return 'Created Successfully';
+      case 400:
+        return 'Bad Request: Please fill all the required fields correctly';
+      case 401:
+        return 'Unauthorized';
+      case 403:
+        return 'Forbidden';
+      case 404:
+        return 'Not Found';
+      case 408:
+        return 'Request Timeout';
+      case 409:
+        return 'Conflict: Stream with id already exists';
+      case 500:
+        return 'Internal Server Error';
+      case 503:
+        return 'Service Unavailable';
+      default:
+        return 'Unknown State';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BottomAppBar(
       elevation: 0,
       height: 60,
@@ -137,24 +179,36 @@ class _AddStreamViewState extends State<AddStreamView>
               context.read<AddStreamController>().clearAllFields();
             },
           ),
-          const Divider(),
+          _status != null && _status! >= 300
+              ? RequestStatusIcon(
+                  status: _status!,
+                  message: _statusToMessage(_status),
+                )
+              : const SizedBox(
+                  width: 40,
+                ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
             tooltip: 'OK',
             onPressed: () async {
               context
-                  .watch<AddStreamController>()
+                  .read<AddStreamController>()
                   .addStream(formKey, context)
-                  .then((success) => {
-                        if (success != null && mounted)
+                  .then((status) => {
+                        if (status != null && context.mounted)
                           {
-                            if (success)
+                            if (status < 300)
                               {
                                 context
                                     .read<StreamsController>()
                                     .loadAllStreamStatus(),
-                                if (mounted) Navigator.pop(context),
+                                if (context.mounted) Navigator.pop(context),
+                              }
+                            else
+                              {
+                                _status = status,
+                                setState(() {}),
                               }
                           }
                       });
@@ -176,17 +230,21 @@ class _AddStreamViewState extends State<AddStreamView>
               context
                   .read<AddStreamController>()
                   .addStream(formKey, context)
-                  .then((success) => {
-                        if (success != null)
-                          {
-                            if (success && mounted)
-                              {
-                                context
-                                    .read<StreamsController>()
-                                    .loadAllStreamStatus(),
-                              }
-                          }
-                      });
+                  .then(
+                    (success) => {
+                      if (success != null)
+                        {
+                          _status = success,
+                          setState(() {}),
+                          if (success < 300 && context.mounted)
+                            {
+                              context
+                                  .read<StreamsController>()
+                                  .loadAllStreamStatus(),
+                            },
+                        }
+                    },
+                  );
             },
           ),
         ],

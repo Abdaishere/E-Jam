@@ -2,7 +2,7 @@ import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
-import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:e_jam/src/View/Dialogues/device_status_icon_button.dart';
 import 'package:e_jam/src/controller/Devices/edit_device_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
