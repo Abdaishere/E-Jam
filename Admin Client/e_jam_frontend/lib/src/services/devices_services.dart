@@ -26,9 +26,7 @@ class DevicesServices {
 
   Future<Device?> getDevice(String deviceMac) async {
     try {
-      final response = await client
-          .get(Uri.parse('$uri/$deviceMac'))
-          .timeout(NetworkController.timeout);
+      final response = await client.get(Uri.parse('$uri/$deviceMac'));
 
       if (300 > response.statusCode) {
         return Device.fromJson(json.decode(response.body));

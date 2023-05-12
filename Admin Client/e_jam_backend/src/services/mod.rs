@@ -414,25 +414,22 @@ if not running or queued, queue the stream
 * `Queued all streams to start` - after all streams are queued to start"]
 #[post("/streams/start_all")]
 async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
-    let mut streams_entries = data.stream_entries.lock().await;
+    let streams_entries_len = data.stream_entries.lock().await.len();
 
-    if streams_entries.is_empty() {
+    if streams_entries_len == 0 {
         warn!("No streams to start");
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
 
-    let queues = streams_entries
-        .iter_mut()
-        .map(|stream_entry| async {
-            stream_entry
-                .queue_stream(&data.queued_streams, &mut data.device_list.lock().await)
-                .await
-        })
-        .collect::<Vec<_>>();
-
     let mut counter: usize = 0;
-    for connections in queues {
-        if connections.await > 1 {
+    for i in 0..streams_entries_len {
+        let mut stream_entries = data.stream_entries.lock().await;
+        let stream_entry = stream_entries.get_mut(i).unwrap();
+        if stream_entry
+            .queue_stream(&data.queued_streams, &mut data.device_list.lock().await)
+            .await
+            > 1
+        {
             counter += 1;
         }
     }
@@ -457,38 +454,33 @@ if the stream is running, stop it
 * `Stopped all streams` - after all streams are attempted to be stopped"]
 #[post("/streams/stop_all")]
 async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
-    let mut streams_entries = data.stream_entries.lock().await;
 
-    if streams_entries.is_empty() {
+    let streams_entries_len = data.stream_entries.lock().await.len();
+    if streams_entries_len == 0 {
         warn!("No streams to stop");
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
-
-    let tasks = streams_entries
-        .iter_mut()
-        .map(|stream_entry| async {
-            // if the stream is queued, remove it from the queue
-            if stream_entry.check_stream_status(StreamStatus::Queued) {
-                return stream_entry
-                    .remove_stream_from_queue(
-                        &data.queued_streams,
-                        &mut data.device_list.lock().await,
-                    )
-                    .await;
-            } else if stream_entry.check_stream_status(StreamStatus::Running) {
-                return stream_entry
-                    .stop_stream(&mut data.device_list.lock().await)
-                    .await;
-            }
-            stream_entry.get_stream_status().clone()
-        })
-        .collect::<Vec<_>>();
-
     let mut counter = 0;
     let mut unqueued = 0;
 
-    for task in tasks {
-        match task.await {
+    for i in 0..streams_entries_len {
+        let mut stream_entries = data.stream_entries.lock().await;
+        let stream_entry = stream_entries.get_mut(i).unwrap();
+        // if the stream is queued, remove it from the queue
+
+        let task = if stream_entry.check_stream_status(StreamStatus::Queued) {
+            stream_entry
+                .remove_stream_from_queue(&data.queued_streams, &mut data.device_list.lock().await)
+                .await
+        } else if stream_entry.check_stream_status(StreamStatus::Running) {
+            stream_entry
+                .stop_stream(&mut data.device_list.lock().await)
+                .await
+        } else {
+            stream_entry.get_stream_status().clone()
+        };
+
+        match task {
             StreamStatus::Queued => unqueued += 1,
             StreamStatus::Stopped => counter += 1,
             StreamStatus::Running => error!("Failed to stop some streams"),

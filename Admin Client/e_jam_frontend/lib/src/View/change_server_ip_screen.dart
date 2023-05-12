@@ -63,9 +63,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                       onPressed: () {
                         formKey.currentState!.save();
                         NetworkController.changeServerIpAddress(
-                            "",
-                            _serverPortController.text,
-                            const Duration(seconds: 20));
+                            "", _serverPortController.text);
 
                         Navigator.pop(context);
                       },
@@ -98,8 +96,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                           formKey.currentState!.save();
                           NetworkController.changeServerIpAddress(
                               _serverIpAddressController.text,
-                              _serverPortController.text,
-                              const Duration(seconds: 20));
+                              _serverPortController.text);
                           Navigator.pop(context);
                         }
                       },

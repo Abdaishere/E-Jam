@@ -45,12 +45,9 @@ class ThemePreferences {
 class NetworkController {
   static Uri serverIpAddress = Uri.parse('http://127.0.0.1:8080');
   static final client = http.Client();
-  static Duration timeout = const Duration(seconds: 5);
+  static Duration timeout = const Duration(minutes: 5);
 
-  static changeServerIpAddress(
-      String newIpAddress, String newPort, Duration newTimeout) async {
-    timeout = newTimeout;
-
+  static changeServerIpAddress(String newIpAddress, String newPort) async {
     if (newIpAddress == "") {
       newIpAddress = "127.0.0.1";
     }
@@ -111,8 +108,7 @@ class SystemSettings {
 
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",
-        pref.getInt('serverPort')?.toString() ?? "",
-        const Duration(seconds: 5));
+        pref.getInt('serverPort')?.toString() ?? "");
   }
 }
 
