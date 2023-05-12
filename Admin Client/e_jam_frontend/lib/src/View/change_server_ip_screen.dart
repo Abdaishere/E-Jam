@@ -65,7 +65,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                         NetworkController.changeServerIpAddress(
                             "",
                             _serverPortController.text,
-                            const Duration(seconds: 5));
+                            const Duration(seconds: 20));
 
                         Navigator.pop(context);
                       },
@@ -99,7 +99,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                           NetworkController.changeServerIpAddress(
                               _serverIpAddressController.text,
                               _serverPortController.text,
-                              const Duration(seconds: 5));
+                              const Duration(seconds: 20));
                           Navigator.pop(context);
                         }
                       },

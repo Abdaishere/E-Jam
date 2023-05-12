@@ -32,7 +32,9 @@ class _AddStreamViewState extends State<AddStreamView>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     Future.delayed(Duration.zero, () {
-      context.read<AddStreamController>().syncDevicesList();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AddStreamController>().syncDevicesList();
+      });
     });
   }
 

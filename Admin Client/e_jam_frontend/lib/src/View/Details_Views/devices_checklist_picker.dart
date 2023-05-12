@@ -55,7 +55,9 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
   @override
   void initState() {
     super.initState();
-    _syncDevices();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _syncDevices();
+    });
   }
 
   @override

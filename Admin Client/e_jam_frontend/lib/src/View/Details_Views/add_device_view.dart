@@ -29,7 +29,9 @@ class _AddDeviceViewState extends State<AddDeviceView> {
   void initState() {
     super.initState();
     if (widget.ip != null) {
-      context.read<AddDeviceController>().getIpController.text = widget.ip!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AddDeviceController>().getIpController.text = widget.ip!;
+      });
     }
   }
 

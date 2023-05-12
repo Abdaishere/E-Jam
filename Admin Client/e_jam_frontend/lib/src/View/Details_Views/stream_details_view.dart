@@ -35,12 +35,14 @@ class StreamDetailsView extends StatefulWidget {
 class _StreamDetailsViewState extends State<StreamDetailsView> {
   get id => widget.id;
   StreamEntry? stream;
-  late bool isLoading;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadStream();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadStream();
+    });
   }
 
   _loadStream() async {

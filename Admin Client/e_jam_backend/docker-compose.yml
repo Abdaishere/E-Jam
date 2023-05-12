@@ -45,22 +45,22 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
 
-  # init-kafka:
-  #   image: confluentinc/cp-kafka:latest
-  #   hostname: init-kafka
-  #   container_name: init-kafka
-  #   depends_on:
-  #     - broker
-  #   entrypoint: [ '/bin/sh', '-c' ]
-  #   command: "
-  #     # blocks until kafka is reachable
-  #     kafka-topics --bootstrap-server broker:29092 --list
+  init-kafka:
+    image: confluentinc/cp-kafka:latest
+    hostname: init-kafka
+    container_name: init-kafka
+    depends_on:
+      - broker
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server broker:29092 --list
 
-  #     echo -e 'Creating kafka topics'
-  #     kafka-topics --bootstrap-server kafka:229092 --create --if-not-exists --topic Verifier --replication-factor 1 --partitions 1
-  #     kafka-topics --bootstrap-server kafka:229092 --create --if-not-exists --topic Generator --replication-factor 1 --partitions 1
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:229092 --create --if-not-exists --topic Verifier --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server kafka:229092 --create --if-not-exists --topic Generator --replication-factor 1 --partitions 1
 
-  #     echo -e 'Successfully created the following topics:'
-  #     kafka-topics --bootstrap-server broker:29092 --list
-  #     "
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server broker:29092 --list
+      "
         

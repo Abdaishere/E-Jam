@@ -127,6 +127,7 @@ class StreamsController extends ChangeNotifier {
       _isLoading = false;
       return;
     }
+
     return _streamServices.getAllStreamStatus().then((value) {
       _streamsStatusDetails = value;
       _isLoading = false;

@@ -22,10 +22,12 @@ class _DashBoardViewState extends State<DashBoardView> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => _loadSystemData(false));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSystemData(false);
+    });
   }
 
-  void _loadSystemData(bool forced) {
+  void _loadSystemData(bool forced) async {
     // load system data
     context.read<DevicesController>().loadAllDevices(forced);
     context.read<StreamsController>().loadAllStreamStatus(forced);

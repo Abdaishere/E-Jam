@@ -8,7 +8,8 @@ class DevicesServices {
 
   Future<List<Device>?> getDevices() async {
     try {
-      final response = await client.get(uri);
+      final response = await client.get(uri).timeout(NetworkController.timeout);
+
       if (response.statusCode == 200) {
         return (json.decode(response.body) as List)
             .map((e) => Device.fromJson(e))
@@ -25,7 +26,10 @@ class DevicesServices {
 
   Future<Device?> getDevice(String deviceMac) async {
     try {
-      final response = await client.get(Uri.parse('$uri/$deviceMac'));
+      final response = await client
+          .get(Uri.parse('$uri/$deviceMac'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return Device.fromJson(json.decode(response.body));
       } else {
@@ -38,9 +42,12 @@ class DevicesServices {
 
   Future<int?> createDevice(Device device) async {
     try {
-      final response = await client.post(uri,
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(device.toJson()));
+      final response = await client
+          .post(uri,
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode(device.toJson()))
+          .timeout(NetworkController.timeout);
+
       return response.statusCode;
     } catch (e) {
       return null;
@@ -50,7 +57,10 @@ class DevicesServices {
   // ping a device
   Future<bool> pingDevice(String deviceMac) async {
     try {
-      final response = await client.get(Uri.parse('$uri/$deviceMac/ping'));
+      final response = await client
+          .get(Uri.parse('$uri/$deviceMac/ping'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -63,9 +73,11 @@ class DevicesServices {
 
   Future<bool> checkNewDevice(Device device) async {
     try {
-      final response = await client.post(Uri.parse('$uri/ping'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(device.toJson()));
+      final response = await client
+          .post(Uri.parse('$uri/ping'),
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode(device.toJson()))
+          .timeout(NetworkController.timeout);
 
       if (300 > response.statusCode) {
         return true;
@@ -80,7 +92,10 @@ class DevicesServices {
   // ping all devices
   Future<bool> pingAllDevices() async {
     try {
-      final response = await client.get(Uri.parse('$uri/ping_all'));
+      final response = await client
+          .get(Uri.parse('$uri/ping_all'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -93,9 +108,12 @@ class DevicesServices {
 
   Future<bool> updateDevice(Device device) async {
     try {
-      final response = await client.put(Uri.parse('$uri/${device.macAddress}'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(device.toJson()));
+      final response = await client
+          .put(Uri.parse('$uri/${device.macAddress}'),
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode(device.toJson()))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -108,7 +126,10 @@ class DevicesServices {
 
   Future<bool> deleteDevice(String deviceMac) async {
     try {
-      final response = await client.delete(Uri.parse('$uri/$deviceMac'));
+      final response = await client
+          .delete(Uri.parse('$uri/$deviceMac'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {

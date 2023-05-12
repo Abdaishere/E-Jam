@@ -32,9 +32,11 @@ class _EditDeviceViewState extends State<EditDeviceView> {
   @override
   void initState() {
     super.initState();
-    context
-        .read<EditDeviceController>()
-        .updateFields(widget.device, widget.mac);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context
+          .read<EditDeviceController>()
+          .updateFields(widget.device, widget.mac);
+    });
   }
 
   Future<bool?> _editDevice() async {

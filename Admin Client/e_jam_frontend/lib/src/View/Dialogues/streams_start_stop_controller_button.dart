@@ -43,6 +43,8 @@ class _StreamsStartStopControllerButtonState
             _success = value;
             setState(() {});
           }
+
+          // yes i am lazy and i know it :P
           final pref = await SharedPreferences.getInstance();
           pref.setBool(
               'streamsAreRunning', SystemSettings.streamsAreRunning ?? false);

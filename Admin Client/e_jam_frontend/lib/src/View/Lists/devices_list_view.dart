@@ -46,8 +46,9 @@ class _DevicesListViewState extends State<DevicesListView> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-        () => context.read<DevicesController>().loadAllDevices(false));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DevicesController>().loadAllDevices(false);
+    });
   }
 
   @override

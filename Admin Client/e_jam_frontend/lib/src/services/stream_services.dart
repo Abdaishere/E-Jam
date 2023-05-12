@@ -10,7 +10,8 @@ class StreamServices {
 
   Future<List<StreamEntry>?> getStreams() async {
     try {
-      final response = await client.get(uri);
+      final response = await client.get(uri).timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return (json.decode(response.body) as List)
             .map((e) => StreamEntry.fromJson(e))
@@ -25,7 +26,9 @@ class StreamServices {
 
   Future<StreamEntry?> getStream(String streamId) async {
     try {
-      final response = await client.get(Uri.parse('$uri/$streamId'));
+      final response = await client
+          .get(Uri.parse('$uri/$streamId'))
+          .timeout(NetworkController.timeout);
 
       if (300 > response.statusCode) {
         return StreamEntry.fromJson(json.decode(response.body));
@@ -39,13 +42,15 @@ class StreamServices {
 
   Future<int?> createStream(StreamEntry stream) async {
     try {
-      final response = await client.post(
-        uri,
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
-        body: json.encode(stream.toJson()),
-      );
+      final response = await client
+          .post(
+            uri,
+            headers: {
+              HttpHeaders.contentTypeHeader: 'application/json',
+            },
+            body: json.encode(stream.toJson()),
+          )
+          .timeout(NetworkController.timeout);
       return response.statusCode;
     } catch (e) {
       return null;
@@ -54,13 +59,15 @@ class StreamServices {
 
   Future<bool?> updateStream(String id, StreamEntry stream) async {
     try {
-      final response = await client.put(
-        Uri.parse('$uri/$id'),
-        headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        },
-        body: json.encode(stream.toJson()),
-      );
+      final response = await client
+          .put(
+            Uri.parse('$uri/$id'),
+            headers: {
+              HttpHeaders.contentTypeHeader: 'application/json',
+            },
+            body: json.encode(stream.toJson()),
+          )
+          .timeout(NetworkController.timeout);
 
       if (300 > response.statusCode) {
         return true;
@@ -74,7 +81,10 @@ class StreamServices {
 
   Future<bool> deleteStream(String streamId) async {
     try {
-      final response = await client.delete(Uri.parse('$uri/$streamId'));
+      final response = await client
+          .delete(Uri.parse('$uri/$streamId'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -87,7 +97,10 @@ class StreamServices {
 
   Future<bool> startStream(String streamId) async {
     try {
-      final response = await client.post(Uri.parse('$uri/$streamId/start'));
+      final response = await client
+          .post(Uri.parse('$uri/$streamId/start'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -101,7 +114,10 @@ class StreamServices {
   // stop a stream by id
   Future<bool> stopStream(String streamId) async {
     try {
-      final response = await client.post(Uri.parse('$uri/$streamId/stop'));
+      final response = await client
+          .post(Uri.parse('$uri/$streamId/stop'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -114,7 +130,10 @@ class StreamServices {
 
   Future<bool> startAllStreams() async {
     try {
-      final response = await client.post(Uri.parse('$uri/start_all'));
+      final response = await client
+          .post(Uri.parse('$uri/start_all'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -127,7 +146,10 @@ class StreamServices {
 
   Future<bool> stopAllStreams() async {
     try {
-      final response = await client.post(Uri.parse('$uri/stop_all'));
+      final response = await client
+          .post(Uri.parse('$uri/stop_all'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -140,8 +162,10 @@ class StreamServices {
 
   Future<bool> forceStartStream(String streamId) async {
     try {
-      final response =
-          await client.post(Uri.parse('$uri/$streamId/force_start'));
+      final response = await client
+          .post(Uri.parse('$uri/$streamId/force_start'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -154,8 +178,10 @@ class StreamServices {
 
   Future<bool> forceStopStream(String streamId) async {
     try {
-      final response =
-          await client.post(Uri.parse('$uri/$streamId/force_stop'));
+      final response = await client
+          .post(Uri.parse('$uri/$streamId/force_stop'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return true;
       } else {
@@ -168,7 +194,10 @@ class StreamServices {
 
   Future<StreamStatusDetails?> getStreamStatus(String streamId) async {
     try {
-      final response = await client.get(Uri.parse('$uri/$streamId/status'));
+      final response = await client
+          .get(Uri.parse('$uri/$streamId/status'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return StreamStatusDetails.fromJson(jsonDecode(response.body));
       } else {
@@ -181,7 +210,10 @@ class StreamServices {
 
   Future<List<StreamStatusDetails>?> getAllStreamStatus() async {
     try {
-      final response = await client.get(Uri.parse('$uri/status_all'));
+      final response = await client
+          .get(Uri.parse('$uri/status_all'))
+          .timeout(NetworkController.timeout);
+
       if (300 > response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => StreamStatusDetails.fromJson(e))

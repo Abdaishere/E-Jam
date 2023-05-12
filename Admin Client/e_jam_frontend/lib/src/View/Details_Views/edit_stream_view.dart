@@ -36,7 +36,9 @@ class _EditStreamViewState extends State<EditStreamView>
   @override
   void initState() {
     super.initState();
-    context.read<EditStreamController>().loadAllFields(stream, context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EditStreamController>().loadAllFields(stream, context);
+    });
   }
 
   _editStream() async {
