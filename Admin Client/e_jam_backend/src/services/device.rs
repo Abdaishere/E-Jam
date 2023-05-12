@@ -338,7 +338,7 @@ async fn stream_finished(
                 let ip = val.ip().to_string();
 
                 stream_entry
-                    .notify_process_completed(mac_address, &mut data.device_list.lock().await)
+                    .notify_process_completed(mac_address, &data.device_list)
                     .await;
                 info!("stream finished {} by {}", stream_id, ip);
             };
@@ -382,7 +382,7 @@ async fn stream_started(
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
                 stream_entry
-                    .notify_process_running(mac_address, &mut data.device_list.lock().await)
+                    .notify_process_running(mac_address, &data.device_list)
                     .await;
                 info!(
                     "Address {} notified of starting the stream {}",

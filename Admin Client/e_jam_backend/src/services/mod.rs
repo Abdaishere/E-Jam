@@ -99,12 +99,11 @@ async fn add_stream(
     new_stream_entry: web::Json<StreamEntry>,
     data: web::Data<AppState>,
 ) -> impl Responder {
-    let mut streams_entries = data.stream_entries.lock().await;
     let mut stream_entry = new_stream_entry.into_inner();
 
     if stream_entry.get_stream_id() == "" {
         stream_entry
-            .generate_stream_id(&data.stream_id_counter, &streams_entries)
+            .generate_stream_id(&data.stream_id_counter, &data.stream_entries)
             .await;
     }
 
@@ -116,6 +115,7 @@ async fn add_stream(
         }
     }
 
+    let mut streams_entries = data.stream_entries.lock().await;
     let stream_id = stream_entry.get_stream_id().to_string();
     let stream_entry_check = streams_entries
         .iter()
@@ -182,18 +182,13 @@ async fn update_stream(
 
             // if the stream is running, stop it
             if stream_entry.check_stream_status(StreamStatus::Running) {
-                stream_entry
-                    .stop_stream(&mut data.device_list.lock().await)
-                    .await;
+                stream_entry.stop_stream(&data.device_list).await;
             }
 
             // if the stream is queued, remove it from the queue
             if stream_entry.check_stream_status(StreamStatus::Queued) {
                 stream_entry
-                    .remove_stream_from_queue(
-                        &data.queued_streams,
-                        &mut data.device_list.lock().await,
-                    )
+                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
             }
 
@@ -239,14 +234,11 @@ async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) 
         Some(stream_entry) => {
             if streams_entries[stream_entry].check_stream_status(StreamStatus::Running) {
                 streams_entries[stream_entry]
-                    .stop_stream(&mut data.device_list.lock().await)
+                    .stop_stream(&data.device_list)
                     .await;
             } else if streams_entries[stream_entry].check_stream_status(StreamStatus::Queued) {
                 streams_entries[stream_entry]
-                    .remove_stream_from_queue(
-                        &data.queued_streams,
-                        &mut data.device_list.lock().await,
-                    )
+                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
             }
 
@@ -301,7 +293,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
             } else {
                 // queue the stream in a different thread
                 let connections = stream_entry
-                    .queue_stream(&data.queued_streams, &mut data.device_list.lock().await)
+                    .queue_stream(&data.queued_streams, &data.device_list)
                     .await;
                 debug!(
                     "{} stream {}",
@@ -374,9 +366,7 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
             if stream_entry.check_stream_status(StreamStatus::Running)
                 || stream_entry.check_stream_status(StreamStatus::Queued)
             {
-                stream_entry
-                    .stop_stream(&mut data.device_list.lock().await)
-                    .await;
+                stream_entry.stop_stream(&data.device_list).await;
                 info!("Stopped stream {}", stream_id);
                 if stream_entry.get_stream_status() == &StreamStatus::Stopped {
                     HttpResponse::Ok().body(format!("Stream {} Stopped Successfully", stream_id))
@@ -426,7 +416,7 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(i).unwrap();
         if stream_entry
-            .queue_stream(&data.queued_streams, &mut data.device_list.lock().await)
+            .queue_stream(&data.queued_streams, &data.device_list)
             .await
             > 1
         {
@@ -454,7 +444,6 @@ if the stream is running, stop it
 * `Stopped all streams` - after all streams are attempted to be stopped"]
 #[post("/streams/stop_all")]
 async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
-
     let streams_entries_len = data.stream_entries.lock().await.len();
     if streams_entries_len == 0 {
         warn!("No streams to stop");
@@ -470,12 +459,10 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
 
         let task = if stream_entry.check_stream_status(StreamStatus::Queued) {
             stream_entry
-                .remove_stream_from_queue(&data.queued_streams, &mut data.device_list.lock().await)
+                .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                 .await
         } else if stream_entry.check_stream_status(StreamStatus::Running) {
-            stream_entry
-                .stop_stream(&mut data.device_list.lock().await)
-                .await
+            stream_entry.stop_stream(&data.device_list).await
         } else {
             stream_entry.get_stream_status().clone()
         };
@@ -535,28 +522,21 @@ async fn force_start_stream(
             // if the stream is queued, remove it from the queue
             if stream_entry.check_stream_status(StreamStatus::Running) {
                 warn!("Stream {} is already running", stream_id);
-                stream_entry
-                    .stop_stream(&mut data.device_list.lock().await)
-                    .await;
+                stream_entry.stop_stream(&data.device_list).await;
                 body += "stopped, ";
             }
 
             if stream_entry.check_stream_status(StreamStatus::Queued) {
                 warn!("Stream {} is already queued", stream_id);
                 stream_entry
-                    .remove_stream_from_queue(
-                        &data.queued_streams,
-                        &mut data.device_list.lock().await,
-                    )
+                    .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
                 body += "removed from queue ";
             }
 
             body += ", force started";
             // start the stream
-            let connections = stream_entry
-                .send_stream(true, &mut data.device_list.lock().await)
-                .await;
+            let connections = stream_entry.send_stream(true, &data.device_list).await;
 
             info!("Stream {} force started", stream_id);
             match stream_entry.get_stream_status() {
@@ -618,9 +598,7 @@ async fn force_stop_stream(
 
     match stream_entry {
         Some(stream_entry) => {
-            stream_entry
-                .stop_stream(&mut data.device_list.lock().await)
-                .await;
+            stream_entry.stop_stream(&data.device_list).await;
 
             info!("Force Stopped stream {}", stream_id);
             if stream_entry.get_stream_status() == &StreamStatus::Stopped {

@@ -2,7 +2,7 @@ use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use tokio::sync::MutexGuard;
+use tokio::sync::Mutex;
 use validator::Validate;
 
 use super::{
@@ -275,8 +275,9 @@ this is also done to mimic the behavior of another device by changing the name o
 * `Option of Device` - the device if found else None
 # Panics
 * `Error: Failed to find the device` - if the device list is locked"]
-    pub fn find_device(name: &str, device_list: &MutexGuard<'_, Vec<Device>>) -> Option<usize> {
+    pub async fn find_device(name: &str, device_list: &Mutex<Vec<Device>>) -> Option<usize> {
         // find in all mac addresses
+        let device_list = device_list.lock().await;
         for (index, device) in device_list.iter().enumerate() {
             if device.mac_address == name {
                 return Some(index);
@@ -423,6 +424,47 @@ this is used to set the device to reachable or unreachable and update the last u
         self.ip_address = device.ip_address.clone();
         self.port = device.port;
         self.last_updated = Utc::now();
+    }
+
+    #[cfg(feature = "fake_data")]
+    pub async fn generate_fake_device() -> Device {
+        use chrono::{prelude::*, Duration};
+        use fake::{
+            faker::address::en::CityName,
+            faker::internet::en::{MACAddress, UserAgent, Username, IP},
+            Fake, Faker,
+        };
+        loop {
+            let start_time = Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap();
+            let end_time = Utc::now() + Duration::days(365); // 1 year into the future
+            let duration_secs = (end_time - start_time).num_seconds();
+
+            let device = Device {
+                name: Username().fake::<String>(),
+                description: UserAgent().fake::<String>(),
+                location: CityName().fake::<String>(),
+                mac_address: MACAddress().fake(),
+                ip_address: IP().fake(),
+                last_updated: start_time
+                    + Duration::seconds(Faker.fake::<i64>().rem_euclid(duration_secs)),
+
+                port: Faker.fake(),
+                gen_processes: Faker.fake(),
+                ver_processes: Faker.fake(),
+                status: vec![
+                    DeviceStatus::Online,
+                    DeviceStatus::Offline,
+                    DeviceStatus::Running,
+                    DeviceStatus::Idle,
+                ][(0..4).fake::<usize>()]
+                .clone(),
+            };
+
+            match device.validate() {
+                Ok(_) => return device,
+                Err(e) => println!("Invalid device generated, trying again {}", e),
+            }
+        }
     }
 }
 
