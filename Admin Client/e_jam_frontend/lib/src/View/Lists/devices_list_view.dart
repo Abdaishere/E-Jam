@@ -28,10 +28,10 @@ class _DevicesListViewState extends State<DevicesListView> {
   bool _isPinging = false;
   bool? _isPinged;
 
-  void _pingAll() async {
+  void _pingAll() {
     _isPinging = true;
     setState(() {});
-    await context.read<DevicesController>().pingAllDevices().then(
+    context.read<DevicesController>().pingAllDevices().then(
           (value) => {
             if (mounted)
               {
@@ -46,7 +46,8 @@ class _DevicesListViewState extends State<DevicesListView> {
   @override
   void initState() {
     super.initState();
-    context.read<DevicesController>().loadAllDevices(false);
+    Future.microtask(
+        () => context.read<DevicesController>().loadAllDevices(false));
   }
 
   @override
@@ -261,11 +262,13 @@ class _DeviceCardState extends State<DeviceCard> {
     context
         .read<DevicesController>()
         .loadDeviceDetails(widget.device.macAddress)
-        .then(
-          (value) => {
-            if (mounted) {updateDevice = value, setState(() {})}
-          },
-        );
+        .then((value) => {
+              if (mounted)
+                {
+                  updateDevice = value,
+                  setState(() {}),
+                }
+            });
   }
 
   @override
@@ -438,16 +441,18 @@ class _DeviceCardState extends State<DeviceCard> {
                   child: const Text('Cancel'),
                 ),
                 TextButton(
-                  onPressed: () async {
-                    bool success = await context
-                        .read<DevicesController>()
-                        .deleteDevice(device.macAddress);
-
-                    if (success && mounted) {
-                      context.read<DevicesController>().loadAllDevices(true);
-                      Navigator.of(context).pop();
-                    }
-                  },
+                  onPressed: () => context
+                      .read<DevicesController>()
+                      .deleteDevice(device.macAddress)
+                      .then((success) => {
+                            if (success && mounted)
+                              {
+                                context
+                                    .read<DevicesController>()
+                                    .loadAllDevices(true),
+                                Navigator.of(context).pop(),
+                              }
+                          }),
                   child: const Text('Delete'),
                 ),
               ],

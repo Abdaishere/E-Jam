@@ -27,7 +27,8 @@ class _StreamsListViewState extends State<StreamsListView> {
   @override
   void initState() {
     super.initState();
-    context.read<StreamsController>().loadAllStreamStatus(false);
+    Future.microtask(
+        () => context.read<StreamsController>().loadAllStreamStatus(false));
   }
 
   @override

@@ -6,7 +6,7 @@ class DevicesController extends ChangeNotifier {
   static List<Device>? devices;
   static bool _isLoading = true;
   static bool _isPinging = false;
-  static DateTime? _lastRefresh;
+  static DateTime _lastRefresh = DateTime.now();
   static DevicesServices devicesServices = DevicesServices();
 
   List<Device>? get getDevices => devices;
@@ -17,14 +17,14 @@ class DevicesController extends ChangeNotifier {
   Future loadAllDevices(bool forced) async {
     _isLoading = true;
 
-    if (_lastRefresh != null &&
+    if (devices != null &&
         !forced &&
-        DateTime.now().difference(_lastRefresh!).inSeconds < 5) {
+        DateTime.now().difference(_lastRefresh).inSeconds < 5) {
       _isLoading = false;
       return;
     }
 
-    return await devicesServices.getDevices().then((value) {
+    return devicesServices.getDevices().then((value) {
       devices = value;
       _isLoading = false;
       _lastRefresh = DateTime.now();

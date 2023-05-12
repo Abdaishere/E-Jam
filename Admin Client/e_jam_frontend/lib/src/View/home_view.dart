@@ -22,7 +22,7 @@ class _DashBoardViewState extends State<DashBoardView> {
   @override
   void initState() {
     super.initState();
-    _loadSystemData(false);
+    Future.microtask(() => _loadSystemData(false));
   }
 
   void _loadSystemData(bool forced) {

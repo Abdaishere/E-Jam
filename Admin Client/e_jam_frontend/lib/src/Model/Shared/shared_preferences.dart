@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'package:e_jam/src/services/devices_services.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class ThemePreferences {
   static const String _themeMode = 'themeMode';
@@ -44,9 +44,11 @@ class ThemePreferences {
 
 class NetworkController {
   static Uri serverIpAddress = Uri.parse('http://127.0.0.1:8080');
-  static var client = http.Client();
+  static final client = HttpClient();
 
-  static changeServerIpAddress(String newIpAddress, String newPort) async {
+  static changeServerIpAddress(
+      String newIpAddress, String newPort, Duration timeout) async {
+    client.connectionTimeout = timeout;
     if (newIpAddress == "") {
       newIpAddress = "127.0.0.1";
     }

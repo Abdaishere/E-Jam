@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 
-// TODO: add a wrapper for the response to handle errors and exceptions and return a custom response
 class DevicesServices {
   static Uri uri = Uri.parse('${NetworkController.serverIpAddress}/devices');
-
   static get client => NetworkController.client;
 
   Future<List<Device>?> getDevices() async {
@@ -28,10 +26,8 @@ class DevicesServices {
   Future<Device?> getDevice(String deviceMac) async {
     try {
       final response = await client.get(Uri.parse('$uri/$deviceMac'));
-      if (response.statusCode == 200) {
+      if (300 > response.statusCode) {
         return Device.fromJson(json.decode(response.body));
-      } else if (404 == response.statusCode) {
-        return null;
       } else {
         return null;
       }
@@ -55,12 +51,8 @@ class DevicesServices {
   Future<bool> pingDevice(String deviceMac) async {
     try {
       final response = await client.get(Uri.parse('$uri/$deviceMac/ping'));
-      if (response.statusCode == 200) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (404 == response.statusCode) {
-        return false;
-      } else if (500 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -75,10 +67,8 @@ class DevicesServices {
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
 
-      if (response.statusCode == 200) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (500 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -91,12 +81,8 @@ class DevicesServices {
   Future<bool> pingAllDevices() async {
     try {
       final response = await client.get(Uri.parse('$uri/ping_all'));
-      if (response.statusCode == 200) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (204 == response.statusCode) {
-        return false;
-      } else if (500 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -110,12 +96,8 @@ class DevicesServices {
       final response = await client.put(Uri.parse('$uri/${device.macAddress}'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(device.toJson()));
-      if (response.statusCode == 200) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (404 == response.statusCode) {
-        return false;
-      } else if (400 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -127,10 +109,8 @@ class DevicesServices {
   Future<bool> deleteDevice(String deviceMac) async {
     try {
       final response = await client.delete(Uri.parse('$uri/$deviceMac'));
-      if (response.statusCode == 200) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }

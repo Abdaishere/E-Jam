@@ -4,21 +4,17 @@ import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 
-// TODO: add a wrapper for the response to handle errors and exceptions and return a custom response
 class StreamServices {
   static Uri uri = Uri.parse('${NetworkController.serverIpAddress}/streams');
-
   static get client => NetworkController.client;
 
   Future<List<StreamEntry>?> getStreams() async {
     try {
       final response = await client.get(uri);
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return (json.decode(response.body) as List)
             .map((e) => StreamEntry.fromJson(e))
             .toList();
-      } else if (204 == response.statusCode) {
-        return [];
       } else {
         return [];
       }
@@ -31,10 +27,8 @@ class StreamServices {
     try {
       final response = await client.get(Uri.parse('$uri/$streamId'));
 
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return StreamEntry.fromJson(json.decode(response.body));
-      } else if (404 == response.statusCode) {
-        return null;
       } else {
         return null;
       }
@@ -68,12 +62,8 @@ class StreamServices {
         body: json.encode(stream.toJson()),
       );
 
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (400 == response.statusCode) {
-        return false;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -85,10 +75,8 @@ class StreamServices {
   Future<bool> deleteStream(String streamId) async {
     try {
       final response = await client.delete(Uri.parse('$uri/$streamId'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -100,12 +88,8 @@ class StreamServices {
   Future<bool> startStream(String streamId) async {
     try {
       final response = await client.post(Uri.parse('$uri/$streamId/start'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (409 == response.statusCode) {
-        return false;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -118,12 +102,8 @@ class StreamServices {
   Future<bool> stopStream(String streamId) async {
     try {
       final response = await client.post(Uri.parse('$uri/$streamId/stop'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (409 == response.statusCode) {
-        return false;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -135,10 +115,8 @@ class StreamServices {
   Future<bool> startAllStreams() async {
     try {
       final response = await client.post(Uri.parse('$uri/start_all'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (204 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -150,10 +128,8 @@ class StreamServices {
   Future<bool> stopAllStreams() async {
     try {
       final response = await client.post(Uri.parse('$uri/stop_all'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (204 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -166,10 +142,8 @@ class StreamServices {
     try {
       final response =
           await client.post(Uri.parse('$uri/$streamId/force_start'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -182,10 +156,8 @@ class StreamServices {
     try {
       final response =
           await client.post(Uri.parse('$uri/$streamId/force_stop'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return true;
-      } else if (404 == response.statusCode) {
-        return false;
       } else {
         return false;
       }
@@ -197,10 +169,8 @@ class StreamServices {
   Future<StreamStatusDetails?> getStreamStatus(String streamId) async {
     try {
       final response = await client.get(Uri.parse('$uri/$streamId/status'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return StreamStatusDetails.fromJson(jsonDecode(response.body));
-      } else if (404 == response.statusCode) {
-        return null;
       } else {
         return null;
       }
@@ -212,12 +182,10 @@ class StreamServices {
   Future<List<StreamStatusDetails>?> getAllStreamStatus() async {
     try {
       final response = await client.get(Uri.parse('$uri/status_all'));
-      if (200 == response.statusCode) {
+      if (300 > response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => StreamStatusDetails.fromJson(e))
             .toList();
-      } else if (204 == response.statusCode) {
-        return [];
       } else {
         return [];
       }

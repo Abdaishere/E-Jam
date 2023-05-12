@@ -139,10 +139,11 @@ class _HomeState extends State<Home> {
     return ZoomDrawer(
       menuScreen: MenuScreen(
         setIndex: (index) {
-          if (mounted)
+          if (mounted) {
             setState(() {
               currentIndex = index;
             });
+          }
         },
       ),
       mainScreen: mainScreen(),
@@ -206,9 +207,9 @@ class GradientBackground extends StatelessWidget {
 }
 
 class MenuScreen extends StatefulWidget {
-  final ValueSetter setIndex;
   const MenuScreen({Key? key, required this.setIndex}) : super(key: key);
 
+  final ValueSetter setIndex;
   @override
   State<MenuScreen> createState() => _MenuScreenState();
 }
