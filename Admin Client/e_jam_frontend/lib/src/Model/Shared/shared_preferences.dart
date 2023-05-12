@@ -109,7 +109,8 @@ class SystemSettings {
 
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",
-        pref.getInt('serverPort')?.toString() ?? "");
+        pref.getInt('serverPort')?.toString() ?? "",
+        const Duration(seconds: 5));
   }
 }
 
