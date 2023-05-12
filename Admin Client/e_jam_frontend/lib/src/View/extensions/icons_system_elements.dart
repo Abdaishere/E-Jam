@@ -103,8 +103,11 @@ class StreamsRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.view_dashboard,
-                    semanticLabel: 'Streams'),
+                icon: const Icon(
+                  MaterialCommunityIcons.view_dashboard,
+                  semanticLabel: 'Streams',
+                  size: 28,
+                ),
                 color: Colors.blueAccent,
                 tooltip: 'System Streams',
                 onPressed: () {},
@@ -125,8 +128,11 @@ class StreamsRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.lan_connect,
-                    semanticLabel: 'Streams'),
+                icon: const Icon(
+                  MaterialCommunityIcons.lan_connect,
+                  semanticLabel: 'Streams',
+                  size: 28,
+                ),
                 color: streamRunningColor,
                 tooltip: 'Running Streams',
                 onPressed: () {},
@@ -147,8 +153,11 @@ class StreamsRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.lan_disconnect,
-                    semanticLabel: 'Streams'),
+                icon: const Icon(
+                  MaterialCommunityIcons.lan_disconnect,
+                  semanticLabel: 'Streams',
+                  size: 28,
+                ),
                 color: streamErrorColor,
                 tooltip: 'Error Streams',
                 onPressed: () {},
@@ -169,8 +178,11 @@ class StreamsRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.lan_check,
-                    semanticLabel: 'Streams'),
+                icon: const Icon(
+                  MaterialCommunityIcons.lan_check,
+                  semanticLabel: 'Streams',
+                  size: 28,
+                ),
                 color: streamFinishedColor,
                 tooltip: 'Finished Streams',
                 onPressed: () {},
@@ -191,8 +203,11 @@ class StreamsRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.lan_pending,
-                    semanticLabel: 'Streams'),
+                icon: const Icon(
+                  MaterialCommunityIcons.lan_pending,
+                  semanticLabel: 'Streams',
+                  size: 28,
+                ),
                 color: streamQueuedColor,
                 tooltip: 'Queued Streams',
                 onPressed: () {},
@@ -250,8 +265,11 @@ class DevicesRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const FaIcon(FontAwesomeIcons.microchip,
-                    semanticLabel: 'Devices'),
+                icon: const FaIcon(
+                  FontAwesomeIcons.microchip,
+                  semanticLabel: 'Devices',
+                  size: 28,
+                ),
                 color: Colors.deepOrangeAccent,
                 tooltip: 'System Devices',
                 onPressed: () {},
@@ -272,8 +290,11 @@ class DevicesRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.connection,
-                    semanticLabel: 'Devices'),
+                icon: const Icon(
+                  MaterialCommunityIcons.connection,
+                  semanticLabel: 'Devices',
+                  size: 28,
+                ),
                 color: deviceRunningOrOnlineColor,
                 tooltip: 'Running Devices',
                 onPressed: () {},
@@ -294,8 +315,11 @@ class DevicesRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.connection,
-                    semanticLabel: 'Devices'),
+                icon: const Icon(
+                  MaterialCommunityIcons.connection,
+                  semanticLabel: 'Devices',
+                  size: 28,
+                ),
                 color: deviceOfflineOrErrorColor,
                 tooltip: 'Offline Devices',
                 onPressed: () {},
@@ -319,8 +343,11 @@ class DevicesRow extends StatelessWidget {
                 icon: Transform(
                   alignment: Alignment.center,
                   transform: Matrix4.rotationY(pi),
-                  child: const Icon(MaterialCommunityIcons.progress_upload,
-                      semanticLabel: 'Processes'),
+                  child: const Icon(
+                    MaterialCommunityIcons.progress_upload,
+                    semanticLabel: 'Processes',
+                    size: 28,
+                  ),
                 ),
                 color: uploadColor,
                 tooltip: 'System Generators',
@@ -342,8 +369,11 @@ class DevicesRow extends StatelessWidget {
           child: Column(
             children: <Widget>[
               IconButton(
-                icon: const Icon(MaterialCommunityIcons.progress_check,
-                    semanticLabel: 'Processes'),
+                icon: const Icon(
+                  MaterialCommunityIcons.progress_check,
+                  semanticLabel: 'Processes',
+                  size: 28,
+                ),
                 color: downloadColor,
                 tooltip: 'System Verifiers',
                 onPressed: () {},

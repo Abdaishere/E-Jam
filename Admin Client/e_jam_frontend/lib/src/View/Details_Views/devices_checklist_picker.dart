@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:math';
 
 import 'package:e_jam/src/Theme/color_schemes.dart';
-import 'package:e_jam/src/View/Dialogues/device_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/device_status_icon_button.dart';
 import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';

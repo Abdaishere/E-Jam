@@ -1,7 +1,7 @@
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
-import 'package:e_jam/src/View/Dialogues/streams_start_stop_controller_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/streams_start_stop_controller_button.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';

@@ -7,7 +7,7 @@ import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
-import 'package:e_jam/src/View/Dialogues/stream_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/stream_status_icon_button.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

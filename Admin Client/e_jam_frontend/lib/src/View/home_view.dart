@@ -66,7 +66,7 @@ class _DashBoardViewState extends State<DashBoardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 350, child: TreeMapDrillDownDevicesLoad()),
+            const TreeMapDrillDownDevicesLoad(),
             Wrap(
               children: SystemSettings.dashboardExtensionsOrder
                   .map(

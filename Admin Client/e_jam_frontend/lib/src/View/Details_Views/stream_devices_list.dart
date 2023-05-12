@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
-import 'package:e_jam/src/View/Dialogues/device_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/device_status_icon_button.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';

@@ -11,7 +11,7 @@ import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
 import 'package:e_jam/src/View/Charts/stream_progress_bar.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_devices_list.dart';
-import 'package:e_jam/src/View/Dialogues/stream_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/stream_status_icon_button.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';

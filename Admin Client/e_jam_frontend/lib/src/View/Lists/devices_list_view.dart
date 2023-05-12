@@ -8,7 +8,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
 import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_device_view.dart';
-import 'package:e_jam/src/View/Dialogues/device_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/device_status_icon_button.dart';
 import 'package:e_jam/src/View/devices_radar_card_view.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
