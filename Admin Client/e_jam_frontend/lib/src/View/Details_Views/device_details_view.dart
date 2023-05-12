@@ -35,7 +35,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
     updateDevice = value;
     if (mounted) {
       setState(() {});
-      context.read<DevicesController>().loadAllDevices();
+      context.read<DevicesController>().loadAllDevices(true);
     }
   }
 
@@ -106,21 +106,18 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                             child: const Text('Cancel'),
                           ),
                           TextButton(
-                            onPressed: () {
-                              context
+                            onPressed: () async {
+                              bool value = await context
                                   .read<DevicesController>()
-                                  .deleteDevice(device.macAddress)
-                                  .then(
-                                (value) {
-                                  if (value && mounted) {
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
-                                    context
-                                        .read<DevicesController>()
-                                        .loadAllDevices();
-                                  }
-                                },
-                              );
+                                  .deleteDevice(device.macAddress);
+
+                              if (value && mounted) {
+                                context
+                                    .read<DevicesController>()
+                                    .loadAllDevices(true);
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                              }
                             },
                             child: const Text('Delete'),
                           ),

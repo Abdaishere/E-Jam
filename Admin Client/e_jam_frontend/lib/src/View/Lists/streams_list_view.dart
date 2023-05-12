@@ -27,7 +27,7 @@ class _StreamsListViewState extends State<StreamsListView> {
   @override
   void initState() {
     super.initState();
-    context.read<StreamsController>().loadAllStreamStatus();
+    context.read<StreamsController>().loadAllStreamStatus(false);
   }
 
   @override
@@ -112,8 +112,9 @@ class _StreamsListViewState extends State<StreamsListView> {
                     stream: context
                         .watch<StreamsController>()
                         .getStreamsStatusDetails![index],
-                    loadStreamView: () =>
-                        context.read<StreamsController>().loadAllStreamStatus(),
+                    loadStreamView: () => context
+                        .read<StreamsController>()
+                        .loadAllStreamStatus(true),
                   );
                 },
               ),
@@ -144,7 +145,7 @@ class _StreamsListViewState extends State<StreamsListView> {
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.arrowsRotate, size: 20.0),
           onPressed: () async =>
-              context.read<StreamsController>().loadAllStreamStatus(),
+              context.read<StreamsController>().loadAllStreamStatus(true),
         ),
         // Explanation icon for details about how the stream card works and what the icons mean and what the colors mean
         IconButton(

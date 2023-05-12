@@ -8,16 +8,23 @@ class StreamsController extends ChangeNotifier {
   static List<StreamEntry>? _streams;
   static List<StreamStatusDetails>? _streamsStatusDetails;
   static bool _isLoading = true;
+  static DateTime? _lastRefresh;
   static final StreamServices _streamServices = StreamServices();
 
   List<StreamEntry>? get getStreams => _streams;
   List<StreamStatusDetails>? get getStreamsStatusDetails =>
       _streamsStatusDetails;
-  get getIsLoading => _isLoading;
-  get getStreamServices => _streamServices;
+  bool get getIsLoading => _isLoading;
+  StreamServices get getStreamServices => _streamServices;
 
-  Future loadAllStreamsWithDetails() async {
+  Future loadAllStreamsWithDetails(bool forced) async {
     _isLoading = true;
+    if (_lastRefresh != null &&
+        !forced &&
+        DateTime.now().difference(_lastRefresh!).inSeconds < 5) {
+      _isLoading = false;
+      return;
+    }
     return _streamServices.getStreams().then((value) {
       _streams = value;
       _isLoading = false;
@@ -112,11 +119,18 @@ class StreamsController extends ChangeNotifier {
     });
   }
 
-  Future loadAllStreamStatus() async {
+  Future loadAllStreamStatus(bool forced) async {
     _isLoading = true;
+    if (_lastRefresh != null &&
+        !forced &&
+        DateTime.now().difference(_lastRefresh!).inSeconds < 5) {
+      _isLoading = false;
+      return;
+    }
     return await _streamServices.getAllStreamStatus().then((value) {
       _streamsStatusDetails = value;
       _isLoading = false;
+      _lastRefresh = DateTime.now();
       notifyListeners();
     });
   }

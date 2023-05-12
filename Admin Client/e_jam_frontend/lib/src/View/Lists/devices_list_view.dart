@@ -37,7 +37,7 @@ class _DevicesListViewState extends State<DevicesListView> {
               {
                 _isPinging = false,
                 _isPinged = value,
-                context.read<DevicesController>().loadAllDevices(),
+                context.read<DevicesController>().loadAllDevices(true),
               }
           },
         );
@@ -46,7 +46,7 @@ class _DevicesListViewState extends State<DevicesListView> {
   @override
   void initState() {
     super.initState();
-    context.read<DevicesController>().loadAllDevices();
+    context.read<DevicesController>().loadAllDevices(false);
   }
 
   @override
@@ -204,7 +204,8 @@ class _DevicesListViewState extends State<DevicesListView> {
             size: 20.0,
           ),
           tooltip: 'Refresh',
-          onPressed: () => context.read<DevicesController>().loadAllDevices(),
+          onPressed: () =>
+              context.read<DevicesController>().loadAllDevices(true),
         ),
         // Explanation icon for details about how the Device card works and what the icons mean and what the colors mean
         IconButton(
@@ -437,17 +438,15 @@ class _DeviceCardState extends State<DeviceCard> {
                   child: const Text('Cancel'),
                 ),
                 TextButton(
-                  onPressed: () {
-                    context
+                  onPressed: () async {
+                    bool success = await context
                         .read<DevicesController>()
-                        .deleteDevice(device.macAddress)
-                        .then((success) => {
-                              if (success && mounted)
-                                context
-                                    .read<DevicesController>()
-                                    .loadAllDevices()
-                            });
-                    Navigator.of(context).pop();
+                        .deleteDevice(device.macAddress);
+
+                    if (success && mounted) {
+                      context.read<DevicesController>().loadAllDevices(true);
+                      Navigator.of(context).pop();
+                    }
                   },
                   child: const Text('Delete'),
                 ),

@@ -142,7 +142,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
     if (!mounted) return null;
     _status = code;
     setState(() {});
-    context.read<DevicesController>().loadAllDevices();
+    context.read<DevicesController>().loadAllDevices(true);
     return _status != null && _status! <= 300;
   }
 

@@ -3,10 +3,12 @@ import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/extensions/icons_system_elements.dart';
 import 'package:e_jam/src/View/extensions/gauge_speed_chart.dart';
 import 'package:e_jam/src/View/extensions/progress_task_for_all_system.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:e_jam/src/View/extensions/treemap_drilldown_devices_load.dart';
+import 'package:provider/provider.dart';
 
 // should not be scrollable
 class DashBoardView extends StatefulWidget {
@@ -17,6 +19,18 @@ class DashBoardView extends StatefulWidget {
 }
 
 class _DashBoardViewState extends State<DashBoardView> {
+  @override
+  void initState() {
+    super.initState();
+    _loadSystemData(false);
+  }
+
+  void _loadSystemData(bool forced) {
+    // load system data
+    context.read<DevicesController>().loadAllDevices(forced);
+    context.read<StreamsController>().loadAllStreamStatus(forced);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +48,7 @@ class _DashBoardViewState extends State<DashBoardView> {
               FontAwesomeIcons.arrowsRotate,
               size: 20,
             ),
-            onPressed: () {},
+            onPressed: () => _loadSystemData(true),
           ),
           // question mark icon for help
           IconButton(

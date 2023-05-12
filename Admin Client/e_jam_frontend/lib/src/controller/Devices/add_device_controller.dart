@@ -13,12 +13,12 @@ class AddDeviceController extends ChangeNotifier {
       TextEditingController(text: SystemSettings.defaultDevicesPort.toString());
   static final TextEditingController _macController = TextEditingController();
 
-  get getNameController => _nameController;
-  get getDescriptionController => _descriptionController;
-  get getLocationController => _locationController;
-  get getIpController => _ipController;
-  get getPortController => _portController;
-  get getMacController => _macController;
+  TextEditingController get getNameController => _nameController;
+  TextEditingController get getDescriptionController => _descriptionController;
+  TextEditingController get getLocationController => _locationController;
+  TextEditingController get getIpController => _ipController;
+  TextEditingController get getPortController => _portController;
+  TextEditingController get getMacController => _macController;
 
   Future<Device?> createNewDevice(GlobalKey<FormState> formKey) async {
     if (formKey.currentState!.validate()) {

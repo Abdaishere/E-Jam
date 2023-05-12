@@ -38,26 +38,30 @@ class EditStreamController extends ChangeNotifier {
   static Map<String, bool> _pickedVerifiers = {};
   static int _numberOfVerifiers = 0;
 
-  get getIdController => _idController;
-  get getNameController => _nameController;
-  get getDescriptionController => _descriptionController;
-  get getDelayController => _delayController;
-  get getTimeToLiveController => _timeToLiveController;
-  get getInterFrameGapController => _interFrameGapController;
-  get getPayloadLengthController => _payloadLengthController;
-  get getBurstLengthController => _burstLengthController;
-  get getBurstDelayController => _burstDelayController;
-  get getBroadcastFramesController => _broadcastFramesController;
-  get getPacketsController => _packetsController;
-  get getSeedController => _seedController;
-  get getFlowType => _flowType;
-  get getPayloadType => _payloadType;
-  get getTransportLayerProtocol => _transportLayerProtocol;
-  get getCheckContent => _checkContent;
+  TextEditingController get getIdController => _idController;
+  TextEditingController get getNameController => _nameController;
+  TextEditingController get getDescriptionController => _descriptionController;
+  TextEditingController get getDelayController => _delayController;
+  TextEditingController get getTimeToLiveController => _timeToLiveController;
+  TextEditingController get getInterFrameGapController =>
+      _interFrameGapController;
+  TextEditingController get getPayloadLengthController =>
+      _payloadLengthController;
+  TextEditingController get getBurstLengthController => _burstLengthController;
+  TextEditingController get getBurstDelayController => _burstDelayController;
+  TextEditingController get getBroadcastFramesController =>
+      _broadcastFramesController;
+  TextEditingController get getPacketsController => _packetsController;
+  TextEditingController get getSeedController => _seedController;
+  FlowType get getFlowType => _flowType;
+  int get getPayloadType => _payloadType;
+  TransportLayerProtocol get getTransportLayerProtocol =>
+      _transportLayerProtocol;
+  bool get getCheckContent => _checkContent;
   Map<String, bool> get getPickedGenerators => _pickedGenerators;
-  get getNumberOfGenerators => _numberOfGenerators;
+  int get getNumberOfGenerators => _numberOfGenerators;
   Map<String, bool> get getPickedVerifiers => _pickedVerifiers;
-  get getNumberOfVerifiers => _numberOfVerifiers;
+  int get getNumberOfVerifiers => _numberOfVerifiers;
 
   void checkContentSwitch() {
     _checkContent = !_checkContent;
@@ -105,11 +109,11 @@ class EditStreamController extends ChangeNotifier {
   }
 
   syncGeneratorsDevicesList(
-      List<String> generators, bool showDeleted, BuildContext context) async {
-    await context.read<DevicesController>().loadAllDevices().then((value) => {
-          if (context.mounted)
-            context.read<AddStreamController>().syncDevicesList()
-        });
+      List<String> generators, bool showDeleted, BuildContext context) {
+    context.read<DevicesController>().loadAllDevices(true);
+
+    if (!context.mounted) return;
+    context.read<AddStreamController>().syncDevicesList();
 
     _pickedGenerators = {
       for (final Device device in DevicesController.devices!)
@@ -127,11 +131,11 @@ class EditStreamController extends ChangeNotifier {
   }
 
   syncVerifiersDevicesList(
-      List<String> verifiers, bool showDeleted, BuildContext context) async {
-    await context.read<DevicesController>().loadAllDevices().then((value) => {
-          if (context.mounted)
-            context.read<AddStreamController>().syncDevicesList()
-        });
+      List<String> verifiers, bool showDeleted, BuildContext context) {
+    context.read<DevicesController>().loadAllDevices(true);
+
+    if (!context.mounted) return;
+    context.read<AddStreamController>().syncDevicesList();
 
     _pickedVerifiers = {
       for (final Device device in DevicesController.devices!)

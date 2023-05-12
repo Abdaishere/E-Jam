@@ -192,26 +192,18 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             color: Colors.blueAccent,
             tooltip: 'OK',
             onPressed: () async {
-              context
+              int? status = await context
                   .read<AddStreamController>()
-                  .addStream(formKey, context)
-                  .then((status) => {
-                        if (status != null && context.mounted)
-                          {
-                            if (status < 300)
-                              {
-                                context
-                                    .read<StreamsController>()
-                                    .loadAllStreamStatus(),
-                                if (context.mounted) Navigator.pop(context),
-                              }
-                            else
-                              {
-                                _status = status,
-                                setState(() {}),
-                              }
-                          }
-                      });
+                  .addStream(formKey, context);
+              if (status != null && context.mounted) {
+                if (status < 300) {
+                  context.read<StreamsController>().loadAllStreamStatus(true);
+                  if (context.mounted) Navigator.pop(context);
+                } else {
+                  _status = status;
+                  setState(() {});
+                }
+              }
             },
           ),
           IconButton(
@@ -227,24 +219,16 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             color: Colors.greenAccent.shade700,
             tooltip: 'Apply',
             onPressed: () async {
-              context
+              int? status = await context
                   .read<AddStreamController>()
-                  .addStream(formKey, context)
-                  .then(
-                    (success) => {
-                      if (success != null)
-                        {
-                          _status = success,
-                          setState(() {}),
-                          if (success < 300 && context.mounted)
-                            {
-                              context
-                                  .read<StreamsController>()
-                                  .loadAllStreamStatus(),
-                            },
-                        }
-                    },
-                  );
+                  .addStream(formKey, context);
+              if (status != null) {
+                _status = status;
+                setState(() {});
+                if (status < 300 && context.mounted) {
+                  context.read<StreamsController>().loadAllStreamStatus(true);
+                }
+              }
             },
           ),
         ],
@@ -812,15 +796,16 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                   builder: (BuildContext context) => Center(
                     child: DevicesCheckListPicker(
                       areGenerators: true,
-                      devicesReloader: () => context
-                          .read<DevicesController>()
-                          .loadAllDevices()
-                          .then((value) => {
-                                if (mounted)
-                                  context
-                                      .read<AddStreamController>()
-                                      .syncDevicesList()
-                              }),
+                      devicesReloader: () async {
+                        await context
+                            .read<DevicesController>()
+                            .loadAllDevices(true);
+                        if (mounted) {
+                          await context
+                              .read<AddStreamController>()
+                              .syncDevicesList();
+                        }
+                      },
                       isStateless: false,
                     ),
                   ),
@@ -872,15 +857,14 @@ class _StreamDevicesListsState extends State<StreamDevicesLists> {
                   builder: (BuildContext context) => Center(
                     child: DevicesCheckListPicker(
                       areGenerators: false,
-                      devicesReloader: () => context
-                          .read<DevicesController>()
-                          .loadAllDevices()
-                          .then((value) => {
-                                if (mounted)
-                                  context
-                                      .read<AddStreamController>()
-                                      .syncDevicesList()
-                              }),
+                      devicesReloader: () async {
+                        await context
+                            .read<DevicesController>()
+                            .loadAllDevices(true);
+                        if (mounted) {
+                          context.read<AddStreamController>().syncDevicesList();
+                        }
+                      },
                       isStateless: false,
                     ),
                   ),

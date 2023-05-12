@@ -4,77 +4,87 @@ import 'package:flutter/material.dart';
 
 class DevicesController extends ChangeNotifier {
   static List<Device>? devices;
-  static bool isLoading = true;
-  static bool isPinging = false;
+  static bool _isLoading = true;
+  static bool _isPinging = false;
+  static DateTime? _lastRefresh;
   static DevicesServices devicesServices = DevicesServices();
 
   List<Device>? get getDevices => devices;
-  bool get getIsLoading => isLoading;
-  bool get getIsPinging => isPinging;
+  bool get getIsLoading => _isLoading;
+  bool get getIsPinging => _isPinging;
   DevicesServices get getDevicesServices => devicesServices;
 
-  Future loadAllDevices() async {
-    isLoading = true;
+  Future loadAllDevices(bool forced) async {
+    _isLoading = true;
+
+    if (_lastRefresh != null &&
+        !forced &&
+        DateTime.now().difference(_lastRefresh!).inSeconds < 5) {
+      _isLoading = false;
+      return;
+    }
+
     return await devicesServices.getDevices().then((value) {
       devices = value;
-      isLoading = false;
+      _isLoading = false;
+      _lastRefresh = DateTime.now();
       notifyListeners();
     });
   }
 
   Future<Device?> loadDeviceDetails(String mac) async {
-    isLoading = true;
+    _isLoading = true;
     return devicesServices.getDevice(mac).then((value) {
-      isLoading = false;
+      _isLoading = false;
       return value;
     });
   }
 
   Future<int?> addNewDevice(Device device) async {
-    isLoading = true;
+    _isLoading = true;
     return devicesServices.createDevice(device).then((value) {
-      isLoading = false;
+      _isLoading = false;
       return value;
     });
   }
 
   Future<bool> pingDevice(String deviceMac) {
-    isPinging = true;
+    _isPinging = true;
     return devicesServices.pingDevice(deviceMac).then((value) {
-      loadAllDevices();
-      isPinging = false;
+      loadAllDevices(true);
+      _isPinging = false;
       return value;
     });
   }
 
   Future<bool> pingNewDevice(Device device) {
-    isPinging = true;
+    _isPinging = true;
     return devicesServices.checkNewDevice(device).then((value) {
-      isPinging = false;
+      _isPinging = false;
       return value;
     });
   }
 
   Future<bool?> pingAllDevices() {
-    isPinging = true;
+    _isPinging = true;
     return devicesServices.pingAllDevices().then((value) {
-      isPinging = false;
+      _isPinging = false;
       return value;
     });
   }
 
   Future<bool?> updateDevice(Device device) async {
-    isLoading = true;
+    _isLoading = true;
     return devicesServices.updateDevice(device).then((value) {
-      isLoading = false;
+      _isLoading = false;
       return value;
     });
   }
 
   Future<bool> deleteDevice(String deviceMac) async {
-    isLoading = true;
+    _isLoading = true;
     return devicesServices.deleteDevice(deviceMac).then((value) {
-      isLoading = false;
+      _isLoading = false;
       return value;
     });
   }
