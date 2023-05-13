@@ -135,34 +135,7 @@ class BottomOptionsBar extends StatefulWidget {
 }
 
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
-  int? _status;
-
-  String _statusToMessage(int? status) {
-    switch (status) {
-      case 200:
-        return 'OK';
-      case 201:
-        return 'Created Successfully';
-      case 400:
-        return 'Bad Request: Please fill all the required fields correctly';
-      case 401:
-        return 'Unauthorized';
-      case 403:
-        return 'Forbidden';
-      case 404:
-        return 'Not Found';
-      case 408:
-        return 'Request Timeout';
-      case 409:
-        return 'Conflict: Stream with id already exists';
-      case 500:
-        return 'Internal Server Error';
-      case 503:
-        return 'Service Unavailable';
-      default:
-        return 'Unknown State';
-    }
-  }
+  Message? _status;
 
   @override
   Widget build(BuildContext context) {
@@ -181,10 +154,9 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
               context.read<AddStreamController>().clearAllFields();
             },
           ),
-          _status != null && _status! >= 300
+          _status != null && _status!.responseCode >= 300
               ? RequestStatusIcon(
-                  status: _status!,
-                  message: _statusToMessage(_status),
+                  response: _status!,
                 )
               : const SizedBox(
                   width: 40,
@@ -194,11 +166,11 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             color: Colors.blueAccent,
             tooltip: 'OK',
             onPressed: () async {
-              int? status = await context
+              Message? status = await context
                   .read<AddStreamController>()
                   .addStream(formKey, context);
               if (status != null && context.mounted) {
-                if (status < 300) {
+                if (status.responseCode < 300) {
                   context.read<StreamsController>().loadAllStreamStatus(true);
                   if (context.mounted) Navigator.pop(context);
                 } else {
@@ -221,13 +193,13 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             color: Colors.greenAccent.shade700,
             tooltip: 'Apply',
             onPressed: () async {
-              int? status = await context
+              Message? status = await context
                   .read<AddStreamController>()
                   .addStream(formKey, context);
               if (status != null) {
                 _status = status;
                 setState(() {});
-                if (status < 300 && context.mounted) {
+                if (status.responseCode < 300 && context.mounted) {
                   context.read<StreamsController>().loadAllStreamStatus(true);
                 }
               }

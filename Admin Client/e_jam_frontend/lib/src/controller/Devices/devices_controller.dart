@@ -1,4 +1,5 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/services/devices_services.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +41,7 @@ class DevicesController extends ChangeNotifier {
     });
   }
 
-  Future<int?> addNewDevice(Device device) async {
+  Future<Message?> addNewDevice(Device device) async {
     _isLoading = true;
     return devicesServices.createDevice(device).then((value) {
       _isLoading = false;

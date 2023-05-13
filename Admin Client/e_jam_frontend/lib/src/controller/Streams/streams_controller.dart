@@ -1,6 +1,7 @@
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +41,7 @@ class StreamsController extends ChangeNotifier {
     });
   }
 
-  Future<int?> createNewStream(StreamEntry stream) async {
+  Future<Message?> createNewStream(StreamEntry stream) async {
     _isLoading = true;
     return _streamServices.createStream(stream).then((value) {
       _isLoading = false;

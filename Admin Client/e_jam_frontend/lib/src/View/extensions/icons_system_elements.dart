@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
@@ -62,10 +63,36 @@ class Elements extends StatelessWidget {
   }
 }
 
-class StreamsRow extends StatelessWidget {
+class StreamsRow extends StatefulWidget {
   const StreamsRow({
     super.key,
   });
+
+  @override
+  State<StreamsRow> createState() => _StreamsRowState();
+}
+
+class _StreamsRowState extends State<StreamsRow> {
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<StreamsController>().loadAllStreamStatus(false);
+    });
+    timer = Timer.periodic(
+        const Duration(seconds: 5),
+        (Timer t) =>
+            context.read<StreamsController>().loadAllStreamStatus(true));
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,10 +256,34 @@ class StreamsRow extends StatelessWidget {
   }
 }
 
-class DevicesRow extends StatelessWidget {
+class DevicesRow extends StatefulWidget {
   const DevicesRow({
     super.key,
   });
+
+  @override
+  State<DevicesRow> createState() => _DevicesRowState();
+}
+
+class _DevicesRowState extends State<DevicesRow> {
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DevicesController>().loadAllDevices(false);
+    });
+    timer = Timer.periodic(const Duration(seconds: 5),
+        (Timer t) => context.read<DevicesController>().loadAllDevices(true));
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

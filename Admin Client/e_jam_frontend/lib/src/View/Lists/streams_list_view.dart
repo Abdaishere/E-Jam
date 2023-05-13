@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:e_jam/main.dart';
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Statistics/utils.dart';
@@ -319,7 +320,7 @@ class _StreamCardState extends State<StreamCard> {
         Icons.more_vert,
         size: 20.0,
       ),
-      onSelected: (dynamic value) {
+      onSelected: (dynamic value) async {
         if (value == 'View') {
           Navigator.of(context).push(
             HeroDialogRoute(
@@ -370,51 +371,43 @@ class _StreamCardState extends State<StreamCard> {
             ),
           );
         } else if (value == 'Edit') {
-          context
+          StreamEntry? value = await context
               .read<StreamsController>()
-              .loadStreamDetails(stream.streamId)
-              .then(
-                (value) => {
-                  if (mounted)
-                    {
-                      if (value != null && mounted)
-                        {
-                          Navigator.of(context).push(
-                            HeroDialogRoute(
-                              builder: (BuildContext context) => Center(
-                                  child: EditStreamView(
-                                      stream: value,
-                                      reload: refreshCard,
-                                      id: stream.streamId)),
-                              settings:
-                                  const RouteSettings(name: 'EditStreamView'),
-                            ),
-                          ),
-                        }
-                      else
-                        {
-                          showDialog<void>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                              title: const Text('Error'),
-                              content: const Text('Error loading stream'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                            ),
-                          ),
-                        }
-                    },
-                },
+              .loadStreamDetails(stream.streamId);
+
+          if (mounted) {
+            if (value != null) {
+              Navigator.of(context).push(
+                HeroDialogRoute(
+                  builder: (BuildContext context) => Center(
+                      child: EditStreamView(
+                          stream: value,
+                          reload: refreshCard,
+                          id: stream.streamId)),
+                  settings: const RouteSettings(name: 'EditStreamView'),
+                ),
               );
+            } else {
+              showDialog<void>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Error'),
+                  content: const Text('Error loading stream'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                ),
+              );
+            }
+          }
         }
       },
       itemBuilder: (BuildContext context) {

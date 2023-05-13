@@ -1,6 +1,7 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
@@ -107,7 +108,7 @@ class AddStreamController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int?> addStream(
+  Future<Message?> addStream(
       GlobalKey<FormState> formKey, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();

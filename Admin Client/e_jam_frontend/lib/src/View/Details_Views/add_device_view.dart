@@ -105,47 +105,21 @@ class BottomOptionsBar extends StatefulWidget {
 }
 
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
-  int? _status;
-
-  String _statusToMessage(int? status) {
-    switch (status) {
-      case 200:
-        return 'OK';
-      case 201:
-        return 'Created Successfully';
-      case 400:
-        return 'Bad Request: Please fill all the required fields correctly';
-      case 401:
-        return 'Unauthorized';
-      case 403:
-        return 'Forbidden';
-      case 404:
-        return 'Not Found';
-      case 408:
-        return 'Request Timeout';
-      case 409:
-        return 'Conflict: Device with mac address already exists';
-      case 500:
-        return 'Internal Server Error';
-      case 503:
-        return 'Service Unavailable';
-      default:
-        return 'Unknown State';
-    }
-  }
+  Message? _status;
 
   Future<bool?> _addDevice() async {
     Device? device =
         await context.read<AddDeviceController>().createNewDevice(formKey);
 
     if (!mounted || device == null) return null;
-    int? code = await context.read<DevicesController>().addNewDevice(device);
+    Message? code =
+        await context.read<DevicesController>().addNewDevice(device);
 
     if (!mounted) return null;
     _status = code;
     setState(() {});
     context.read<DevicesController>().loadAllDevices(true);
-    return _status != null && _status! <= 300;
+    return _status != null && _status!.responseCode <= 300;
   }
 
   @override
@@ -165,10 +139,9 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
               context.read<AddDeviceController>().clearAllFields();
             },
           ),
-          _status != null && _status! >= 300
+          _status != null && _status!.responseCode >= 300
               ? RequestStatusIcon(
-                  status: _status!,
-                  message: _statusToMessage(_status),
+                  response: _status!,
                 )
               : const SizedBox(
                   width: 40,

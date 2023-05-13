@@ -19,7 +19,7 @@ class GaugeTotalProgressForSystem extends StatefulWidget {
 
 class _GaugeTotalProgressForSystemState
     extends State<GaugeTotalProgressForSystem> {
-  double _totalProgress = 0;
+  double? _totalProgress = 0;
   bool _loading = true;
   Timer? timer;
 
@@ -48,7 +48,7 @@ class _GaugeTotalProgressForSystemState
         context.read<StreamsController>().getStreams;
 
     if (streams == null) {
-      _totalProgress = 0;
+      _totalProgress = null;
     } else {
       int totalProgress = 0;
       int totalTasks = 0;
@@ -69,6 +69,16 @@ class _GaugeTotalProgressForSystemState
 
   @override
   Widget build(BuildContext context) {
+    double progress = _totalProgress ?? 0;
+    String message = '${(_totalProgress ?? 0).toStringAsFixed(2)}%';
+    if (_loading) message = 'Loading...';
+    if (_totalProgress == null) {
+      message = 'Oops!';
+    } else {
+      if (_totalProgress == 0) message = 'No Tasks';
+      if (_totalProgress == 100) message = 'Done';
+    }
+
     return SizedBox(
       width: MediaQuery.of(context).orientation == Orientation.portrait
           ? MediaQuery.of(context).size.width > 450
@@ -101,7 +111,7 @@ class _GaugeTotalProgressForSystemState
               ),
               pointers: [
                 RangePointer(
-                  value: _totalProgress,
+                  value: progress,
                   width: 0.1,
                   sizeUnit: GaugeSizeUnit.factor,
                   cornerStyle: CornerStyle.bothCurve,
@@ -115,7 +125,7 @@ class _GaugeTotalProgressForSystemState
                   ),
                 ),
                 MarkerPointer(
-                  value: _totalProgress,
+                  value: progress,
                   markerType: MarkerType.circle,
                   markerHeight: 15,
                   markerWidth: 15,
@@ -128,13 +138,7 @@ class _GaugeTotalProgressForSystemState
                   angle: 90,
                   positionFactor: 0.1,
                   widget: Text(
-                    _loading
-                        ? 'Loading...'
-                        : _totalProgress == 0
-                            ? 'No Tasks'
-                            : _totalProgress == 100
-                                ? 'Done'
-                                : '${(_totalProgress).toStringAsFixed(2)}%',
+                    message,
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,

@@ -4,20 +4,18 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class RequestStatusIcon extends StatelessWidget {
   const RequestStatusIcon({
     super.key,
-    required this.status,
-    required this.message,
+    required this.response,
   });
 
-  final int status;
-  final String message;
+  final Message response;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      tooltip: message,
+      tooltip: response.message,
       icon: FaIcon(
-        getIcon(status),
-        color: getColor(status),
+        getIcon(response.responseCode),
+        color: getColor(response.responseCode),
         size: 20.0,
       ),
       onPressed: () {},
@@ -49,4 +47,13 @@ class RequestStatusIcon extends StatelessWidget {
     }
     return Colors.red;
   }
+}
+
+class Message {
+  const Message({
+    required this.responseCode,
+    required this.message,
+  });
+  final int responseCode;
+  final String message;
 }

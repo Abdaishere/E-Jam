@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 
 class StreamServices {
   static Uri uri = Uri.parse('${NetworkController.serverIpAddress}/streams');
@@ -39,7 +40,7 @@ class StreamServices {
     }
   }
 
-  Future<int?> createStream(StreamEntry stream) async {
+  Future<Message?> createStream(StreamEntry stream) async {
     try {
       final response = await client
           .post(
@@ -50,7 +51,7 @@ class StreamServices {
             body: json.encode(stream.toJson()),
           )
           .timeout(NetworkController.timeout);
-      return response.statusCode;
+      return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
       return null;
     }

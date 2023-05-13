@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 
 class DevicesServices {
   static Uri uri = Uri.parse('${NetworkController.serverIpAddress}/devices');
@@ -38,7 +39,7 @@ class DevicesServices {
     }
   }
 
-  Future<int?> createDevice(Device device) async {
+  Future<Message?> createDevice(Device device) async {
     try {
       final response = await client
           .post(uri,
@@ -46,7 +47,7 @@ class DevicesServices {
               body: json.encode(device.toJson()))
           .timeout(NetworkController.timeout);
 
-      return response.statusCode;
+      return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
       return null;
     }
