@@ -130,22 +130,27 @@ class AddStreamController extends ChangeNotifier {
               StreamEntry(
                 name: _nameController.text,
                 description: _descriptionController.text,
-                delay: (int.tryParse(_delayController.text) ?? 0),
+                delay: (num.tryParse(_delayController.text) ?? num.parse("-1")),
                 streamId: _idController.text,
                 generatorsIds: generators,
                 verifiersIds: verifiers,
                 payloadType: _payloadType,
-                burstLength: (int.tryParse(_burstLengthController.text) ?? 0),
-                burstDelay: (int.tryParse(_burstDelayController.text) ?? 0),
-                numberOfPackets: (int.tryParse(_packetsController.text) ?? 0),
-                payloadLength:
-                    (int.tryParse(_payloadLengthController.text) ?? 0),
-                seed: (int.tryParse(_seedController.text) ?? 0),
+                burstLength: (num.tryParse(_burstLengthController.text) ??
+                    num.parse("-1")),
+                burstDelay: (num.tryParse(_burstDelayController.text) ??
+                    num.parse("-1")),
+                numberOfPackets:
+                    (num.tryParse(_packetsController.text) ?? num.parse("-1")),
+                payloadLength: (num.tryParse(_payloadLengthController.text) ??
+                    num.parse("-1")),
+                seed: (num.tryParse(_seedController.text) ?? num.parse("-1")),
                 broadcastFrames:
-                    (int.tryParse(_broadcastFramesController.text) ?? 0),
-                interFrameGap:
-                    (int.tryParse(_interFrameGapController.text) ?? 0),
-                timeToLive: (int.tryParse(_timeToLiveController.text) ?? 0),
+                    (num.tryParse(_broadcastFramesController.text) ??
+                        num.parse("-1")),
+                interFrameGap: (num.tryParse(_interFrameGapController.text) ??
+                    num.parse("-1")),
+                timeToLive: (num.tryParse(_timeToLiveController.text) ??
+                    num.parse("-1")),
                 transportLayerProtocol: _transportLayerProtocol,
                 flowType: _flowType,
                 checkContent: _checkContent,

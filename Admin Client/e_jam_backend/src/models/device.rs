@@ -38,7 +38,7 @@ pub struct Device {
     * The default value is the ip address of the device
     "]
     #[validate(length(
-        min = 1,
+        min = 0,
         max = 50,
         message = "name must be between 1 and 50 characters long"
     ))]
@@ -54,7 +54,7 @@ pub struct Device {
     * The default value is an empty string
     "]
     #[validate(length(
-        min = 1,
+        min = 0,
         max = 255,
         message = "description must be between 1 and 255 characters long"
     ))]
@@ -70,7 +70,7 @@ pub struct Device {
     * The default value is an empty string
     "]
     #[validate(length(
-        min = 1,
+        min = 0,
         max = 255,
         message = "location must be between 1 and 255 characters long"
     ))]
@@ -211,57 +211,47 @@ this function is used to update the device status according to the status of the
     fn update_device_processes(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
         match type_of_process {
             ProcessType::Generation => match status {
-                ProcessStatus::Queued => self.gen_processes += 1,
-                ProcessStatus::Completed => {
-                    if self.gen_processes > 0 {
-                        self.gen_processes -= 1
-                    }
-                }
-                ProcessStatus::Stopped => {
-                    if self.gen_processes > 0 {
-                        self.gen_processes -= 1
-                    }
-                }
-                _ => (),
+                ProcessStatus::Queued => self.add_ver_processes(),
+                ProcessStatus::Running => {}
+                _ => self.remove_gen_process(),
             },
             ProcessType::Verification => match status {
-                ProcessStatus::Queued => self.ver_processes += 1,
-                ProcessStatus::Completed => {
-                    if self.ver_processes > 0 {
-                        self.ver_processes -= 1
-                    }
-                }
-                ProcessStatus::Stopped => {
-                    if self.ver_processes > 0 {
-                        self.ver_processes -= 1
-                    }
-                }
-                _ => (),
+                ProcessStatus::Queued => self.add_ver_processes(),
+                ProcessStatus::Running => {}
+                _ => self.remove_ver_processes(),
             },
             ProcessType::GeneratingAndVerification => match status {
                 ProcessStatus::Queued => {
-                    self.gen_processes += 1;
-                    self.ver_processes += 1;
+                    self.add_gen_process();
+                    self.add_ver_processes();
                 }
-                ProcessStatus::Completed => {
-                    if self.gen_processes > 0 {
-                        self.gen_processes -= 1
-                    };
-                    if self.ver_processes > 0 {
-                        self.ver_processes -= 1
-                    }
+                ProcessStatus::Running => {}
+                _ => {
+                    self.remove_gen_process();
+                    self.remove_ver_processes();
                 }
-                ProcessStatus::Stopped => {
-                    if self.gen_processes > 0 {
-                        self.gen_processes -= 1
-                    };
-                    if self.ver_processes > 0 {
-                        self.ver_processes -= 1
-                    }
-                }
-                _ => (),
             },
         }
+    }
+
+    pub fn add_gen_process(&mut self) {
+        self.gen_processes += 1;
+    }
+
+    pub fn remove_gen_process(&mut self) {
+        if self.gen_processes > 0 {
+            self.gen_processes -= 1
+        };
+    }
+
+    pub fn add_ver_processes(&mut self) {
+        self.ver_processes += 1;
+    }
+
+    pub fn remove_ver_processes(&mut self) {
+        if self.ver_processes > 0 {
+            self.ver_processes -= 1
+        };
     }
 
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
@@ -449,8 +439,8 @@ this is used to set the device to reachable or unreachable and update the last u
                     + Duration::seconds(Faker.fake::<i64>().rem_euclid(duration_secs)),
 
                 port: Faker.fake(),
-                gen_processes: Faker.fake(),
-                ver_processes: Faker.fake(),
+                gen_processes: 0,
+                ver_processes: 0,
                 status: vec![
                     DeviceStatus::Online,
                     DeviceStatus::Offline,

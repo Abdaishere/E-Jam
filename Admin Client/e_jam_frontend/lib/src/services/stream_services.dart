@@ -28,10 +28,7 @@ class StreamServices {
 
   Future<StreamEntry?> getStream(String streamId) async {
     try {
-      final response = await client
-          .get(Uri.parse('$uri/$streamId'))
-          .timeout(NetworkController.timeout);
-
+      final response = await client.get(Uri.parse('$uri/$streamId'));
       if (300 > response.statusCode) {
         return StreamEntry.fromJson(json.decode(response.body));
       } else {

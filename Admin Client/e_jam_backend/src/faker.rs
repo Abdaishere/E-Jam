@@ -12,18 +12,20 @@ pub async fn generate_fake_stream_entries(
 ) {
     for _i in 0..count {
         let mut ver_mac: Vec<String> = vec![];
-        for device in devices_list.lock().await.iter() {
-            let pick: bool = Faker.fake();
-            if pick {
-                ver_mac.push(device.get_device_mac().clone());
-            }
-        }
-
         let mut gen_mac: Vec<String> = vec![];
-        for device in devices_list.lock().await.iter() {
-            let pick: bool = Faker.fake();
-            if pick {
-                gen_mac.push(device.get_device_mac().clone());
+        loop {
+            for device in devices_list.lock().await.iter_mut() {
+                if Faker.fake() {
+                    gen_mac.push(device.get_device_mac().clone());
+                    device.add_gen_process();
+                }
+                if Faker.fake() {
+                    ver_mac.push(device.get_device_mac().clone());
+                    device.add_ver_processes();
+                }
+            }
+            if gen_mac.len() != 0 && ver_mac.len() != 0 {
+                break;
             }
         }
         let stream = StreamEntry::generate_fake_stream_entry(

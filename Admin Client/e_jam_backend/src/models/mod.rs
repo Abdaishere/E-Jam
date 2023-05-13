@@ -344,7 +344,7 @@ impl StreamEntry {
 This function is used to generate a new id for the stream and check if the id is unique.
 The function uses the nanoid crate to generate a random id of length 3.
 The Id is random to lower the chances of having the same id for two different streams so the average case would be O(n).
-In other words being random is less predictable than being sequential (yes i know that the max is 2^24 minus all the non URL Friendly things).
+In other words being random is less predictable than being sequential and the user is able to add random Id (Always act like the user).
 ## Arguments
 * `stream_id_counter` - A reference to a Mutex for u32 that is used to generate the id of the stream
 * `streams_entries` - A reference to a Mutex for Vec of StreamEntry that is used to check if the id of the stream is unique
@@ -355,24 +355,24 @@ changes the stream_id of the stream to a new id"]
         stream_id_counter: &Mutex<usize>,
         streams_entries: &Mutex<Vec<StreamEntry>>,
     ) {
-        info!("Generating stream id");
+        info!("Generating stream id for stream");
         loop {
             let id = nanoid!(3);
-            info!("Checking if stream id {} is unique", id);
+            debug!("Checking if stream id {} is unique", id);
             let streams_entries_lock = streams_entries.lock().await;
             let checker = streams_entries_lock
                 .iter()
                 .find(|stream| stream.stream_id == id);
             match checker {
                 Some(stream) => {
-                    info!(
+                    debug!(
                         "Stream ID {} already used by stream {}, generating new id",
                         id, stream.name
                     );
                     continue;
                 }
                 None => {
-                    info!("Stream ID {} is unique", id);
+                    debug!("Stream ID {} is unique", id);
                     let mut generated_stream_ids_counter = stream_id_counter.lock().await;
 
                     *generated_stream_ids_counter += 1;

@@ -35,19 +35,19 @@ class StreamEntry {
   final DateTime? lastUpdated;
   final DateTime? startTime;
   final DateTime? endTime;
-  final int delay;
+  final num delay;
   final String streamId;
   final List<String> generatorsIds;
   final List<String> verifiersIds;
   final int payloadType;
-  final int burstLength;
-  final int burstDelay;
-  final int numberOfPackets;
-  final int payloadLength;
-  final int seed;
-  final int broadcastFrames;
-  final int interFrameGap;
-  final int timeToLive;
+  final num burstLength;
+  final num burstDelay;
+  final num numberOfPackets;
+  final num payloadLength;
+  final num seed;
+  final num broadcastFrames;
+  final num interFrameGap;
+  final num timeToLive;
   final TransportLayerProtocol transportLayerProtocol;
   final FlowType flowType;
   final bool checkContent;
@@ -72,19 +72,33 @@ class StreamEntry {
         endTime:
             DateTime.fromMillisecondsSinceEpoch((json["endTime"] ?? 0) * 1000)
                 .toLocal(),
-        delay: json["delay"],
+        delay: (num.tryParse(json["delay"].toString()) ?? num.parse("-1")),
         streamId: json["streamId"],
         generatorsIds: List<String>.from(json["generatorsIds"].map((x) => x)),
         verifiersIds: List<String>.from(json["verifiersIds"].map((x) => x)),
         payloadType: json["payloadType"],
-        burstLength: json["burstLength"],
-        burstDelay: json["burstDelay"],
-        numberOfPackets: json["numberOfPackets"],
-        payloadLength: json["payloadLength"],
-        seed: json["seed"],
-        broadcastFrames: json["broadcastFrames"],
-        interFrameGap: json["interFrameGap"],
-        timeToLive: json["timeToLive"],
+        burstLength:
+            (num.tryParse(json["burstLength"].toString()) ?? num.parse("-1"))
+                .floor(),
+        burstDelay:
+            (num.tryParse(json["burstDelay"].toString()) ?? num.parse("-1"))
+                .floor(),
+        numberOfPackets: (num.tryParse(json["numberOfPackets"].toString()) ??
+                num.parse("-1"))
+            .floor(),
+        payloadLength:
+            (num.tryParse(json["payloadLength"].toString()) ?? num.parse("-1"))
+                .floor(),
+        seed: (num.tryParse(json["seed"].toString()) ?? num.parse("-1")),
+        broadcastFrames: (num.tryParse(json["broadcastFrames"].toString()) ??
+                num.parse("-1"))
+            .floor(),
+        interFrameGap:
+            (num.tryParse(json["interFrameGap"].toString()) ?? num.parse("-1"))
+                .floor(),
+        timeToLive:
+            (num.tryParse(json["timeToLive"].toString()) ?? num.parse("-1"))
+                .floor(),
         transportLayerProtocol:
             transportLayerProtocolFromString(json["transportLayerProtocol"]),
         flowType: flowTypeFromString(json["flowType"]),
