@@ -17,16 +17,19 @@ class StreamsController extends ChangeNotifier {
   bool get getIsLoading => _isLoading;
   StreamServices get getStreamServices => _streamServices;
 
-  Future loadAllStreamsWithDetails(bool forced) async {
+  Future loadAllStreams(bool forced) async {
     _isLoading = true;
     if (_streams != null &&
+        _streamsStatusDetails != null &&
         !forced &&
-        DateTime.now().difference(_lastRefresh).inSeconds < 5) {
+        DateTime.now().difference(_lastRefresh).inSeconds < 10) {
       _isLoading = false;
       return;
     }
+
     return _streamServices.getStreams().then((value) {
       _streams = value;
+      _lastRefresh = DateTime.now();
       _isLoading = false;
     });
   }
@@ -107,6 +110,7 @@ class StreamsController extends ChangeNotifier {
     _isLoading = true;
     return _streamServices.forceStopStream(id).then((value) {
       _isLoading = false;
+
       return value;
     });
   }

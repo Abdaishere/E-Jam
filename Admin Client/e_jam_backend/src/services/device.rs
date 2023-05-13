@@ -172,23 +172,26 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[get("/devices/ping_all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
-    let mut devices = data.device_list.lock().await;
+    let devices_len = data.device_list.lock().await.len();
 
-    match devices.len() {
+    match devices_len {
         0 => HttpResponse::NoContent()
             .body("No devices in the system, please add some devices and try again"),
         _ => {
-            let handles = devices
-                .iter()
-                .map(|device| {
-                    let device = device.clone();
-                    tokio::spawn(async move { device.is_reachable().await })
-                })
-                .collect::<Vec<_>>();
+            let mut handles = Vec::new();
+            for i in 0..devices_len {
+                let devices = data.device_list.lock().await;
+                let device = devices.get(i).unwrap().clone();
+
+                handles.push(tokio::spawn(async move { device.is_reachable().await }));
+            }
 
             let mut counter = 0;
             for (i, handle) in handles.into_iter().enumerate() {
-                let response = match handle.await {
+                let handle = handle.await;
+                let mut devices = data.device_list.lock().await;
+
+                let response = match handle {
                     Ok(response) => response,
                     Err(_) => {
                         error!(

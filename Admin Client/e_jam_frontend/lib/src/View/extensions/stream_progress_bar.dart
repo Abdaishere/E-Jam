@@ -1,5 +1,6 @@
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/Model/Statistics/utils.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -19,28 +20,7 @@ class StreamProgressBar extends StatefulWidget {
 }
 
 class _StreamProgressBarState extends State<StreamProgressBar> {
-  final double accuracy = 0.8;
-  double getProgress(
-      StreamStatus status, DateTime? startTime, DateTime? endTime) {
-    if (status == StreamStatus.running ||
-        status == StreamStatus.stopped ||
-        status == StreamStatus.error) {
-      return startTime == null
-          ? 0
-          : endTime == null
-              ? 50
-              : (startTime.difference(DateTime.now()).inSeconds /
-                      (startTime.difference(endTime).inSeconds == 0
-                          ? 1
-                          : startTime.difference(DateTime.now()).inSeconds)) *
-                  accuracy *
-                  100;
-    } else if (status == StreamStatus.finished) {
-      return 100;
-    } else {
-      return 0;
-    }
-  }
+  final double accuracy = 0.9;
 
   @override
   Widget build(BuildContext context) {
@@ -55,8 +35,8 @@ class _StreamProgressBarState extends State<StreamProgressBar> {
       labelPosition: LinearLabelPosition.outside,
       markerPointers: [
         LinearShapePointer(
-          value: getProgress(widget.status ?? StreamStatus.created,
-              widget.startTime, widget.endTime),
+          value: Utils.getProgress(widget.status ?? StreamStatus.created,
+              widget.startTime, widget.endTime, false),
           shapeType: LinearShapePointerType.diamond,
           position: LinearElementPosition.cross,
           enableAnimation: false,
@@ -68,8 +48,8 @@ class _StreamProgressBarState extends State<StreamProgressBar> {
       ],
       barPointers: [
         LinearBarPointer(
-          value: getProgress(widget.status ?? StreamStatus.created,
-              widget.startTime, widget.endTime),
+          value: Utils.getProgress(widget.status ?? StreamStatus.created,
+              widget.startTime, widget.endTime, false),
           enableAnimation: SystemSettings.showChartsAnimation,
           animationType: LinearAnimationType.ease,
           color: streamColorScheme(widget.status),

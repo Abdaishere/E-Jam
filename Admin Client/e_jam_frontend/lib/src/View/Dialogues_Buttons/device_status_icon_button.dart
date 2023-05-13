@@ -11,12 +11,10 @@ class DeviceStatusIconButton extends StatelessWidget {
       required this.status,
       required this.lastUpdated,
       required this.mac,
-      this.message,
       required this.isDense});
 
   final DeviceStatus status;
   final DateTime lastUpdated;
-  final String? message;
   final bool isDense;
   final String mac;
 
@@ -26,7 +24,7 @@ class DeviceStatusIconButton extends StatelessWidget {
       padding: isDense ? EdgeInsets.zero : null,
       constraints: isDense ? const BoxConstraints() : null,
       tooltip:
-          '${deviceStatusToString(status)}: ${timeago.format(lastUpdated)}${'\n$message'}',
+          '${deviceStatusToString(status)}: ${timeago.format(lastUpdated)}',
       icon: FaIcon(
         getIcon(status),
         color: deviceStatusColorScheme(status),
@@ -38,7 +36,7 @@ class DeviceStatusIconButton extends StatelessWidget {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Device is ${deviceStatusToString(status)}'),
-              content: Text('${'$message\n'}Last updated: $lastUpdated'),
+              content: Text('Last updated: $lastUpdated'),
               actions: [
                 TextButton(
                   onPressed: () {

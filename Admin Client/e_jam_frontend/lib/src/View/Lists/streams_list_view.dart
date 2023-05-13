@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:e_jam/main.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/Model/Statistics/utils.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
@@ -525,33 +526,11 @@ class MiniProgressBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(10.0),
       child: LinearProgressIndicator(
         minHeight: 5.0,
-        value: getProgress(status, startTime, endTime),
+        value: Utils.getProgress(status, startTime, endTime, true),
         backgroundColor: streamColorScheme(status).withAlpha(100),
         valueColor: AlwaysStoppedAnimation<Color>(streamColorScheme(status)),
       ),
     );
-  }
-
-  final double accuracy = 0.8;
-  double getProgress(
-      StreamStatus status, DateTime? startTime, DateTime? endTime) {
-    if (status == StreamStatus.running ||
-        status == StreamStatus.stopped ||
-        status == StreamStatus.error) {
-      return startTime == null
-          ? 0
-          : endTime == null
-              ? 0.5
-              : (startTime.difference(DateTime.now()).inSeconds /
-                      (startTime.difference(endTime).inSeconds == 0
-                          ? 1
-                          : startTime.difference(DateTime.now()).inSeconds)) *
-                  accuracy;
-    } else if (status == StreamStatus.finished) {
-      return 1;
-    } else {
-      return 0;
-    }
   }
 }
 

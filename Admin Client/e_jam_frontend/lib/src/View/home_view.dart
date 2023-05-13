@@ -31,6 +31,7 @@ class _DashBoardViewState extends State<DashBoardView> {
     // load system data
     context.read<DevicesController>().loadAllDevices(forced);
     context.read<StreamsController>().loadAllStreamStatus(forced);
+    context.read<StreamsController>().loadAllStreams(forced);
   }
 
   @override

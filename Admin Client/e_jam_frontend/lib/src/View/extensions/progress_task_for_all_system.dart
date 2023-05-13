@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/Model/Statistics/utils.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-// should be the difference between the youngest and oldest stream task in the system
 class GaugeTotalProgressForSystem extends StatefulWidget {
   const GaugeTotalProgressForSystem({super.key});
 
@@ -17,29 +19,56 @@ class GaugeTotalProgressForSystem extends StatefulWidget {
 
 class _GaugeTotalProgressForSystemState
     extends State<GaugeTotalProgressForSystem> {
-  double getProgress() {
+  double _totalProgress = 0;
+  bool _loading = true;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getProgress(false);
+    });
+
+    timer = Timer.periodic(
+        const Duration(seconds: 5), (Timer t) => _getProgress(true));
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  _getProgress(bool forced) async {
+    await context.read<StreamsController>().loadAllStreams(forced);
+    if (!mounted) return;
+
     final List<StreamEntry>? streams =
-        Provider.of<StreamsController>(context, listen: false).getStreams;
+        context.read<StreamsController>().getStreams;
+
     if (streams == null) {
-      return 0;
+      _totalProgress = 0;
+    } else {
+      int totalProgress = 0;
+      int totalTasks = 0;
+      for (final StreamEntry stream in streams) {
+        totalProgress += stream.runningGenerators?.progress ?? 0;
+        totalTasks += stream.runningGenerators?.total ?? 0;
+        totalProgress += stream.runningVerifiers?.progress ?? 0;
+        totalTasks += stream.runningVerifiers?.total ?? 0;
+      }
+
+      _totalProgress =
+          Utils.mapOneRangeToAnother(totalProgress, 0, totalTasks, 0, 100, 2);
     }
-    int totalProgress = 0;
-    int totalTasks = 0;
-    for (final StreamEntry stream in streams) {
-      totalProgress += stream.runningGenerators?.progress ?? 0;
-      totalTasks += stream.runningGenerators?.total ?? 0;
-      totalProgress += stream.runningVerifiers?.progress ?? 0;
-      totalTasks += stream.runningVerifiers?.total ?? 0;
-    }
-    if (totalTasks == 0) {
-      return 0;
-    }
-    return totalProgress / totalTasks;
+    _loading = false;
+    if (mounted) setState(() {});
+    return;
   }
 
   @override
   Widget build(BuildContext context) {
-    double totalProgress = getProgress();
     return SizedBox(
       width: MediaQuery.of(context).orientation == Orientation.portrait
           ? MediaQuery.of(context).size.width > 450
@@ -72,7 +101,7 @@ class _GaugeTotalProgressForSystemState
               ),
               pointers: [
                 RangePointer(
-                  value: totalProgress,
+                  value: _totalProgress,
                   width: 0.1,
                   sizeUnit: GaugeSizeUnit.factor,
                   cornerStyle: CornerStyle.bothCurve,
@@ -86,7 +115,7 @@ class _GaugeTotalProgressForSystemState
                   ),
                 ),
                 MarkerPointer(
-                  value: totalProgress,
+                  value: _totalProgress,
                   markerType: MarkerType.circle,
                   markerHeight: 15,
                   markerWidth: 15,
@@ -99,11 +128,13 @@ class _GaugeTotalProgressForSystemState
                   angle: 90,
                   positionFactor: 0.1,
                   widget: Text(
-                    totalProgress == 0
-                        ? 'No Tasks'
-                        : totalProgress == 100
-                            ? 'Done'
-                            : '${(getProgress() * 100).toStringAsFixed(2)}%',
+                    _loading
+                        ? 'Loading...'
+                        : _totalProgress == 0
+                            ? 'No Tasks'
+                            : _totalProgress == 100
+                                ? 'Done'
+                                : '${(_totalProgress).toStringAsFixed(2)}%',
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,

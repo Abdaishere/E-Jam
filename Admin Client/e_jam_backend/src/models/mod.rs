@@ -1191,10 +1191,24 @@ this is used to update the stream with the new details passed in the stream entr
             Fake, Faker,
         };
 
-        let start_time = Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap();
-        let end_time = Utc::now() + Duration::days(365); // 1 year into the future
-        let duration = end_time - start_time;
-        let duration_secs = duration.num_seconds();
+        let start_time = Utc::now() - Duration::days(365);
+        let end_time = Utc::now() + Duration::days(365 * 10); // 1 year into the past
+
+        let starts_at = start_time
+            + Duration::seconds(
+                Faker
+                    .fake::<i64>()
+                    .rem_euclid((Utc::now() - start_time).num_seconds()),
+            );
+
+        let updates = starts_at
+            + Duration::seconds(
+                Faker
+                    .fake::<i64>()
+                    .rem_euclid((Utc::now() - start_time).num_seconds()),
+            );
+
+        let ends_at = starts_at + Duration::seconds(Faker.fake::<i64>().rem_euclid((end_time - Utc::now()).num_seconds()));
 
         loop {
             let mut running_generators_map: HashMap<String, ProcessStatus> = HashMap::new();
@@ -1257,14 +1271,9 @@ this is used to update the stream with the new details passed in the stream entr
                 flow_type: vec![FlowType::Bursts, FlowType::BackToBack][(0..1).fake::<usize>()]
                     .clone(),
                 check_content: Faker.fake(),
-                last_updated: start_time
-                    + Duration::seconds(Faker.fake::<i64>().rem_euclid(duration_secs)),
-                start_time: Some(
-                    start_time + Duration::seconds(Faker.fake::<i64>().rem_euclid(duration_secs)),
-                ),
-                end_time: Some(
-                    start_time + Duration::seconds(Faker.fake::<i64>().rem_euclid(duration_secs)),
-                ),
+                last_updated: updates,
+                start_time: Some(starts_at),
+                end_time: Some(ends_at),
                 running_generators: running_generators_map,
                 running_verifiers: running_verifiers_map,
                 stream_status: vec![

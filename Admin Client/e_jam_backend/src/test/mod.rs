@@ -1,7 +1,28 @@
-use crate::models::{device::Device, StreamEntry};
+use crate::models::{device::Device, StreamEntry, AppState};
+use actix_web::web::Data;
 use fake::{Fake, Faker};
 use log::info;
 use tokio::sync::Mutex;
+
+const FAKE_DEVICES_COUNT: usize = 2e2 as usize;
+const FAKE_STREAM_ENTRIES_COUNT: usize = 2e3 as usize;
+
+pub async fn generate_fake_metrics(app_state: &Data<AppState>) {
+    println!("Fake data feature enabled");
+
+    // generate testing data
+    generate_fake_devices(&app_state.device_list, FAKE_DEVICES_COUNT).await;
+
+    generate_fake_stream_entries(
+        &app_state.stream_entries,
+        &app_state.device_list,
+        FAKE_STREAM_ENTRIES_COUNT,
+        &app_state.stream_id_counter,
+        &app_state.stream_entries,
+    ).await;
+
+}
+
 
 pub async fn generate_fake_stream_entries(
     stream_entries: &Mutex<Vec<StreamEntry>>,

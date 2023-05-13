@@ -5,6 +5,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:syncfusion_flutter_treemap/treemap.dart';
 
 // should include all the devices and their streams and the total packets (uploaded and downloaded) of each stream in the device
+// gives error for index (IDK yet)
 class TreeMapDrillDownDevicesLoad extends StatefulWidget {
   const TreeMapDrillDownDevicesLoad({super.key});
 

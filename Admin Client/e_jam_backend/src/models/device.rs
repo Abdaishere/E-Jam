@@ -421,33 +421,66 @@ this is used to set the device to reachable or unreachable and update the last u
         use chrono::{prelude::*, Duration};
         use fake::{
             faker::address::en::CityName,
+            faker::company::en::Buzzword,
             faker::internet::en::{MACAddress, UserAgent, Username, IP},
             Fake, Faker,
         };
+
+        const WORDS: [&str; 20] = [
+            "raspberry ",
+            "pine64 ",
+            "linux ",
+            "linux ",
+            "linux ",
+            "printer ",
+            "printer ",
+            "router ",
+            "firewall ",
+            "switch ",
+            "home ",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "laptop ",
+            "microsoft ",
+            "hub ",
+        ];
+
+        const STATUSES: [DeviceStatus; 4] = [
+            DeviceStatus::Online,
+            DeviceStatus::Offline,
+            DeviceStatus::Running,
+            DeviceStatus::Idle,
+        ];
+
         loop {
-            let start_time = Utc.with_ymd_and_hms(1970, 1, 1, 0, 0, 0).unwrap();
-            let end_time = Utc::now() + Duration::days(365); // 1 year into the future
-            let duration_secs = (end_time - start_time).num_seconds();
+            let start_time = Utc::now() - Duration::days(365);
+            let updates = start_time
+            + Duration::seconds(
+                Faker
+                    .fake::<i64>()
+                    .rem_euclid((Utc::now() - start_time).num_seconds()),
+            );
 
             let device = Device {
-                name: Username().fake::<String>(),
+                name: format!(
+                    "{} {}{}",
+                    Buzzword().fake::<String>(),
+                    WORDS[(0..WORDS.len()).fake::<usize>()],
+                    Username().fake::<String>()
+                ),
                 description: UserAgent().fake::<String>(),
                 location: CityName().fake::<String>(),
                 mac_address: MACAddress().fake(),
                 ip_address: IP().fake(),
-                last_updated: start_time
-                    + Duration::seconds(Faker.fake::<i64>().rem_euclid(duration_secs)),
-
+                last_updated: updates,
                 port: Faker.fake(),
                 gen_processes: 0,
                 ver_processes: 0,
-                status: vec![
-                    DeviceStatus::Online,
-                    DeviceStatus::Offline,
-                    DeviceStatus::Running,
-                    DeviceStatus::Idle,
-                ][(0..4).fake::<usize>()]
-                .clone(),
+                status: STATUSES[(0..4).fake::<usize>()].clone(),
             };
 
             match device.validate() {

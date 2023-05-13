@@ -8,7 +8,7 @@ import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:e_jam/src/View/Charts/line_chart_stream.dart';
 import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
-import 'package:e_jam/src/View/Charts/stream_progress_bar.dart';
+import 'package:e_jam/src/View/extensions/stream_progress_bar.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_devices_list.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/stream_status_icon_button.dart';
@@ -162,80 +162,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                     visible: MediaQuery.of(context).orientation ==
                             Orientation.landscape &&
                         MediaQuery.of(context).size.width > 1000,
-                    replacement: Column(
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: StreamGraph(id),
-                        ),
-                        const VerticalDivider(
-                          width: 5,
-                          thickness: 1,
-                          indent: 0,
-                          endIndent: 0,
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Visibility(
-                            visible: !isLoading,
-                            replacement: Center(
-                              child: LoadingAnimationWidget.threeArchedCircle(
-                                color: Colors.grey,
-                                size: 40.0,
-                              ),
-                            ),
-                            child: Visibility(
-                              visible: stream != null,
-                              replacement: const Center(
-                                child: Icon(
-                                  Icons.warning_amber_rounded,
-                                  color: Colors.redAccent,
-                                  size: 40,
-                                ),
-                              ),
-                              child: _streamFieldsDetails(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: StreamGraph(id),
-                        ),
-                        const VerticalDivider(
-                          width: 5,
-                          thickness: 1,
-                          indent: 0,
-                          endIndent: 0,
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Visibility(
-                            visible: !isLoading,
-                            replacement: Center(
-                              child: LoadingAnimationWidget.threeArchedCircle(
-                                color: Colors.grey,
-                                size: 40.0,
-                              ),
-                            ),
-                            child: Visibility(
-                              visible: stream != null,
-                              replacement: const Center(
-                                child: Icon(
-                                  Icons.warning_amber_rounded,
-                                  color: Colors.redAccent,
-                                  size: 40,
-                                ),
-                              ),
-                              child: _streamFieldsDetails(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    replacement: _columView(),
+                    child: _rowView(),
                   ),
                 ),
                 StreamProgressBar(
@@ -251,6 +179,86 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
           ),
         ),
       ),
+    );
+  }
+
+  Row _rowView() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 4,
+          child: StreamGraph(id),
+        ),
+        const VerticalDivider(
+          width: 5,
+          thickness: 1,
+          indent: 0,
+          endIndent: 0,
+        ),
+        Expanded(
+          flex: 2,
+          child: Visibility(
+            visible: !isLoading,
+            replacement: Center(
+              child: LoadingAnimationWidget.threeArchedCircle(
+                color: Colors.grey,
+                size: 40.0,
+              ),
+            ),
+            child: Visibility(
+              visible: stream != null,
+              replacement: const Center(
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.redAccent,
+                  size: 40,
+                ),
+              ),
+              child: _streamFieldsDetails(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Column _columView() {
+    return Column(
+      children: [
+        Expanded(
+          flex: 4,
+          child: StreamGraph(id),
+        ),
+        const VerticalDivider(
+          width: 5,
+          thickness: 1,
+          indent: 0,
+          endIndent: 0,
+        ),
+        Expanded(
+          flex: 2,
+          child: Visibility(
+            visible: !isLoading,
+            replacement: Center(
+              child: LoadingAnimationWidget.threeArchedCircle(
+                color: Colors.grey,
+                size: 40.0,
+              ),
+            ),
+            child: Visibility(
+              visible: stream != null,
+              replacement: const Center(
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.redAccent,
+                  size: 40,
+                ),
+              ),
+              child: _streamFieldsDetails(),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

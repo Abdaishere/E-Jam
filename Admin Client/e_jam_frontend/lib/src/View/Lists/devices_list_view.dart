@@ -329,10 +329,7 @@ class _DeviceCardState extends State<DeviceCard> {
                   device.location,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  device.description,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                const SizedBox(height: 15),
                 const Divider(),
                 _deviceProcesses(device),
                 Text(
@@ -342,7 +339,7 @@ class _DeviceCardState extends State<DeviceCard> {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 5.0),
+                const SizedBox(height: 2.0),
               ],
             ),
           ),

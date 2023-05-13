@@ -14,14 +14,12 @@ class StreamStatusIconButton extends StatelessWidget {
       required this.id,
       required this.lastUpdated,
       required this.refresh,
-      this.message,
       required this.isDense});
 
   final StreamStatus status;
   final String id;
   final DateTime lastUpdated;
   final Function refresh;
-  final String? message;
   final bool isDense;
 
   @override
@@ -45,7 +43,7 @@ class StreamStatusIconButton extends StatelessWidget {
         padding: isDense ? EdgeInsets.zero : null,
         constraints: isDense ? const BoxConstraints() : null,
         tooltip:
-            '${streamStatusToString(status)}: ${timeago.format(lastUpdated)}${'\n$message'}',
+            '${streamStatusToString(status)}: ${timeago.format(lastUpdated)}',
         icon: FaIcon(
           getIcon(status),
           color: streamColorScheme(status),
@@ -56,7 +54,7 @@ class StreamStatusIconButton extends StatelessWidget {
             context: context,
             builder: (BuildContext context) => AlertDialog(
               title: Text('Stream is ${streamStatusToString(status)}'),
-              content: Text('${'$message\n'}Last updated: $lastUpdated'),
+              content: Text('Last updated: $lastUpdated'),
               actions: [
                 TextButton(
                   onPressed: () {
