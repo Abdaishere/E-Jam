@@ -24,7 +24,7 @@ pub async fn generate_fake_stream_entries(
                     device.add_ver_processes();
                 }
             }
-            if gen_mac.len() != 0 && ver_mac.len() != 0 {
+            if !gen_mac.is_empty() && !ver_mac.is_empty() {
                 break;
             }
         }
