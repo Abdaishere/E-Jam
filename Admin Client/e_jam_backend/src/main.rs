@@ -51,17 +51,17 @@ async fn main() -> std::io::Result<()> {
             .values()
             .cloned()
             .collect();
-        let dev = devices.clone();
-        let str = streams.clone();
+        let dev_s = devices.clone();
+        let str_s = streams.clone();
         thread::spawn(|| {
             
-            test::run_generator_faker(dev, str);
+            test::run_generator_faker(dev_s, str_s);
         });
-        let dev = devices.clone();
-        let str = streams.clone();
+        let dev_s = devices;
+        let str_s = streams.clone();
         thread::spawn(|| {
           
-            test::run_verifier_faker(dev, str);
+            test::run_verifier_faker(dev_s, str_s);
         });
     }
 

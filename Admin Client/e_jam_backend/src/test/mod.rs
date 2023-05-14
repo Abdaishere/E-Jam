@@ -105,7 +105,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
     let encoder = AvroEncoder::new(sr_settings);
     let strategy = SubjectNameStrategy::TopicRecordNameStrategy(
         GENERATOR_TOPIC.to_string(),
-        NAMESPACE.to_string() + "." + &GENERATOR_TOPIC.to_string(),
+        NAMESPACE.to_string() + "." + GENERATOR_TOPIC,
     );
 
     let mut producer: Producer = loop {
@@ -170,7 +170,7 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
     let encoder = AvroEncoder::new(sr_settings);
     let strategy = SubjectNameStrategy::TopicRecordNameStrategy(
         VERIFIER_TOPIC.to_string(),
-        NAMESPACE.to_string() + "." + &VERIFIER_TOPIC.to_string(),
+        NAMESPACE.to_string() + "." + VERIFIER_TOPIC, // this looks ugly (but it works)
     );
 
     let mut producer: Producer = loop {
