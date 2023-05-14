@@ -1,13 +1,25 @@
-use std::collections::HashMap;
-
-use crate::models::{device::Device, AppState, StreamEntry};
+use crate::models::statistics::{Generator, Verifier};
+use crate::{
+    models::{device::Device, AppState, StreamEntry},
+    services::statistics::{
+        GENERATOR_TOPIC, HOST, MAIN_BROKER_PORT, NAMESPACE, SCHEMA_REGISTRY_PORT, SLEEP_TIME,
+        VERIFIER_TOPIC,
+    },
+};
 use actix_web::web::Data;
 use fake::{Fake, Faker};
+use kafka::producer::{AsBytes, Producer, Record, RequiredAcks};
+use log::error;
 use log::info;
+use schema_registry_converter::blocking::avro::AvroEncoder;
+use schema_registry_converter::blocking::schema_registry::SrSettings;
+use schema_registry_converter::schema_registry_common::SubjectNameStrategy;
+use std::thread::sleep;
+use std::{collections::HashMap, time::Duration};
 use tokio::sync::Mutex;
 
-const FAKE_DEVICES_COUNT: usize = 2e2 as usize;
-const FAKE_STREAM_ENTRIES_COUNT: usize = 2e2 as usize;
+const FAKE_DEVICES_COUNT: usize = 2e1 as usize;
+const FAKE_STREAM_ENTRIES_COUNT: usize = 2e1 as usize;
 
 pub async fn generate_fake_metrics(app_state: &Data<AppState>) {
     println!("Fake data feature enabled");
@@ -83,5 +95,136 @@ pub async fn generate_fake_devices(devices_list: &Mutex<HashMap<String, Device>>
             .lock()
             .await
             .insert(device.get_device_mac().to_owned(), device);
+    }
+}
+
+// Warning: you need to put the schemas first in the schema registry first in order to produce and encode the fake data
+pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<StreamEntry>) {
+    let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
+    let sr_settings = SrSettings::new(schema_registry_url);
+    let encoder = AvroEncoder::new(sr_settings);
+    let strategy = SubjectNameStrategy::TopicRecordNameStrategy(
+        GENERATOR_TOPIC.to_string(),
+        NAMESPACE.to_string() + "." + &GENERATOR_TOPIC.to_string(),
+    );
+
+    let mut producer: Producer = loop {
+        match Producer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
+            .with_ack_timeout(Duration::from_secs(1))
+            .with_required_acks(RequiredAcks::One)
+            .create()
+        {
+            Ok(consumer) => break consumer,
+            Err(e) => {
+                error!("{:?}", e);
+                sleep(Duration::from_secs(SLEEP_TIME));
+            }
+        }
+    };
+
+    info!("fake data Generator for Generator type statistics connected to Kafka Broker");
+    loop {
+        // encode a new generator struct with fake data then send it to the kafka broker
+        for device in devices_list.iter() {
+            let pick: bool = Faker.fake();
+            if pick {
+                let mac = device.get_device_mac().to_owned();
+                let id = loop {
+                    let stream: Option<&StreamEntry> =
+                        streams_entries.iter().find(|_| Faker.fake::<bool>());
+                    match stream {
+                        Some(stream) => {
+                            break stream.get_stream_id().clone();
+                        }
+                        None => continue,
+                    }
+                };
+                let fake_statics = Generator::generate_fake_generator_data(id.to_owned(), mac);
+
+                // convert the fake_statics to a Value type data for avro encoding
+                let encoded_data = encoder.encode_struct(fake_statics, &strategy);
+                match encoded_data {
+                    Ok(data) => {
+                        let record = Record {
+                            key: id.as_bytes(),
+                            value: data.as_bytes(),
+                            topic: GENERATOR_TOPIC,
+                            partition: 0,
+                        };
+
+                        producer.send(&record).unwrap();
+                    }
+                    Err(e) => {
+                        error!("Failed to encode fake data: {:?}", e);
+                    }
+                }
+            }
+        }
+        sleep(Duration::from_secs(SLEEP_TIME));
+    }
+}
+
+pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<StreamEntry>) {
+    let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
+    let sr_settings = SrSettings::new(schema_registry_url);
+    let encoder = AvroEncoder::new(sr_settings);
+    let strategy = SubjectNameStrategy::TopicRecordNameStrategy(
+        VERIFIER_TOPIC.to_string(),
+        NAMESPACE.to_string() + "." + &VERIFIER_TOPIC.to_string(),
+    );
+
+    let mut producer: Producer = loop {
+        match Producer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
+            .with_ack_timeout(Duration::from_secs(1))
+            .with_required_acks(RequiredAcks::One)
+            .create()
+        {
+            Ok(consumer) => break consumer,
+            Err(e) => {
+                error!("{:?}", e);
+                sleep(Duration::from_secs(SLEEP_TIME));
+            }
+        }
+    };
+
+    info!("fake data Generator for Generator type statistics connected to Kafka Broker");
+    loop {
+        // encode a new generator struct with fake data then send it to the kafka broker
+        for device in devices_list.iter() {
+            let pick: bool = Faker.fake();
+            if pick {
+                let mac = device.get_device_mac().to_owned();
+                let id = loop {
+                    let stream: Option<&StreamEntry> =
+                        streams_entries.iter().find(|_| Faker.fake::<bool>());
+                    match stream {
+                        Some(stream) => {
+                            break stream.get_stream_id().clone();
+                        }
+                        None => continue,
+                    }
+                };
+                let fake_statics = Verifier::generate_fake_verifier_data(id.to_owned(), mac);
+
+                // convert the fake_statics to a Value type data for avro encoding
+                let encoded_data = encoder.encode_struct(fake_statics, &strategy);
+                match encoded_data {
+                    Ok(data) => {
+                        let record = Record {
+                            key: id.as_bytes(),
+                            value: data.as_bytes(),
+                            topic: VERIFIER_TOPIC,
+                            partition: 0,
+                        };
+
+                        producer.send(&record).unwrap();
+                    }
+                    Err(e) => {
+                        error!("Failed to encode fake data: {:?}", e);
+                    }
+                }
+            }
+        }
+        sleep(Duration::from_secs(SLEEP_TIME));
     }
 }

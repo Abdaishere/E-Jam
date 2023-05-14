@@ -4,7 +4,7 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use log::{debug, error, info, warn};
 use validator::Validate;
 
-pub(crate) mod consumer;
+pub(crate) mod statistics;
 mod device;
 mod pre_sets;
 

@@ -5,7 +5,7 @@ pub(crate) mod process;
 pub(crate) mod statistics;
 pub(crate) mod stream_details;
 
-use self::device::Device;
+pub use self::device::Device;
 use self::process::{ProcessStatus, ProcessType};
 use self::stream_details::{StreamDetails, StreamStatusDetails};
 use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};

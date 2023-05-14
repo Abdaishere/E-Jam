@@ -3,17 +3,16 @@ use apache_avro::from_value;
 use kafka::consumer::{Consumer, FetchOffset};
 use log::{error, info, warn};
 use schema_registry_converter::blocking::{avro::AvroDecoder, schema_registry::SrSettings};
-use std::thread::sleep;
-use std::time::Duration;
+use std::{time::Duration, thread::sleep};
 
-const NAMESPACE: &str = "com.ejam.systemapi.stats.SchemaRegistry";
-const SCHEMA_REGISTRY_PORT: &str = "8081";
-const MAIN_BROKER_PORT: &str = "9092";
-const HOST: &str = "localhost";
-const SLEEP_TIME: u64 = 5;
-const FETCH_OFFSET: FetchOffset = FetchOffset::Earliest;
-const GENERATOR_TOPIC: &str = "Generator";
-const VERIFIER_TOPIC: &str = "Verifier";
+pub const NAMESPACE: &str = "com.ejam.systemapi.stats.SchemaRegistry";
+pub const SCHEMA_REGISTRY_PORT: &str = "8081";
+pub const MAIN_BROKER_PORT: &str = "9092";
+pub const HOST: &str = "localhost";
+pub const SLEEP_TIME: u64 = 5;
+pub const FETCH_OFFSET: FetchOffset = FetchOffset::Earliest;
+pub const GENERATOR_TOPIC: &str = "Generator";
+pub const VERIFIER_TOPIC: &str = "Verifier";
 
 pub fn run_generator_consumer() {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
