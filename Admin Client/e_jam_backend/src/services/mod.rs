@@ -27,7 +27,7 @@ async fn index(data: web::Data<AppState>) -> String {
 
     {}
     ",
-        get_devices_table(data.device_list.lock().await.clone()),
+        get_devices_table(data.device_list.lock().await.to_owned()),
     )
 }
 
@@ -233,7 +233,7 @@ async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) 
                     .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
             }
-            let id = stream_entry.get_stream_id().clone();
+            let id = stream_entry.get_stream_id().to_owned();
             streams_entries.remove(&id);
             info!("Deleted stream {}", stream_id);
             info!("{}", "And every where that Mary went");
@@ -454,7 +454,7 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         } else if stream_entry.check_stream_status(StreamStatus::Running) {
             stream_entry.stop_stream(&data.device_list).await
         } else {
-            stream_entry.get_stream_status().clone()
+            stream_entry.get_stream_status().to_owned()
         };
 
         match task {

@@ -76,8 +76,8 @@ async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) ->
     match device_index {
         Some(_device_index) => HttpResponse::Conflict().body(format!("Device {} already exists in the system, please change the device mac address and try again", new_device.get_device_mac())),
         None => {
-            let mac = new_device.get_device_mac().clone();
-            devices.insert(mac.clone() ,new_device.into_inner());
+            let mac = new_device.get_device_mac().to_owned();
+            devices.insert(mac.to_owned() ,new_device.into_inner());
             HttpResponse::Created().body(format!("Device {} added successfully", mac))
         }
     }

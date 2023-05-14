@@ -163,7 +163,7 @@ this function is used to update the device status according to the status of the
 * `Error: Failed to Change the device status` - if the mutex is locked
 * `Error: Device not found {}` - if the device is not found in the list of devices"]
     pub fn update_device_status(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
-        let prev_status = self.status.clone();
+        let prev_status = self.status.to_owned();
 
         // update the number of processes that are running on the device
         self.update_device_processes(status, type_of_process);
@@ -183,7 +183,7 @@ this function is used to update the device status according to the status of the
                     ProcessStatus::Running => DeviceStatus::Running,
                     ProcessStatus::Queued => DeviceStatus::Idle,
                     ProcessStatus::Failed => DeviceStatus::Offline,
-                    _ => self.status.clone(),
+                    _ => self.status.to_owned(),
                 }
             }
             // if for some reason the number of processes is less than 0 then set the status of the device to offline
@@ -414,10 +414,10 @@ this is used to set the device to reachable or unreachable and update the last u
     }
 
     pub fn update(&mut self, device: &Device) {
-        self.name = device.name.clone();
-        self.description = device.description.clone();
-        self.location = device.location.clone();
-        self.ip_address = device.ip_address.clone();
+        self.name = device.name.to_owned();
+        self.description = device.description.to_owned();
+        self.location = device.location.to_owned();
+        self.ip_address = device.ip_address.to_owned();
         self.port = device.port;
         self.last_updated = Utc::now();
     }
@@ -486,7 +486,7 @@ this is used to set the device to reachable or unreachable and update the last u
                 port: Faker.fake(),
                 gen_processes: 0,
                 ver_processes: 0,
-                status: STATUSES[(0..4).fake::<usize>()].clone(),
+                status: STATUSES[(0..4).fake::<usize>()].to_owned(),
             };
 
             match device.validate() {

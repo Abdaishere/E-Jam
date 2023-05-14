@@ -355,7 +355,7 @@ changes the stream_id of the stream to a new id"]
         stream_id_counter: &Mutex<usize>,
         streams_entries: &Mutex<HashMap<String, StreamEntry>>,
     ) {
-        info!("Generating stream id for stream");
+        debug!("Generating stream id for stream");
         loop {
             let id = nanoid!(3);
             debug!("Checking if stream id {} is unique", id);
@@ -609,7 +609,7 @@ The send_stream function is used to send the stream to the devices that will gen
             verifiers_macs.push(mac);
 
             if let std::collections::hash_map::Entry::Vacant(e) =
-                target_devices_pool.entry(ip_address.clone())
+                target_devices_pool.entry(ip_address.to_owned())
             {
                 e.insert(vec![(receiver, ProcessType::Verification)]);
             } else {
@@ -641,7 +641,7 @@ The send_stream function is used to send the stream to the devices that will gen
 
             // add the device to the list of devices that need to receive the request if it already exists, it will be overwritten
             if let std::collections::hash_map::Entry::Vacant(e) =
-                target_devices_pool.entry(ip_address.clone())
+                target_devices_pool.entry(ip_address.to_owned())
             {
                 e.insert(vec![(receiver, ProcessType::Generation)]);
             } else {
@@ -657,10 +657,9 @@ The send_stream function is used to send the stream to the devices that will gen
             .send_stream_to_devices(&target_devices_pool, device_list, &stream_details)
             .await;
 
-        for (i, (ip, handle)) in handles.into_iter().enumerate() {
+        for (ip, handle) in handles.into_iter() {
             match handle.await {
                 Ok(response) => {
-                    info!("Stream sent to device {}", i);
                     let processes = target_devices_pool.get(&ip).unwrap();
 
                     for (device_index, process_type) in processes {
@@ -678,7 +677,7 @@ The send_stream function is used to send the stream to the devices that will gen
                     }
                 }
                 Err(e) => {
-                    error!("Error sending stream to device {}: {}", i, e);
+                    error!("Error sending stream to device {} : {}", ip, e);
                 }
             }
         }
@@ -697,7 +696,7 @@ The send_stream function is used to send the stream to the devices that will gen
                 break;
             }
         }
-
+        info!("Stream sent to {} devices", devices_received);
         if devices_received == 0 {
             self.update_stream_status(StreamStatus::Error);
             error!("No devices are running the stream")
@@ -739,7 +738,7 @@ The send_stream_to_devices function is used to send the stream to the devices th
 
             let handle = device.send_stream(stream_details.to_owned());
 
-            handles.push((receivers.0.clone(), handle));
+            handles.push((receivers.0.to_owned(), handle));
         }
         handles
     }
@@ -811,9 +810,11 @@ if the request fails, the device status will be set to Offline
             .stop_stream_on_devices(&target_devices_pool, device_list)
             .await;
 
+        let mut devices_received: usize = 0;
         for (i, handle) in handles {
             match handle.await {
                 Ok(response) => {
+                    devices_received += 1;
                     let device_info = target_devices_pool.get(&i).unwrap();
                     let mut device = device_list.lock().await;
                     let device = device.get_mut(&device_info.0).unwrap();
@@ -828,11 +829,12 @@ if the request fails, the device status will be set to Offline
             }
         }
 
+        info!("{} devices received the stop request", devices_received);
         // set the stream status to stopped
         self.update_stream_status(StreamStatus::Stopped);
         info!("Stream {} stopped", self.get_stream_id());
         self.sync_stream_status();
-        self.stream_status.clone()
+        self.stream_status.to_owned()
     }
 
     #[doc = r" ## Stop Stream On Devices
@@ -900,6 +902,7 @@ this is used to identify the stream"]
 
                 match _response.status() {
                     StatusCode::OK => {
+                        info!("Stream sent to device {}", device.get_device_mac());
                         // set the receiver status to running
                         device.update_device_status(&process_status, process_type);
 
@@ -915,7 +918,7 @@ this is used to identify the stream"]
                             ProcessType::GeneratingAndVerification => {
                                 self.running_generators.insert(
                                     device.get_device_mac().to_string(),
-                                    process_status.clone(),
+                                    process_status.to_owned(),
                                 );
 
                                 self.running_generators
@@ -937,6 +940,11 @@ this is used to identify the stream"]
                         }
                     }
                     _ => {
+                        info!(
+                            "Stream failed to send to device: {}, process type: {:?}",
+                            device.get_device_mac(),
+                            process_type
+                        );
                         // set the receiver status to offline (generic error)
                         device.update_device_status(&ProcessStatus::Failed, process_type);
 
@@ -985,7 +993,7 @@ this is used to identify the stream"]
             }
 
             Err(_error) => {
-                error!("Connection {}", _error);
+                error!("Connection Error: {}", _error);
 
                 // set the receiver status to offline (generic error)
                 device.update_device_status(&ProcessStatus::Failed, process_type);
@@ -1040,7 +1048,7 @@ this will add the stream to the queue
             queued_streams
                 .lock()
                 .await
-                .insert(self.get_stream_id().clone(), Utc::now());
+                .insert(self.get_stream_id().to_owned(), Utc::now());
         }
         connections
     }
@@ -1072,7 +1080,7 @@ this will remove the stream from the queue
             //return previous status
             return StreamStatus::Queued;
         }
-        self.stream_status.clone()
+        self.stream_status.to_owned()
     }
 
     #[doc = r" ## Update Stream Status
@@ -1119,12 +1127,12 @@ this is used to check if the stream status is the same as the status passed
     this is used to get the stream status card for the stream which contains simple details about the stream (stream id, stream status, start time, end time, last updated, name)"]
     pub fn get_stream_status_card(&self) -> StreamStatusDetails {
         StreamStatusDetails {
-            stream_id: self.stream_id.clone(),
-            stream_status: self.stream_status.clone(),
+            stream_id: self.stream_id.to_owned(),
+            stream_status: self.stream_status.to_owned(),
             start_time: self.start_time,
             end_time: self.end_time,
             last_updated: self.last_updated,
-            name: self.name.clone(),
+            name: self.name.to_owned(),
         }
     }
 
@@ -1138,7 +1146,7 @@ The Details are required and used by the systemAPI to be executed on the targete
         verifiers_macs: Vec<String>,
     ) -> StreamDetails {
         StreamDetails {
-            stream_id: self.get_stream_id().clone(),
+            stream_id: self.stream_id.to_owned(),
             delay: if delayed { self.delay } else { 0 },
             generators: generators_macs,
             verifiers: verifiers_macs,
@@ -1151,8 +1159,8 @@ The Details are required and used by the systemAPI to be executed on the targete
             broadcast_frames: self.broadcast_frames,
             inter_frame_gap: self.inter_frame_gap,
             time_to_live: self.time_to_live,
-            transport_layer_protocol: self.transport_layer_protocol.clone() as u8,
-            flow_type: self.flow_type.clone() as u8,
+            transport_layer_protocol: self.transport_layer_protocol.to_owned() as u8,
+            flow_type: self.flow_type.to_owned() as u8,
             check_content: self.check_content,
         }
     }
@@ -1164,11 +1172,11 @@ The Details are required and used by the systemAPI to be executed on the targete
     #[doc = r" ## Update Stream
 this is used to update the stream with the new details passed in the stream entry, ignoring the stream id and the stream status as they are not allowed to be changed by the user"]
     pub fn update(&mut self, stream: &StreamEntry) {
-        self.name = stream.name.clone();
-        self.description = stream.description.clone();
+        self.name = stream.name.to_owned();
+        self.description = stream.description.to_owned();
         self.delay = stream.delay;
-        self.generators_ids = stream.generators_ids.clone();
-        self.verifiers_ids = stream.verifiers_ids.clone();
+        self.generators_ids = stream.generators_ids.to_owned();
+        self.verifiers_ids = stream.verifiers_ids.to_owned();
         self.payload_type = stream.payload_type;
         self.number_of_packets = stream.number_of_packets;
         self.payload_length = stream.payload_length;
@@ -1178,8 +1186,8 @@ this is used to update the stream with the new details passed in the stream entr
         self.broadcast_frames = stream.broadcast_frames;
         self.inter_frame_gap = stream.inter_frame_gap;
         self.time_to_live = stream.time_to_live;
-        self.transport_layer_protocol = stream.transport_layer_protocol.clone();
-        self.flow_type = stream.flow_type.clone();
+        self.transport_layer_protocol = stream.transport_layer_protocol.to_owned();
+        self.flow_type = stream.flow_type.to_owned();
         self.check_content = stream.check_content;
         self.last_updated = Utc::now();
     }
@@ -1228,7 +1236,7 @@ this is used to update the stream with the new details passed in the stream entr
                 let pick: bool = Faker.fake();
                 if pick {
                     running_generators_map.insert(
-                        device.clone(),
+                        device.to_owned(),
                         vec![
                             ProcessStatus::Queued,
                             ProcessStatus::Running,
@@ -1236,7 +1244,7 @@ this is used to update the stream with the new details passed in the stream entr
                             ProcessStatus::Completed,
                             ProcessStatus::Failed,
                         ][(0..4).fake::<usize>()]
-                        .clone(),
+                        .to_owned(),
                     );
                 }
             }
@@ -1245,7 +1253,7 @@ this is used to update the stream with the new details passed in the stream entr
                 let pick: bool = Faker.fake();
                 if pick {
                     running_verifiers_map.insert(
-                        device.clone(),
+                        device.to_owned(),
                         vec![
                             ProcessStatus::Queued,
                             ProcessStatus::Running,
@@ -1253,7 +1261,7 @@ this is used to update the stream with the new details passed in the stream entr
                             ProcessStatus::Completed,
                             ProcessStatus::Failed,
                         ][(0..4).fake::<usize>()]
-                        .clone(),
+                        .to_owned(),
                     );
                 }
             }
@@ -1263,8 +1271,8 @@ this is used to update the stream with the new details passed in the stream entr
                 name: Username().fake::<String>(),
                 description: UserAgent().fake::<String>(),
                 delay: Faker.fake(),
-                generators_ids: generators_macs.clone(),
-                verifiers_ids: verifiers_macs.clone(),
+                generators_ids: generators_macs.to_owned(),
+                verifiers_ids: verifiers_macs.to_owned(),
                 payload_type: (0..2).fake(),
                 number_of_packets: Faker.fake(),
                 payload_length: (64..1500).fake(),
@@ -1278,9 +1286,9 @@ this is used to update the stream with the new details passed in the stream entr
                     TransportLayerProtocol::Tcp,
                     TransportLayerProtocol::Udp,
                 ][(0..1).fake::<usize>()]
-                .clone(),
+                .to_owned(),
                 flow_type: vec![FlowType::Bursts, FlowType::BackToBack][(0..1).fake::<usize>()]
-                    .clone(),
+                    .to_owned(),
                 check_content: Faker.fake(),
                 last_updated: updates,
                 start_time: Some(starts_at),
@@ -1296,7 +1304,7 @@ this is used to update the stream with the new details passed in the stream entr
                     StreamStatus::Error,
                     StreamStatus::Stopped,
                 ][(0..6).fake::<usize>()]
-                .clone(),
+                .to_owned(),
             };
 
             stream
