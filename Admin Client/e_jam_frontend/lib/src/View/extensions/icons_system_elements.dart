@@ -83,7 +83,7 @@ class _StreamsRowState extends State<StreamsRow> {
       context.read<StreamsController>().loadAllStreamStatus(false);
     });
     timer = Timer.periodic(
-        const Duration(seconds: 5),
+        const Duration(seconds: 10),
         (Timer t) =>
             context.read<StreamsController>().loadAllStreamStatus(true));
   }
@@ -275,7 +275,7 @@ class _DevicesRowState extends State<DevicesRow> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DevicesController>().loadAllDevices(false);
     });
-    timer = Timer.periodic(const Duration(seconds: 5),
+    timer = Timer.periodic(const Duration(seconds: 10),
         (Timer t) => context.read<DevicesController>().loadAllDevices(true));
   }
 

@@ -36,7 +36,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
               enableLoadingAnimation: SystemSettings.showDashboardAnimations,
               animationDuration: 1500,
               axes: <RadialAxis>[
-                // Acceptence rate for packets in the system
+                // Acceptance rate for packets in the system
                 RadialAxis(
                   centerY: 0.3,
                   radiusFactor: 0.55,
@@ -48,7 +48,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                       angle: 270,
                       positionFactor: 0.4,
                       widget: Text(
-                        'AC Pkts',
+                        'AC Pkt',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

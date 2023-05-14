@@ -31,7 +31,7 @@ class _GaugeTotalProgressForSystemState
     });
 
     timer = Timer.periodic(
-        const Duration(seconds: 5), (Timer t) => _getProgress(true));
+        const Duration(seconds: 10), (Timer t) => _getProgress(true));
   }
 
   @override

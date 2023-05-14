@@ -2,13 +2,13 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 
 class Utils {
-  static double mapOneRangeToAnother(num sourceNumber, num fromA, num fromB,
-      num toA, num toB, int decimalPrecision) {
-    num deltaA = fromB - fromA;
-    num deltaB = toB - toA;
+  static double mapOneRangeToAnother(num sourceNumber, num fromStart,
+      num fromEnd, num toStart, num toEnd, int decimalPrecision) {
+    num deltaA = fromEnd - fromStart;
+    num deltaB = toEnd - toStart;
     num scale = deltaB / deltaA;
-    num negA = -1 * fromA;
-    num offset = (negA * scale) + toA;
+    num negA = -1 * fromStart;
+    num offset = (negA * scale) + toStart;
     num finalNumber = (sourceNumber * scale) + offset;
     num calcScale = pow(10, decimalPrecision);
     return ((finalNumber * calcScale).round() / calcScale);

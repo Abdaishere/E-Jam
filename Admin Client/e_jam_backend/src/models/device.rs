@@ -1,7 +1,7 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
+use std::{time::Duration, collections::HashMap};
 use tokio::sync::Mutex;
 use validator::Validate;
 
@@ -265,28 +265,29 @@ this is also done to mimic the behavior of another device by changing the name o
 * `Option of Device` - the device if found else None
 # Panics
 * `Error: Failed to find the device` - if the device list is locked"]
-    pub async fn find_device(name: &str, device_list: &Mutex<Vec<Device>>) -> Option<usize> {
-        // find in all mac addresses
+    pub async fn find_device(key: &str, device_list: &Mutex<HashMap<String ,Device>>) -> Option<String> {
+        // find in all mac addresses first then in all ip addresses then in all names
         let device_list = device_list.lock().await;
-        for (index, device) in device_list.iter().enumerate() {
-            if device.mac_address == name {
-                return Some(index);
+        
+        if device_list.get(key).is_some() {
+            return Some(key.to_string());
+        }
+
+        // iterate and find in all ip addresses
+        for (device_key, device) in device_list.iter() {
+            if device.ip_address == key {
+                return Some(device_key.to_owned());
             }
         }
 
-        // find in all ip addresses
-        for (index, device) in device_list.iter().enumerate() {
-            if device.ip_address == name {
-                return Some(index);
+
+        // iterate and find in all names
+        for (device_key, device) in device_list.iter() {
+            if device.name == key {
+                return Some(device_key.to_owned());
             }
         }
 
-        // find in all names
-        for (index, device) in device_list.iter().enumerate() {
-            if device.name == name {
-                return Some(index);
-            }
-        }
 
         None
     }
@@ -529,14 +530,14 @@ impl ToString for DeviceStatus {
 This is used to get the devices html table in the form of a string that can be used to display in the web interface
 # Arguments
 * `DEVICE_LIST` - the list of devices that are added to the system"]
-pub fn get_devices_table(device_list: Vec<Device>) -> String {
+pub fn get_devices_table(device_list: HashMap<String ,Device>) -> String {
     let mut data = String::from(
         "| Device name | Device ip | Device mac | Device status | Generation processes | Verification processes |
         | --- | --- | --- | --- | --- | --- |
         
     ",
     );
-    for device in device_list.iter() {
+    for device in device_list.values() {
         let row = format!(
             "| {} | {} | {} | {} | {} | {} |",
             &device.name,

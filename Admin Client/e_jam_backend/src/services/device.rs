@@ -16,7 +16,7 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[get("/devices")]
 async fn get_devices(data: web::Data<AppState>) -> impl Responder {
-    let devices = data.device_list.lock().await.clone();
+    let devices: Vec<Device> = data.device_list.lock().await.values().cloned().collect();
 
     match devices.len() {
         0 => HttpResponse::NoContent()
@@ -40,9 +40,8 @@ async fn get_device(device_mac: web::Path<String>, data: web::Data<AppState>) ->
     let device_mac = device_mac.into_inner();
     let devices = data.device_list.lock().await;
 
-    let device = devices
-        .iter()
-        .find(|device| device.get_device_mac() == &device_mac);
+    let device = devices.get(&device_mac);
+
     match device {
         Some(device) => HttpResponse::Ok().json(device),
         None => HttpResponse::NotFound().body(format!(
@@ -73,14 +72,12 @@ async fn add_device(new_device: web::Json<Device>, data: web::Data<AppState>) ->
     }
 
     let mut devices = data.device_list.lock().await;
-    let device_index = devices
-        .iter()
-        .position(|device| device.get_device_mac() == new_device.get_device_mac());
+    let device_index = devices.get(new_device.get_device_mac());
     match device_index {
         Some(_device_index) => HttpResponse::Conflict().body(format!("Device {} already exists in the system, please change the device mac address and try again", new_device.get_device_mac())),
         None => {
             let mac = new_device.get_device_mac().clone();
-            devices.push(new_device.into_inner());
+            devices.insert(mac.clone() ,new_device.into_inner());
             HttpResponse::Created().body(format!("Device {} added successfully", mac))
         }
     }
@@ -100,11 +97,7 @@ async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -
 
     let mut devices = data.device_list.lock().await;
 
-    let device_index = devices
-        .iter()
-        .position(|device| device.get_device_mac() == &device_mac);
-
-    let device_index = devices.get_mut(device_index.unwrap());
+    let device_index = devices.get_mut(&device_mac);
 
     let device = match device_index {
         Some(device) => device,
@@ -172,17 +165,16 @@ if the list is not found, return a 500 Internal Server Error
 * `HttpResponse` - the http response"]
 #[get("/devices/ping_all")]
 async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
-    let devices_len = data.device_list.lock().await.len();
+    let devices_keys: Vec<String> = data.device_list.lock().await.keys().cloned().collect();
 
-    match devices_len {
+    match devices_keys.len() {
         0 => HttpResponse::NoContent()
             .body("No devices in the system, please add some devices and try again"),
         _ => {
             let mut handles = Vec::new();
-            for i in 0..devices_len {
+            for i in devices_keys.iter() {
                 let devices = data.device_list.lock().await;
                 let device = devices.get(i).unwrap().clone();
-
                 handles.push(tokio::spawn(async move { device.is_reachable().await }));
             }
 
@@ -196,13 +188,15 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
                     Err(_) => {
                         error!(
                             "Could not reach device {}, please check the device and try again",
-                            devices[i].get_device_mac()
+                            devices.get(&devices_keys[i]).unwrap().get_device_mac()
                         );
                         false
                     }
                 };
-
-                devices[i].set_reachable(response);
+                devices
+                    .get_mut(&devices_keys[i])
+                    .unwrap()
+                    .set_reachable(response);
                 if response {
                     counter += 1;
                 }
@@ -250,9 +244,7 @@ async fn update_device(
 
     let mut devices = data.device_list.lock().await;
 
-    let device_entry = devices
-        .iter_mut()
-        .find(|device| device.get_device_mac() == &device_mac);
+    let device_entry = devices.get_mut(&device_mac);
 
     match device_entry {
         Some(device_entry) => {
@@ -288,19 +280,15 @@ async fn delete_device(device_mac: web::Path<String>, data: web::Data<AppState>)
     let device_mac = device_mac.into_inner();
     let mut devices = data.device_list.lock().await;
 
-    let device_index = devices
-        .iter()
-        .position(|device| device.get_device_mac() == &device_mac);
-
-    match device_index {
-        Some(device_index) => {
-            devices.remove(device_index);
+    match devices.contains_key(&device_mac) {
+        true => {
+            devices.remove(&device_mac);
             HttpResponse::Ok().body(format!(
                 "Device {} deleted successfully and will not be reachable in the system",
                 device_mac
             ))
         }
-        None => HttpResponse::NotFound().body(format!(
+        false => HttpResponse::NotFound().body(format!(
             "Device {} not found, please check the device mac address and try again",
             device_mac
         )),
@@ -330,9 +318,7 @@ async fn stream_finished(
     let stream_id = stream_id.into_inner();
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
     let mut streams_entries = data.stream_entries.lock().await;
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -376,9 +362,7 @@ async fn stream_started(
     let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
     let mut streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {

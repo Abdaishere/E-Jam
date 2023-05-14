@@ -43,7 +43,8 @@ if the list of streams is not empty, return a 200 OK
 * `Failed to lock streams_entries in get all streams` - if the streams_entries is not found in the mutex lock"]
 #[get("/streams")]
 async fn get_streams(data: web::Data<AppState>) -> impl Responder {
-    let stream_entries = data.stream_entries.lock().await.clone();
+    let stream_entries: Vec<StreamEntry> =
+        data.stream_entries.lock().await.values().cloned().collect();
 
     match stream_entries.is_empty() {
         true => HttpResponse::NoContent()
@@ -68,9 +69,7 @@ async fn get_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> 
     let stream_id = stream_id.into_inner();
     let stream_entries = data.stream_entries.lock().await;
 
-    let stream_entry = stream_entries
-        .iter()
-        .find(|&stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = stream_entries.get(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => HttpResponse::Ok().json(stream_entry),
@@ -117,9 +116,7 @@ async fn add_stream(
 
     let mut streams_entries = data.stream_entries.lock().await;
     let stream_id = stream_entry.get_stream_id().to_string();
-    let stream_entry_check = streams_entries
-        .iter()
-        .find(|&stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry_check = streams_entries.get(&stream_id);
 
     match stream_entry_check {
         Some(duplicate_stream) => HttpResponse::Conflict().body(format!(
@@ -128,7 +125,10 @@ async fn add_stream(
             duplicate_stream.get_stream_status().to_string()
         )),
         None => {
-            streams_entries.push(stream_entry.clone());
+            streams_entries.insert(
+                stream_entry.get_stream_id().to_string(),
+                stream_entry.to_owned(),
+            );
 
             // send the stream back to the client with the default values for all the fields
             HttpResponse::Created().body(format!(
@@ -169,9 +169,7 @@ async fn update_stream(
 
     let mut streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| stream_entry.get_stream_id() == &stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -223,26 +221,20 @@ if the stream is found, delete it and return a 200 OK
 #[delete("/streams/{stream_id}")]
 async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -> impl Responder {
     let stream_id = stream_id.into_inner();
-
     let mut streams_entries = data.stream_entries.lock().await;
-
-    let stream_entry = streams_entries
-        .iter()
-        .position(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
-            if streams_entries[stream_entry].check_stream_status(StreamStatus::Running) {
-                streams_entries[stream_entry]
-                    .stop_stream(&data.device_list)
-                    .await;
-            } else if streams_entries[stream_entry].check_stream_status(StreamStatus::Queued) {
-                streams_entries[stream_entry]
+            if stream_entry.check_stream_status(StreamStatus::Running) {
+                stream_entry.stop_stream(&data.device_list).await;
+            } else if stream_entry.check_stream_status(StreamStatus::Queued) {
+                stream_entry
                     .remove_stream_from_queue(&data.queued_streams, &data.device_list)
                     .await;
             }
-
-            streams_entries.remove(stream_entry);
+            let id = stream_entry.get_stream_id().clone();
+            streams_entries.remove(&id);
             info!("Deleted stream {}", stream_id);
             info!("{}", "And every where that Mary went");
             HttpResponse::Ok().body(format!("Deleted stream {} successfully", stream_id))
@@ -275,9 +267,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
 
     let mut streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -357,9 +347,7 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
 
     let mut streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -404,15 +392,15 @@ if not running or queued, queue the stream
 * `Queued all streams to start` - after all streams are queued to start"]
 #[post("/streams/start_all")]
 async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
-    let streams_entries_len = data.stream_entries.lock().await.len();
-
-    if streams_entries_len == 0 {
+    let streams_entries_keys: Vec<String> =
+        data.stream_entries.lock().await.keys().cloned().collect();
+    if streams_entries_keys.is_empty() {
         warn!("No streams to start");
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
 
     let mut counter: usize = 0;
-    for i in 0..streams_entries_len {
+    for i in streams_entries_keys.iter() {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(i).unwrap();
         if stream_entry
@@ -444,15 +432,17 @@ if the stream is running, stop it
 * `Stopped all streams` - after all streams are attempted to be stopped"]
 #[post("/streams/stop_all")]
 async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
-    let streams_entries_len = data.stream_entries.lock().await.len();
-    if streams_entries_len == 0 {
+    let streams_entries_keys: Vec<String> =
+        data.stream_entries.lock().await.keys().cloned().collect();
+
+    if streams_entries_keys.is_empty() {
         warn!("No streams to stop");
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
     let mut counter = 0;
     let mut unqueued = 0;
 
-    for i in 0..streams_entries_len {
+    for i in streams_entries_keys.iter() {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(i).unwrap();
         // if the stream is queued, remove it from the queue
@@ -470,8 +460,10 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         match task {
             StreamStatus::Queued => unqueued += 1,
             StreamStatus::Stopped => counter += 1,
-            StreamStatus::Running => error!("Failed to stop some streams"),
-            _ => info!("stream already stopped"),
+            StreamStatus::Running => {
+                error!("Failed to stop stream {}", stream_entry.get_stream_id())
+            }
+            _ => info!("stream {} already stopped", stream_entry.get_stream_id()),
         }
     }
 
@@ -511,9 +503,7 @@ async fn force_start_stream(
 
     let mut streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -592,9 +582,7 @@ async fn force_stop_stream(
 
     let mut streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter_mut()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => {
@@ -636,9 +624,7 @@ async fn get_stream_status(
 
     let streams_entries = data.stream_entries.lock().await;
 
-    let stream_entry = streams_entries
-        .iter()
-        .find(|stream_entry| *stream_entry.get_stream_id() == stream_id);
+    let stream_entry = streams_entries.get(&stream_id);
 
     match stream_entry {
         Some(stream_entry) => HttpResponse::Ok().json(stream_entry.get_stream_status_card()),
@@ -659,14 +645,16 @@ if the stream is not found, return a 404 Not Found
 * `HttpResponse` - the http response with a list of tuples of the stream status and the stream id"]
 #[get("/streams/status_all")]
 async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
-    let streams_entries = data.stream_entries.lock().await.clone();
+    let stream_entries: Vec<StreamEntry> =
+        data.stream_entries.lock().await.values().cloned().collect();
 
     let mut streams_status: Vec<StreamStatusDetails> = Vec::new();
-    if streams_entries.is_empty() {
+    if stream_entries.is_empty() {
         return HttpResponse::NoContent()
             .body("No streams found to check their status, please add a stream and try again");
     }
-    for stream_entry in streams_entries.iter() {
+
+    for stream_entry in stream_entries {
         streams_status.push(stream_entry.get_stream_status_card());
     }
 
