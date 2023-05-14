@@ -1,8 +1,8 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
 use serde::{Deserialize, Serialize};
-use std::{time::Duration, collections::HashMap};
-use tokio::sync::Mutex;
+use std::{collections::HashMap, time::Duration};
+use tokio::{sync::Mutex, task::JoinHandle};
 use validator::Validate;
 
 use super::{
@@ -265,10 +265,13 @@ this is also done to mimic the behavior of another device by changing the name o
 * `Option of Device` - the device if found else None
 # Panics
 * `Error: Failed to find the device` - if the device list is locked"]
-    pub async fn find_device(key: &str, device_list: &Mutex<HashMap<String ,Device>>) -> Option<String> {
+    pub async fn find_device(
+        key: &str,
+        device_list: &Mutex<HashMap<String, Device>>,
+    ) -> Option<String> {
         // find in all mac addresses first then in all ip addresses then in all names
         let device_list = device_list.lock().await;
-        
+
         if device_list.get(key).is_some() {
             return Some(key.to_string());
         }
@@ -280,14 +283,12 @@ this is also done to mimic the behavior of another device by changing the name o
             }
         }
 
-
         // iterate and find in all names
         for (device_key, device) in device_list.iter() {
             if device.name == key {
                 return Some(device_key.to_owned());
             }
         }
-
 
         None
     }
@@ -328,48 +329,46 @@ this is used to get the device connection address
         )
     }
 
-    pub async fn send_stream(
+    pub fn send_stream(
         &self,
-        stream_details: &StreamDetails,
-    ) -> Result<reqwest::Response, reqwest::Error> {
-        reqwest::Client::new()
-            .post(&format!(
-                "http://{}:{}/start",
-                self.get_ip_address(),
-                self.get_port()
-            ))
-            .header("mac-address", self.get_device_mac())
-            .header("stream-id", &stream_details.stream_id)
-            .body(
-                serde_json::to_string(&stream_details).expect("Failed to serialize stream details"),
-            )
-            .timeout(Duration::from_millis(2500))
-            .send()
-            .await
+        stream_details: StreamDetails,
+    ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
+        let target = format!("http://{}:{}/start", self.get_ip_address(), self.get_port());
+        let mac = self.get_device_mac().to_owned();
+        tokio::spawn(async move {
+            reqwest::Client::new()
+                .post(target)
+                .header("mac-address", mac)
+                .header("stream-id", stream_details.stream_id.to_owned())
+                .body(
+                    serde_json::to_string(&stream_details)
+                        .expect("Failed to serialize stream details"),
+                )
+                .timeout(Duration::from_millis(2500))
+                .send()
+                .await
+        })
     }
 
-    pub async fn stop_stream(&self, stream_id: &str) -> Result<reqwest::Response, reqwest::Error> {
-        reqwest::Client::new()
-            .post(&format!(
-                "http://{}:{}/stop",
-                self.get_ip_address(),
-                self.get_port()
-            ))
-            .header("mac-address", self.get_device_mac())
-            .header("stream-id", stream_id)
-            .timeout(Duration::from_millis(2500))
-            .send()
-            .await
+    pub fn stop_stream(
+        &self,
+        stream_id: String,
+    ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
+        let mac = self.get_device_mac().to_owned();
+        let target = format!("http://{}:{}/stop", self.get_ip_address(), self.get_port());
+        tokio::spawn(async move {
+            reqwest::Client::new()
+                .post(target)
+                .header("mac-address", mac)
+                .header("stream-id", stream_id)
+                .timeout(Duration::from_millis(2500))
+                .send()
+                .await
+        })
     }
 
-    #[doc = r"Implement Is reachable for the device
-this is used to set the device to reachable or unreachable and update the last updated time
-# Returns
-* `bool` - true if the device is reachable else false
-"]
-    pub async fn is_reachable(&self) -> bool {
-        let reachable = self.ping_device().await;
-        if reachable {
+    pub fn set_reachable(&mut self, is_online: bool) {
+        if is_online {
             info!(
                 "Device {} is reachable after being {} since {} UTC",
                 self.get_device_mac(),
@@ -384,10 +383,6 @@ this is used to set the device to reachable or unreachable and update the last u
                 self.last_updated
             );
         };
-        reachable
-    }
-
-    pub fn set_reachable(&mut self, is_online: bool) {
         self.status = if is_online {
             DeviceStatus::Online
         } else {
@@ -395,17 +390,27 @@ this is used to set the device to reachable or unreachable and update the last u
         }
     }
 
-    pub async fn ping_device(&self) -> bool {
+    #[doc = r"Implement Is reachable for the device
+this is used to set the device to reachable or unreachable and update the last updated time
+# Returns
+* `bool` - true if the device is reachable else false
+"]
+    pub fn ping_device(&self) -> JoinHandle<bool> {
         let url = format!("http://{}:{}/connect", self.ip_address, self.port);
+        let mac_address = self.mac_address.to_owned();
 
-        let response = reqwest::Client::new()
-            .post(url)
-            .header("mac-address", &self.mac_address)
-            .timeout(Duration::from_secs(5))
-            .send()
-            .await;
-
-        response.is_ok()
+        tokio::spawn(async move {
+            let request = reqwest::Client::new()
+                .post(url)
+                .header("mac-address", mac_address)
+                .timeout(Duration::from_secs(5))
+                .send()
+                .await;
+            match request {
+                Ok(request) => request.status().is_success(),
+                Err(_) => false,
+            }
+        })
     }
 
     pub fn update(&mut self, device: &Device) {
@@ -460,11 +465,11 @@ this is used to set the device to reachable or unreachable and update the last u
         loop {
             let start_time = Utc::now() - Duration::days(365);
             let updates = start_time
-            + Duration::seconds(
-                Faker
-                    .fake::<i64>()
-                    .rem_euclid((Utc::now() - start_time).num_seconds()),
-            );
+                + Duration::seconds(
+                    Faker
+                        .fake::<i64>()
+                        .rem_euclid((Utc::now() - start_time).num_seconds()),
+                );
 
             let device = Device {
                 name: format!(
@@ -530,7 +535,7 @@ impl ToString for DeviceStatus {
 This is used to get the devices html table in the form of a string that can be used to display in the web interface
 # Arguments
 * `DEVICE_LIST` - the list of devices that are added to the system"]
-pub fn get_devices_table(device_list: HashMap<String ,Device>) -> String {
+pub fn get_devices_table(device_list: HashMap<String, Device>) -> String {
     let mut data = String::from(
         "| Device name | Device ip | Device mac | Device status | Generation processes | Verification processes |
         | --- | --- | --- | --- | --- | --- |

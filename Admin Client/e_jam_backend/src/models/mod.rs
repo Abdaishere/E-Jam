@@ -43,13 +43,13 @@ All the values are wrapped in a Mutex to allow for thread safe access to the val
 * `device_list` - A Vec of Device struct that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
 * `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be 3 URL-friendly characters"]
 pub struct AppState {
-    pub stream_entries: Mutex<HashMap<String ,StreamEntry>>,
+    pub stream_entries: Mutex<HashMap<String, StreamEntry>>,
 
     #[doc = r"List of all the streams that are currently Queued to be started on the devices"]
-    pub queued_streams: Mutex<HashMap<String ,DateTime<Utc>>>,
+    pub queued_streams: Mutex<HashMap<String, DateTime<Utc>>>,
 
     #[doc = r"List of all the devices that are currently connected to the server (mac address, device name and ip address)"]
-    pub device_list: Mutex<HashMap<String ,Device>>,
+    pub device_list: Mutex<HashMap<String, Device>>,
 
     #[doc = r"Counter for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters"]
     pub stream_id_counter: Mutex<usize>,
@@ -353,15 +353,14 @@ changes the stream_id of the stream to a new id"]
     pub async fn generate_stream_id(
         &mut self,
         stream_id_counter: &Mutex<usize>,
-        streams_entries: &Mutex<HashMap<String ,StreamEntry>>,
+        streams_entries: &Mutex<HashMap<String, StreamEntry>>,
     ) {
         info!("Generating stream id for stream");
         loop {
             let id = nanoid!(3);
             debug!("Checking if stream id {} is unique", id);
             let streams_entries_lock = streams_entries.lock().await;
-            let checker = streams_entries_lock
-                .get(&id);
+            let checker = streams_entries_lock.get(&id);
 
             match checker {
                 Some(stream) => {
@@ -398,7 +397,7 @@ changes the stream_status to Running and updates the device status to Running"]
     pub async fn notify_process_running(
         &mut self,
         card_mac: &str,
-        device_list: &Mutex<HashMap<String ,Device>>,
+        device_list: &Mutex<HashMap<String, Device>>,
     ) {
         let device = Device::find_device(card_mac, device_list).await;
 
@@ -467,7 +466,7 @@ if there are devices left, the stream status will be set to finished
     pub async fn notify_process_completed(
         &mut self,
         card_mac: &str,
-        device_list: &Mutex<HashMap<String ,Device>>,
+        device_list: &Mutex<HashMap<String, Device>>,
     ) {
         /*
         check if there are any devices left in the running streams list for this stream id
@@ -494,7 +493,8 @@ if there are devices left, the stream status will be set to finished
                     // if there are no other generators running, set the DeviceStatus to Idle
                     device_list
                         .lock()
-                        .await.get_mut(&device)
+                        .await
+                        .get_mut(&device)
                         .unwrap()
                         .update_device_status(&ProcessStatus::Completed, &ProcessType::Generation);
                 } else {
@@ -577,7 +577,11 @@ The send_stream function is used to send the stream to the devices that will gen
 * `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
 ## Errors
 * `reqwest::Error` - An error that is returned if the request failed"]
-    pub async fn send_stream(&mut self, delayed: bool, device_list: &Mutex<HashMap<String ,Device>>) -> i32 {
+    pub async fn send_stream(
+        &mut self,
+        delayed: bool,
+        device_list: &Mutex<HashMap<String, Device>>,
+    ) -> i32 {
         /*
             send the start request to all the senders and receivers
             if the request is successful, add the device to the running devices list
@@ -717,7 +721,7 @@ The send_stream_to_devices function is used to send the stream to the devices th
     pub async fn send_stream_to_devices(
         &self,
         target_devices_pool: &HashMap<String, Vec<(String, ProcessType)>>,
-        device_list: &Mutex<HashMap<String ,Device>>,
+        device_list: &Mutex<HashMap<String, Device>>,
         stream_details: &StreamDetails,
     ) -> Vec<(
         String,
@@ -730,10 +734,10 @@ The send_stream_to_devices function is used to send the stream to the devices th
 
         for receivers in target_devices_pool {
             let receiver = receivers.1.first().unwrap();
-            let device = device_list.lock().await.get(&receiver.0).unwrap().clone();
-            let stream_details = stream_details.clone();
+            let device_list = device_list.lock().await;
+            let device = device_list.get(&receiver.0).unwrap();
 
-            let handle = tokio::spawn(async move { device.send_stream(&stream_details).await });
+            let handle = device.send_stream(stream_details.to_owned());
 
             handles.push((receivers.0.clone(), handle));
         }
@@ -752,7 +756,10 @@ if the request fails, the device status will be set to Offline
 * `generators error: {}` - if the request to the generator fails
 * `verifiers error: {}` - if the request to the verifier fails
 * `stream {} stopped` - the stream id"]
-    pub async fn stop_stream(&mut self, device_list: &Mutex<HashMap<String ,Device>>) -> StreamStatus {
+    pub async fn stop_stream(
+        &mut self,
+        device_list: &Mutex<HashMap<String, Device>>,
+    ) -> StreamStatus {
         /*
         send the stop request to all the devices that are running the stream
         if the request is successful, set the device status to idle
@@ -838,7 +845,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
     pub async fn stop_stream_on_devices(
         &self,
         target_devices_pool: &HashMap<String, (String, ProcessType)>,
-        device_list: &Mutex<HashMap<String ,Device>>,
+        device_list: &Mutex<HashMap<String, Device>>,
     ) -> Vec<(
         String,
         JoinHandle<Result<reqwest::Response, reqwest::Error>>,
@@ -850,12 +857,12 @@ The stop_stream_on_devices function is used to send the stop request to the devi
 
         for receivers in target_devices_pool {
             let receiver = receivers.1;
-            let device = device_list.lock().await.get(&receiver.0).unwrap().clone();
-            let stream_id = self.get_stream_id().clone();
+            let device_list = device_list.lock().await;
+            let device = device_list.get(&receiver.0).unwrap();
 
-            let handle = tokio::spawn(async move { device.stop_stream(&stream_id).await });
+            let handle = device.stop_stream(self.get_stream_id().to_owned());
 
-            handles.push((receivers.0.clone(), handle));
+            handles.push((receivers.0.to_owned(), handle));
         }
         handles
     }
@@ -1014,8 +1021,8 @@ this will add the stream to the queue
 * `Stream queued to start in {} seconds` - the delay in seconds before the stream starts (the delay is set by the user)"]
     pub async fn queue_stream(
         &mut self,
-        queued_streams: &Mutex<HashMap<String ,DateTime<Utc>>>,
-        device_list: &Mutex<HashMap<String ,Device>>,
+        queued_streams: &Mutex<HashMap<String, DateTime<Utc>>>,
+        device_list: &Mutex<HashMap<String, Device>>,
     ) -> i32 {
         if self.stream_status == StreamStatus::Running || self.stream_status == StreamStatus::Queued
         {
@@ -1050,8 +1057,8 @@ this will remove the stream from the queue
 * `Error: Could not find the stream {} in the queued streams list` - if the stream is not found in the queued streams list"]
     pub async fn remove_stream_from_queue(
         &mut self,
-        queued_streams: &Mutex<HashMap<String ,DateTime<Utc>>>,
-        device_list: &Mutex<HashMap<String ,Device>>,
+        queued_streams: &Mutex<HashMap<String, DateTime<Utc>>>,
+        device_list: &Mutex<HashMap<String, Device>>,
     ) -> StreamStatus {
         // stop the stream
         self.stop_stream(device_list).await;
@@ -1182,7 +1189,7 @@ this is used to update the stream with the new details passed in the stream entr
         generators_macs: Vec<String>,
         verifiers_macs: Vec<String>,
         stream_id_counter: &Mutex<usize>,
-        streams_entries: &Mutex<HashMap<String ,StreamEntry>>,
+        streams_entries: &Mutex<HashMap<String, StreamEntry>>,
     ) -> StreamEntry {
         use chrono::{prelude::*, Duration};
         use fake::{
@@ -1207,7 +1214,12 @@ this is used to update the stream with the new details passed in the stream entr
                     .rem_euclid((Utc::now() - start_time).num_seconds()),
             );
 
-        let ends_at = starts_at + Duration::seconds(Faker.fake::<i64>().rem_euclid((end_time - Utc::now()).num_seconds()));
+        let ends_at = starts_at
+            + Duration::seconds(
+                Faker
+                    .fake::<i64>()
+                    .rem_euclid((end_time - Utc::now()).num_seconds()),
+            );
 
         loop {
             let mut running_generators_map: HashMap<String, ProcessStatus> = HashMap::new();

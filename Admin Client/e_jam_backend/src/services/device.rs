@@ -109,7 +109,7 @@ async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -
         }
     };
 
-    let response = device.is_reachable().await;
+    let response = device.ping_device().await.is_ok();
     device.set_reachable(response);
 
     match response {
@@ -144,7 +144,7 @@ async fn check_new_device(device: web::Json<Device>) -> impl Responder {
     }
 
     let mut device = device.into_inner();
-    let response = device.is_reachable().await;
+    let response = device.ping_device().await.is_ok();
     device.set_reachable(response);
     match response {
         true => HttpResponse::Ok()
@@ -174,8 +174,8 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
             let mut handles = Vec::new();
             for i in devices_keys.iter() {
                 let devices = data.device_list.lock().await;
-                let device = devices.get(i).unwrap().clone();
-                handles.push(tokio::spawn(async move { device.is_reachable().await }));
+                let device = devices.get(i).unwrap();
+                handles.push(device.ping_device());
             }
 
             let mut counter = 0;
