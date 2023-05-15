@@ -3,15 +3,13 @@ use std::thread;
 use actix_web::{web, App, HttpServer};
 use log::info;
 
-use crate::{
-    services::statistics::{run_generator_consumer, run_verifier_consumer},
-};
+use crate::services::statistics::{run_generator_consumer, run_verifier_consumer};
 mod models;
 mod services;
 #[cfg(feature = "fake_data")]
 mod test;
 
-const PORT: u16 = 8090;
+const PORT: u16 = 8080;
 const HOST: &str = "localhost";
 
 #[actix_web::main]
@@ -54,13 +52,11 @@ async fn main() -> std::io::Result<()> {
         let dev_s = devices.clone();
         let str_s = streams.clone();
         thread::spawn(|| {
-            
             test::run_generator_faker(dev_s, str_s);
         });
         let dev_s = devices;
         let str_s = streams.clone();
         thread::spawn(|| {
-          
             test::run_verifier_faker(dev_s, str_s);
         });
     }

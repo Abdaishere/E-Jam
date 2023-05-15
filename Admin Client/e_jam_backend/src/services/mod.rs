@@ -4,9 +4,9 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use log::{debug, error, info, warn};
 use validator::Validate;
 
-pub(crate) mod statistics;
 mod device;
 mod pre_sets;
+pub(crate) mod statistics;
 
 use self::device::{
     add_device, check_new_device, delete_device, get_device, get_devices, ping_all_devices,

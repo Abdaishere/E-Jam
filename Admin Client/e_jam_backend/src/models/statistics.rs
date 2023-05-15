@@ -10,12 +10,9 @@ pub struct Generator {
 }
 
 impl Generator {
-    
     #[cfg(feature = "fake_data")]
     pub fn generate_fake_generator_data(id: String, mac: String) -> Generator {
-        use fake::{
-            Fake, Faker,
-        };
+        use fake::{Fake, Faker};
 
         Generator {
             mac_address: mac,
@@ -38,12 +35,9 @@ pub struct Verifier {
 }
 
 impl Verifier {
-    
     #[cfg(feature = "fake_data")]
     pub fn generate_fake_verifier_data(id: String, mac: String) -> Verifier {
-        use fake::{
-            Fake, Faker,
-        };
+        use fake::{Fake, Faker};
 
         Verifier {
             mac_address: mac,

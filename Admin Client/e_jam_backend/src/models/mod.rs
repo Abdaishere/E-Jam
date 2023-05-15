@@ -1022,6 +1022,8 @@ this is used to identify the stream"]
 
     #[doc = r" ## Queue Stream
 this will add the stream to the queue
+locking the stream_entries mutex will help prevent racing conditions if the system is under heavy load and multiple streams are being queued at the same time
+the stream will only unlock once it gets a response from all devices then it continues to the next stream in the queue
 ## Arguments
 * `queued_streams` - the list of queued streams by stream id
 * `device_list` - the list of devices that are in the system
