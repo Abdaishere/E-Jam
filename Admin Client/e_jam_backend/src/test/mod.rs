@@ -19,7 +19,7 @@ use std::{collections::HashMap, time::Duration};
 use tokio::sync::Mutex;
 
 const FAKE_DEVICES_COUNT: usize = 1e1 as usize;
-const FAKE_STREAM_ENTRIES_COUNT: usize = 2e3 as usize;
+const FAKE_STREAM_ENTRIES_COUNT: usize = 2e2 as usize;
 
 pub async fn generate_fake_metrics(app_state: &Data<AppState>) {
     println!("Fake data feature enabled");
@@ -114,8 +114,8 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
             .create()
         {
             Ok(consumer) => break consumer,
-            Err(e) => {
-                error!("{:?}", e);
+            Err(_e) => {
+                // error!("{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
@@ -179,8 +179,8 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
             .create()
         {
             Ok(consumer) => break consumer,
-            Err(e) => {
-                error!("{:?}", e);
+            Err(_e) => {
+                // error!("{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }

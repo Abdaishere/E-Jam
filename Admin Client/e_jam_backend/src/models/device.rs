@@ -2,7 +2,10 @@ use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
-use tokio::{sync::Mutex, task::JoinHandle};
+use tokio::{
+    sync::Mutex,
+    task::{self, JoinHandle},
+};
 use validator::Validate;
 
 use super::{
@@ -335,7 +338,7 @@ this is used to get the device connection address
     ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
         let target = format!("http://{}:{}/start", self.get_ip_address(), self.get_port());
         let mac = self.get_device_mac().to_owned();
-        tokio::spawn(async move {
+        task::spawn(async move {
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
@@ -356,7 +359,7 @@ this is used to get the device connection address
     ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
         let mac = self.get_device_mac().to_owned();
         let target = format!("http://{}:{}/stop", self.get_ip_address(), self.get_port());
-        tokio::spawn(async {
+        task::spawn(async {
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
@@ -399,7 +402,7 @@ this is used to set the device to reachable or unreachable and update the last u
         let url = format!("http://{}:{}/connect", self.ip_address, self.port);
         let mac_address = self.mac_address.to_owned();
 
-        tokio::spawn(async {
+        task::spawn(async {
             let request = reqwest::Client::new()
                 .post(url)
                 .header("mac-address", mac_address)

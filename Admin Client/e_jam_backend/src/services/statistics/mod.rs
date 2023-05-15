@@ -26,8 +26,8 @@ pub fn run_generator_consumer() {
             .create()
         {
             Ok(consumer) => break consumer,
-            Err(e) => {
-                error!("{:?}", e);
+            Err(_e) => {
+                // error!("{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
@@ -88,8 +88,8 @@ pub fn run_verifier_consumer() {
             .create()
         {
             Ok(consumer) => break consumer,
-            Err(e) => {
-                error!("{:?}", e);
+            Err(_e) => {
+                // error!("{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
