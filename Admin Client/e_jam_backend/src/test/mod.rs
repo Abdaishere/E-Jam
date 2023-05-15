@@ -44,10 +44,10 @@ pub async fn generate_fake_stream_entries(
     stream_id_counter: &Mutex<usize>,
     streams_entries: &Mutex<HashMap<String, StreamEntry>>,
 ) {
+    let mut devices_list = devices_list.lock().await;
     for _i in 0..count {
         let mut ver_mac: Vec<String> = vec![];
         let mut gen_mac: Vec<String> = vec![];
-        let mut devices_list = devices_list.lock().await;
         loop {
             for (mac, device) in devices_list.iter_mut() {
                 if Faker.fake() {
@@ -80,6 +80,7 @@ pub async fn generate_fake_stream_entries(
         .await;
 
         info!("Generated stream entry: {}", &stream.get_stream_id());
+
         stream_entries
             .lock()
             .await
@@ -88,13 +89,11 @@ pub async fn generate_fake_stream_entries(
 }
 
 pub async fn generate_fake_devices(devices_list: &Mutex<HashMap<String, Device>>, count: usize) {
+    let mut devices_list = devices_list.lock().await;
     for _i in 0..count {
         let device: Device = Device::generate_fake_device().await;
         info!("Generated device: {}", &device.get_device_mac());
-        devices_list
-            .lock()
-            .await
-            .insert(device.get_device_mac().to_owned(), device);
+        devices_list.insert(device.get_device_mac().to_owned(), device);
     }
 }
 

@@ -323,9 +323,9 @@ this is used to get the device connection address
 * `(String, u16, String)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
     pub fn get_device_info_tuple(&self) -> (String, u16, String) {
         (
-            self.get_ip_address().to_string(),
+            self.get_ip_address().to_owned(),
             self.get_port(),
-            self.get_device_mac().to_string(),
+            self.get_device_mac().to_owned(),
         )
     }
 
@@ -344,7 +344,7 @@ this is used to get the device connection address
                     serde_json::to_string(&stream_details)
                         .expect("Failed to serialize stream details"),
                 )
-                .timeout(Duration::from_millis(2500))
+                .timeout(Duration::from_secs(2))
                 .send()
                 .await
         })
@@ -356,12 +356,12 @@ this is used to get the device connection address
     ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
         let mac = self.get_device_mac().to_owned();
         let target = format!("http://{}:{}/stop", self.get_ip_address(), self.get_port());
-        tokio::spawn(async move {
+        tokio::spawn(async {
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
                 .header("stream-id", stream_id)
-                .timeout(Duration::from_millis(2500))
+                .timeout(Duration::from_secs(2))
                 .send()
                 .await
         })
@@ -399,7 +399,7 @@ this is used to set the device to reachable or unreachable and update the last u
         let url = format!("http://{}:{}/connect", self.ip_address, self.port);
         let mac_address = self.mac_address.to_owned();
 
-        tokio::spawn(async move {
+        tokio::spawn(async {
             let request = reqwest::Client::new()
                 .post(url)
                 .header("mac-address", mac_address)

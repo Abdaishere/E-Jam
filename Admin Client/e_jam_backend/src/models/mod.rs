@@ -1,4 +1,5 @@
 use log::{debug, error, info, warn};
+
 use tokio::task::JoinHandle;
 pub(crate) mod device;
 pub(crate) mod process;
@@ -12,7 +13,7 @@ use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
 use nanoid::nanoid;
 use regex::Regex;
-use reqwest::{Response, StatusCode};
+use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
@@ -30,6 +31,17 @@ lazy_static! {
     #[doc = r"Regex for the ip address of the device's ip address
     example of a valid ip address: 192.168.01.1, 192.168.1.00"]
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
+}
+
+#[doc = " # handler
+this is a holder for tuple that contains the device details and the JoinHandle for the thread that is used to send the request to the device
+## Values
+* `(String, u16, String, ProcessType)` - A tuple that contains the device details (ip address, port, mac address and process type)
+*  the JoinHandle for the thread that is used to send the request to the device
+"]
+pub struct Handler {
+    pub connections: (String, String, ProcessType),
+    pub handle: JoinHandle<Result<reqwest::Response, reqwest::Error>>,
 }
 
 #[doc = r" # App State
@@ -581,7 +593,7 @@ The send_stream function is used to send the stream to the devices that will gen
         &mut self,
         delayed: bool,
         device_list: &Mutex<HashMap<String, Device>>,
-    ) -> i32 {
+    ) -> Vec<Handler> {
         /*
             send the start request to all the senders and receivers
             if the request is successful, add the device to the running devices list
@@ -653,60 +665,8 @@ The send_stream function is used to send the stream to the devices that will gen
         }
 
         let stream_details = self.get_stream_details(delayed, generators_macs, verifiers_macs);
-        let handles = self
-            .send_stream_to_devices(&target_devices_pool, device_list, &stream_details)
-            .await;
-
-        for (ip, handle) in handles.into_iter() {
-            match handle.await {
-                Ok(response) => {
-                    let processes = target_devices_pool.get(&ip).unwrap();
-
-                    for (device_index, process_type) in processes {
-                        self.analyze_response(
-                            &response,
-                            process_type,
-                            device_list
-                                .lock()
-                                .await
-                                .get_mut(&device_index.to_owned())
-                                .unwrap(),
-                            true,
-                        )
-                        .await
-                    }
-                }
-                Err(e) => {
-                    error!("Error sending stream to device {} : {}", ip, e);
-                }
-            }
-        }
-
-        // check if the devices are running the stream and set the stream status accordingly (error if only one type of devices is running the stream)
-        let mut devices_received = 0;
-        for device in &self.running_generators {
-            if device.1 == &ProcessStatus::Queued {
-                devices_received += 1;
-                break;
-            }
-        }
-        for device in &self.running_verifiers {
-            if device.1 == &ProcessStatus::Queued {
-                devices_received += 1;
-                break;
-            }
-        }
-        info!("Stream sent to {} devices", devices_received);
-        if devices_received == 0 {
-            self.update_stream_status(StreamStatus::Error);
-            error!("No devices are running the stream")
-        } else if devices_received == 1 {
-            self.update_stream_status(StreamStatus::Error);
-            error!("Only one Process type is running the stream")
-        } else {
-            self.update_stream_status(StreamStatus::Sent);
-        }
-        devices_received
+        self.send_stream_to_devices(&target_devices_pool, device_list, &stream_details)
+            .await
     }
 
     #[doc = r" ## Send Stream To Devices
@@ -722,14 +682,8 @@ The send_stream_to_devices function is used to send the stream to the devices th
         target_devices_pool: &HashMap<String, Vec<(String, ProcessType)>>,
         device_list: &Mutex<HashMap<String, Device>>,
         stream_details: &StreamDetails,
-    ) -> Vec<(
-        String,
-        JoinHandle<Result<reqwest::Response, reqwest::Error>>,
-    )> {
-        let mut handles: Vec<(
-            String,
-            JoinHandle<Result<reqwest::Response, reqwest::Error>>,
-        )> = Vec::new();
+    ) -> Vec<Handler> {
+        let mut handles: Vec<Handler> = Vec::new();
 
         for receivers in target_devices_pool {
             let receiver = receivers.1.first().unwrap();
@@ -737,8 +691,17 @@ The send_stream_to_devices function is used to send the stream to the devices th
             let device = device_list.get(&receiver.0).unwrap();
 
             let handle = device.send_stream(stream_details.to_owned());
-
-            handles.push((receivers.0.to_owned(), handle));
+            let device_info_tuple = device.get_device_info_tuple().to_owned();
+            // the info is (ip,  mac, process_type)
+            let connections = (
+                device_info_tuple.0,
+                device_info_tuple.2,
+                receiver.1.to_owned(),
+            );
+            handles.push(Handler {
+                connections,
+                handle,
+            });
         }
         handles
     }
@@ -758,7 +721,7 @@ if the request fails, the device status will be set to Offline
     pub async fn stop_stream(
         &mut self,
         device_list: &Mutex<HashMap<String, Device>>,
-    ) -> StreamStatus {
+    ) -> Vec<Handler> {
         /*
         send the stop request to all the devices that are running the stream
         if the request is successful, set the device status to idle
@@ -806,35 +769,8 @@ if the request fails, the device status will be set to Offline
             }
         }
 
-        let handles = self
-            .stop_stream_on_devices(&target_devices_pool, device_list)
-            .await;
-
-        let mut devices_received: usize = 0;
-        for (i, handle) in handles {
-            match handle.await {
-                Ok(response) => {
-                    devices_received += 1;
-                    let device_info = target_devices_pool.get(&i).unwrap();
-                    let mut device = device_list.lock().await;
-                    let device = device.get_mut(&device_info.0).unwrap();
-
-                    // set the device status according to the response status
-                    self.analyze_response(&response, &device_info.1, device, false)
-                        .await;
-                }
-                Err(e) => {
-                    error!("{} error: {}", i, e);
-                }
-            }
-        }
-
-        info!("{} devices received the stop request", devices_received);
-        // set the stream status to stopped
-        self.update_stream_status(StreamStatus::Stopped);
-        info!("Stream {} stopped", self.get_stream_id());
-        self.sync_stream_status();
-        self.stream_status.to_owned()
+        self.stop_stream_on_devices(&target_devices_pool, device_list)
+            .await
     }
 
     #[doc = r" ## Stop Stream On Devices
@@ -848,14 +784,8 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         &self,
         target_devices_pool: &HashMap<String, (String, ProcessType)>,
         device_list: &Mutex<HashMap<String, Device>>,
-    ) -> Vec<(
-        String,
-        JoinHandle<Result<reqwest::Response, reqwest::Error>>,
-    )> {
-        let mut handles: Vec<(
-            String,
-            JoinHandle<Result<reqwest::Response, reqwest::Error>>,
-        )> = Vec::new();
+    ) -> Vec<Handler> {
+        let mut handles: Vec<Handler> = Vec::new();
 
         for receivers in target_devices_pool {
             let receiver = receivers.1;
@@ -863,14 +793,23 @@ The stop_stream_on_devices function is used to send the stop request to the devi
             let device = device_list.get(&receiver.0).unwrap();
 
             let handle = device.stop_stream(self.get_stream_id().to_owned());
-
-            handles.push((receivers.0.to_owned(), handle));
+            let device_info_tuple = device.get_device_info_tuple().to_owned();
+            // the info is (ip, mac, process_type)
+            let connections = (
+                device_info_tuple.0,
+                device_info_tuple.2,
+                receiver.1.to_owned(),
+            );
+            handles.push(Handler {
+                connections,
+                handle,
+            });
         }
         handles
     }
 
     #[doc = r" ## Get the Stream ID
-this is used to identify the stream"]
+    this is used to identify the stream"]
     pub fn get_stream_id(&self) -> &String {
         &self.stream_id
     }
@@ -885,13 +824,19 @@ this is used to identify the stream"]
     * `sending` - A bool that represents if the request was a start or stop request
     ## Errors
     * `reqwest::Error` - An error that is returned if the request failed (will set the device status to offline)"]
-    async fn analyze_response(
+    pub async fn analyze_device_response(
         &mut self,
-        response: &Result<Response, reqwest::Error>,
-        process_type: &ProcessType,
-        device: &mut Device,
+        info: (String, String, ProcessType),
+        response: Result<reqwest::Response, reqwest::Error>,
+
+        device_list: &Mutex<HashMap<String, Device>>,
         sending: bool,
-    ) {
+    ) -> Result<(), ()> {
+        // info tuple is (device ip, device port, device mac, process type)
+        let mut device = device_list.lock().await;
+        let device = device.get_mut(&info.1).unwrap();
+        let process_type = &info.2;
+
         match response {
             Ok(_response) => {
                 let process_status = if sending {
@@ -903,6 +848,7 @@ this is used to identify the stream"]
                 match _response.status() {
                     StatusCode::OK => {
                         info!("Stream sent to device {}", device.get_device_mac());
+
                         // set the receiver status to running
                         device.update_device_status(&process_status, process_type);
 
@@ -938,6 +884,7 @@ this is used to identify the stream"]
                                 self.get_stream_id()
                             );
                         }
+                        return Ok(());
                     }
                     _ => {
                         info!(
@@ -1018,6 +965,56 @@ this is used to identify the stream"]
                 }
             }
         }
+
+        Err(())
+    }
+
+    pub async fn get_received_devices(
+        &mut self,
+        sending: bool,
+        results: Vec<Result<(), ()>>,
+    ) -> usize {
+        let mut devices_received: usize = 0;
+        for result in results {
+            match result {
+                Ok(_) => devices_received += 1,
+                Err(_) => continue,
+            }
+        }
+        if sending {
+            // check if the devices are running the stream and set the stream status accordingly (error if only one type of devices is running the stream)
+            let mut devices_received = 0;
+            for device in &self.running_generators {
+                if device.1 == &ProcessStatus::Queued {
+                    devices_received += 1;
+                    break;
+                }
+            }
+            for device in &self.running_verifiers {
+                if device.1 == &ProcessStatus::Queued {
+                    devices_received += 1;
+                    break;
+                }
+            }
+
+            if devices_received == 0 {
+                self.update_stream_status(StreamStatus::Error);
+                error!("No devices are running the stream")
+            } else if devices_received == 1 {
+                self.update_stream_status(StreamStatus::Error);
+                error!("Only one Process type is running the stream")
+            } else {
+                info!("Stream sent to {} devices", devices_received);
+                self.update_stream_status(StreamStatus::Sent);
+            }
+        } else {
+            info!("{} devices received the stop request", devices_received);
+            // set the stream status to stopped
+            self.update_stream_status(StreamStatus::Stopped);
+            info!("Stream {} stopped", self.get_stream_id());
+            self.sync_stream_status();
+        }
+        devices_received
     }
 
     #[doc = r" ## Queue Stream
@@ -1025,64 +1022,44 @@ this will add the stream to the queue
 locking the stream_entries mutex will help prevent racing conditions if the system is under heavy load and multiple streams are being queued at the same time
 the stream will only unlock once it gets a response from all devices then it continues to the next stream in the queue
 ## Arguments
-* `queued_streams` - the list of queued streams by stream id
 * `device_list` - the list of devices that are in the system
 ## Logs
 * `Stream queued to start in {} seconds` - the delay in seconds before the stream starts (the delay is set by the user)"]
-    pub async fn queue_stream(
+    pub async fn try_queue_stream(
         &mut self,
-        queued_streams: &Mutex<HashMap<String, DateTime<Utc>>>,
         device_list: &Mutex<HashMap<String, Device>>,
-    ) -> i32 {
+    ) -> Vec<Handler> {
         if self.stream_status == StreamStatus::Running || self.stream_status == StreamStatus::Queued
         {
-            return 0;
+            return vec![];
         }
         // log the start time
-        info!("Stream queued to start in {} seconds", self.delay / 1000);
+        info!("queueing stream {} to start in {} seconds", self.get_stream_id(), self.delay / 1000);
 
         // send the stream to the client to update the stream status to queued
-        let connections = self.send_stream(true, device_list).await;
 
-        // add the thread to the queued streams list
-        if self.stream_status == StreamStatus::Sent {
-            self.update_stream_status(StreamStatus::Queued);
-            queued_streams
-                .lock()
-                .await
-                .insert(self.get_stream_id().to_owned(), Utc::now());
-        }
-        connections
+        self.send_stream(true, device_list).await
     }
 
     #[doc = r" ## Remove Stream From Queue
 this will remove the stream from the queue
 ## Arguments
-* `queued_streams` - the list of queued streams by stream id
 * `device_list` - the list of devices that are in the system
 ## Panics
 * `Error: Failed to lock the queued streams list for removing the stream from the queue {}` - if the queued streams list is locked
 ## Logs
 * `Error: {}` - if the stream fails to stop
 * `Error: Could not find the stream {} in the queued streams list` - if the stream is not found in the queued streams list"]
-    pub async fn remove_stream_from_queue(
+    pub async fn try_remove_stream_from_queue(
         &mut self,
-        queued_streams: &Mutex<HashMap<String, DateTime<Utc>>>,
         device_list: &Mutex<HashMap<String, Device>>,
-    ) -> StreamStatus {
-        // stop the stream
-        self.stop_stream(device_list).await;
-
-        // remove the stream from the queued streams list
-        let mut queue = queued_streams.lock().await;
-
-        // remove the stream from the queued streams Map
-        if queue.get(self.get_stream_id()).is_some() {
-            queue.remove(self.get_stream_id());
-            //return previous status
-            return StreamStatus::Queued;
+    ) -> Vec<Handler> {
+        if self.stream_status != StreamStatus::Queued {
+            return vec![];
         }
-        self.stream_status.to_owned()
+        info!("removing stream {} from the queue", self.get_stream_id());
+        // stop the stream
+        self.stop_stream(device_list).await
     }
 
     #[doc = r" ## Update Stream Status
@@ -1091,8 +1068,8 @@ if the stream is stopped, the start and end times are set to None
 and the last updated time is set to the current time all the time
 ## Arguments
 * `status` - the new stream status"]
-    fn update_stream_status(&mut self, status: StreamStatus) {
-        if status == self.stream_status {
+    pub fn update_stream_status(&mut self, status: StreamStatus) {
+        if status == self.stream_status && status != StreamStatus::Error {
             return;
         }
         self.stream_status = status;
