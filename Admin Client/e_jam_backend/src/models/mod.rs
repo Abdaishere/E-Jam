@@ -16,8 +16,8 @@ use regex::Regex;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tokio::sync::Mutex;
 use tokio::runtime::Runtime;
+use tokio::sync::Mutex;
 use validator::Validate;
 
 lazy_static! {

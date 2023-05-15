@@ -134,12 +134,12 @@ pub struct Device {
     #[doc = " ## Device Generation Processes Number
     A u16 that represents the number of generation processes that are running on the device"]
     #[serde(default, skip_deserializing)]
-    gen_processes: u16,
+    gen_processes: u64,
 
     #[doc = " ## Device Verification Processes Number
     A u16 that represents the number of verification processes that are running on the device"]
     #[serde(default)]
-    ver_processes: u16,
+    ver_processes: u64,
 
     #[doc = " ## Device Status
     A DeviceStatus that represents the status of the device at any given time (Offline, Online, Idle, Running)
@@ -337,14 +337,14 @@ this is used to get the device connection address
         let mac = self.get_device_mac().to_owned();
         let stream_id = stream_id.to_owned();
         let stream_details = stream_details.to_owned();
-        RUNTIME.spawn({
+        RUNTIME.spawn(async {
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
                 .header("stream-id", stream_id)
                 .body(stream_details)
                 .timeout(Duration::from_secs(2))
-                .send()
+                .send().await
         })
     }
 
@@ -355,13 +355,13 @@ this is used to get the device connection address
         let target = format!("http://{}:{}/stop", self.get_ip_address(), self.get_port());
         let mac = self.get_device_mac().to_owned();
         let stream_id = stream_id.to_owned();
-        RUNTIME.spawn({
+        RUNTIME.spawn(async{
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
                 .header("stream-id", stream_id)
                 .timeout(Duration::from_secs(2))
-                .send()
+                .send().await
         })
     }
 
