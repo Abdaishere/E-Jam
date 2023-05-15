@@ -17,6 +17,7 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::sync::Mutex;
+use tokio::runtime::Runtime;
 use validator::Validate;
 
 lazy_static! {
@@ -31,6 +32,8 @@ lazy_static! {
     #[doc = r"Regex for the ip address of the device's ip address
     example of a valid ip address: 192.168.01.1, 192.168.1.00"]
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
+
+    static ref RUNTIME: Runtime = Runtime::new().unwrap();
 }
 
 #[doc = " # handler
@@ -684,13 +687,16 @@ The send_stream_to_devices function is used to send the stream to the devices th
         stream_details: StreamDetails,
     ) -> Vec<Handler> {
         let mut handles: Vec<Handler> = Vec::new();
-
+        let stream_id = stream_details.stream_id.clone();
+        let stream_json =
+            serde_json::to_string(&stream_details).expect("Failed to serialize stream details");
+        drop(stream_details);
         for receivers in target_devices_pool.into_iter() {
             let receiver = receivers.1.first().unwrap();
             let device_list = device_list.lock().await;
             let device = device_list.get(&receiver.0).unwrap();
 
-            let handle = device.send_stream(stream_details.to_owned());
+            let handle = device.send_stream(&stream_id, &stream_json);
             let device_info_tuple = device.get_device_info_tuple().to_owned();
             // the info is (ip,  mac, process_type)
             let connections = (
@@ -792,7 +798,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
             let device_list = device_list.lock().await;
             let device = device_list.get(&receiver.0).unwrap();
 
-            let handle = device.stop_stream(self.get_stream_id().to_owned());
+            let handle = device.stop_stream(self.get_stream_id());
             let device_info_tuple = device.get_device_info_tuple().to_owned();
             // the info is (ip, mac, process_type)
             let connections = (
@@ -823,7 +829,6 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         &mut self,
         info: (String, String, ProcessType),
         response: Result<reqwest::Response, reqwest::Error>,
-
         device_list: &Mutex<HashMap<String, Device>>,
         sending: bool,
     ) -> Result<(), ()> {

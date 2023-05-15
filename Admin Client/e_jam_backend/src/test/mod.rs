@@ -18,11 +18,11 @@ use std::thread::sleep;
 use std::{collections::HashMap, time::Duration};
 use tokio::sync::Mutex;
 
-const FAKE_DEVICES_COUNT: usize = 1e1 as usize;
+const FAKE_DEVICES_COUNT: usize = 1e2 as usize;
 const FAKE_STREAM_ENTRIES_COUNT: usize = 2e2 as usize;
 
 pub async fn generate_fake_metrics(app_state: &Data<AppState>) {
-    println!("Fake data feature enabled");
+    info!("Fake data feature enabled");
 
     // generate testing data
     generate_fake_devices(&app_state.device_list, FAKE_DEVICES_COUNT).await;

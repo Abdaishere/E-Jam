@@ -465,11 +465,22 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         return HttpResponse::NoContent().body("No streams to start, Please add a stream first");
     }
 
-    let mut counter: usize = 0;
+    let mut handles: Vec<Vec<models::Handler>> = Vec::with_capacity(streams_entries_keys.len());
     for stream_id in streams_entries_keys.iter() {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
         let connections = stream_entry.try_queue_stream(&data.device_list).await;
+        handles.push(connections);
+    }
+
+    let mut counter: usize = 0;
+
+    for (i, connections) in handles.into_iter().enumerate() {
+        let stream_id = &streams_entries_keys[i];
+        if connections.is_empty() {
+            debug!("Stream {} is already running or queued", stream_id);
+            continue;
+        }
 
         if connections.is_empty() {
             debug!("Stream {} is already running or queued", stream_id);
@@ -482,10 +493,12 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
             connections.len()
         );
 
-        // this is opinionated, if you want the stream_entries to be locked for each stream, leave it here
+        // this is opinionated, if you want the stream_entries to be locked for each stream, uncomment this here
         // if you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
         // this will make the stream_entries locked for a shorter time, but will lock it more times
         // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons.
+        // let mut stream_entries = data.stream_entries.lock().await;
+        // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
         let mut results = Vec::new();
         for handler in connections.into_iter() {
@@ -493,6 +506,8 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
             let handle = handler.handle;
             match handle.await {
                 Ok(response) => {
+                    let mut stream_entries = data.stream_entries.lock().await;
+                    let stream_entry = stream_entries.get_mut(stream_id).unwrap();
                     // gather all results in main thread and analyze them by device type
 
                     results.push(
@@ -507,6 +522,8 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
             }
         }
 
+        let mut stream_entries = data.stream_entries.lock().await;
+        let stream_entry = stream_entries.get_mut(stream_id).unwrap();
         // get the number of devices that are running the stream and return it
         let connects = stream_entry.get_received_devices(true, results).await;
         if connects > 1 {
@@ -551,7 +568,7 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
     }
     let mut counter = 0;
     let mut unqueued = 0;
-
+    let mut handles: Vec<Vec<models::Handler>> = Vec::with_capacity(streams_entries_keys.len());
     for stream_id in streams_entries_keys.iter() {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
@@ -578,6 +595,15 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
                 .try_remove_stream_from_queue(&data.device_list)
                 .await;
         }
+        handles.push(connections);
+    }
+
+    for (i, connections) in handles.into_iter().enumerate() {
+        let stream_id = &streams_entries_keys[i];
+        if connections.is_empty() {
+            debug!("Stream {} is already running or queued", stream_id);
+            continue;
+        }
 
         info!(
             "Running threads for Stopping stream {} are {} thread",
@@ -590,10 +616,12 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             continue;
         }
 
-        // this is opinionated, if you want the stream_entries to be locked for each stream, leave it here
-        // if you want to lock the stream_entries only when you receive a response from a device, move it inside the for loop and lock it again when get_received_devices is called
+        // this is opinionated, if you want the stream_entries to be locked for each stream, uncomment this here
+        // if you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
         // this will make the stream_entries locked for a shorter time, but will lock it more times
-        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons
+        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons.
+        // let mut stream_entries = data.stream_entries.lock().await;
+        // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
         let mut results = Vec::new();
         for handler in connections {
@@ -602,6 +630,8 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
 
             match handle.await {
                 Ok(response) => {
+                    let mut stream_entries = data.stream_entries.lock().await;
+                    let stream_entry = stream_entries.get_mut(stream_id).unwrap();
                     // gather all results in main thread and analyze them by device type
                     results.push(
                         stream_entry
@@ -615,6 +645,8 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             }
         }
 
+        let mut stream_entries = data.stream_entries.lock().await;
+        let stream_entry = stream_entries.get_mut(stream_id).unwrap();
         // get the number of devices that are running the stream and return it
         let connects = stream_entry.get_received_devices(true, results).await;
         if stream_entry.get_stream_status() == &StreamStatus::Stopped && connects > 1 {

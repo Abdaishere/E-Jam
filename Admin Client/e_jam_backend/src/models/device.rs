@@ -2,16 +2,12 @@ use chrono::{serde::ts_seconds, DateTime, Utc};
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
-use tokio::{
-    sync::Mutex,
-    task::{self, JoinHandle},
-};
+use tokio::{sync::Mutex, task::JoinHandle};
 use validator::Validate;
 
 use super::{
     process::{ProcessStatus, ProcessType},
-    stream_details::StreamDetails,
-    IP_ADDRESS, MAC_ADDRESS,
+    IP_ADDRESS, MAC_ADDRESS, RUNTIME,
 };
 
 #[doc = r"Device Model
@@ -334,39 +330,38 @@ this is used to get the device connection address
 
     pub fn send_stream(
         &self,
-        stream_details: StreamDetails,
+        stream_id: &String,
+        stream_details: &String,
     ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
         let target = format!("http://{}:{}/start", self.get_ip_address(), self.get_port());
         let mac = self.get_device_mac().to_owned();
-        task::spawn(async move {
+        let stream_id = stream_id.to_owned();
+        let stream_details = stream_details.to_owned();
+        RUNTIME.spawn({
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
-                .header("stream-id", stream_details.stream_id.to_owned())
-                .body(
-                    serde_json::to_string(&stream_details)
-                        .expect("Failed to serialize stream details"),
-                )
+                .header("stream-id", stream_id)
+                .body(stream_details)
                 .timeout(Duration::from_secs(2))
                 .send()
-                .await
         })
     }
 
     pub fn stop_stream(
         &self,
-        stream_id: String,
+        stream_id: &String,
     ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
-        let mac = self.get_device_mac().to_owned();
         let target = format!("http://{}:{}/stop", self.get_ip_address(), self.get_port());
-        task::spawn(async {
+        let mac = self.get_device_mac().to_owned();
+        let stream_id = stream_id.to_owned();
+        RUNTIME.spawn({
             reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
                 .header("stream-id", stream_id)
                 .timeout(Duration::from_secs(2))
                 .send()
-                .await
         })
     }
 
@@ -402,7 +397,7 @@ this is used to set the device to reachable or unreachable and update the last u
         let url = format!("http://{}:{}/connect", self.ip_address, self.port);
         let mac_address = self.mac_address.to_owned();
 
-        task::spawn(async {
+        RUNTIME.spawn(async {
             let request = reqwest::Client::new()
                 .post(url)
                 .header("mac-address", mac_address)
