@@ -665,7 +665,7 @@ The send_stream function is used to send the stream to the devices that will gen
         }
 
         let stream_details = self.get_stream_details(delayed, generators_macs, verifiers_macs);
-        self.send_stream_to_devices(&target_devices_pool, device_list, &stream_details)
+        self.send_stream_to_devices(target_devices_pool, device_list, stream_details)
             .await
     }
 
@@ -679,13 +679,13 @@ The send_stream_to_devices function is used to send the stream to the devices th
 * `Vec<JoinHandle<()>>` - A list of JoinHandles that can be used to wait for the threads to finish"]
     pub async fn send_stream_to_devices(
         &self,
-        target_devices_pool: &HashMap<String, Vec<(String, ProcessType)>>,
+        target_devices_pool: HashMap<String, Vec<(String, ProcessType)>>,
         device_list: &Mutex<HashMap<String, Device>>,
-        stream_details: &StreamDetails,
+        stream_details: StreamDetails,
     ) -> Vec<Handler> {
         let mut handles: Vec<Handler> = Vec::new();
 
-        for receivers in target_devices_pool {
+        for receivers in target_devices_pool.into_iter() {
             let receiver = receivers.1.first().unwrap();
             let device_list = device_list.lock().await;
             let device = device_list.get(&receiver.0).unwrap();
@@ -769,7 +769,7 @@ if the request fails, the device status will be set to Offline
             }
         }
 
-        self.stop_stream_on_devices(&target_devices_pool, device_list)
+        self.stop_stream_on_devices(target_devices_pool, device_list)
             .await
     }
 
@@ -782,12 +782,12 @@ The stop_stream_on_devices function is used to send the stop request to the devi
 * `Vec<JoinHandle<()>>` - A list of JoinHandles that can be used to wait for the threads to finish"]
     pub async fn stop_stream_on_devices(
         &self,
-        target_devices_pool: &HashMap<String, (String, ProcessType)>,
+        target_devices_pool: HashMap<String, (String, ProcessType)>,
         device_list: &Mutex<HashMap<String, Device>>,
     ) -> Vec<Handler> {
         let mut handles: Vec<Handler> = Vec::new();
 
-        for receivers in target_devices_pool {
+        for receivers in target_devices_pool.into_iter() {
             let receiver = receivers.1;
             let device_list = device_list.lock().await;
             let device = device_list.get(&receiver.0).unwrap();
@@ -805,13 +805,8 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                 handle,
             });
         }
-        handles
-    }
 
-    #[doc = r" ## Get the Stream ID
-    this is used to identify the stream"]
-    pub fn get_stream_id(&self) -> &String {
-        &self.stream_id
+        handles
     }
 
     #[doc = r" ## Analyze Response
@@ -969,13 +964,19 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         Err(())
     }
 
+    #[doc = r" ## Get the Stream ID
+    this is used to identify the stream"]
+    pub fn get_stream_id(&self) -> &String {
+        &self.stream_id
+    }
+
     pub async fn get_received_devices(
         &mut self,
         sending: bool,
         results: Vec<Result<(), ()>>,
     ) -> usize {
         let mut devices_received: usize = 0;
-        for result in results {
+        for result in results.into_iter() {
             match result {
                 Ok(_) => devices_received += 1,
                 Err(_) => continue,
@@ -984,13 +985,13 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         if sending {
             // check if the devices are running the stream and set the stream status accordingly (error if only one type of devices is running the stream)
             let mut devices_received = 0;
-            for device in &self.running_generators {
+            for device in self.running_generators.iter() {
                 if device.1 == &ProcessStatus::Queued {
                     devices_received += 1;
                     break;
                 }
             }
-            for device in &self.running_verifiers {
+            for device in self.running_verifiers.iter() {
                 if device.1 == &ProcessStatus::Queued {
                     devices_received += 1;
                     break;
@@ -1034,7 +1035,11 @@ the stream will only unlock once it gets a response from all devices then it con
             return vec![];
         }
         // log the start time
-        info!("queueing stream {} to start in {} seconds", self.get_stream_id(), self.delay / 1000);
+        info!(
+            "queueing stream {} to start in {} seconds",
+            self.get_stream_id(),
+            self.delay / 1000
+        );
 
         // send the stream to the client to update the stream status to queued
 
