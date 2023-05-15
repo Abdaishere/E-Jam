@@ -21,18 +21,16 @@ use tokio::sync::Mutex;
 use validator::Validate;
 
 lazy_static! {
-    #[doc = r"Regex for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters
-    example of a valid stream id: 123, abc, 1a2, 1A2, 1aB, 1Ab, 1AB, _1A, _1a, _1_, _1a2, _1A2, _1aB, _1Ab, _1AB"]
+    #[doc = r"Regex for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters example of a valid stream id: 123, abc, 1a2, 1A2, 1aB, 1Ab, 1AB, _1A, _1a, _1_, _1a2, _1A2, _1aB, _1Ab, _1AB"]
     static ref STREAM_ID : Regex = Regex::new(r"^[A-Za-z0-9_~-]{3}$").unwrap();
 
-    #[doc = r"Regex for the mac address of the device's mac address
-    example of a valid mac address: 00:00:00:00:00:00, 00-00-00-00-00-00"]
+    #[doc = r"Regex for the mac address of the device's mac address example of a valid mac address: 00:00:00:00:00:00, 00-00-00-00-00-00"]
     static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").unwrap();
 
-    #[doc = r"Regex for the ip address of the device's ip address
-    example of a valid ip address: 192.168.01.1, 192.168.1.00"]
+    #[doc = r"Regex for the ip address of the device's ip address example of a valid ip address: 192.168.01.1, 192.168.1.00"]
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
 
+    #[doc="Runtime that is used to spawn the threads that are used to send the requests to the systemAPI"]
     static ref RUNTIME: Runtime = Runtime::new().unwrap();
 }
 
@@ -44,7 +42,7 @@ this is a holder for tuple that contains the device details and the JoinHandle f
 "]
 pub struct Handler {
     pub connections: (String, String, ProcessType),
-    pub handle: JoinHandle<Result<reqwest::Response, reqwest::Error>>,
+    pub handle: JoinHandle<Result<reqwest::blocking::Response, reqwest::Error>>,
 }
 
 #[doc = r" # App State
@@ -828,7 +826,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
     pub async fn analyze_device_response(
         &mut self,
         info: (String, String, ProcessType),
-        response: Result<reqwest::Response, reqwest::Error>,
+        response: Result<reqwest::blocking::Response, reqwest::Error>,
         device_list: &Mutex<HashMap<String, Device>>,
         sending: bool,
     ) -> Result<(), ()> {
