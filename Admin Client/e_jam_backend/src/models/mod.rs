@@ -16,7 +16,7 @@ use regex::Regex;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tokio::runtime::{Builder, Runtime};
+use tokio::runtime::Runtime;
 use tokio::sync::Mutex;
 use validator::Validate;
 
@@ -31,7 +31,7 @@ lazy_static! {
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
 
     #[doc="Runtime that is used to spawn the threads that are used to send the requests to the systemAPI"]
-    static ref RUNTIME: Runtime = Builder::new_multi_thread().build().unwrap();
+    static ref RUNTIME: Runtime = Runtime::new().unwrap();
 }
 
 #[doc = " # handler
