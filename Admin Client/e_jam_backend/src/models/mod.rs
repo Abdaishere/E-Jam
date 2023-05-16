@@ -42,7 +42,7 @@ this is a holder for tuple that contains the device details and the JoinHandle f
 "]
 pub struct Handler {
     pub connections: (String, String, ProcessType),
-    pub handle: JoinHandle<Result<reqwest::blocking::Response, reqwest::Error>>,
+    pub handle: JoinHandle<Result<reqwest::Response, reqwest::Error>>,
 }
 
 #[doc = r" # App State
@@ -426,19 +426,17 @@ changes the stream_status to Running and updates the device status to Running"]
                         .get_mut(card_mac)
                         .unwrap()
                         .clone_from(&ProcessStatus::Running);
-                } else {
-                    self.running_generators
-                        .insert(card_mac.to_owned(), ProcessStatus::Running)
-                        .unwrap();
-                }
 
-                // then update the device status to Running
-                device_list
-                    .lock()
-                    .await
-                    .get_mut(&device)
-                    .unwrap()
-                    .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
+                    // then update the device status to Running
+                    device_list
+                        .lock()
+                        .await
+                        .get_mut(&device)
+                        .unwrap()
+                        .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
+                } else {
+                    warn!("Generator not found");
+                }
 
                 // check if the device is a verifier
                 // if it is, mark the verifier as Running
@@ -457,9 +455,7 @@ changes the stream_status to Running and updates the device status to Running"]
                         .unwrap()
                         .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
                 } else {
-                    self.running_verifiers
-                        .insert(card_mac.to_owned(), ProcessStatus::Running)
-                        .unwrap();
+                    warn!("Verifier not found");
                 }
 
                 // update the stream status to Running
@@ -830,7 +826,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
     pub async fn analyze_device_response(
         &mut self,
         info: (String, String, ProcessType),
-        response: Result<reqwest::blocking::Response, reqwest::Error>,
+        response: Result<reqwest::Response, reqwest::Error>,
         device_list: &Mutex<HashMap<String, Device>>,
         sending: bool,
     ) -> Result<(), ()> {

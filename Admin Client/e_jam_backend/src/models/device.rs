@@ -332,36 +332,38 @@ this is used to get the device connection address
         &self,
         stream_id: &String,
         stream_details: &String,
-    ) -> JoinHandle<Result<reqwest::blocking::Response, reqwest::Error>> {
+    ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
         let target = format!("http://{}:{}/start", self.get_ip_address(), self.get_port());
         let mac = self.get_device_mac().to_owned();
         let stream_id = stream_id.to_owned();
         let stream_details = stream_details.to_owned();
-        RUNTIME.spawn_blocking(|| {
-            reqwest::blocking::Client::new()
+        RUNTIME.spawn(async {
+            reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
                 .header("stream-id", stream_id)
                 .body(stream_details)
                 .timeout(Duration::from_secs(2))
                 .send()
+                .await
         })
     }
 
     pub fn stop_stream(
         &self,
         stream_id: &String,
-    ) -> JoinHandle<Result<reqwest::blocking::Response, reqwest::Error>> {
+    ) -> JoinHandle<Result<reqwest::Response, reqwest::Error>> {
         let target = format!("http://{}:{}/stop", self.get_ip_address(), self.get_port());
         let mac = self.get_device_mac().to_owned();
         let stream_id = stream_id.to_owned();
-        RUNTIME.spawn_blocking(|| {
-            reqwest::blocking::Client::new()
+        RUNTIME.spawn(async {
+            reqwest::Client::new()
                 .post(target)
                 .header("mac-address", mac)
                 .header("stream-id", stream_id)
                 .timeout(Duration::from_secs(2))
                 .send()
+                .await
         })
     }
 
@@ -397,14 +399,14 @@ this is used to set the device to reachable or unreachable and update the last u
         let url = format!("http://{}:{}/connect", self.ip_address, self.port);
         let mac_address = self.mac_address.to_owned();
 
-        RUNTIME.spawn_blocking(|| {
-            let request = reqwest::blocking::Client::new()
+        RUNTIME.spawn(async {
+            let request = reqwest::Client::new()
                 .post(url)
                 .header("mac-address", mac_address)
                 .timeout(Duration::from_secs(5))
                 .send();
 
-            match request {
+            match request.await {
                 Ok(request) => request.status().is_success(),
                 Err(_) => false,
             }

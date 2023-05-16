@@ -493,10 +493,10 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
             connections.len()
         );
 
-        // if you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
+        // If you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
         // this will make the stream_entries locked for a shorter time, but will lock it more times
-        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons.
-        // this is opinionated, if you want the stream_entries to be locked for each stream, uncomment this here
+        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons. (Using Kafka or not)
+        // If you don't want the stream_entries to be locked for each stream, comment this here, keep in mind that a device might notify that a process has started before the stream status is set to queued
         // let mut stream_entries = data.stream_entries.lock().await;
         // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
@@ -611,10 +611,10 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
 
         // if you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
         // this will make the stream_entries locked for a shorter time, but will lock it more times
-        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons.
-        // this is optional, if you want the stream_entries to be locked for each stream, uncomment this here
-        let mut stream_entries = data.stream_entries.lock().await;
-        let stream_entry = stream_entries.get_mut(stream_id).unwrap();
+        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons. (using Kafka or not)
+        // If you want the stream_entries to be locked for each stream, comment this here.
+        // let mut stream_entries = data.stream_entries.lock().await;
+        // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
         let mut results = Vec::with_capacity(connections.len());
         for handler in connections {
@@ -623,8 +623,8 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
 
             match handle.await {
                 Ok(response) => {
-                    // let mut stream_entries = data.stream_entries.lock().await;
-                    // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
+                    let mut stream_entries = data.stream_entries.lock().await;
+                    let stream_entry = stream_entries.get_mut(stream_id).unwrap();
                     // gather all results in main thread and analyze them by device type
                     results.push(
                         stream_entry
@@ -638,8 +638,8 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
             }
         }
 
-        // let mut stream_entries = data.stream_entries.lock().await;
-        // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
+        let mut stream_entries = data.stream_entries.lock().await;
+        let stream_entry = stream_entries.get_mut(stream_id).unwrap();
         // get the number of devices that are running the stream and return it
         let connects = stream_entry.get_received_devices(true, results).await;
         if stream_entry.get_stream_status() == &StreamStatus::Stopped && connects > 1 {

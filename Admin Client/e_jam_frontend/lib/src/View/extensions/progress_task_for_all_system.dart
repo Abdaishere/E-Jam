@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Statistics/utils.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
@@ -41,26 +41,16 @@ class _GaugeTotalProgressForSystemState
   }
 
   _getProgress(bool forced) async {
-    await context.read<StreamsController>().loadAllStreams(forced);
+    await context.read<StreamsController>().loadAllStreamStatus(forced);
     if (!mounted) return;
 
-    final List<StreamEntry>? streams =
-        context.read<StreamsController>().getStreams;
+    final List<StreamStatusDetails>? streams =
+        context.read<StreamsController>().getStreamsStatusDetails;
 
     if (streams == null) {
       _totalProgress = null;
     } else {
-      int totalProgress = 0;
-      int totalTasks = 0;
-      for (final StreamEntry stream in streams) {
-        totalProgress += stream.runningGenerators?.progress ?? 0;
-        totalTasks += stream.runningGenerators?.total ?? 0;
-        totalProgress += stream.runningVerifiers?.progress ?? 0;
-        totalTasks += stream.runningVerifiers?.total ?? 0;
-      }
-
-      _totalProgress =
-          Utils.mapOneRangeToAnother(totalProgress, 0, totalTasks, 0, 100, 2);
+      _totalProgress = Utils.getTotalProgress(streams);
     }
     _loading = false;
     if (mounted) setState(() {});

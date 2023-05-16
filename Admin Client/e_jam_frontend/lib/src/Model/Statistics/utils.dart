@@ -1,9 +1,10 @@
 import 'dart:math';
+import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 
 class Utils {
-  static double mapOneRangeToAnother(num sourceNumber, num fromStart,
-      num fromEnd, num toStart, num toEnd, int decimalPrecision) {
+  static double valueMapper(num sourceNumber, num fromStart, num fromEnd,
+      num toStart, num toEnd, int decimalPrecision) {
     num deltaA = fromEnd - fromStart;
     num deltaB = toEnd - toStart;
     num scale = deltaB / deltaA;
@@ -26,8 +27,8 @@ class Utils {
       num fromStartToNow = DateTime.now().difference(epoch).inSeconds;
       num toEnd = endTime.difference(epoch).inSeconds;
 
-      num progress = Utils.mapOneRangeToAnother(
-          fromStartToNow, 0, toEnd, isDense ? 1 : 100, 0, 5);
+      num progress =
+          Utils.valueMapper(fromStartToNow, 0, toEnd, isDense ? 1 : 100, 0, 5);
 
       return progress.toDouble();
     } else if (status == StreamStatus.finished) {
@@ -35,5 +36,27 @@ class Utils {
     } else {
       return 0;
     }
+  }
+
+  // get the oldest start time and the latest end time and calculate the progress
+  static double? getTotalProgress(List<StreamStatusDetails> streams) {
+    DateTime epoch = DateTime.fromMicrosecondsSinceEpoch(0);
+    num minStart = DateTime.now().difference(epoch).inSeconds;
+    num maxEnd = DateTime.now().difference(epoch).inSeconds;
+    bool hasRunning = false;
+
+    for (final StreamStatusDetails stream in streams) {
+      if (stream.streamStatus != StreamStatus.running) continue;
+      hasRunning = true;
+      num start = stream.startTime.difference(epoch).inSeconds;
+      if (start < minStart) minStart = start;
+      num end = stream.endTime.difference(epoch).inSeconds;
+      if (end > maxEnd) maxEnd = end;
+    }
+
+    num fromStartToNow = DateTime.now().difference(epoch).inSeconds;
+    return hasRunning
+        ? Utils.valueMapper(fromStartToNow, minStart, maxEnd, 0, 100, 2)
+        : 0;
   }
 }
