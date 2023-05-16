@@ -1,6 +1,5 @@
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
-import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +84,6 @@ class StreamsController extends ChangeNotifier {
     _isLoading = true;
     return _streamServices.startAllStreams().then((success) {
       _isLoading = false;
-      SystemSettings.streamsAreRunning = true;
       return success;
     });
   }
@@ -94,7 +92,6 @@ class StreamsController extends ChangeNotifier {
     _isLoading = true;
     return _streamServices.stopAllStreams().then((success) {
       _isLoading = false;
-      SystemSettings.streamsAreRunning = false;
       return success;
     });
   }

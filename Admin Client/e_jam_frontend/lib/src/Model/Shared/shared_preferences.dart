@@ -83,7 +83,6 @@ class SystemSettings {
   ];
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";
-  static bool? streamsAreRunning = false;
   static bool chartsAreRunning = true;
 
   static init() async {
@@ -102,8 +101,6 @@ class SystemSettings {
     defaultDevicesPort = pref.getInt('defaultDevicesPort') ?? 8000;
     defaultSystemApiSubnet =
         pref.getString('defaultSystemApiSubnet') ?? "192.168.0";
-
-    streamsAreRunning = pref.getBool('streamsAreRunning') ?? false;
     chartsAreRunning = pref.getBool('chartsAreRunning') ?? true;
 
     NetworkController.changeServerIpAddress(

@@ -1,7 +1,7 @@
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
-import 'package:e_jam/src/View/Dialogues_Buttons/streams_start_stop_controller_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/streams_start_stop_controller_buttons.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
 import 'package:e_jam/src/View/change_server_ip_screen.dart';
@@ -152,7 +152,7 @@ class _HomeState extends State<Home> {
       mainScreenTapClose: true,
       shadowLayer1Color: shadowColor,
       angle: 0.0,
-      slideWidth: 250.0,
+      slideWidth: 270.0,
       openCurve: Curves.easeIn,
       closeCurve: Curves.easeOut,
     );
@@ -220,6 +220,7 @@ class _MenuScreenState extends State<MenuScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // back button to close drawer menu
           Container(
@@ -247,74 +248,24 @@ class _MenuScreenState extends State<MenuScreen> {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                StreamsStartStopControllerButton(),
+                StreamsStartStopControllerButtons(isStopping: false),
+                StreamsStartStopControllerButtons(isStopping: true),
                 GraphsControllerButton(),
                 ExportButton(),
               ],
             ),
           ),
           const SizedBox(height: 25),
-          ListTile(
-            leading: const FaIcon(FontAwesome.dashboard),
-            iconColor: Colors.white,
-            title: const Text('Dashboard'),
-            onTap: () {
-              widget.setIndex(0);
-            },
+          ListTileTheme(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            style: ListTileStyle.drawer,
+            enableFeedback: true,
+            contentPadding: const EdgeInsets.only(left: 30),
+            child: menuList(),
           ),
-          ListTile(
-            leading: const Icon(Icons.dashboard),
-            iconColor: Colors.blueAccent,
-            title: const Text('Streams'),
-            onTap: () {
-              widget.setIndex(1);
-            },
-          ),
-          ListTile(
-            leading: const FaIcon(FontAwesomeIcons.microchip, size: 21),
-            iconColor: Colors.deepOrangeAccent,
-            title: const Text('Devices'),
-            onTap: () {
-              widget.setIndex(2);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.auto_graph_outlined),
-            iconColor: Colors.deepPurpleAccent,
-            title: const Text('Charts'),
-            onTap: () {
-              widget.setIndex(3);
-            },
-          ),
-          ListTile(
-            leading: const FaIcon(FontAwesomeIcons.gears, size: 21),
-            iconColor: Colors.blueGrey.shade500,
-            title: const Text('Settings'),
-            onTap: () {
-              widget.setIndex(4);
-            },
-          ),
-          AboutListTile(
-            icon: const Icon(MaterialCommunityIcons.information, size: 21),
-            applicationName: "E-Jam",
-            applicationVersion: "1.0.2",
-            applicationIcon:
-                Image.asset("assets/Icon-logo.ico", width: 100, height: 100),
-            applicationLegalese: "© 2023 E-Jam",
-            aboutBoxChildren: const <Widget>[
-              Text(
-                  'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
-                  style: TextStyle(fontSize: 15)),
-              Text('Developed by:',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              Text('\tAbdullah Elbelkasy'),
-              Text('\tMohamed Elhagery'),
-              Text('\tKhaled Waleed'),
-              Text('\tIslam Wagih'),
-              Text('\tMostafa Abdullah'),
-            ],
-            child: const Text('About'),
-          ),
+
           const Spacer(),
           Container(
             margin: const EdgeInsets.only(right: 60),
@@ -353,6 +304,74 @@ class _MenuScreenState extends State<MenuScreen> {
           const SizedBox(height: 20),
         ],
       ),
+    );
+  }
+
+  Column menuList() {
+    return Column(
+      children: [
+        ListTile(
+          leading: const FaIcon(FontAwesome.dashboard),
+          iconColor: Colors.white,
+          title: const Text('Dashboard'),
+          onTap: () {
+            widget.setIndex(0);
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.dashboard),
+          iconColor: Colors.blueAccent,
+          title: const Text('Streams'),
+          onTap: () {
+            widget.setIndex(1);
+          },
+        ),
+        ListTile(
+          leading: const FaIcon(FontAwesomeIcons.microchip, size: 21),
+          iconColor: Colors.deepOrangeAccent,
+          title: const Text('Devices'),
+          onTap: () {
+            widget.setIndex(2);
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.auto_graph_outlined),
+          iconColor: Colors.deepPurpleAccent,
+          title: const Text('Charts'),
+          onTap: () {
+            widget.setIndex(3);
+          },
+        ),
+        ListTile(
+          leading: const FaIcon(FontAwesomeIcons.gears, size: 21),
+          iconColor: Colors.blueGrey.shade500,
+          title: const Text('Settings'),
+          onTap: () {
+            widget.setIndex(4);
+          },
+        ),
+        AboutListTile(
+          icon: const Icon(MaterialCommunityIcons.information, size: 21),
+          applicationName: "E-Jam",
+          applicationVersion: "1.0.2",
+          applicationIcon:
+              Image.asset("assets/Icon-logo.ico", width: 100, height: 100),
+          applicationLegalese: "© 2023 E-Jam",
+          aboutBoxChildren: const <Widget>[
+            Text(
+                'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
+                style: TextStyle(fontSize: 15)),
+            Text('Developed by:',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            Text('\tAbdullah Elbelkasy'),
+            Text('\tMohamed Elhagery'),
+            Text('\tKhaled Waleed'),
+            Text('\tIslam Wagih'),
+            Text('\tMostafa Abdullah'),
+          ],
+          child: const Text('About'),
+        ),
+      ],
     );
   }
 }
