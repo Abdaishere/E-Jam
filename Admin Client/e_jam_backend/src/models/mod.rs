@@ -973,7 +973,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         &self.stream_id
     }
 
-    pub async fn get_received_devices(
+    pub async fn update_received_devices_result(
         &mut self,
         sending: bool,
         results: Vec<Result<(), ()>>,

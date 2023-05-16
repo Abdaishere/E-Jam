@@ -617,41 +617,36 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        status != StreamStatus.running
-            ? IconButton(
-                icon: const FaIcon(FontAwesomeIcons.play),
-                color:
-                    status == StreamStatus.running ? streamRunningColor : null,
-                tooltip: "Start",
-                onPressed: () {
-                  context
-                      .read<StreamsController>()
-                      .startStream(id)
-                      .then((success) {
-                    if (mounted) {
-                      _loadStream();
-                      widget.refreshCard();
-                    }
-                  });
-                },
-              )
-            : IconButton(
-                icon: const FaIcon(FontAwesomeIcons.pause),
-                color:
-                    status == StreamStatus.running ? streamRunningColor : null,
-                tooltip: "Pause",
-                onPressed: () {
-                  context
-                      .read<StreamsController>()
-                      .pauseStream(id)
-                      .then((success) {
-                    if (mounted) {
-                      _loadStream();
-                      widget.refreshCard();
-                    }
-                  });
-                },
-              ),
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.play),
+          color: status == StreamStatus.running ? streamRunningColor : null,
+          tooltip: "Start",
+          onPressed: () {
+            context.read<StreamsController>().startStream(id).then((success) {
+              if (mounted) {
+                _loadStream();
+                widget.refreshCard();
+              }
+            });
+          },
+        ),
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.pause),
+          color: (status != StreamStatus.running &&
+                  status != StreamStatus.stopped &&
+                  status != StreamStatus.queued)
+              ? streamColorScheme(status)
+              : null,
+          tooltip: "Pause",
+          onPressed: () {
+            context.read<StreamsController>().pauseStream(id).then((success) {
+              if (mounted) {
+                _loadStream();
+                widget.refreshCard();
+              }
+            });
+          },
+        ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.hourglassStart),
           color: status == StreamStatus.queued ? streamQueuedColor : null,

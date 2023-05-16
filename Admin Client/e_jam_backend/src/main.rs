@@ -32,34 +32,34 @@ async fn main() -> std::io::Result<()> {
     });
 
     // start fake data generator and verifier statics
-    #[cfg(feature = "fake_data")]
-    {
-        use crate::models::{Device, StreamEntry};
-        let streams: Vec<StreamEntry> = app_state
-            .stream_entries
-            .lock()
-            .await
-            .values()
-            .cloned()
-            .collect();
-        let devices: Vec<Device> = app_state
-            .device_list
-            .lock()
-            .await
-            .values()
-            .cloned()
-            .collect();
-        let dev_s = devices.clone();
-        let str_s = streams.clone();
-        thread::spawn(|| {
-            test::run_generator_faker(dev_s, str_s);
-        });
-        let dev_s = devices;
-        let str_s = streams.clone();
-        thread::spawn(|| {
-            test::run_verifier_faker(dev_s, str_s);
-        });
-    }
+    // #[cfg(feature = "fake_data")]
+    // {
+    //     use crate::models::{Device, StreamEntry};
+    //     let streams: Vec<StreamEntry> = app_state
+    //         .stream_entries
+    //         .lock()
+    //         .await
+    //         .values()
+    //         .cloned()
+    //         .collect();
+    //     let devices: Vec<Device> = app_state
+    //         .device_list
+    //         .lock()
+    //         .await
+    //         .values()
+    //         .cloned()
+    //         .collect();
+    //     let dev_s = devices.clone();
+    //     let str_s = streams.clone();
+    //     thread::spawn(|| {
+    //         test::run_generator_faker(dev_s, str_s);
+    //     });
+    //     let dev_s = devices;
+    //     let str_s = streams.clone();
+    //     thread::spawn(|| {
+    //         test::run_verifier_faker(dev_s, str_s);
+    //     });
+    // }
 
     info!("running on http://{}:{}", HOST, PORT);
     HttpServer::new(move || {

@@ -25,10 +25,10 @@ class DevicesController extends ChangeNotifier {
       return;
     }
 
+    _lastRefresh = DateTime.now();
     return devicesServices.getDevices().then((value) {
       devices = value;
       _isLoading = false;
-      _lastRefresh = DateTime.now();
       notifyListeners();
     });
   }

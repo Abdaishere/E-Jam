@@ -460,8 +460,6 @@ class _StreamCardState extends State<StreamCard> {
         status != StreamStatus.running
             ? IconButton(
                 icon: const FaIcon(FontAwesomeIcons.play),
-                color:
-                    status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Start",
                 onPressed: () async {
                   await context.read<StreamsController>().startStream(id);
@@ -470,8 +468,6 @@ class _StreamCardState extends State<StreamCard> {
               )
             : IconButton(
                 icon: const FaIcon(FontAwesomeIcons.pause),
-                color:
-                    status == StreamStatus.running ? streamRunningColor : null,
                 tooltip: "Pause",
                 onPressed: () async {
                   await context.read<StreamsController>().pauseStream(id);

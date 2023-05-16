@@ -27,9 +27,9 @@ class StreamsController extends ChangeNotifier {
       return;
     }
 
+    _lastRefresh = DateTime.now();
     return _streamServices.getStreams().then((value) {
       _streams = value;
-      _lastRefresh = DateTime.now();
       _isLoading = false;
     });
   }
@@ -130,10 +130,10 @@ class StreamsController extends ChangeNotifier {
       return;
     }
 
+    _lastRefresh = DateTime.now();
     return _streamServices.getAllStreamStatus().then((value) {
       _streamsStatusDetails = value;
       _isLoading = false;
-      _lastRefresh = DateTime.now();
       notifyListeners();
     });
   }
