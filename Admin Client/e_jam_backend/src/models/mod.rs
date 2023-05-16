@@ -16,7 +16,7 @@ use regex::Regex;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use tokio::runtime::Runtime;
+use tokio::runtime::{Builder, Runtime};
 use tokio::sync::Mutex;
 use validator::Validate;
 
@@ -31,7 +31,7 @@ lazy_static! {
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
 
     #[doc="Runtime that is used to spawn the threads that are used to send the requests to the systemAPI"]
-    static ref RUNTIME: Runtime = Runtime::new().unwrap();
+    static ref RUNTIME: Runtime = Builder::new_multi_thread().build().unwrap();
 }
 
 #[doc = " # handler
@@ -51,9 +51,9 @@ This is used to store the list of all the devices that are connected to the serv
 This is also used to store the counter for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters
 All the values are wrapped in a Mutex to allow for thread safe access to the values from all the threads of the server.
 ## Values
-* `streams_entries` - A Vec of StreamEntry struct that represents the list of all the streams that are currently running on the devices
-* `queued_streams` - A Vec of Strings that represents the list of all the streams that are currently Queued to be started on the devices
-* `device_list` - A Vec of Device struct that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
+* `streams_entries` - A HashMap of StreamEntry struct that represents the list of all the streams that are currently running on the devices
+* `queued_streams` - A HashMap of Strings that represents the list of all the streams that are currently Queued to be started on the devices
+* `device_list` - A HashMap of Device struct that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
 * `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be 3 URL-friendly characters"]
 pub struct AppState {
     pub stream_entries: Mutex<HashMap<String, StreamEntry>>,
@@ -426,17 +426,19 @@ changes the stream_status to Running and updates the device status to Running"]
                         .get_mut(card_mac)
                         .unwrap()
                         .clone_from(&ProcessStatus::Running);
-
-                    // then update the device status to Running
-                    device_list
-                        .lock()
-                        .await
-                        .get_mut(&device)
-                        .unwrap()
-                        .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
                 } else {
-                    warn!("Generator not found")
+                    self.running_generators
+                        .insert(card_mac.to_owned(), ProcessStatus::Running)
+                        .unwrap();
                 }
+
+                // then update the device status to Running
+                device_list
+                    .lock()
+                    .await
+                    .get_mut(&device)
+                    .unwrap()
+                    .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
 
                 // check if the device is a verifier
                 // if it is, mark the verifier as Running
@@ -455,7 +457,9 @@ changes the stream_status to Running and updates the device status to Running"]
                         .unwrap()
                         .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
                 } else {
-                    warn!("Verifier not found")
+                    self.running_verifiers
+                        .insert(card_mac.to_owned(), ProcessStatus::Running)
+                        .unwrap();
                 }
 
                 // update the stream status to Running
@@ -664,7 +668,7 @@ The send_stream function is used to send the stream to the devices that will gen
                     .push((receiver, ProcessType::Generation));
             }
         }
-
+        self.update_stream_status(StreamStatus::Sent);
         let stream_details = self.get_stream_details(delayed, generators_macs, verifiers_macs);
         self.send_stream_to_devices(target_devices_pool, device_list, stream_details)
             .await
@@ -684,7 +688,7 @@ The send_stream_to_devices function is used to send the stream to the devices th
         device_list: &Mutex<HashMap<String, Device>>,
         stream_details: StreamDetails,
     ) -> Vec<Handler> {
-        let mut handles: Vec<Handler> = Vec::new();
+        let mut handles: Vec<Handler> = Vec::with_capacity(target_devices_pool.len());
         let stream_id = stream_details.stream_id.clone();
         let stream_json =
             serde_json::to_string(&stream_details).expect("Failed to serialize stream details");
@@ -789,7 +793,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         target_devices_pool: HashMap<String, (String, ProcessType)>,
         device_list: &Mutex<HashMap<String, Device>>,
     ) -> Vec<Handler> {
-        let mut handles: Vec<Handler> = Vec::new();
+        let mut handles: Vec<Handler> = Vec::with_capacity(target_devices_pool.len());
 
         for receivers in target_devices_pool.into_iter() {
             let receiver = receivers.1;

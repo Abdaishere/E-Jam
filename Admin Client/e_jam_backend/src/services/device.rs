@@ -171,7 +171,7 @@ async fn ping_all_devices(data: web::Data<AppState>) -> impl Responder {
         0 => HttpResponse::NoContent()
             .body("No devices in the system, please add some devices and try again"),
         _ => {
-            let mut handles = Vec::new();
+            let mut handles = Vec::with_capacity(devices_keys.len());
             for i in devices_keys.iter() {
                 let devices = data.device_list.lock().await;
                 let device = devices.get(i).unwrap();

@@ -286,7 +286,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                 let connections = stream_entry.try_queue_stream(&data.device_list).await;
 
                 // gather all results in main thread and analyze them by device type
-                let mut results = Vec::new();
+                let mut results = Vec::with_capacity(connections.len());
                 for handler in connections {
                     let info = handler.connections;
                     let handle = handler.handle;
@@ -394,7 +394,7 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
                 let connections = stream_entry.stop_stream(&data.device_list).await;
 
                 // gather all results in main thread and analyze them by device type
-                let mut results = Vec::new();
+                let mut results = Vec::with_capacity(connections.len());
                 for handler in connections {
                     let info = handler.connections;
                     let handle = handler.handle;
@@ -500,7 +500,7 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         // let mut stream_entries = data.stream_entries.lock().await;
         // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
-        let mut results = Vec::new();
+        let mut results = Vec::with_capacity(connections.len());
         for handler in connections.into_iter() {
             let info = handler.connections;
             let handle = handler.handle;
@@ -616,7 +616,7 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
-        let mut results = Vec::new();
+        let mut results = Vec::with_capacity(connections.len());
         for handler in connections {
             let info = handler.connections;
             let handle = handler.handle;
@@ -914,7 +914,7 @@ async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
     let stream_entries: Vec<StreamEntry> =
         data.stream_entries.lock().await.values().cloned().collect();
 
-    let mut streams_status: Vec<StreamStatusDetails> = Vec::new();
+    let mut streams_status: Vec<StreamStatusDetails> = Vec::with_capacity(stream_entries.len());
     if stream_entries.is_empty() {
         return HttpResponse::NoContent()
             .body("No streams found to check their status, please add a stream and try again");
