@@ -5,6 +5,7 @@ import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
 import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -14,13 +15,10 @@ import 'package:provider/provider.dart';
 
 class EditStreamView extends StatefulWidget {
   const EditStreamView(
-      {super.key,
-      required this.reload,
-      required this.stream,
-      required this.id});
+      {super.key, required this.reload, this.stream, required this.id});
 
   final Function() reload;
-  final StreamEntry stream;
+  final StreamEntry? stream;
   final String id;
   @override
   State<EditStreamView> createState() => _EditStreamViewState();
@@ -31,13 +29,48 @@ class _EditStreamViewState extends State<EditStreamView>
   bool pickedVerifiersFirstTime = true;
   bool pickedGeneratorsFirstTime = true;
   final formKey = GlobalKey<FormState>();
-  StreamEntry get stream => widget.stream;
+  StreamEntry? stream;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EditStreamController>().loadAllFields(stream, context);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.stream != null) {
+        stream = widget.stream;
+        context.read<EditStreamController>().loadAllFields(stream!, context);
+        return;
+      }
+
+      StreamEntry? value =
+          await context.read<StreamsController>().loadStreamDetails(widget.id);
+      if (!mounted) return;
+
+      if (value != null && value.streamId == widget.id) {
+        stream = value;
+        context.read<EditStreamController>().loadAllFields(stream!, context);
+      } else {
+        context.read<EditStreamController>().clearAllFields();
+        showDialog<void>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Error'),
+            content: const Text(
+                'Error loading stream, please try again or check your internet connection to the server.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+          ),
+        );
+      }
     });
   }
 
@@ -95,8 +128,8 @@ class _EditStreamViewState extends State<EditStreamView>
           const DelayTimeToLiveInterFrameGapFields(),
           const SizedBox(height: 20),
           StreamDevicesLists(
-            generatorsIds: stream.generatorsIds,
-            verifiersIds: stream.verifiersIds,
+            generatorsIds: stream?.generatorsIds ?? [],
+            verifiersIds: stream?.verifiersIds ?? [],
           ),
           const PacketsBroadcastFramesSizes(),
           const GenerationSeed(),

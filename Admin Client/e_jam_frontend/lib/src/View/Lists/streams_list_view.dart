@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Statistics/utils.dart';
@@ -320,7 +319,7 @@ class _StreamCardState extends State<StreamCard> {
         Icons.more_vert,
         size: 20.0,
       ),
-      onSelected: (dynamic value) async {
+      onSelected: (dynamic value) {
         if (value == 'View') {
           Navigator.of(context).push(
             HeroDialogRoute(
@@ -371,43 +370,14 @@ class _StreamCardState extends State<StreamCard> {
             ),
           );
         } else if (value == 'Edit') {
-          StreamEntry? value = await context
-              .read<StreamsController>()
-              .loadStreamDetails(stream.streamId);
-
-          if (mounted) {
-            if (value != null) {
-              Navigator.of(context).push(
-                HeroDialogRoute(
-                  builder: (BuildContext context) => Center(
-                      child: EditStreamView(
-                          stream: value,
-                          reload: refreshCard,
-                          id: stream.streamId)),
-                  settings: const RouteSettings(name: 'EditStreamView'),
-                ),
-              );
-            } else {
-              showDialog<void>(
-                context: context,
-                builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Error'),
-                  content: const Text('Error loading stream'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                ),
-              );
-            }
-          }
+          Navigator.of(context).push(
+            HeroDialogRoute(
+              builder: (BuildContext context) => Center(
+                  child:
+                      EditStreamView(reload: refreshCard, id: stream.streamId)),
+              settings: const RouteSettings(name: 'EditStreamView'),
+            ),
+          );
         }
       },
       itemBuilder: (BuildContext context) {

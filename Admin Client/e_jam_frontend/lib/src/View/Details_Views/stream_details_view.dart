@@ -98,9 +98,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                             HeroDialogRoute(
                               builder: (BuildContext context) => Center(
                                 child: EditStreamView(
-                                  stream: stream!,
                                   reload: _loadStream,
                                   id: id,
+                                  stream: stream,
                                 ),
                               ),
                               settings:
@@ -639,7 +639,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               : null,
           tooltip: "Pause",
           onPressed: () {
-            context.read<StreamsController>().pauseStream(id).then((success) {
+            context.read<StreamsController>().stopStream(id).then((success) {
               if (mounted) {
                 _loadStream();
                 widget.refreshCard();
