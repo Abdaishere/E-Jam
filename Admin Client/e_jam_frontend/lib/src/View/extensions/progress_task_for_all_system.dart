@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/Model/Statistics/utils.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/utils.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

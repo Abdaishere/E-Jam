@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:e_jam/src/Model/Classes/device.dart';
-import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';

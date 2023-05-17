@@ -5,6 +5,8 @@ use log::{error, info, warn};
 use schema_registry_converter::blocking::{avro::AvroDecoder, schema_registry::SrSettings};
 use std::{thread::sleep, time::Duration};
 
+pub (crate) mod query;
+
 pub const NAMESPACE: &str = "com.ejam.systemapi.stats.SchemaRegistry";
 pub const SCHEMA_REGISTRY_PORT: &str = "8081";
 pub const MAIN_BROKER_PORT: &str = "9092";

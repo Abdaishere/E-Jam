@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:e_jam/main.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
-import 'package:e_jam/src/Model/Statistics/utils.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/utils.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_stream_view.dart';
 import 'package:e_jam/src/View/Details_Views/edit_stream_view.dart';

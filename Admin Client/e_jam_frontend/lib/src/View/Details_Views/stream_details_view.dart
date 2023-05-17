@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
-import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -829,6 +829,7 @@ class _StreamGraphState extends State<StreamGraph> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              Expanded(child: DoughnutChartPackets(packetsState())),
               Expanded(
                 child: PieDevices(
                   initRunningProcesses(
@@ -840,7 +841,6 @@ class _StreamGraphState extends State<StreamGraph> {
                   ),
                 ),
               ),
-              Expanded(child: DoughnutChartPackets(packetsState())),
             ],
           ),
         ),
