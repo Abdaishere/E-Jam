@@ -269,7 +269,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a delay';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid delay';
               }
               return null;
@@ -292,7 +292,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a time to live';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid time to live';
               }
               return null;
@@ -316,7 +316,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a inter frame gap';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid inter frame gap';
               }
               return null;
@@ -353,7 +353,7 @@ class GenerationSeed extends StatelessWidget {
             return 'Please enter a Generation Seed for Random Payload';
           }
           return null;
-        } else if (int.tryParse(value) == null) {
+        } else if (BigInt.tryParse(value) == null) {
           return 'Please enter a valid Seed';
         }
         return null;
@@ -387,7 +387,7 @@ class BurstLengthAndDelay extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a burst length';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid burst length';
               }
               return null;
@@ -411,7 +411,7 @@ class BurstLengthAndDelay extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a burst delay';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid burst delay';
               }
               return null;
@@ -595,7 +595,7 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a payload length';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid payload length';
               } else if (int.parse(value) > 1500) {
                 return 'Payload length cannot be greater than 1500';
@@ -671,7 +671,7 @@ class _PacketsBroadcastFramesSizesState
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a number of packets';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid number of packets';
               }
               return null;
@@ -695,7 +695,7 @@ class _PacketsBroadcastFramesSizesState
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a number of frames';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid number of frames';
               }
               return null;

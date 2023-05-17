@@ -24,8 +24,8 @@ class Device {
   final String ipAddress;
   final int port;
   final String macAddress;
-  final int? genProcesses;
-  final int? verProcesses;
+  final num? genProcesses;
+  final num? verProcesses;
   final DeviceStatus? status;
 
   factory Device.fromRawJson(String str) => Device.fromJson(json.decode(str));
@@ -42,8 +42,10 @@ class Device {
         ipAddress: json["ipAddress"],
         port: json["port"],
         macAddress: json["macAddress"],
-        genProcesses: json["genProcesses"],
-        verProcesses: json["verProcesses"],
+        genProcesses:
+            (num.tryParse(json["genProcesses"].toString()) ?? 0).floor(),
+        verProcesses:
+            (num.tryParse(json["verProcesses"].toString()) ?? 0).floor(),
         status: deviceStatusFromString(json["status"]),
       );
 
@@ -56,8 +58,8 @@ class Device {
         "ipAddress": ipAddress,
         "port": port,
         "macAddress": macAddress,
-        "genProcesses": genProcesses ?? 0,
-        "verProcesses": verProcesses ?? 0,
+        "genProcesses": genProcesses,
+        "verProcesses": verProcesses,
         "status": deviceStatusToString(status),
       };
 }

@@ -193,8 +193,8 @@ class _DevicePingerState extends State<DevicePinger> {
           color: _isPinged == null
               ? Colors.lightBlueAccent
               : _isPinged!
-                  ? deviceRunningOrOnlineColor
-                  : deviceOfflineOrErrorColor,
+                  ? deviceStatusColorScheme(DeviceStatus.online)
+                  : deviceStatusColorScheme(DeviceStatus.offline),
         ),
       ),
     );
@@ -306,6 +306,8 @@ class ConnectionIpAndPort extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a port for the Device';
+              } else if (int.parse(value) > 65535) {
+                return 'Please enter a valid port for the Device';
               }
               return null;
             },

@@ -22,7 +22,7 @@ class StreamsController extends ChangeNotifier {
     if (_streams != null &&
         _streamsStatusDetails != null &&
         !forced &&
-        DateTime.now().difference(_lastRefresh).inSeconds < 10) {
+        DateTime.now().difference(_lastRefresh).inSeconds < 20) {
       _isLoading = false;
       return;
     }
@@ -48,7 +48,7 @@ class StreamsController extends ChangeNotifier {
     });
   }
 
-  Future<bool?> updateStream(String id, StreamEntry stream) async {
+  Future<Message?> updateStream(String id, StreamEntry stream) async {
     _isLoading = true;
     return _streamServices.updateStream(id, stream).then((value) {
       _isLoading = false;
@@ -125,7 +125,7 @@ class StreamsController extends ChangeNotifier {
     _isLoading = true;
     if (_streamsStatusDetails != null &&
         !forced &&
-        DateTime.now().difference(_lastRefresh).inSeconds < 5) {
+        DateTime.now().difference(_lastRefresh).inSeconds < 10) {
       _isLoading = false;
       return;
     }

@@ -5,6 +5,7 @@ import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_doughnut_chart_packets.dart';
 import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_line_chart_stream.dart';
 import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_pie_chart_devices_per_stream.dart';
+import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
 import 'package:flutter/material.dart';
 
 // the User can attach a graph of a stream or a device or any other data source (Staggered Grid View)
@@ -39,7 +40,8 @@ class _GraphsListViewState extends State<GraphsListView> {
           Widget randomWidget = [
             DynamicDoughnutChartPackets(packetsState()),
             DynamicLineChartStream(index.toString()),
-            DynamicPieDevices(runningDevices()),
+            DynamicPieDevices(initRunningProcesses(
+                completed: 1, failed: 1, queued: 1, running: 1, stopped: 1)),
           ][Random().nextInt(3)];
           return Card(
             child: Center(child: randomWidget),

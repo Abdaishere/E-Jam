@@ -75,6 +75,7 @@ class SystemSettings {
   static bool showBackgroundBall = true;
   static bool fullChartsDetails = true;
   static bool showDashboardAnimations = true;
+  static bool showTreeMap = true;
   static bool fullTreeMap = true;
   static List<String> dashboardExtensionsOrder = [
     "1Progress",
@@ -102,6 +103,8 @@ class SystemSettings {
     defaultSystemApiSubnet =
         pref.getString('defaultSystemApiSubnet') ?? "192.168.0";
     chartsAreRunning = pref.getBool('chartsAreRunning') ?? true;
+
+    showTreeMap = pref.getBool('showTreeMap') ?? true;
 
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",

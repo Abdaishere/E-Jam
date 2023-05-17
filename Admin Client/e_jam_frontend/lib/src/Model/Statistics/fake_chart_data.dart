@@ -11,20 +11,6 @@ class ChartData {
   }
 }
 
-class RunningDevices {
-  final String state;
-  final int value;
-
-  RunningDevices(this.state, this.value);
-}
-
-List<RunningDevices> runningDevices() => [
-      RunningDevices('Running', Random().nextInt(100)),
-      RunningDevices('Finished', Random().nextInt(100)),
-      RunningDevices('Error', Random().nextInt(100)),
-      RunningDevices('Stopped', Random().nextInt(100)),
-    ];
-
 class PacketsState {
   final String state;
   final int value;

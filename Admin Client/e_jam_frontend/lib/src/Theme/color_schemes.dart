@@ -13,67 +13,54 @@ const backColor =
 const packetErrorColor =
     Color(0xFFBA1A1A); // Color for Packet Errors indicators (charts only)
 
-// Stream Colors
-const streamCreatedColor = Colors.blueGrey; // or no color (transparent)
-const streamQueuedColor = Colors.orangeAccent; // hourglass button pressed
-const streamRunningColor = Colors.greenAccent; // start button pressed
-const streamStoppedColor = Colors.redAccent; // stop button pressed
-const streamErrorColor = Colors.red; // any error
-const streamFinishedColor = Colors.blueAccent; // finished successfully
-
 Color streamColorScheme(StreamStatus? status) {
   switch (status) {
     case StreamStatus.created:
-      return streamCreatedColor;
+      return Colors.blueGrey.shade700;
     case StreamStatus.queued:
-      return streamQueuedColor;
+      return Colors.orangeAccent.shade400;
     case StreamStatus.running:
-      return streamRunningColor;
+      return Colors.greenAccent.shade700;
     case StreamStatus.stopped:
-      return streamStoppedColor;
+      return Colors.redAccent.shade400;
     case StreamStatus.error:
-      return streamErrorColor;
+      return Colors.red.shade600;
     case StreamStatus.finished:
-      return streamFinishedColor;
+      return Colors.blueAccent.shade700;
     default:
-      return streamCreatedColor;
+      return Colors.blueGrey.shade600;
   }
 }
-
-// Device Colors
-const deviceRunningOrOnlineColor = Color(0xFF3dcc77); // online
-const deviceIdleColor = Colors.orangeAccent; // idle
-const deviceOfflineOrErrorColor = Color(0xFFe34845); // offline or error
 
 Color deviceStatusColorScheme(DeviceStatus? status) {
   switch (status) {
     case DeviceStatus.running:
-      return deviceRunningOrOnlineColor;
+      return Colors.greenAccent.shade700;
     case DeviceStatus.online:
-      return deviceRunningOrOnlineColor;
+      return Colors.green.shade400;
     case DeviceStatus.idle:
-      return deviceIdleColor;
+      return Colors.orangeAccent.shade400;
     case DeviceStatus.offline:
-      return deviceOfflineOrErrorColor;
+      return Colors.red.shade600;
     default:
-      return deviceOfflineOrErrorColor;
+      return Colors.red.shade600;
   }
 }
 
 Color processStatusColorScheme(ProcessStatus? status) {
   switch (status) {
     case ProcessStatus.queued:
-      return streamQueuedColor;
+      return Colors.orange.shade500;
     case ProcessStatus.running:
-      return deviceRunningOrOnlineColor;
+      return Colors.green.shade500;
     case ProcessStatus.stopped:
-      return streamStoppedColor;
+      return Colors.redAccent.shade100;
     case ProcessStatus.completed:
-      return streamFinishedColor;
+      return Colors.blueGrey.shade700;
     case ProcessStatus.failed:
-      return streamErrorColor;
+      return Colors.red.shade400;
     default:
-      return streamErrorColor;
+      return Colors.blueGrey.shade700;
   }
 }
 

@@ -180,8 +180,6 @@ async fn update_stream(
             }
 
             let mut body = format!("stream {} ", stream_id);
-            let mut streams_entries = data.stream_entries.lock().await;
-            let stream_entry = streams_entries.get_mut(&stream_id).unwrap();
 
             let mut unqueued = 0;
             let mut stopped = 0;

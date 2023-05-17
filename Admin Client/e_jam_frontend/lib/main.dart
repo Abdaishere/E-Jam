@@ -308,10 +308,11 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Column menuList() {
+    const double size = 21;
     return Column(
       children: [
         ListTile(
-          leading: const FaIcon(FontAwesome.dashboard),
+          leading: const FaIcon(FontAwesome.dashboard, size: size),
           iconColor: Colors.white,
           title: const Text('Dashboard'),
           onTap: () {
@@ -327,7 +328,7 @@ class _MenuScreenState extends State<MenuScreen> {
           },
         ),
         ListTile(
-          leading: const FaIcon(FontAwesomeIcons.microchip, size: 21),
+          leading: const FaIcon(FontAwesomeIcons.microchip, size: size),
           iconColor: Colors.deepOrangeAccent,
           title: const Text('Devices'),
           onTap: () {
@@ -343,7 +344,7 @@ class _MenuScreenState extends State<MenuScreen> {
           },
         ),
         ListTile(
-          leading: const FaIcon(FontAwesomeIcons.gears, size: 21),
+          leading: const FaIcon(FontAwesomeIcons.gears, size: size),
           iconColor: Colors.blueGrey.shade500,
           title: const Text('Settings'),
           onTap: () {
@@ -351,7 +352,7 @@ class _MenuScreenState extends State<MenuScreen> {
           },
         ),
         AboutListTile(
-          icon: const Icon(MaterialCommunityIcons.information, size: 21),
+          icon: const Icon(MaterialCommunityIcons.information, size: size),
           applicationName: "E-Jam",
           applicationVersion: "1.0.2",
           applicationIcon:

@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
@@ -35,6 +37,7 @@ class StreamDetailsView extends StatefulWidget {
 class _StreamDetailsViewState extends State<StreamDetailsView> {
   get id => widget.id;
   StreamEntry? stream;
+  Timer? timer;
   bool isLoading = true;
 
   @override
@@ -43,6 +46,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadStream();
     });
+    timer =
+        Timer.periodic(const Duration(seconds: 10), (Timer t) => _loadStream());
   }
 
   _loadStream() async {
@@ -55,6 +60,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       stream = value;
       setState(() {});
     }
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -170,6 +181,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   status: stream?.streamStatus,
                   startTime: stream?.startTime,
                   endTime: stream?.endTime,
+                  lastUpdated: stream?.lastUpdated,
                 ),
                 _streamActionButtons(
                     id: id, status: stream?.streamStatus ?? StreamStatus.error),
@@ -187,7 +199,26 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       children: [
         Expanded(
           flex: 4,
-          child: StreamGraph(id),
+          child: Visibility(
+            visible: !isLoading,
+            replacement: Center(
+              child: LoadingAnimationWidget.threeArchedCircle(
+                color: Colors.grey,
+                size: 40.0,
+              ),
+            ),
+            child: Visibility(
+              visible: stream != null,
+              replacement: const Center(
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.redAccent,
+                  size: 40,
+                ),
+              ),
+              child: StreamGraph(stream: stream),
+            ),
+          ),
         ),
         const VerticalDivider(
           width: 5,
@@ -227,7 +258,26 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       children: [
         Expanded(
           flex: 4,
-          child: StreamGraph(id),
+          child: Visibility(
+            visible: isLoading,
+            replacement: Center(
+              child: LoadingAnimationWidget.threeArchedCircle(
+                color: Colors.grey,
+                size: 40.0,
+              ),
+            ),
+            child: Visibility(
+              visible: stream != null,
+              replacement: const Center(
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.redAccent,
+                  size: 40,
+                ),
+              ),
+              child: StreamGraph(stream: stream),
+            ),
+          ),
         ),
         const VerticalDivider(
           width: 5,
@@ -619,7 +669,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       children: <Widget>[
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.play),
-          color: status == StreamStatus.running ? streamRunningColor : null,
+          color: status == StreamStatus.running
+              ? streamColorScheme(StreamStatus.running)
+              : null,
           tooltip: "Start",
           onPressed: () {
             context.read<StreamsController>().startStream(id).then((success) {
@@ -649,7 +701,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.hourglassStart),
-          color: status == StreamStatus.queued ? streamQueuedColor : null,
+          color: status == StreamStatus.queued
+              ? streamColorScheme(StreamStatus.queued)
+              : null,
           tooltip: "Delay",
           onPressed: () {
             context.read<StreamsController>().queueStream(id).then((success) {
@@ -662,7 +716,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.stop),
-          color: status == StreamStatus.stopped ? streamStoppedColor : null,
+          color: status == StreamStatus.stopped
+              ? streamColorScheme(StreamStatus.stopped)
+              : null,
           tooltip: "Stop",
           onPressed: () {
             context.read<StreamsController>().stopStream(id).then((success) {
@@ -678,28 +734,112 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
 }
 
 class StreamGraph extends StatefulWidget {
-  const StreamGraph(this.id, {super.key});
+  const StreamGraph({super.key, required this.stream});
 
-  final String id;
+  final StreamEntry? stream;
   @override
   State<StreamGraph> createState() => _StreamGraphState();
 }
 
 class _StreamGraphState extends State<StreamGraph> {
-  get id => widget.id;
+  int _completed = 0;
+  int _failed = 0;
+  int _queued = 0;
+  int _running = 0;
+  int _stopped = 0;
+  StreamEntry? get stream => widget.stream;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _countProcesses();
+    });
+  }
+
+  _countProcesses() {
+    if (stream == null) {
+      return;
+    }
+
+    if (stream?.runningGenerators != null) {
+      stream?.runningGenerators?.processes.forEach((key, value) {
+        switch (value) {
+          case ProcessStatus.completed:
+            _completed++;
+            break;
+          case ProcessStatus.failed:
+            _failed++;
+            break;
+          case ProcessStatus.queued:
+            _queued++;
+            break;
+          case ProcessStatus.running:
+            _running++;
+            break;
+          case ProcessStatus.stopped:
+            _stopped++;
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
+    if (stream?.runningVerifiers != null) {
+      stream?.runningVerifiers?.processes.forEach((key, value) {
+        switch (value) {
+          case ProcessStatus.completed:
+            _completed++;
+            break;
+          case ProcessStatus.failed:
+            _failed++;
+            break;
+          case ProcessStatus.queued:
+            _queued++;
+            break;
+          case ProcessStatus.running:
+            _running++;
+            break;
+          case ProcessStatus.stopped:
+            _stopped++;
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    return _showChart();
+  }
+
+  Column _showChart() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: LineChartStream(id),
+          child: LineChartStream(stream?.streamId ?? ''),
         ),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(child: PieDevices(runningDevices())),
+              Expanded(
+                child: PieDevices(
+                  initRunningProcesses(
+                    completed: _completed,
+                    failed: _failed,
+                    queued: _queued,
+                    running: _running,
+                    stopped: _stopped,
+                  ),
+                ),
+              ),
               Expanded(child: DoughnutChartPackets(packetsState())),
             ],
           ),

@@ -33,7 +33,6 @@ class _SettingsViewState extends State<SettingsView> {
         child: SingleChildScrollView(
           child: ListTileTheme(
             contentPadding: const EdgeInsets.symmetric(horizontal: 40),
-            horizontalTitleGap: 5,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
               child: Column(
@@ -51,10 +50,8 @@ class _SettingsViewState extends State<SettingsView> {
     return [
       const ListTile(
         leading: Icon(Icons.auto_graph_outlined),
-        title: Text(
-          'Charts',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
+        iconColor: Colors.white,
+        title: Text('Charts'),
       ),
       ListTile(
         title: const Text('Animation'),
@@ -133,10 +130,8 @@ class _SettingsViewState extends State<SettingsView> {
     return [
       const ListTile(
         leading: FaIcon(FontAwesome.dashboard),
-        title: Text(
-          'Dashboard',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
+        iconColor: Colors.white,
+        title: Text('Dashboard'),
       ),
       ListTile(
         title: const Text('Dashboard Animations'),
@@ -151,15 +146,30 @@ class _SettingsViewState extends State<SettingsView> {
         ),
       ),
       ListTile(
+        title: const Text('Show Tree Map'),
+        trailing: CupertinoSwitch(
+          value: SystemSettings.showTreeMap,
+          onChanged: (value) async {
+            SystemSettings.showTreeMap = value;
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setBool('showTreeMap', value);
+            setState(() {});
+          },
+        ),
+      ),
+      ListTile(
         title: const Text('Dense Tree Map'),
         trailing: CupertinoSwitch(
           value: !SystemSettings.fullTreeMap,
-          onChanged: (value) async {
-            SystemSettings.fullTreeMap = !value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('fullTreeMap', !value);
-            setState(() {});
-          },
+          onChanged: SystemSettings.showTreeMap
+              ? (value) async {
+                  SystemSettings.fullTreeMap = !value;
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setBool('fullTreeMap', !value);
+                  setState(() {});
+                }
+              : null,
         ),
       ),
       const SizedBox(height: 10),

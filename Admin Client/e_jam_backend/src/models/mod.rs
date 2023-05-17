@@ -1192,8 +1192,8 @@ this is used to update the stream with the new details passed in the stream entr
             Fake, Faker,
         };
 
-        let start_time = Utc::now() - Duration::days(365);
-        let end_time = Utc::now() + Duration::days(365 * 10); // 1 year into the past
+        let start_time = Utc::now() - Duration::minutes(40);
+        let end_time = Utc::now() + Duration::minutes(40);
 
         let starts_at = start_time
             + Duration::seconds(
@@ -1220,38 +1220,42 @@ this is used to update the stream with the new details passed in the stream entr
             let mut running_generators_map: HashMap<String, ProcessStatus> = HashMap::new();
             let mut running_verifiers_map: HashMap<String, ProcessStatus> = HashMap::new();
             for device in generators_macs.iter() {
-                let pick: bool = Faker.fake();
-                if pick {
-                    running_generators_map.insert(
-                        device.to_owned(),
-                        vec![
-                            ProcessStatus::Queued,
-                            ProcessStatus::Running,
-                            ProcessStatus::Stopped,
-                            ProcessStatus::Completed,
-                            ProcessStatus::Failed,
-                        ][(0..4).fake::<usize>()]
-                        .to_owned(),
-                    );
-                }
+                running_generators_map.insert(
+                    device.to_owned(),
+                    vec![
+                        ProcessStatus::Queued,
+                        ProcessStatus::Running,
+                        ProcessStatus::Stopped,
+                        ProcessStatus::Completed,
+                        ProcessStatus::Failed,
+                    ][(0..4).fake::<usize>()]
+                    .to_owned(),
+                );
             }
 
             for device in verifiers_macs.iter() {
-                let pick: bool = Faker.fake();
-                if pick {
-                    running_verifiers_map.insert(
-                        device.to_owned(),
-                        vec![
-                            ProcessStatus::Queued,
-                            ProcessStatus::Running,
-                            ProcessStatus::Stopped,
-                            ProcessStatus::Completed,
-                            ProcessStatus::Failed,
-                        ][(0..4).fake::<usize>()]
-                        .to_owned(),
-                    );
-                }
+                running_verifiers_map.insert(
+                    device.to_owned(),
+                    vec![
+                        ProcessStatus::Queued,
+                        ProcessStatus::Running,
+                        ProcessStatus::Stopped,
+                        ProcessStatus::Completed,
+                        ProcessStatus::Failed,
+                    ][(0..4).fake::<usize>()]
+                    .to_owned(),
+                );
             }
+            let status = vec![
+                StreamStatus::Created,
+                StreamStatus::Sent,
+                StreamStatus::Queued,
+                StreamStatus::Running,
+                StreamStatus::Finished,
+                StreamStatus::Error,
+                StreamStatus::Stopped,
+            ][(0..6).fake::<usize>()]
+            .to_owned();
 
             let mut stream = StreamEntry {
                 stream_id: "".to_string(),
@@ -1282,16 +1286,7 @@ this is used to update the stream with the new details passed in the stream entr
                 end_time: Some(ends_at),
                 running_generators: running_generators_map,
                 running_verifiers: running_verifiers_map,
-                stream_status: vec![
-                    StreamStatus::Created,
-                    StreamStatus::Sent,
-                    StreamStatus::Queued,
-                    StreamStatus::Running,
-                    StreamStatus::Finished,
-                    StreamStatus::Error,
-                    StreamStatus::Stopped,
-                ][(0..6).fake::<usize>()]
-                .to_owned(),
+                stream_status: status,
             };
 
             stream

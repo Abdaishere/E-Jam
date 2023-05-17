@@ -1,19 +1,46 @@
+import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/Model/Statistics/fake_chart_data.dart';
+import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class PieDevices extends StatefulWidget {
-  const PieDevices(this.data, {super.key});
-  final List<RunningDevices> data;
-  @override
-  State<StatefulWidget> createState() => _PieDevicesState();
+class RunningProcesses {
+  final ProcessStatus state;
+  final int number;
+
+  RunningProcesses(this.state, this.number);
 }
 
-/// State class of pie series.
-class _PieDevicesState extends State<PieDevices> {
-  get data => widget.data;
-  _PieDevicesState();
+List<RunningProcesses> initRunningProcesses({
+  required int completed,
+  required int failed,
+  required int queued,
+  required int running,
+  required int stopped,
+}) {
+  List<RunningProcesses> result = [];
+  if (completed != 0) {
+    result.add(RunningProcesses(ProcessStatus.completed, completed));
+  }
+  if (failed != 0) {
+    result.add(RunningProcesses(ProcessStatus.failed, failed));
+  }
+  if (queued != 0) {
+    result.add(RunningProcesses(ProcessStatus.queued, queued));
+  }
+  if (running != 0) {
+    result.add(RunningProcesses(ProcessStatus.running, running));
+  }
+  if (stopped != 0) {
+    result.add(RunningProcesses(ProcessStatus.stopped, stopped));
+  }
+
+  return result;
+}
+
+class PieDevices extends StatelessWidget {
+  const PieDevices(this.data, {super.key});
+  final List<RunningProcesses> data;
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +77,22 @@ class _PieDevicesState extends State<PieDevices> {
   }
 
   /// Returns the pie series.
-  List<PieSeries<RunningDevices, String>> _getDefaultPieSeries() {
-    return <PieSeries<RunningDevices, String>>[
-      PieSeries<RunningDevices, String>(
+  List<PieSeries<RunningProcesses, String>> _getDefaultPieSeries() {
+    return <PieSeries<RunningProcesses, String>>[
+      PieSeries<RunningProcesses, String>(
         animationDuration: SystemSettings.showChartsAnimation ? 800 : 0,
         radius: '90%',
         explode: SystemSettings.fullChartsDetails,
         explodeIndex: 0,
         explodeOffset: '15%',
         dataSource: data,
-        xValueMapper: (RunningDevices data, _) => data.state,
-        yValueMapper: (RunningDevices data, _) => data.value,
-        dataLabelMapper: (RunningDevices data, _) => data.state,
+        xValueMapper: (RunningProcesses data, _) =>
+            processStatusToString(data.state),
+        yValueMapper: (RunningProcesses data, _) => data.number,
+        dataLabelMapper: (RunningProcesses data, _) =>
+            processStatusToString(data.state),
+        pointColorMapper: (RunningProcesses data, _) =>
+            processStatusColorScheme(data.state),
         startAngle: 90,
         endAngle: 90,
         enableTooltip: true,

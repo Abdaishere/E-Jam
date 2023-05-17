@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:circular_motion/circular_motion.dart';
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
@@ -144,7 +145,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
           IconButton(
             icon: const Icon(Icons.device_hub_rounded),
             iconSize: 75,
-            color: deviceIdleColor,
+            color: deviceStatusColorScheme(DeviceStatus.idle),
             tooltip:
                 'Add ${devices.elementAt(index)}:${SystemSettings.defaultDevicesPort}',
             onPressed: () {

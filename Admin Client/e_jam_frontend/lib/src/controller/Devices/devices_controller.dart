@@ -20,7 +20,7 @@ class DevicesController extends ChangeNotifier {
 
     if (devices != null &&
         !forced &&
-        DateTime.now().difference(_lastRefresh).inSeconds < 5) {
+        DateTime.now().difference(_lastRefresh).inSeconds < 10) {
       _isLoading = false;
       return;
     }

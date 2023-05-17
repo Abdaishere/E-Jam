@@ -57,7 +57,7 @@ class StreamServices {
     }
   }
 
-  Future<bool?> updateStream(String id, StreamEntry stream) async {
+  Future<Message?> updateStream(String id, StreamEntry stream) async {
     try {
       final response = await client
           .put(
@@ -69,11 +69,7 @@ class StreamServices {
           )
           .timeout(NetworkController.timeout);
 
-      if (300 > response.statusCode) {
-        return true;
-      } else {
-        return false;
-      }
+      return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
       return null;
     }

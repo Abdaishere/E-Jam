@@ -4,6 +4,7 @@ import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _EditStreamViewState extends State<EditStreamView>
   bool pickedGeneratorsFirstTime = true;
   final formKey = GlobalKey<FormState>();
   StreamEntry? stream;
+  Message? _status;
 
   @override
   void initState() {
@@ -75,13 +77,15 @@ class _EditStreamViewState extends State<EditStreamView>
   }
 
   _editStream() async {
-    bool success = await context
-            .read<EditStreamController>()
-            .updateStream(formKey, widget.id, context) ??
-        false;
-    if (success && mounted) {
+    _status = await context
+        .read<EditStreamController>()
+        .updateStream(formKey, widget.id, context);
+    if (!mounted) return;
+    if (_status != null && _status!.responseCode < 300) {
       widget.reload();
       Navigator.pop(context);
+    } else {
+      setState(() {});
     }
   }
 
@@ -155,7 +159,13 @@ class _EditStreamViewState extends State<EditStreamView>
               Navigator.pop(context);
             },
           ),
-          const Divider(),
+          _status != null && _status!.responseCode >= 300
+              ? RequestStatusIcon(
+                  response: _status!,
+                )
+              : const SizedBox(
+                  width: 40,
+                ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
@@ -246,7 +256,7 @@ class _PacketsBroadcastFramesSizesState
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a number of packets';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid number of packets';
               }
               return null;
@@ -270,7 +280,7 @@ class _PacketsBroadcastFramesSizesState
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a number of frames';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid number of frames';
               }
               return null;
@@ -312,7 +322,7 @@ class PayloadLengthAndType extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a payload length';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid payload length';
               } else if (int.parse(value) > 1500) {
                 return 'Payload length cannot be greater than 1500';
@@ -451,7 +461,7 @@ class BurstLengthAndDelay extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a burst length';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid burst length';
               }
               return null;
@@ -475,7 +485,7 @@ class BurstLengthAndDelay extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a burst delay';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid burst delay';
               }
               return null;
@@ -512,7 +522,7 @@ class GenerationSeed extends StatelessWidget {
             return 'Please enter a Generation Seed for Random Payload';
           }
           return null;
-        } else if (int.tryParse(value) == null) {
+        } else if (BigInt.tryParse(value) == null) {
           return 'Please enter a valid Seed';
         }
         return null;
@@ -547,7 +557,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a time to live';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid time to live';
               }
               return null;
@@ -571,7 +581,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter a time to live';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid time to live';
               }
               return null;
@@ -595,7 +605,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter an inter frame gap';
-              } else if (int.tryParse(value) == null) {
+              } else if (BigInt.tryParse(value) == null) {
                 return 'Please enter a valid inter frame gap';
               }
               return null;

@@ -1,3 +1,4 @@
+import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
@@ -67,12 +68,12 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                     GaugeRange(
                       startValue: 0,
                       endValue: 100,
-                      gradient: const SweepGradient(
+                      gradient: SweepGradient(
                         colors: <Color>[
                           Colors.greenAccent,
-                          deviceRunningOrOnlineColor,
+                          deviceStatusColorScheme(DeviceStatus.online),
                         ],
-                        stops: <double>[0.5, 0.75],
+                        stops: const <double>[0.5, 0.75],
                       ),
                     ),
                   ],

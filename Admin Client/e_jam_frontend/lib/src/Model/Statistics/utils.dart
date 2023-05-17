@@ -20,26 +20,27 @@ class Utils {
   }
 
   static double getProgress(StreamStatus status, DateTime? startTime,
-      DateTime? endTime, bool isDense) {
+      DateTime? endTime, bool isDense, DateTime? nowTime) {
+    if (status == StreamStatus.finished) return isDense ? 1 : 100;
     if (status == StreamStatus.running ||
-        status == StreamStatus.stopped ||
-        status == StreamStatus.error) {
+        status == StreamStatus.error ||
+        status == StreamStatus.stopped) {
+      // sanity check
       if (startTime == null) return 0;
       if (endTime == null) return 50;
       if (endTime.difference(startTime).inSeconds <= 0) return 0;
-      DateTime epoch = DateTime.fromMicrosecondsSinceEpoch(0);
-      num fromStartToNow = DateTime.now().difference(epoch).inSeconds;
-      num toEnd = endTime.difference(epoch).inSeconds;
 
-      num progress =
-          Utils.valueMapper(fromStartToNow, 0, toEnd, isDense ? 1 : 100, 0, 5);
+      DateTime epoch = DateTime.fromMicrosecondsSinceEpoch(0);
+      DateTime now = nowTime ?? DateTime.now();
+      num fromStartToNow = now.difference(epoch).inSeconds;
+      num fromStart = startTime.difference(epoch).inSeconds;
+      num toEnd = endTime.difference(epoch).inSeconds;
+      num progress = Utils.valueMapper(
+          fromStartToNow, fromStart, toEnd, 0, isDense ? 1 : 100, 5);
 
       return progress.toDouble();
-    } else if (status == StreamStatus.finished) {
-      return isDense ? 1 : 100;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   // get the oldest start time and the latest end time and calculate the progress

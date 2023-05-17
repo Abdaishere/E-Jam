@@ -72,33 +72,19 @@ class StreamEntry {
         endTime:
             DateTime.fromMillisecondsSinceEpoch((json["endTime"] ?? 0) * 1000)
                 .toLocal(),
-        delay: (num.tryParse(json["delay"].toString()) ?? num.parse("-1")),
+        delay: num.tryParse(json["delay"].toString()) ?? -1,
         streamId: json["streamId"],
         generatorsIds: List<String>.from(json["generatorsIds"].map((x) => x)),
         verifiersIds: List<String>.from(json["verifiersIds"].map((x) => x)),
         payloadType: json["payloadType"],
-        burstLength:
-            (num.tryParse(json["burstLength"].toString()) ?? num.parse("-1"))
-                .floor(),
-        burstDelay:
-            (num.tryParse(json["burstDelay"].toString()) ?? num.parse("-1"))
-                .floor(),
-        numberOfPackets: (num.tryParse(json["numberOfPackets"].toString()) ??
-                num.parse("-1"))
-            .floor(),
-        payloadLength:
-            (num.tryParse(json["payloadLength"].toString()) ?? num.parse("-1"))
-                .floor(),
-        seed: (num.tryParse(json["seed"].toString()) ?? num.parse("-1")),
-        broadcastFrames: (num.tryParse(json["broadcastFrames"].toString()) ??
-                num.parse("-1"))
-            .floor(),
-        interFrameGap:
-            (num.tryParse(json["interFrameGap"].toString()) ?? num.parse("-1"))
-                .floor(),
-        timeToLive:
-            (num.tryParse(json["timeToLive"].toString()) ?? num.parse("-1"))
-                .floor(),
+        burstLength: num.tryParse(json["burstLength"].toString()) ?? -1,
+        burstDelay: num.tryParse(json["burstDelay"].toString()) ?? -1,
+        numberOfPackets: num.tryParse(json["numberOfPackets"].toString()) ?? -1,
+        payloadLength: num.tryParse(json["payloadLength"].toString()) ?? -1,
+        seed: num.tryParse(json["seed"].toString()) ?? -1,
+        broadcastFrames: num.tryParse(json["broadcastFrames"].toString()) ?? -1,
+        interFrameGap: num.tryParse(json["interFrameGap"].toString()) ?? -1,
+        timeToLive: num.tryParse(json["timeToLive"].toString()) ?? -1,
         transportLayerProtocol:
             transportLayerProtocolFromString(json["transportLayerProtocol"]),
         flowType: flowTypeFromString(json["flowType"]),
@@ -147,9 +133,6 @@ class Process {
   final Map<String, ProcessStatus> processes;
 
   int get total => processes.length;
-  int get progress => processes.values
-      .where((element) => element == ProcessStatus.completed)
-      .length;
 
   factory Process.fromRawJson(String str) => Process.fromJson(json.decode(str));
 

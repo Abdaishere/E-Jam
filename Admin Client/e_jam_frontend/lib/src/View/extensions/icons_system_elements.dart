@@ -160,7 +160,7 @@ class _StreamsRowState extends State<StreamsRow> {
                   semanticLabel: 'Streams',
                   size: 28,
                 ),
-                color: streamRunningColor,
+                color: streamColorScheme(StreamStatus.running),
                 tooltip: 'Running Streams',
                 onPressed: () {},
               ),
@@ -185,7 +185,7 @@ class _StreamsRowState extends State<StreamsRow> {
                   semanticLabel: 'Streams',
                   size: 28,
                 ),
-                color: streamErrorColor,
+                color: streamColorScheme(StreamStatus.error),
                 tooltip: 'Error Streams',
                 onPressed: () {},
               ),
@@ -210,7 +210,7 @@ class _StreamsRowState extends State<StreamsRow> {
                   semanticLabel: 'Streams',
                   size: 28,
                 ),
-                color: streamFinishedColor,
+                color: streamColorScheme(StreamStatus.finished),
                 tooltip: 'Finished Streams',
                 onPressed: () {},
               ),
@@ -235,7 +235,7 @@ class _StreamsRowState extends State<StreamsRow> {
                   semanticLabel: 'Streams',
                   size: 28,
                 ),
-                color: streamQueuedColor,
+                color: streamColorScheme(StreamStatus.queued),
                 tooltip: 'Queued Streams',
                 onPressed: () {},
               ),
@@ -300,11 +300,11 @@ class _DevicesRowState extends State<DevicesRow> {
             ?.where((element) => element.status == DeviceStatus.offline)
             .length ??
         0;
-    int gens = 0;
+    num gens = 0;
     context.watch<DevicesController>().getDevices?.forEach(
           (element) => gens += element.genProcesses ?? 0,
         );
-    int vers = 0;
+    num vers = 0;
     context.watch<DevicesController>().getDevices?.forEach(
           (element) => vers += element.verProcesses ?? 0,
         );
@@ -346,7 +346,7 @@ class _DevicesRowState extends State<DevicesRow> {
                   semanticLabel: 'Devices',
                   size: 28,
                 ),
-                color: deviceRunningOrOnlineColor,
+                color: deviceStatusColorScheme(DeviceStatus.online),
                 tooltip: 'Running Devices',
                 onPressed: () {},
               ),
@@ -371,7 +371,7 @@ class _DevicesRowState extends State<DevicesRow> {
                   semanticLabel: 'Devices',
                   size: 28,
                 ),
-                color: deviceOfflineOrErrorColor,
+                color: deviceStatusColorScheme(DeviceStatus.offline),
                 tooltip: 'Offline Devices',
                 onPressed: () {},
               ),

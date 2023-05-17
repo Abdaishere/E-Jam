@@ -278,6 +278,7 @@ class _StreamCardState extends State<StreamCard> {
                   status: stream.streamStatus,
                   startTime: stream.startTime,
                   endTime: stream.endTime,
+                  lastUpdated: stream.lastUpdated,
                 ),
               ],
             ),
@@ -446,7 +447,9 @@ class _StreamCardState extends State<StreamCard> {
               ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.hourglassStart),
-          color: status == StreamStatus.queued ? streamQueuedColor : null,
+          color: status == StreamStatus.queued
+              ? streamColorScheme(StreamStatus.queued)
+              : null,
           tooltip: "Delay",
           onPressed: () async {
             await context.read<StreamsController>().queueStream(id);
@@ -455,7 +458,9 @@ class _StreamCardState extends State<StreamCard> {
         ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.stop),
-          color: status == StreamStatus.stopped ? streamStoppedColor : null,
+          color: status == StreamStatus.stopped
+              ? streamColorScheme(StreamStatus.stopped)
+              : null,
           tooltip: "Stop",
           onPressed: () async {
             await context.read<StreamsController>().stopStream(id);
@@ -473,11 +478,13 @@ class MiniProgressBar extends StatelessWidget {
     required this.status,
     required this.startTime,
     required this.endTime,
+    required this.lastUpdated,
   });
 
   final StreamStatus status;
   final DateTime startTime;
   final DateTime endTime;
+  final DateTime lastUpdated;
 
   @override
   Widget build(BuildContext context) {
@@ -485,7 +492,8 @@ class MiniProgressBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(10.0),
       child: LinearProgressIndicator(
         minHeight: 5.0,
-        value: Utils.getProgress(status, startTime, endTime, true),
+        value: Utils.getProgress(status, startTime, endTime, true,
+            status != StreamStatus.running ? lastUpdated : DateTime.now()),
         backgroundColor: streamColorScheme(status).withAlpha(100),
         valueColor: AlwaysStoppedAnimation<Color>(streamColorScheme(status)),
       ),

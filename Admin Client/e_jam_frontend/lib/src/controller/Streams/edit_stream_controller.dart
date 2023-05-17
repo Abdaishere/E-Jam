@@ -1,6 +1,7 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
@@ -153,7 +154,7 @@ class EditStreamController extends ChangeNotifier {
     updateDevicesCounter();
   }
 
-  Future<bool?> updateStream(
+  Future<Message?> updateStream(
       GlobalKey<FormState> formKey, String id, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
@@ -171,32 +172,25 @@ class EditStreamController extends ChangeNotifier {
           verifiers.add(key);
         }
       });
-
       return context.read<StreamsController>().updateStream(
             id,
             StreamEntry(
               name: _nameController.text,
               description: _descriptionController.text,
-              delay: (num.tryParse(_delayController.text) ?? num.parse("-1")),
+              delay: num.parse(_delayController.text).floor(),
               streamId: _idController.text,
               generatorsIds: generators,
               verifiersIds: verifiers,
               payloadType: _payloadType,
-              burstLength: (num.tryParse(_burstLengthController.text) ??
-                  num.parse("-1")),
-              burstDelay:
-                  (num.tryParse(_burstDelayController.text) ?? num.parse("-1")),
-              numberOfPackets:
-                  (num.tryParse(_packetsController.text) ?? num.parse("-1")),
-              payloadLength: (num.tryParse(_payloadLengthController.text) ??
-                  num.parse("-1")),
-              seed: (num.tryParse(_seedController.text) ?? num.parse("-1")),
-              broadcastFrames: (num.tryParse(_broadcastFramesController.text) ??
-                  num.parse("-1")),
-              interFrameGap: (num.tryParse(_interFrameGapController.text) ??
-                  num.parse("-1")),
-              timeToLive:
-                  (num.tryParse(_timeToLiveController.text) ?? num.parse("-1")),
+              burstLength: num.parse(_burstLengthController.text).floor(),
+              burstDelay: num.parse(_burstDelayController.text).floor(),
+              numberOfPackets: num.parse(_packetsController.text).floor(),
+              payloadLength: num.parse(_payloadLengthController.text).floor(),
+              seed: num.parse(_seedController.text).floor(),
+              broadcastFrames:
+                  num.parse(_broadcastFramesController.text).floor(),
+              interFrameGap: num.parse(_interFrameGapController.text).floor(),
+              timeToLive: num.parse(_timeToLiveController.text).floor(),
               transportLayerProtocol: _transportLayerProtocol,
               flowType: _flowType,
               checkContent: _checkContent,

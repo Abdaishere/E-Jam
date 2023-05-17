@@ -195,8 +195,8 @@ class _DevicesListViewState extends State<DevicesListView> {
               color: _isPinged == null
                   ? Colors.lightBlue.shade300
                   : _isPinged!
-                      ? deviceRunningOrOnlineColor
-                      : deviceOfflineOrErrorColor,
+                      ? deviceStatusColorScheme(DeviceStatus.online)
+                      : deviceStatusColorScheme(DeviceStatus.offline),
             ),
           ),
         ),
@@ -230,7 +230,7 @@ class AddDeviceButton extends StatelessWidget {
     return FloatingActionButton(
       tooltip: 'Add Device',
       heroTag: 'addDevice',
-      backgroundColor: Colors.deepOrangeAccent,
+      backgroundColor: Colors.orange.shade800,
       mini: true,
       onPressed: () {
         Navigator.of(context).push(
