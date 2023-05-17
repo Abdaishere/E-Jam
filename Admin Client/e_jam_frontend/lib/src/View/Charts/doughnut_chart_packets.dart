@@ -53,7 +53,7 @@ class _DoughnutChartPacketsState extends State<DoughnutChartPackets> {
       DoughnutSeries<PacketsState, String>(
           animationDuration: SystemSettings.showChartsAnimation ? 800 : 0,
           radius: '90%',
-          explode: SystemSettings.fullChartsDetails,
+          explode: SystemSettings.chartsExplode,
           explodeOffset: '15%',
           dataSource: packetsState,
           xValueMapper: (PacketsState data, _) => data.state,

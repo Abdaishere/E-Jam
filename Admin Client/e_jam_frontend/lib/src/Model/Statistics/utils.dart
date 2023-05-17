@@ -35,8 +35,8 @@ class Utils {
       num fromStartToNow = now.difference(epoch).inSeconds;
       num fromStart = startTime.difference(epoch).inSeconds;
       num toEnd = endTime.difference(epoch).inSeconds;
-      num progress = Utils.valueMapper(
-          fromStartToNow, fromStart, toEnd, 0, isDense ? 1 : 100, 5);
+      num progress = Utils.valueMapper(fromStartToNow, fromStart, toEnd, 0,
+          isDense ? 1 : 100, isDense ? 5 : 2);
 
       return progress.toDouble();
     }

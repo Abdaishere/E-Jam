@@ -118,6 +118,18 @@ class _SettingsViewState extends State<SettingsView> {
           },
         ),
       ),
+      ListTile(
+        title: const Text('Explode charts'),
+        trailing: CupertinoSwitch(
+          value: SystemSettings.chartsExplode,
+          onChanged: (value) async {
+            SystemSettings.chartsExplode = value;
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setBool('chartsExplode', value);
+            setState(() {});
+          },
+        ),
+      ),
       const Divider(
         height: 15,
         indent: 10,

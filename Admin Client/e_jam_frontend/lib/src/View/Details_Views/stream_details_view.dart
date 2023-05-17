@@ -184,7 +184,8 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   lastUpdated: stream?.lastUpdated,
                 ),
                 _streamActionButtons(
-                    id: id, status: stream?.streamStatus ?? StreamStatus.error),
+                    id: id,
+                    status: stream?.streamStatus ?? StreamStatus.created),
                 const SizedBox(height: 10),
               ],
             ),
@@ -259,7 +260,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         Expanded(
           flex: 4,
           child: Visibility(
-            visible: isLoading,
+            visible: !isLoading,
             replacement: Center(
               child: LoadingAnimationWidget.threeArchedCircle(
                 color: Colors.grey,
@@ -684,11 +685,10 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.pause),
-          color: (status != StreamStatus.running &&
-                  status != StreamStatus.stopped &&
-                  status != StreamStatus.queued)
-              ? streamColorScheme(status)
-              : null,
+          color:
+              (status == StreamStatus.error || status == StreamStatus.stopped)
+                  ? streamColorScheme(status)
+                  : null,
           tooltip: "Pause",
           onPressed: () {
             context.read<StreamsController>().stopStream(id).then((success) {

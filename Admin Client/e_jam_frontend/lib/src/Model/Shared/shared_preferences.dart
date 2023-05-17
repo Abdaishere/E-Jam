@@ -73,7 +73,8 @@ class SystemSettings {
   static bool lineGraphCurveSmooth = true;
   static bool showBottomLineChart = true;
   static bool showBackgroundBall = true;
-  static bool fullChartsDetails = true;
+  static bool fullChartsDetails = false;
+  static bool chartsExplode = true;
   static bool showDashboardAnimations = true;
   static bool showTreeMap = true;
   static bool fullTreeMap = true;
@@ -93,7 +94,8 @@ class SystemSettings {
     lineGraphCurveSmooth = pref.getBool('lineGraphCurveSmooth') ?? true;
     showBottomLineChart = pref.getBool('showBottomLineChart') ?? true;
     showBackgroundBall = pref.getBool('showBackgroundBall') ?? true;
-    fullChartsDetails = pref.getBool('fullChartsDetails') ?? true;
+    fullChartsDetails = pref.getBool('fullChartsDetails') ?? false;
+    chartsExplode = pref.getBool("chartsExplode") ?? true;
     showDashboardAnimations = pref.getBool('showDashboardAnimations') ?? true;
     fullTreeMap = pref.getBool('fullTreeMap') ?? true;
     dashboardExtensionsOrder = pref.getStringList('dashboardExtensionsOrder') ??

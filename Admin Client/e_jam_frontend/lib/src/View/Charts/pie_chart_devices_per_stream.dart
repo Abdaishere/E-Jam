@@ -11,6 +11,7 @@ class RunningProcesses {
   RunningProcesses(this.state, this.number);
 }
 
+// if chart explode is enabled then the first index is exploded by default according to the insertion order
 List<RunningProcesses> initRunningProcesses({
   required int completed,
   required int failed,
@@ -19,17 +20,17 @@ List<RunningProcesses> initRunningProcesses({
   required int stopped,
 }) {
   List<RunningProcesses> result = [];
-  if (completed != 0) {
-    result.add(RunningProcesses(ProcessStatus.completed, completed));
-  }
   if (failed != 0) {
     result.add(RunningProcesses(ProcessStatus.failed, failed));
   }
-  if (queued != 0) {
-    result.add(RunningProcesses(ProcessStatus.queued, queued));
-  }
   if (running != 0) {
     result.add(RunningProcesses(ProcessStatus.running, running));
+  }
+  if (completed != 0) {
+    result.add(RunningProcesses(ProcessStatus.completed, completed));
+  }
+  if (queued != 0) {
+    result.add(RunningProcesses(ProcessStatus.queued, queued));
   }
   if (stopped != 0) {
     result.add(RunningProcesses(ProcessStatus.stopped, stopped));
@@ -82,7 +83,7 @@ class PieDevices extends StatelessWidget {
       PieSeries<RunningProcesses, String>(
         animationDuration: SystemSettings.showChartsAnimation ? 800 : 0,
         radius: '90%',
-        explode: SystemSettings.fullChartsDetails,
+        explode: SystemSettings.chartsExplode,
         explodeIndex: 0,
         explodeOffset: '15%',
         dataSource: data,

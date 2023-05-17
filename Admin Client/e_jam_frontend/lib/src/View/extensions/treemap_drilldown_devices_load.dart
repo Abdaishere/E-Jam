@@ -65,7 +65,7 @@ class _TreeMapDrillDownDevicesLoadState
             deviceProcesses[processStatus] = ProcessInfo(
               deviceName: "${device.name} \n${device.macAddress} ",
               streamOnDevice:
-                  "${stream.name} \n${stream.streamId} \nGenerator ",
+                  "${stream.name} \nID: ${stream.streamId} \nType: Generator ",
               deviceStatus: device.status ?? DeviceStatus.offline,
               totalProcesses:
                   (deviceProcesses[processStatus]?.totalProcesses ?? 0) + 1,
@@ -81,7 +81,8 @@ class _TreeMapDrillDownDevicesLoadState
           if (processStatus != null) {
             deviceProcesses[processStatus] = ProcessInfo(
               deviceName: "${device.name} \n${device.macAddress} ",
-              streamOnDevice: "${stream.name} \n${stream.streamId} \nVerifier",
+              streamOnDevice:
+                  "${stream.name} \nID: ${stream.streamId} \nType: Verifier",
               deviceStatus: device.status ?? DeviceStatus.offline,
               totalProcesses:
                   (deviceProcesses[processStatus]?.totalProcesses ?? 0) + 1,
@@ -212,7 +213,7 @@ class _TreeMapDrillDownDevicesLoadState
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Device: ${tile.group.substring(0, tile.group.indexOf('\n'))} \nProcesses :${(totalDeviceProcesses).floor()}',
+                    'Device: ${tile.group.substring(0, tile.group.indexOf('\n'))} \nProcesses: ${(totalDeviceProcesses).floor()}',
                     style: const TextStyle(color: Colors.black),
                   ),
                 );
@@ -252,7 +253,7 @@ class _TreeMapDrillDownDevicesLoadState
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'Stream: ${tile.group} \nProcesses :${(_source[tile.indices[0]].totalProcesses).floor()}',
+                    'Stream: ${tile.group} \nProcesses: ${(_source[tile.indices[0]].totalProcesses).floor()}',
                     style: const TextStyle(color: Colors.black),
                   ),
                 );

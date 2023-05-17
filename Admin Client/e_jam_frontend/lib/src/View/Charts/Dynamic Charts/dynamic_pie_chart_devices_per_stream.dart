@@ -55,7 +55,7 @@ class _DynamicPieDevicesState extends State<DynamicPieDevices> {
       PieSeries<RunningProcesses, String>(
         animationDuration: SystemSettings.showChartsAnimation ? 800 : 0,
         radius: '90%',
-        explode: SystemSettings.fullChartsDetails,
+        explode: SystemSettings.chartsExplode,
         explodeIndex: 0,
         explodeOffset: '15%',
         dataSource: data,
