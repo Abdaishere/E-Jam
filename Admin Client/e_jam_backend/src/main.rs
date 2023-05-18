@@ -1,9 +1,8 @@
-use std::thread;
-
 use actix_web::{web, App, HttpServer};
 use log::info;
 
-use crate::services::statistics::{run_generator_consumer, run_verifier_consumer};
+#[cfg(feature = "fake_data")]
+use std::thread;
 #[cfg(feature = "fake_data")]
 mod faker;
 mod models;
@@ -21,15 +20,6 @@ async fn main() -> std::io::Result<()> {
     // generate fake data for Devices and StreamEntry Struct
     #[cfg(feature = "fake_data")]
     faker::generate_fake_metrics(&app_state).await;
-
-    // start consumer threads for generator and verifier statistics
-    thread::spawn(|| {
-        run_generator_consumer();
-    });
-
-    thread::spawn(|| {
-        run_verifier_consumer();
-    });
 
     // start fake data for generator and verifier statics
     #[cfg(feature = "fake_data")]

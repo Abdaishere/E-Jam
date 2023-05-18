@@ -139,7 +139,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
                     }
                 };
                 let fake_statics = Generator::generate_fake_generator_data(id.to_owned(), mac);
-
+                info!("fake date for Generator: {:?}", &fake_statics);
                 // convert the fake_statics to a Value type data for avro encoding
                 let encoded_data = encoder.encode_struct(fake_statics, &strategy);
                 match encoded_data {
@@ -150,8 +150,18 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
                             topic: GENERATOR_TOPIC,
                             partition: 0,
                         };
-
-                        producer.send(&record).unwrap();
+                        let result = producer.send(&record);
+                        match result {
+                            Ok(_) => {
+                                info!("Sent fake Generator data to Kafka Broker");
+                            }
+                            Err(e) => {
+                                error!(
+                                    "Failed to send fake Generator data to Kafka Broker: {:?}",
+                                    e
+                                );
+                            }
+                        }
                     }
                     Err(e) => {
                         error!("Failed to encode fake data: {:?}", e);
@@ -204,6 +214,7 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
                 };
                 let fake_statics = Verifier::generate_fake_verifier_data(id.to_owned(), mac);
 
+                info!("fake date for verifier: {:?}", &fake_statics);
                 // convert the fake_statics to a Value type data for avro encoding
                 let encoded_data = encoder.encode_struct(fake_statics, &strategy);
                 match encoded_data {
@@ -214,8 +225,18 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
                             topic: VERIFIER_TOPIC,
                             partition: 0,
                         };
-
-                        producer.send(&record).unwrap();
+                        let result = producer.send(&record);
+                        match result {
+                            Ok(_) => {
+                                info!("Sent fake Verifier stats to Kafka Broker");
+                            }
+                            Err(e) => {
+                                error!(
+                                    "Failed to send fake Verifier data to Kafka Broker: {:?}",
+                                    e
+                                );
+                            }
+                        }
                     }
                     Err(e) => {
                         error!("Failed to encode fake data: {:?}", e);

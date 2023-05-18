@@ -9,9 +9,18 @@ mod device;
 mod pre_sets;
 pub(crate) mod statistics;
 
-use self::device::{
-    add_device, check_new_device, delete_device, get_device, get_devices, ping_all_devices,
-    ping_device, stream_finished, stream_started, update_device,
+use self::{
+    device::{
+        add_device, check_new_device, delete_device, get_device, get_devices, ping_all_devices,
+        ping_device, stream_finished, stream_started, update_device,
+    },
+    statistics::query::{
+        get_all_stream_statistics_for_generator, get_all_stream_statistics_for_verifier,
+        get_earliest_device_statistics_for_generator, get_earliest_device_statistics_for_verifier,
+        get_earliest_stream_statistics_for_generator, get_earliest_stream_statistics_for_verifier,
+        get_latest_device_statistics_for_generator, get_latest_device_statistics_for_verifier,
+        get_latest_stream_statistics_for_generator, get_latest_stream_statistics_for_verifier,
+    },
 };
 
 #[doc = r"# Index
@@ -1098,6 +1107,16 @@ pub fn init_routes(config: &mut web::ServiceConfig) {
         .service(start_all_streams)
         .service(stop_all_streams)
         .service(ping_all_devices)
+        .service(get_all_stream_statistics_for_generator)
+        .service(get_all_stream_statistics_for_verifier)
+        .service(get_earliest_stream_statistics_for_generator)
+        .service(get_earliest_stream_statistics_for_verifier)
+        .service(get_latest_stream_statistics_for_generator)
+        .service(get_latest_stream_statistics_for_verifier)
+        .service(get_earliest_device_statistics_for_generator)
+        .service(get_earliest_device_statistics_for_verifier)
+        .service(get_latest_device_statistics_for_generator)
+        .service(get_latest_device_statistics_for_verifier)
         .service(get_streams)
         .service(get_stream)
         .service(add_stream)

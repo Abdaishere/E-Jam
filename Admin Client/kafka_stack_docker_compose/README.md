@@ -7,6 +7,18 @@ Just connect against `localhost:9092`. If you are on Mac or Windows and want to 
 
 This replicates as well as possible real deployment configurations, where you have your zookeeper servers and kafka servers actually all distinct from each other. This solves all the networking hurdles that comes with Docker and docker-compose, and is compatible cross platform.
 
+## Start the ksqlDB CLI
+
+ksqlDB runs as a server which clients connect to in order to issue queries.
+
+Run this command to connect to the ksqlDB server and enter an interactive command-line interface (CLI) session.
+
+for more info see [ksqlDB CLI](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/cli/)
+
+```bash
+docker-compose exec ksqldb-cli ksql http://ksqldb-server:8088
+```
+
 ## Stack version
 
 - Conduktor Platform: latest
@@ -18,7 +30,7 @@ This replicates as well as possible real deployment configurations, where you ha
 - ksqlDB Server: Confluent 7.3.2
 - Zoonavigator: 1.1.1
 
-For a UI tool to access your local Kafka cluster, use the free version of [Conduktor](https://www.conduktor.io/get-started)
+For a UI tool to access your local Kafka cluster, use [Conduktor](https://www.conduktor.io/get-started)
 
 ## Requirements
 

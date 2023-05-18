@@ -122,10 +122,20 @@ services:
       KSQL_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:19092
       KSQL_LISTENERS: http://0.0.0.0:8088/
       KSQL_KSQL_SERVICE_ID: ksqldb-server_
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: http://kafka-schema-registry:8081/
     depends_on:
       - Zookeeper
       - kafka
 
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:latest
+    container_name: ksqldb-cli
+    depends_on:
+      - kafka
+      - ksqldb-server
+    entrypoint: /bin/sh
+    tty: true
+    
   conduktor-platform:
     image: conduktor/conduktor-platform:latest
     ports:

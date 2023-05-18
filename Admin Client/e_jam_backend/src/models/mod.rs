@@ -31,7 +31,7 @@ lazy_static! {
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
 
     #[doc="Runtime that is used to spawn the threads that are used to send the requests to the systemAPI"]
-    static ref RUNTIME: Runtime = Runtime::new().unwrap();
+    pub static ref RUNTIME: Runtime = Runtime::new().unwrap();
 }
 
 #[doc = " # handler
