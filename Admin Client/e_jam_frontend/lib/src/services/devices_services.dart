@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
@@ -136,6 +138,46 @@ class DevicesServices {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<List<VerifierStatisticsInstance>> getVerifierStatisticsInstances(
+      String deviceMac) async {
+    try {
+      final response = await client
+          .get(Uri.parse('$uri/$deviceMac/statistics/verifier/earliest'))
+          .timeout(NetworkController.timeout);
+      if (200 == response.statusCode) {
+        return (jsonDecode(response.body) as List)
+            .map((e) => VerifierStatisticsInstance.fromJson(e))
+            .toList();
+      } else if (204 == response.statusCode) {
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<GeneratorStatisticsInstance>> getGeneratorStatisticsInstance(
+      String deviceMac) async {
+    try {
+      final response = await client
+          .get(Uri.parse('$uri/$deviceMac/statistics/generator/earliest'))
+          .timeout(NetworkController.timeout);
+      if (200 == response.statusCode) {
+        return (jsonDecode(response.body) as List)
+            .map((e) => GeneratorStatisticsInstance.fromJson(e))
+            .toList();
+      } else if (204 == response.statusCode) {
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
     }
   }
 }

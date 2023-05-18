@@ -263,9 +263,10 @@ The structure of the Device object as a table is as follows:
 - `status` - A DeviceStatus that represents the status of the device (Offline, Idle, Running)
 - `mac_address` - A string that represents the mac address of the device (used for authentication) MAC_ADDRESS is a regex that is used to validate the mac address
 
-#### Kafka REST Proxy
-https://migratorydata.com/blog/migratorydata-with-flutter-and-kafka/
-https://migratorydata.com/solutions/kafka/
-https://medium.com/@stefentaime_10958/real-time-data-processing-and-analysis-with-kafka-connect-ksql-elasticsearch-and-flask-f55366032d78
-https://github.com/conduktor/kafka-stack-docker-compose
-Bridging using the Admin client center point 
+### Kafka REST Proxy
+
+<https://migratorydata.com/blog/migratorydata-with-flutter-and-kafka/>
+<https://migratorydata.com/solutions/kafka/>
+<https://medium.com/@stefentaime_10958/real-time-data-processing-and-analysis-with-kafka-connect-ksql-elasticsearch-and-flask-f55366032d78>
+<https://github.com/conduktor/kafka-stack-docker-compose>
+Bridging using the Admin client center point

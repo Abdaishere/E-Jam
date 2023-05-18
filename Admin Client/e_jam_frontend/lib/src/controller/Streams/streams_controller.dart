@@ -1,6 +1,9 @@
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
+import 'package:e_jam/src/services/statistics.dart';
 import 'package:e_jam/src/services/stream_services.dart';
 import 'package:flutter/material.dart';
 
@@ -135,6 +138,40 @@ class StreamsController extends ChangeNotifier {
       _streamsStatusDetails = value;
       _isLoading = false;
       notifyListeners();
+    });
+  }
+
+  Future<List<VerifierStatisticsInstance>> loadVerifierStatistics(
+      String id) async {
+    _isLoading = true;
+    return _streamServices.getVerifierStatisticsInstances(id).then((value) {
+      _isLoading = false;
+      return value;
+    });
+  }
+
+  Future<List<GeneratorStatisticsInstance>> loadGeneratorStatistics(
+      String id) async {
+    _isLoading = true;
+    return _streamServices.getGeneratorStatisticsInstance(id).then((value) {
+      _isLoading = false;
+      return value;
+    });
+  }
+}
+
+class StatisticsController {
+  static final StatisticsService _statisticsService = StatisticsService();
+
+  Future<List<VerifierStatisticsInstance>> loadAllVerifierStatistics() async {
+    return _statisticsService.getAllVerifierStatisticsInstances().then((value) {
+      return value;
+    });
+  }
+
+  Future<List<GeneratorStatisticsInstance>> loadAllGeneratorStatistics() async {
+    return _statisticsService.getAllGeneratorStatisticsInstance().then((value) {
+      return value;
     });
   }
 }

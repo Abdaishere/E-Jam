@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
@@ -209,6 +211,46 @@ class StreamServices {
       }
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<List<VerifierStatisticsInstance>> getVerifierStatisticsInstances(
+      String streamId) async {
+    try {
+      final response = await client
+          .get(Uri.parse('$uri/$streamId/statistics/verifier/earliest'))
+          .timeout(NetworkController.timeout);
+      if (200 == response.statusCode) {
+        return (jsonDecode(response.body) as List)
+            .map((e) => VerifierStatisticsInstance.fromJson(e))
+            .toList();
+      } else if (204 == response.statusCode) {
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<GeneratorStatisticsInstance>> getGeneratorStatisticsInstance(
+      String streamId) async {
+    try {
+      final response = await client
+          .get(Uri.parse('$uri/$streamId/statistics/generator/earliest'))
+          .timeout(NetworkController.timeout);
+      if (200 == response.statusCode) {
+        return (jsonDecode(response.body) as List)
+            .map((e) => GeneratorStatisticsInstance.fromJson(e))
+            .toList();
+      } else if (204 == response.statusCode) {
+        return [];
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
     }
   }
 }

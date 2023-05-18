@@ -1,3 +1,5 @@
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/services/devices_services.dart';
@@ -8,12 +10,12 @@ class DevicesController extends ChangeNotifier {
   static bool _isLoading = true;
   static bool _isPinging = false;
   static DateTime _lastRefresh = DateTime.now();
-  static DevicesServices devicesServices = DevicesServices();
+  static DevicesServices _devicesServices = DevicesServices();
 
   List<Device>? get getDevices => devices;
   bool get getIsLoading => _isLoading;
   bool get getIsPinging => _isPinging;
-  DevicesServices get getDevicesServices => devicesServices;
+  DevicesServices get getDevicesServices => _devicesServices;
 
   Future loadAllDevices(bool forced) async {
     _isLoading = true;
@@ -26,7 +28,7 @@ class DevicesController extends ChangeNotifier {
     }
 
     _lastRefresh = DateTime.now();
-    return devicesServices.getDevices().then((value) {
+    return _devicesServices.getDevices().then((value) {
       devices = value;
       _isLoading = false;
       notifyListeners();
@@ -35,7 +37,7 @@ class DevicesController extends ChangeNotifier {
 
   Future<Device?> loadDeviceDetails(String mac) async {
     _isLoading = true;
-    return devicesServices.getDevice(mac).then((value) {
+    return _devicesServices.getDevice(mac).then((value) {
       _isLoading = false;
       return value;
     });
@@ -43,7 +45,7 @@ class DevicesController extends ChangeNotifier {
 
   Future<Message?> addNewDevice(Device device) async {
     _isLoading = true;
-    return devicesServices.createDevice(device).then((value) {
+    return _devicesServices.createDevice(device).then((value) {
       _isLoading = false;
       return value;
     });
@@ -51,7 +53,7 @@ class DevicesController extends ChangeNotifier {
 
   Future<bool> pingDevice(String deviceMac) {
     _isPinging = true;
-    return devicesServices.pingDevice(deviceMac).then((value) {
+    return _devicesServices.pingDevice(deviceMac).then((value) {
       loadAllDevices(true);
       _isPinging = false;
       return value;
@@ -60,7 +62,7 @@ class DevicesController extends ChangeNotifier {
 
   Future<bool> pingNewDevice(Device device) {
     _isPinging = true;
-    return devicesServices.checkNewDevice(device).then((value) {
+    return _devicesServices.checkNewDevice(device).then((value) {
       _isPinging = false;
       return value;
     });
@@ -68,7 +70,7 @@ class DevicesController extends ChangeNotifier {
 
   Future<bool?> pingAllDevices() {
     _isPinging = true;
-    return devicesServices.pingAllDevices().then((value) {
+    return _devicesServices.pingAllDevices().then((value) {
       _isPinging = false;
       return value;
     });
@@ -76,7 +78,7 @@ class DevicesController extends ChangeNotifier {
 
   Future<bool?> updateDevice(Device device) async {
     _isLoading = true;
-    return devicesServices.updateDevice(device).then((value) {
+    return _devicesServices.updateDevice(device).then((value) {
       _isLoading = false;
       return value;
     });
@@ -84,7 +86,29 @@ class DevicesController extends ChangeNotifier {
 
   Future<bool> deleteDevice(String deviceMac) async {
     _isLoading = true;
-    return devicesServices.deleteDevice(deviceMac).then((value) {
+    return _devicesServices.deleteDevice(deviceMac).then((value) {
+      _isLoading = false;
+      return value;
+    });
+  }
+
+  Future<List<VerifierStatisticsInstance>> loadVerifierStatistics(
+      String deviceMac) async {
+    _isLoading = true;
+    return _devicesServices
+        .getVerifierStatisticsInstances(deviceMac)
+        .then((value) {
+      _isLoading = false;
+      return value;
+    });
+  }
+
+  Future<List<GeneratorStatisticsInstance>> loadGeneratorStatistics(
+      String deviceMac) async {
+    _isLoading = true;
+    return _devicesServices
+        .getGeneratorStatisticsInstance(deviceMac)
+        .then((value) {
       _isLoading = false;
       return value;
     });
