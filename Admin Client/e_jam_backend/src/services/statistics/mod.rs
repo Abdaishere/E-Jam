@@ -23,15 +23,12 @@ const TIMEOUT: u64 = 10;
 pub fn run_generator_consumer(
     stream_id: &str,
     mac_address: &str,
-    is_latest: bool,
+    fetch_offset: FetchOffset,
 ) -> Result<LinkedList<Generator>, ()> {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
     let sr_settings = SrSettings::new(schema_registry_url);
     let decoder = AvroDecoder::new(sr_settings);
-    let fetch_offset = match is_latest {
-        true => FetchOffset::Latest,
-        false => FetchOffset::Earliest,
-    };
+
     let mut counter = RETRIES;
     let mut consumer: Consumer = loop {
         match Consumer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
@@ -95,9 +92,6 @@ pub fn run_generator_consumer(
                         {
                             info!("Value: {:?}", value);
                             generators.push_back(value);
-                            if is_latest {
-                                break;
-                            }
                         }
                     }
                     Err(e) => {
@@ -110,13 +104,8 @@ pub fn run_generator_consumer(
             if consumed.is_err() {
                 error!("{:?}", consumed.err());
             }
-            if is_latest && !generators.is_empty() {
-                break;
-            }
         }
-        if (is_latest && !generators.is_empty())
-            || (time_counter.elapsed().as_secs() > TIMEOUT && !generators.is_empty())
-        {
+        if time_counter.elapsed().as_secs() > TIMEOUT && !generators.is_empty() {
             break;
         }
 
@@ -128,15 +117,12 @@ pub fn run_generator_consumer(
 pub fn run_verifier_consumer(
     stream_id: &str,
     mac_address: &str,
-    is_latest: bool,
+    fetch_offset: FetchOffset,
 ) -> Result<LinkedList<Verifier>, ()> {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
     let sr_settings = SrSettings::new(schema_registry_url);
     let decoder = AvroDecoder::new(sr_settings);
-    let fetch_offset = match is_latest {
-        true => FetchOffset::Latest,
-        false => FetchOffset::Earliest,
-    };
+
     let mut counter = RETRIES;
     let mut consumer: Consumer = loop {
         match Consumer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
@@ -200,9 +186,6 @@ pub fn run_verifier_consumer(
                         {
                             info!("Value: {:?}", value);
                             verifiers.push_back(value);
-                            if is_latest {
-                                break;
-                            }
                         }
                     }
                     Err(e) => {
@@ -215,13 +198,8 @@ pub fn run_verifier_consumer(
             if consumed.is_err() {
                 error!("{:?}", consumed.err());
             }
-            if is_latest && !verifiers.is_empty() {
-                break;
-            }
         }
-        if (is_latest && !verifiers.is_empty())
-            || (time_counter.elapsed().as_secs() > TIMEOUT && !verifiers.is_empty())
-        {
+        if time_counter.elapsed().as_secs() > TIMEOUT && !verifiers.is_empty() {
             break;
         }
         time_counter = Instant::now();
