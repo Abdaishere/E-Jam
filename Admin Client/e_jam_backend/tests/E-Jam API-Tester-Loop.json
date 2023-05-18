@@ -1,0 +1,223 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "E-Jam API Tester",
+    "dateExported": "2023-05-18T05:29:08.684Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "55a1d160-b2d3-42d3-aeea-1f73cb99ae75",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "list device",
+            "url": "http://localhost:8084/devices",
+            "method": "GET",
+            "sortNum": 12500,
+            "created": "2023-05-08T08:20:46.651Z",
+            "modified": "2023-05-08T08:20:46.651Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "2764cccb-dc5d-4452-8a16-ca6c8eaa0439",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "add random stream",
+            "url": "http://localhost:8084/streams",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-05-08T08:34:02.216Z",
+            "modified": "2023-05-08T08:34:02.216Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"first stream\",\n  \"description\": \"this is stream 000\",\n  \"lastUpdated\": 0,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"delay\": 0,\n  \"generatorsIds\": [\n    \"AA:AA:AA:AA:AA:AA\"\n  ],\n  \"verifiersIds\": [\n    \"AA:AA:AA:AA:AA:AA\"\n  ],\n  \"payloadType\": 0,\n  \"burstLength\": 0,\n  \"burstDelay\": 0,\n  \"numberOfPackets\": 100,\n  \"payloadLength\": 1499,\n  \"seed\": 540024,\n  \"broadcastFrames\": 12,\n  \"interFrameGap\": 123,\n  \"timeToLive\": 1000,\n  \"transportLayerProtocol\": \"TCP\",\n  \"flowType\": \"BackToBack\",\n  \"checkContent\": false\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "00af0afb-fd1d-4de5-85ca-ecc30505cc2c",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "Delete the stream 000",
+            "url": "http://localhost:8084/streams/000",
+            "method": "DELETE",
+            "sortNum": 22500,
+            "created": "2023-05-08T08:20:46.654Z",
+            "modified": "2023-05-08T08:20:46.654Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "c499c851-3034-40d5-893c-64096ddf7fee",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "list streams",
+            "url": "http://localhost:8084/streams",
+            "method": "GET",
+            "sortNum": 23708.5,
+            "created": "2023-05-08T08:20:46.648Z",
+            "modified": "2023-05-15T14:19:43.606Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "54decbbe-08ff-4a94-ab1e-8f36703b77b2",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "queue all",
+            "url": "http://localhost:8084/streams/start_all",
+            "method": "POST",
+            "sortNum": 24917,
+            "created": "2023-05-08T08:20:46.655Z",
+            "modified": "2023-05-08T08:20:46.655Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "62a87b89-0630-4c68-beab-2dab7d6fe3b3",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "add stream 000",
+            "url": "http://localhost:8084/streams",
+            "method": "POST",
+            "sortNum": 26125.5,
+            "created": "2023-05-08T08:32:49.065Z",
+            "modified": "2023-05-08T08:33:23.582Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"streamId\": \"000\",\n  \"name\": \"first stream\",\n  \"description\": \"this is stream 000\",\n  \"lastUpdated\": 0,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"delay\": 0,\n  \"generatorsIds\": [\n    \"AA:AA:AA:AA:AA:AA\"\n  ],\n  \"verifiersIds\": [\n    \"AA:AA:AA:AA:AA:AA\"\n  ],\n  \"payloadType\": 0,\n  \"burstLength\": 0,\n  \"burstDelay\": 0,\n  \"numberOfPackets\": 100,\n  \"payloadLength\": 1499,\n  \"seed\": 540024,\n  \"broadcastFrames\": 12,\n  \"interFrameGap\": 123,\n  \"timeToLive\": 1000,\n  \"transportLayerProtocol\": \"TCP\",\n  \"flowType\": \"BackToBack\",\n  \"checkContent\": false\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "a0a57351-16f3-4b3f-b29d-479d60fad04b",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "stop all",
+            "url": "http://localhost:8084/streams/stop_all",
+            "method": "POST",
+            "sortNum": 27334,
+            "created": "2023-05-08T08:20:46.656Z",
+            "modified": "2023-05-08T08:20:46.656Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "fc1cb151-c261-4d55-b77b-e51b520033ea",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "add stream again",
+            "url": "http://localhost:8084/streams",
+            "method": "POST",
+            "sortNum": 38000.5,
+            "created": "2023-05-08T08:34:58.810Z",
+            "modified": "2023-05-08T08:35:47.354Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"description\": \"this is random stream\",\n  \"lastUpdated\": 0,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"delay\": 0,\n  \"generatorsIds\": [\n    \"AA:AA:AA:AA:AA:AA\"\n  ],\n  \"verifiersIds\": [\n    \"AA:AA:AA:AA:AA:AA\"\n  ],\n  \"payloadType\": 0,\n  \"burstLength\": 0,\n  \"burstDelay\": 0,\n  \"numberOfPackets\": 100,\n  \"payloadLength\": 1499,\n  \"seed\": 540024,\n  \"broadcastFrames\": 12,\n  \"interFrameGap\": 123,\n  \"timeToLive\": 1000,\n  \"transportLayerProtocol\": \"TCP\",\n  \"flowType\": \"BackToBack\",\n  \"checkContent\": false\n}",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "166820e7-32d7-4655-bdfc-592cdc3c9e68",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "add invalid stream",
+            "url": "http://localhost:8084/streams",
+            "method": "POST",
+            "sortNum": 48667,
+            "created": "2023-05-08T08:20:46.657Z",
+            "modified": "2023-05-10T07:50:35.447Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n  \"lastUpdated\": 0,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"delay\": 0,\n  \"generatorsIds\": [\"\"\n  ],\n  \"verifiersIds\": [\"\"\n  ],\n  \"payloadType\": 0,\n  \"burstLength\": 0,\n  \"burstDelay\": 0,\n  \"numberOfPackets\": 0,\n  \"payloadLength\": 15000,\n  \"seed\": 0,\n  \"broadcastFrames\": 0,\n  \"interFrameGap\": 0,\n  \"timeToLive\": 0,\n  \"transportLayerProtocol\": \"TCP\",\n  \"flowType\": \"BackToBack\",\n  \"checkContent\": false\n  }",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "2917205a-1262-4055-9ace-75eea5ec5949",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "queue stream",
+            "url": "http://localhost:8084/streams/000/start",
+            "method": "POST",
+            "sortNum": 54000.3,
+            "created": "2023-05-08T08:20:46.658Z",
+            "modified": "2023-05-08T08:20:46.658Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "4775e776-3873-428a-9264-22748bccfcc8",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "edit stream 000",
+            "url": "http://localhost:8084/streams/000",
+            "method": "PUT",
+            "sortNum": 59333.5,
+            "created": "2023-05-08T08:20:46.659Z",
+            "modified": "2023-05-08T08:20:46.659Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "  {\n    \"streamId\": \"000\",\n    \"name\": \"first stream\",\n    \"description\": \"this is stream 000\",\n    \"lastUpdated\": 0,\n    \"startTime\": null,\n    \"endTime\": null,\n    \"delay\": 0,\n    \"generatorsIds\": [\n      \"localhost\"\n    ],\n    \"verifiersIds\": [\n      \"localhost\"\n    ],\n    \"payloadType\": 0,\n    \"burstLength\": 0,\n    \"burstDelay\": 0,\n    \"numberOfPackets\": 100,\n    \"payloadLength\": 1499,\n    \"seed\": 540024,\n    \"broadcastFrames\": 12,\n    \"interFrameGap\": 123,\n    \"timeToLive\": 1000,\n    \"transportLayerProtocol\": \"TCP\",\n    \"flowType\": \"BackToBack\",\n    \"checkContent\": false\n  }",
+                "form": []
+            },
+            "tests": []
+        },
+        {
+            "_id": "aa5a5213-37e6-497d-a308-7fd267e493ce",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "get the stream entry",
+            "url": "http://localhost:8084/streams/000",
+            "method": "GET",
+            "sortNum": 64666.8,
+            "created": "2023-05-08T08:20:46.660Z",
+            "modified": "2023-05-08T08:20:46.660Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "28d630b9-ea35-4b64-88e3-8ac9efa00465",
+            "colId": "21f3bdbb-2b6c-491a-9709-7169d30d2ae9",
+            "containerId": "",
+            "name": "checkt stats of all",
+            "url": "http://localhost:8084/streams/status_all",
+            "method": "GET",
+            "sortNum": 67333.4,
+            "created": "2023-05-08T08:20:46.661Z",
+            "modified": "2023-05-08T08:59:20.719Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        }
+    ],
+    "settings": {
+        "runOptions": {
+            "delay": 5,
+            "iterations": 10,
+            "dataFilePath": ""
+        }
+    }
+}
