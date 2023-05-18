@@ -32,4 +32,4 @@ rand = { version = "0.8.5", optional = true }
 
 [features]
 # Runing with fake data and a random statics generator
-fake_data = ["dep:fake", "dep:rand"] 
+fake_data = ["dep:fake", "dep:rand"]

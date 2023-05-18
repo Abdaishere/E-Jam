@@ -72,7 +72,6 @@ pub async fn generate_fake_stream_entries(
             }
         }
 
-
         let stream: StreamEntry = StreamEntry::generate_fake_stream_entry(
             gen_mac,
             ver_mac,
@@ -99,15 +98,14 @@ pub async fn generate_fake_devices(devices_list: &Mutex<HashMap<String, Device>>
     }
 }
 
-// Warning: you need to put the schemas first in the schema registry first in order to produce and encode the fake data
+// schemas should exist in the registry first
 pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<StreamEntry>) {
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
     let sr_settings = SrSettings::new(schema_registry_url);
     let encoder = AvroEncoder::new(sr_settings);
-    let strategy = SubjectNameStrategy::TopicRecordNameStrategy(
-        GENERATOR_TOPIC.to_string(),
-        NAMESPACE.to_string() + "." + GENERATOR_TOPIC,
-    );
+    let subject = format!("{}.{}", NAMESPACE, GENERATOR_TOPIC);
+    let strategy =
+        SubjectNameStrategy::TopicRecordNameStrategy(GENERATOR_TOPIC.to_string(), subject);
 
     let mut producer: Producer = loop {
         match Producer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])
@@ -117,7 +115,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
         {
             Ok(consumer) => break consumer,
             Err(_e) => {
-                // error!("{:?}", _e);
+                error!("{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
@@ -169,10 +167,9 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
     let schema_registry_url = format!("http://{}:{}", HOST, SCHEMA_REGISTRY_PORT);
     let sr_settings = SrSettings::new(schema_registry_url);
     let encoder = AvroEncoder::new(sr_settings);
-    let strategy = SubjectNameStrategy::TopicRecordNameStrategy(
-        VERIFIER_TOPIC.to_string(),
-        NAMESPACE.to_string() + "." + VERIFIER_TOPIC, // this looks ugly (but it works)
-    );
+    let subject = format!("{}.{}", NAMESPACE, VERIFIER_TOPIC);
+    let strategy =
+        SubjectNameStrategy::TopicRecordNameStrategy(VERIFIER_TOPIC.to_string(), subject);
 
     let mut producer: Producer = loop {
         match Producer::from_hosts(vec![format!("{}:{}", HOST, MAIN_BROKER_PORT)])

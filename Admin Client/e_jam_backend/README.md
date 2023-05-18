@@ -22,7 +22,7 @@ The API is tested on a Raspberry Pi 4 Model B with 4GB of RAM.
 The Raspberry Pi is connected to a 100 Mbps network.
 The Raspberry Pi is running Pie OS.
 
-The API is hosted on port 8080.
+The API is hosted on port 8084.
 
 ### What's new
 

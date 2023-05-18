@@ -1,0 +1,59 @@
+# A docker compose file to run Kafka with a graphical desktop user interface for Apache Kafka
+
+Once you have started your cluster, you can use Conduktor to easily manage it.
+Just connect against `localhost:9092`. If you are on Mac or Windows and want to connect from another container, use `host.docker.internal:29092`
+
+## kafka-stack-docker-compose
+
+This replicates as well as possible real deployment configurations, where you have your zookeeper servers and kafka servers actually all distinct from each other. This solves all the networking hurdles that comes with Docker and docker-compose, and is compatible cross platform.
+
+## Stack version
+
+- Conduktor Platform: latest
+- Zookeeper version: 3.6.3 (Confluent 7.3.2)
+- Kafka version: 3.3.0 (Confluent 7.3.2)
+- Kafka Schema Registry: Confluent 7.3.2
+- Kafka Rest Proxy: Confluent 7.3.2
+- Kafka Connect: Confluent 7.3.2
+- ksqlDB Server: Confluent 7.3.2
+- Zoonavigator: 1.1.1
+
+For a UI tool to access your local Kafka cluster, use the free version of [Conduktor](https://www.conduktor.io/get-started)
+
+## Requirements
+
+Kafka will be exposed on `127.0.0.1` or `DOCKER_HOST_IP` if set in the environment.
+(You probably don't need to set it if you're not using Docker-Toolbox)
+
+## Full stack
+
+To ease you journey with kafka just connect to [localhost:8080](http://localhost:8080/)
+
+login: `admin@admin.io`
+password: `admin`
+
+- Conduktor-platform: `$DOCKER_HOST_IP:8080`
+- Single Zookeeper: `$DOCKER_HOST_IP:2181`
+- Single Kafka: `$DOCKER_HOST_IP:9092`
+- Kafka Schema Registry: `$DOCKER_HOST_IP:8081`
+- Kafka Rest Proxy: `$DOCKER_HOST_IP:8082`
+- Kafka Connect: `$DOCKER_HOST_IP:8083`
+- KSQL Server: `$DOCKER_HOST_IP:8088`
+- JMX port at `$DOCKER_HOST_IP:9001`
+
+ Run with:
+
+ ```bash
+ docker-compose up
+ docker-compose down
+ ```
+
+** Note: if you find that you can not connect to [localhost:8080](http://localhost:8080/) please run `docker-compose build` to rebuild the port mappings.
+
+## Testing
+
+Some basic tests are included to verify that the stack is working once up.
+
+```bash
+./test.sh docker-compose.yml
+```
