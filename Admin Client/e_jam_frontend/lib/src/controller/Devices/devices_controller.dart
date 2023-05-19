@@ -1,5 +1,3 @@
-import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
-import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/services/devices_services.dart';
@@ -10,7 +8,7 @@ class DevicesController extends ChangeNotifier {
   static bool _isLoading = true;
   static bool _isPinging = false;
   static DateTime _lastRefresh = DateTime.now();
-  static DevicesServices _devicesServices = DevicesServices();
+  static final DevicesServices _devicesServices = DevicesServices();
 
   List<Device>? get getDevices => devices;
   bool get getIsLoading => _isLoading;
@@ -87,28 +85,6 @@ class DevicesController extends ChangeNotifier {
   Future<bool> deleteDevice(String deviceMac) async {
     _isLoading = true;
     return _devicesServices.deleteDevice(deviceMac).then((value) {
-      _isLoading = false;
-      return value;
-    });
-  }
-
-  Future<List<VerifierStatisticsInstance>> loadVerifierStatistics(
-      String deviceMac) async {
-    _isLoading = true;
-    return _devicesServices
-        .getVerifierStatisticsInstances(deviceMac)
-        .then((value) {
-      _isLoading = false;
-      return value;
-    });
-  }
-
-  Future<List<GeneratorStatisticsInstance>> loadGeneratorStatistics(
-      String deviceMac) async {
-    _isLoading = true;
-    return _devicesServices
-        .getGeneratorStatisticsInstance(deviceMac)
-        .then((value) {
       _isLoading = false;
       return value;
     });

@@ -69,3 +69,38 @@ Some basic tests are included to verify that the stack is working once up.
 ```bash
 ./test.sh docker-compose.yml
 ```
+
+## Advanced usage
+
+## Create a consumer for Avro data in "my_avro_consumer_group" consumer group, starting at the beginning of the topic's
+
+## log and subscribe to a topic. Then consume some data from a topic, which is decoded, translated to
+
+## JSON, and included in the response. The schema used for deserialization is
+
+## fetched automatically from schema registry. Finally, clean up
+
+curl -X POST  -H "Content-Type: application/vnd.kafka.v2+json" \
+      --data '{"name": "my_consumer_instance", "format": "avro", "auto.offset.reset": "earliest"}' \
+      <http://localhost:8082/consumers/my_avro_consumer_group>
+
+## Expected output from preceding command
+
+  {"instance_id":"my_consumer_instance","base_uri":"<http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance"}>
+
+curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" --data '{"topics":["avrotest"]}' \
+      <http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance/subscription>
+
+## No content in response
+
+curl -X GET -H "Accept: application/vnd.kafka.avro.v2+json" \
+      <http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance/records>
+
+## Expected output from preceding command (note that the actual output will contain different data)
+
+  [{"key":null,"value":{"name":"testUser"},"partition":0,"offset":1,"topic":"avrotest"}]
+
+curl -X DELETE -H "Content-Type: application/vnd.kafka.v2+json" \
+      <http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance>
+
+## No content in response if successful

@@ -282,7 +282,7 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
           flex: 1,
           child: TextFormField(
             decoration: const InputDecoration(
-              labelText: 'Time to live',
+              labelText: 'Duration',
               hintText: 'In milliseconds',
             ),
             keyboardType: TextInputType.number,
@@ -291,9 +291,9 @@ class DelayTimeToLiveInterFrameGapFields extends StatelessWidget {
             ],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter a time to live';
+                return 'Please enter a Duration';
               } else if (BigInt.tryParse(value) == null) {
-                return 'Please enter a valid time to live';
+                return 'Please enter a valid Duration';
               }
               return null;
             },
@@ -618,11 +618,11 @@ class _PayloadLengthAndTypeState extends State<PayloadLengthAndType> {
             items: const [
               DropdownMenuItem(
                 value: 0,
-                child: Text('Type 0'),
+                child: Text('Ipv4'),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text('Type 1'),
+                child: Text('Ipv6'),
               ),
               DropdownMenuItem(
                 value: 2,
@@ -685,8 +685,8 @@ class _PacketsBroadcastFramesSizesState
           flex: 1,
           child: TextFormField(
             decoration: const InputDecoration(
-              labelText: 'Broadcast Frames Size',
-              hintText: 'Frames to be broadcasted',
+              labelText: 'Broadcast Frames Frequency',
+              hintText: 'Frequency of broadcasts',
             ),
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[

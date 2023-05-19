@@ -9,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // should include but not limited to:
-// TODO: dense drawer view
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
 

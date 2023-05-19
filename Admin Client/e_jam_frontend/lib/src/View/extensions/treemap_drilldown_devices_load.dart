@@ -116,7 +116,7 @@ class _TreeMapDrillDownDevicesLoadState
   Widget build(BuildContext context) {
     if (_isLoading) {
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.55,
+        height: MediaQuery.of(context).size.height * 0.45,
         child: Center(
           child: LoadingAnimationWidget.dotsTriangle(
             color: Colors.grey,
@@ -126,7 +126,7 @@ class _TreeMapDrillDownDevicesLoadState
       );
     } else if (_source.isEmpty) {
       return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.55,
+        height: MediaQuery.of(context).size.height * 0.45,
         child: const Center(
           child: Icon(
             Icons.stream_sharp,
@@ -138,7 +138,7 @@ class _TreeMapDrillDownDevicesLoadState
     }
 
     return SizedBox(
-        height: MediaQuery.of(context).size.height * 0.55,
+        height: MediaQuery.of(context).size.height * 0.45,
         child: _getTreemap());
   }
 

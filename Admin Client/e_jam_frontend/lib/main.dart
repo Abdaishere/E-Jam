@@ -11,6 +11,7 @@ import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
+import 'package:e_jam/src/services/statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -78,7 +79,7 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer(
         builder: (context, ThemeModel themeModel, child) => MaterialApp(
-          title: 'E Jam',
+          title: 'E-Jam',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
           darkTheme:
@@ -223,7 +224,7 @@ class _MenuScreenState extends State<MenuScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // back button to close drawer menu
-          Container(
+          Padding(
             padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
             child: IconButton(
               onPressed: () {

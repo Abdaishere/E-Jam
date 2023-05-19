@@ -523,12 +523,25 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            subtitle: Text(stream?.payloadType.toString() ?? 'Unknown',
+            subtitle: Text(payloadTypeToString(stream?.payloadType ?? -1),
                 overflow: TextOverflow.ellipsis),
           ),
         ),
       ],
     );
+  }
+
+  String payloadTypeToString(int payloadType) {
+    switch (payloadType) {
+      case 0:
+        return 'Ipv4';
+      case 1:
+        return 'Ipv6';
+      case 2:
+        return 'Random';
+      default:
+        return 'Unknown';
+    }
   }
 
   ListTile _generationSeed() {
@@ -636,7 +649,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         Expanded(
           child: ListTile(
             title: const Text(
-              'Time to Live',
+              'Duration',
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.bold,

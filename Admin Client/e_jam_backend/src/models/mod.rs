@@ -209,13 +209,11 @@ pub struct StreamEntry {
 
     #[doc = r" ## Payload Type
     This is the type of payload that will be used during the stream
-    0 - alphabetic from a to z four times
-    1 - ....  
-    2 - random bytes with seed and length
+    0 for IPV4, 1 for IPV6 or 2 for Random Bytes
     ## Constraints
     * Must be 0, 1 or 2
     "]
-    #[validate(range(min = 0, max = 2, message = "Payload Type must be 0, 1 or 2"))]
+    #[validate(range(min = 0, max = 2, message = "Payload Type must be 0 for IPV4, 1 for IPV6 or 2 for Random Bytes"))]
     #[serde(default)]
     payload_type: u8,
 
@@ -297,7 +295,7 @@ pub struct StreamEntry {
     #[serde(default)]
     inter_frame_gap: u64,
 
-    #[doc = r" ## Time to Live
+    #[doc = r" ## Time to Live for the packets (also called Time to run)
     This is the time the stream will live for in the device
     time to live in milliseconds
     ## Constraints
@@ -1216,46 +1214,49 @@ this is used to update the stream with the new details passed in the stream entr
                     .rem_euclid((end_time - Utc::now()).num_seconds()),
             );
 
+        const DEV_STATUS: [ProcessStatus; 5] = [
+            ProcessStatus::Queued,
+            ProcessStatus::Running,
+            ProcessStatus::Stopped,
+            ProcessStatus::Completed,
+            ProcessStatus::Failed,
+        ];
+        const STREAM_STATUSES: [StreamStatus; 6] = [
+            StreamStatus::Created,
+            StreamStatus::Queued,
+            StreamStatus::Running,
+            StreamStatus::Finished,
+            StreamStatus::Error,
+            StreamStatus::Stopped,
+        ];
+        const TRANSPORT_LAYER_PROTOCOL_ARR: [TransportLayerProtocol; 2] =
+            [TransportLayerProtocol::Tcp, TransportLayerProtocol::Udp];
+        const FLOW_TYPE_ARR: [FlowType; 2] = [FlowType::Bursts, FlowType::BackToBack];
+
         loop {
             let mut running_generators_map: HashMap<String, ProcessStatus> = HashMap::new();
             let mut running_verifiers_map: HashMap<String, ProcessStatus> = HashMap::new();
+
             for device in generators_macs.iter() {
                 running_generators_map.insert(
                     device.to_owned(),
-                    vec![
-                        ProcessStatus::Queued,
-                        ProcessStatus::Running,
-                        ProcessStatus::Stopped,
-                        ProcessStatus::Completed,
-                        ProcessStatus::Failed,
-                    ][(0..4).fake::<usize>()]
-                    .to_owned(),
+                    DEV_STATUS[(0..DEV_STATUS.len()).fake::<usize>()].to_owned(),
                 );
             }
 
             for device in verifiers_macs.iter() {
                 running_verifiers_map.insert(
                     device.to_owned(),
-                    vec![
-                        ProcessStatus::Queued,
-                        ProcessStatus::Running,
-                        ProcessStatus::Stopped,
-                        ProcessStatus::Completed,
-                        ProcessStatus::Failed,
-                    ][(0..4).fake::<usize>()]
-                    .to_owned(),
+                    DEV_STATUS[(0..DEV_STATUS.len()).fake::<usize>()].to_owned(),
                 );
             }
-            let status = vec![
-                StreamStatus::Created,
-                StreamStatus::Sent,
-                StreamStatus::Queued,
-                StreamStatus::Running,
-                StreamStatus::Finished,
-                StreamStatus::Error,
-                StreamStatus::Stopped,
-            ][(0..6).fake::<usize>()]
-            .to_owned();
+
+            let stream_stat = STREAM_STATUSES[(0..STREAM_STATUSES.len()).fake::<usize>()].to_owned();
+
+            let flow_t = FLOW_TYPE_ARR[(0..FLOW_TYPE_ARR.len()).fake::<usize>()].to_owned();
+
+            let transport_layer_prot = TRANSPORT_LAYER_PROTOCOL_ARR
+                [(0..TRANSPORT_LAYER_PROTOCOL_ARR.len()).fake::<usize>()].to_owned();
 
             let mut stream = StreamEntry {
                 stream_id: "".to_string(),
@@ -1273,20 +1274,15 @@ this is used to update the stream with the new details passed in the stream entr
                 broadcast_frames: Faker.fake(),
                 inter_frame_gap: Faker.fake(),
                 time_to_live: Faker.fake(),
-                transport_layer_protocol: vec![
-                    TransportLayerProtocol::Tcp,
-                    TransportLayerProtocol::Udp,
-                ][(0..1).fake::<usize>()]
-                .to_owned(),
-                flow_type: vec![FlowType::Bursts, FlowType::BackToBack][(0..1).fake::<usize>()]
-                    .to_owned(),
+                transport_layer_protocol: transport_layer_prot,
+                flow_type: flow_t,
                 check_content: Faker.fake(),
                 last_updated: updates,
                 start_time: Some(starts_at),
                 end_time: Some(ends_at),
                 running_generators: running_generators_map,
                 running_verifiers: running_verifiers_map,
-                stream_status: status,
+                stream_status: stream_stat,
             };
 
             stream
