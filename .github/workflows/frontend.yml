@@ -27,7 +27,8 @@ jobs:
 
             - name: "Install Tools"
               run: sudo apt-get install build-essential
-              
+            - run: sudo apt-get install cmake
+            - run: sudo apt-get install clang++
             - run: sudo apt-get install ninja-build
             - run: sudo apt-get install libvlccore-dev
             - run: sudo apt-get install libvlc-dev
