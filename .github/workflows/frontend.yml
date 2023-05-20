@@ -13,6 +13,9 @@ jobs:
     build-Linux-Web-APK:
         name : "Build Flutter App"
         runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: "./Admin Client/e_jam_frontend/"
         steps:
             - name: "Checkout"
               uses: actions/checkout@v2
@@ -26,9 +29,6 @@ jobs:
               uses: subosito/flutter-action@v1
               with:
                     flutter-version: "3.10.1"
-
-            - name: "Go to Frontend"
-              run: "cd \"./Admin Client/e_jam_frontend/\""
 
             - name: "Get Packages"
               run: flutter pub get
@@ -69,6 +69,9 @@ jobs:
     build-MacOS-IOS:
         name: "Deploy to MacOS and IOS"
         runs-on: macos-latest
+        defaults:
+          run:
+            working-directory: "./Admin Client/e_jam_frontend/"
         steps:
             - name: "Checkout"
               uses: actions/checkout@v2
@@ -82,9 +85,6 @@ jobs:
               uses: subosito/flutter-action@v1
               with:
                     flutter-version: "3.10.1"
-            
-            - name: "Go to Frontend"
-              run: "cd \"./Admin Client/e_jam_frontend/\""
 
             - name: "Get Packages"
               run: flutter pub get
@@ -114,6 +114,9 @@ jobs:
     build-Windows:
         name: "Deploy to Windows"
         runs-on: windows-latest
+        defaults:
+          run:
+            working-directory: "./Admin Client/e_jam_frontend/"
         steps:
             - name: "Checkout"
               uses: actions/checkout@v2
@@ -127,9 +130,6 @@ jobs:
               uses: subosito/flutter-action@v1
               with:
                     flutter-version: "3.10.1"
-            
-            - name: "Go to Frontend"
-              run: "cd \"./Admin Client/e_jam_frontend/\""
 
             - name: "Get Packages"
               run: flutter pub get
