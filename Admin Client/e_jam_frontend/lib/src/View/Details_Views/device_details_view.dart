@@ -1,5 +1,6 @@
 import 'dart:math';
-
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
@@ -9,11 +10,13 @@ import 'package:e_jam/src/View/Charts/doughnut_chart_packets.dart';
 import 'package:e_jam/src/View/Details_Views/edit_device_view.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/device_status_icon_button.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DevicesDetailsView extends StatefulWidget {
@@ -147,7 +150,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                   indent: 10,
                   endIndent: 10,
                 ),
-                const ProgressDeviceDetails(),
+                SpeedMonitor(mac: device.macAddress),
                 const SizedBox(height: 10),
               ],
             ),
@@ -377,22 +380,53 @@ class NameAndAddress extends StatelessWidget {
   }
 }
 
-class ProgressDeviceDetails extends StatelessWidget {
-  const ProgressDeviceDetails({
+class SpeedMonitor extends StatefulWidget {
+  const SpeedMonitor({
+    required this.mac,
     super.key,
   });
 
+  final String mac;
+
   @override
-  Widget build(BuildContext context) => const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              children: <Widget>[
-                FaIcon(FontAwesomeIcons.caretUp, color: uploadColor),
-                Text(
-                  '987654321MB/s',
-                  style: TextStyle(
+  State<SpeedMonitor> createState() => _SpeedMonitorState();
+}
+
+class _SpeedMonitorState extends State<SpeedMonitor> {
+  @override
+  Widget build(BuildContext context) {
+    int upload = 0;
+    int download = 0;
+
+    VerifierStatisticsInstance? verInfo = context
+        .watch<StatisticsController>()
+        .getVerifierStatistics
+        .lastWhereOrNull((element) => element.macAddress == widget.mac);
+    upload = verInfo != null ? verInfo.packetsCorrect : 0;
+
+    GeneratorStatisticsInstance? genInfo = context
+        .watch<StatisticsController>()
+        .getGeneratorStatistics
+        .lastWhereOrNull((element) => element.macAddress == widget.mac);
+
+    download = genInfo != null ? genInfo.packetsSent : 0;
+
+    return getUploadDownload(upload, download);
+  }
+
+  Row getUploadDownload(int upload, int download) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              const FaIcon(FontAwesomeIcons.caretUp,
+                  color: uploadColor, size: 35.0),
+              SizedBox(
+                child: Text(
+                  '$upload MB/s',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
                     letterSpacing: 1.0,
@@ -400,16 +434,20 @@ class ProgressDeviceDetails extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Expanded(
-            child: Column(
-              children: <Widget>[
-                FaIcon(FontAwesomeIcons.caretDown, color: downloadColor),
-                Text(
-                  '987654321MB/s',
-                  style: TextStyle(
+        ),
+        const VerticalDivider(),
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              const FaIcon(FontAwesomeIcons.caretDown,
+                  color: downloadColor, size: 35.0),
+              SizedBox(
+                child: Text(
+                  '$download MB/s',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
                     letterSpacing: 1.0,
@@ -417,11 +455,13 @@ class ProgressDeviceDetails extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 }
 
 class DevicePinger extends StatefulWidget {

@@ -37,6 +37,8 @@ void main() async {
       ),
     );
   };
+
+  WidgetsFlutterBinding.ensureInitialized();
   // init shared preferences
   SystemSettings.init();
 
@@ -177,7 +179,7 @@ class _HomeState extends State<Home> {
       mainScreenTapClose: true,
       shadowLayer1Color: shadowColor,
       angle: 0.0,
-      slideWidth: 270.0,
+      slideWidth: 280.0,
       openCurve: Curves.easeIn,
       closeCurve: Curves.easeOut,
     );
@@ -269,7 +271,7 @@ class _MenuScreenState extends State<MenuScreen> {
               borderRadius: BorderRadius.circular(18),
             ),
             padding:
-                const EdgeInsets.only(top: 1, left: 20, right: 20, bottom: 1),
+                const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

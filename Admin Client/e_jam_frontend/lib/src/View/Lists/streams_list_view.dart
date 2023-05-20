@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:e_jam/main.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/utils.dart';
@@ -16,6 +18,7 @@ import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
 class StreamsListView extends StatefulWidget {
   const StreamsListView({super.key});
@@ -264,7 +267,7 @@ class _StreamCardState extends State<StreamCard> {
                   ],
                 ),
                 // upload and download speed
-                SpeedMonitor(stream.streamId),
+                SpeedMonitor(id: stream.streamId),
 
                 // delay, start, stop, delete, edit, progress bar
                 // status icons should be the status of the stream (running, error, stopped, queued, finished, ready) and stream name (Alphanumeric 3 letters long names) and menu icon for more options and details
@@ -501,26 +504,53 @@ class MiniProgressBar extends StatelessWidget {
   }
 }
 
-// TODO: Bind this to kafka Consumer and update the UI
-class SpeedMonitor extends StatelessWidget {
-  const SpeedMonitor(
-    String id, {
+class SpeedMonitor extends StatefulWidget {
+  const SpeedMonitor({
+    required this.id,
     super.key,
   });
 
+  final String id;
+
+  @override
+  State<SpeedMonitor> createState() => _SpeedMonitorState();
+}
+
+class _SpeedMonitorState extends State<SpeedMonitor> {
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    int upload = 0;
+    int download = 0;
+
+    VerifierStatisticsInstance? verInfo = context
+        .watch<StatisticsController>()
+        .getVerifierStatistics
+        .lastWhereOrNull((element) => element.streamId == widget.id);
+    upload = verInfo != null ? verInfo.packetsCorrect : 0;
+
+    GeneratorStatisticsInstance? genInfo = context
+        .watch<StatisticsController>()
+        .getGeneratorStatistics
+        .lastWhereOrNull((element) => element.streamId == widget.id);
+
+    download = genInfo != null ? genInfo.packetsSent : 0;
+
+    return getUploadDownload(upload, download);
+  }
+
+  Row getUploadDownload(int upload, int download) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Expanded(
           child: Column(
             children: <Widget>[
-              FaIcon(FontAwesomeIcons.caretUp, color: uploadColor, size: 35.0),
+              const FaIcon(FontAwesomeIcons.caretUp,
+                  color: uploadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '0 MB/s',
-                  style: TextStyle(
+                  '$upload MB/s',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
                     letterSpacing: 1.0,
@@ -532,16 +562,16 @@ class SpeedMonitor extends StatelessWidget {
             ],
           ),
         ),
-        VerticalDivider(),
+        const VerticalDivider(),
         Expanded(
           child: Column(
             children: <Widget>[
-              FaIcon(FontAwesomeIcons.caretDown,
+              const FaIcon(FontAwesomeIcons.caretDown,
                   color: downloadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '0 MB/s',
-                  style: TextStyle(
+                  '$download MB/s',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
                     letterSpacing: 1.0,

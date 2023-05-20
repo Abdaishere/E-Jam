@@ -2,43 +2,32 @@ import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
-import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LineChartStream extends StatefulWidget {
-  const LineChartStream(this.id, {super.key});
+  const LineChartStream(
+      {super.key,
+      required this.id,
+      required this.genChartData,
+      required this.verChartData});
 
   final String id;
+  final List<GeneratorStatisticsInstance> genChartData;
+  final List<VerifierStatisticsInstance> verChartData;
   @override
   State<LineChartStream> createState() => _LineChartStreamState();
 }
 
 class _LineChartStreamState extends State<LineChartStream> {
   get id => widget.id;
-  List<GeneratorStatisticsInstance> _genChartData = [];
-  List<VerifierStatisticsInstance> _verChartData = [];
+  get _genChartData => widget.genChartData;
+  get _verChartData => widget.verChartData;
   DateTime now = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    getStatistics();
-  }
-
-  getStatistics() async {
-    var data =
-        await context.read<StreamsController>().loadGeneratorStatistics(id);
-    if (!mounted) return;
-    var data2 =
-        await context.read<StreamsController>().loadVerifierStatistics(id);
-    if (!mounted) return;
-    setState(() {
-      _genChartData = data;
-      _verChartData = data2;
-      now = DateTime.now();
-    });
   }
 
   @override

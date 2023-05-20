@@ -64,7 +64,10 @@ class _DashBoardViewState extends State<DashBoardView> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              MediaQuery.of(context).orientation == Orientation.portrait
+                  ? CrossAxisAlignment.center
+                  : CrossAxisAlignment.start,
           children: [
             if (SystemSettings.showTreeMap) const TreeMapDrillDownDevicesLoad(),
             Wrap(

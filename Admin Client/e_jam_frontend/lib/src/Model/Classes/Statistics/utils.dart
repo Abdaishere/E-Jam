@@ -15,7 +15,6 @@ class Utils {
       num offset = (negA * scale) + toStart;
       num finalNumber = (sourceNumber * scale) + offset;
       num calcScale = pow(10, decimalPrecision);
-      print(finalNumber);
       return ((finalNumber * calcScale).round() / calcScale);
     } catch (e) {
       return 0;

@@ -19,20 +19,22 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
   @override
   Widget build(BuildContext context) {
     SpeedInfoWrapper speedInfoWrapper = Utils.getUploadSpeed(
-        context.watch<StatisticsController>().getGeneratorStatistics ?? [],
-        context.watch<StatisticsController>().getVerifierStatistics ?? []);
-    return SizedBox(
-      width: MediaQuery.of(context).orientation == Orientation.portrait
-          ? MediaQuery.of(context).size.width > 450
-              ? 340
-              : MediaQuery.of(context).size.width
-          : 340,
-      height: 280,
-      child: Card(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-          Radius.circular(8),
-        )),
+        context.watch<StatisticsController>().getGeneratorStatistics,
+        context.watch<StatisticsController>().getVerifierStatistics);
+    return buildGauge(context, speedInfoWrapper);
+  }
+
+  Card buildGauge(BuildContext context, SpeedInfoWrapper speedInfoWrapper) {
+    return Card(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      )),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width > 450
+            ? 340
+            : MediaQuery.of(context).size.width,
+        height: 280,
         child: Consumer(
           builder: (context, ThemeModel theme, child) {
             return SfRadialGauge(
@@ -45,7 +47,8 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                 // Acceptance rate for packets in the system
                 RadialAxis(
                   centerY: 0.3,
-                  radiusFactor: 0.55,
+                  radiusFactor:
+                      MediaQuery.of(context).size.width > 450 ? 0.55 : 0.6,
                   startAngle: 205,
                   endAngle: 335,
                   showLabels: false,
@@ -99,7 +102,8 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                 RadialAxis(
                   centerY: 0.5,
                   centerX: 0.25,
-                  radiusFactor: 0.6,
+                  radiusFactor:
+                      MediaQuery.of(context).size.width > 450 ? 0.6 : 0.7,
                   startAngle: 90,
                   endAngle: 360,
                   showLabels: false,
@@ -163,7 +167,8 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                 RadialAxis(
                   centerY: 0.5,
                   centerX: 0.75,
-                  radiusFactor: 0.6,
+                  radiusFactor:
+                      MediaQuery.of(context).size.width > 450 ? 0.6 : 0.7,
                   startAngle: 180,
                   endAngle: 90,
                   showLabels: false,
@@ -225,9 +230,10 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                 ),
                 // error rate
                 RadialAxis(
-                  radiusFactor: 0.45,
                   startAngle: 180,
                   endAngle: 360,
+                  radiusFactor:
+                      MediaQuery.of(context).size.width > 450 ? 0.45 : 0.5,
                   showLabels: false,
                   canScaleToFit: true,
                   annotations: [

@@ -32,35 +32,33 @@ class _BottomLineChartState extends State<BottomLineChart> {
       ),
       series: <ChartSeries>[
         // Renders spline area chart
-        if (context.watch<StatisticsController>().getGeneratorStatistics !=
-            null)
-          SplineAreaSeries<GeneratorStatisticsInstance, int>(
-            borderColor: uploadColor,
-            borderWidth: 1,
-            dataSource:
-                context.watch<StatisticsController>().getGeneratorStatistics!,
-            yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
-                chartData.packetsSent,
-            xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
-                now.difference(chartData.timestamp).inSeconds,
-            color: uploadColor.withOpacity(0.2),
-          ),
+
+        SplineAreaSeries<GeneratorStatisticsInstance, int>(
+          borderColor: uploadColor,
+          borderWidth: 1,
+          dataSource:
+              context.watch<StatisticsController>().getGeneratorStatistics,
+          yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              chartData.packetsSent,
+          xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              now.difference(chartData.timestamp).inSeconds,
+          color: uploadColor.withOpacity(0.2),
+        ),
 
         // Renders spline area chart
-        if (context.watch<StatisticsController>().getVerifierStatistics != null)
-          SplineAreaSeries<VerifierStatisticsInstance, int>(
-            borderColor: downloadColor,
-            borderWidth: 1,
-            dataSource:
-                context.watch<StatisticsController>().getVerifierStatistics!,
-            yValueMapper: (VerifierStatisticsInstance chartData, _) =>
-                chartData.packetsCorrect +
-                chartData.packetsErrors +
-                chartData.packetsOutOfOrder,
-            xValueMapper: (VerifierStatisticsInstance chartData, _) =>
-                now.difference(chartData.timestamp).inSeconds,
-            color: downloadColor.withOpacity(0.2),
-          ),
+        SplineAreaSeries<VerifierStatisticsInstance, int>(
+          borderColor: downloadColor,
+          borderWidth: 1,
+          dataSource:
+              context.watch<StatisticsController>().getVerifierStatistics,
+          yValueMapper: (VerifierStatisticsInstance chartData, _) =>
+              chartData.packetsCorrect +
+              chartData.packetsErrors +
+              chartData.packetsOutOfOrder,
+          xValueMapper: (VerifierStatisticsInstance chartData, _) =>
+              now.difference(chartData.timestamp).inSeconds,
+          color: downloadColor.withOpacity(0.2),
+        ),
       ],
     );
   }

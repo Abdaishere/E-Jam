@@ -49,6 +49,7 @@ dependencies:
   ping_discover_network_forked: ^0.0.1
   circular_motion: ^0.0.3
   flutter_ripple: ^0.0.3
+  collection: ^1.17.1
   
 
 dev_dependencies:

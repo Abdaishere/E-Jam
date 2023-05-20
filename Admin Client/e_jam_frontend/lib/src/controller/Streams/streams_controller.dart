@@ -165,26 +165,23 @@ class StatisticsController extends ChangeNotifier {
   static final StatisticsService _statisticsService = StatisticsService();
   static DateTime _lastRefresh1 = DateTime.now();
   static DateTime _lastRefresh2 = DateTime.now();
-  List<VerifierStatisticsInstance>? _verifierStatistics;
-  List<GeneratorStatisticsInstance>? _generatorStatistics;
+  List<VerifierStatisticsInstance> _verifierStatistics = [];
+  List<GeneratorStatisticsInstance> _generatorStatistics = [];
 
-  List<VerifierStatisticsInstance>? get getVerifierStatistics =>
+  List<VerifierStatisticsInstance> get getVerifierStatistics =>
       _verifierStatistics;
-  List<GeneratorStatisticsInstance>? get getGeneratorStatistics =>
+  List<GeneratorStatisticsInstance> get getGeneratorStatistics =>
       _generatorStatistics;
-
-  StatisticsController() {
-    loadAllVerifierStatistics();
-    loadAllGeneratorStatistics();
-  }
 
   loadAllVerifierStatistics() async {
     if (DateTime.now().difference(_lastRefresh1).inSeconds > 10) {
       return _statisticsService
           .getAllVerifierStatisticsInstances()
           .then((value) {
-        _lastRefresh1 = DateTime.now();
-        _verifierStatistics = value;
+        if (value.isNotEmpty) {
+          _lastRefresh1 = DateTime.now();
+          _verifierStatistics = value;
+        }
         notifyListeners();
       });
     }
@@ -195,8 +192,10 @@ class StatisticsController extends ChangeNotifier {
       return _statisticsService
           .getAllGeneratorStatisticsInstance()
           .then((value) {
-        _lastRefresh2 = DateTime.now();
-        _generatorStatistics = value;
+        if (value.isNotEmpty) {
+          _generatorStatistics = value;
+          _lastRefresh2 = DateTime.now();
+        }
         notifyListeners();
       });
     }

@@ -69,18 +69,16 @@ class _GaugeTotalProgressForSystemState
       if (_totalProgress == 100) message = 'Done';
     }
 
-    return SizedBox(
-      width: MediaQuery.of(context).orientation == Orientation.portrait
-          ? MediaQuery.of(context).size.width > 450
-              ? 340
-              : MediaQuery.of(context).size.width
-          : 340,
-      height: 280,
-      child: Card(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-          Radius.circular(8),
-        )),
+    return Card(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      )),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width > 450
+            ? 340
+            : MediaQuery.of(context).size.width,
+        height: 280,
         child: SfRadialGauge(
           title: const GaugeTitle(
             text: 'Progress',

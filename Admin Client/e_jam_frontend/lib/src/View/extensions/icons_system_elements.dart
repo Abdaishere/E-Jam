@@ -20,19 +20,17 @@ class IconsElementsSystem extends StatefulWidget {
 class _IconsElementsSystemState extends State<IconsElementsSystem> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).orientation == Orientation.portrait
-          ? MediaQuery.of(context).size.width > 450
-              ? 340
-              : MediaQuery.of(context).size.width
-          : 340,
-      height: 280,
-      child: const Card(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(
-          Radius.circular(8),
-        )),
-        child: Elements(),
+    return Card(
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+        Radius.circular(8),
+      )),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width > 450
+            ? 340
+            : MediaQuery.of(context).size.width,
+        height: 280,
+        child: const Elements(),
       ),
     );
   }

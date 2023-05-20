@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
@@ -828,15 +830,33 @@ class _StreamGraphState extends State<StreamGraph> {
 
   @override
   Widget build(BuildContext context) {
-    return _showChart();
+    List<VerifierStatisticsInstance> streamVerifiers = [];
+    streamVerifiers = context
+        .watch<StatisticsController>()
+        .getVerifierStatistics
+        .where((element) => element.streamId == stream?.streamId)
+        .toList();
+
+    List<GeneratorStatisticsInstance> streamGenerators = [];
+    streamGenerators = context
+        .watch<StatisticsController>()
+        .getGeneratorStatistics
+        .where((element) => element.streamId == stream?.streamId)
+        .toList();
+
+    return _showChart(streamVerifiers, streamGenerators);
   }
 
-  Column _showChart() {
+  Column _showChart(List<VerifierStatisticsInstance> streamVerifiers,
+      List<GeneratorStatisticsInstance> streamGenerators) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: LineChartStream(stream?.streamId ?? ''),
+          child: LineChartStream(
+              id: stream?.streamId ?? '',
+              verChartData: streamVerifiers,
+              genChartData: streamGenerators),
         ),
         Expanded(
           child: Row(
