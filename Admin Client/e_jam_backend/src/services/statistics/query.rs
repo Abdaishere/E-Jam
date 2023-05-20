@@ -66,8 +66,9 @@ async fn get_stream_statistics_for_generator(
 
     match stream_entry {
         true => {
-            let handle =
-                RUNTIME.spawn_blocking(move || run_generator_consumer(&stream_id, "", FetchOffset::Earliest));
+            let handle = RUNTIME.spawn_blocking(move || {
+                run_generator_consumer(&stream_id, "", FetchOffset::Earliest)
+            });
 
             match handle.await {
                 Ok(generators) => match generators {
@@ -95,8 +96,9 @@ async fn get_stream_statistics_for_verifier(
 
     match stream_entry {
         true => {
-            let handle =
-                RUNTIME.spawn_blocking(move || run_verifier_consumer(&stream_id, "", FetchOffset::Earliest));
+            let handle = RUNTIME.spawn_blocking(move || {
+                run_verifier_consumer(&stream_id, "", FetchOffset::Earliest)
+            });
 
             match handle.await {
                 Ok(verifiers) => match verifiers {
@@ -124,8 +126,9 @@ async fn get_device_statistics_for_generator(
 
     match device {
         true => {
-            let handle =
-                RUNTIME.spawn_blocking(move || run_generator_consumer("", &device_mac, FetchOffset::Earliest));
+            let handle = RUNTIME.spawn_blocking(move || {
+                run_generator_consumer("", &device_mac, FetchOffset::Earliest)
+            });
 
             match handle.await {
                 Ok(generators) => match generators {
@@ -153,8 +156,9 @@ async fn get_device_statistics_for_verifier(
 
     match device {
         true => {
-            let handle =
-                RUNTIME.spawn_blocking(move || run_verifier_consumer("", &device_mac, FetchOffset::Earliest));
+            let handle = RUNTIME.spawn_blocking(move || {
+                run_verifier_consumer("", &device_mac, FetchOffset::Earliest)
+            });
 
             match handle.await {
                 Ok(verifiers) => match verifiers {

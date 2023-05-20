@@ -1,7 +1,7 @@
 use crate::models::statistics::{Generator, Verifier};
 use apache_avro::from_value;
 use kafka::consumer::{Consumer, FetchOffset};
-use log::{error, info, warn};
+use log::{debug, error};
 use schema_registry_converter::blocking::{avro::AvroDecoder, schema_registry::SrSettings};
 use std::{
     collections::LinkedList,
@@ -14,11 +14,11 @@ pub const NAMESPACE: &str = "com.ejam.systemapi.stats.SchemaRegistry";
 pub const SCHEMA_REGISTRY_PORT: &str = "8081";
 pub const MAIN_BROKER_PORT: &str = "9092";
 pub const HOST: &str = "localhost";
-pub const SLEEP_TIME: u64 = 5;
+pub const SLEEP_TIME: u64 = 1;
 pub const GENERATOR_TOPIC: &str = "Generator";
 pub const VERIFIER_TOPIC: &str = "Verifier";
 const RETRIES: usize = 6;
-const TIMEOUT: u128 = 500;
+const TIMEOUT: u128 = 600;
 
 pub fn run_generator_consumer(
     stream_id: &str,
@@ -49,7 +49,7 @@ pub fn run_generator_consumer(
         }
     };
     let mut time_counter = Instant::now();
-    info!("Generator Consumer Connected to Kafka Broker");
+    debug!("Generator Consumer Connected to Kafka Broker");
     let mut generators: LinkedList<Generator> = LinkedList::new();
     loop {
         let message = consumer.poll();
@@ -67,39 +67,38 @@ pub fn run_generator_consumer(
 
         for ms in message.unwrap().iter() {
             for m in ms.messages() {
-                
                 let result = decoder.decode(Some(m.value));
                 if result.is_err() {
                     error!("{:?}", result.err().unwrap());
                     continue;
                 }
                 let result = result.unwrap();
-                
+
                 if result.name.is_none() {
-                    warn!("No name");
+                    debug!("No name");
                     continue;
                 }
 
                 let name = result.name.unwrap();
-                info!("Name: {}", name.name);
+                debug!("Name: {}", name.name);
                 if name.namespace.is_none() {
-                    warn!("No namespace");
+                    debug!("No namespace");
                     continue;
                 }
                 let namespace = name.namespace.unwrap();
                 if namespace != NAMESPACE {
-                    warn!("Unknown namespace");
+                    debug!("Unknown namespace");
                     continue;
                 }
-                
+
                 let value = from_value::<Generator>(&result.value);
                 match value {
                     Ok(value) => {
-                        info!("Stream ID: {}", value.stream_id);
+                        debug!("Stream ID: {}", value.stream_id);
                         if (stream_id.is_empty() || stream_id == value.stream_id)
                             && (mac_address.is_empty() || mac_address == value.mac_address)
                         {
-                            info!("Value: {:?}", value);
+                            debug!("Value: {:?}", value);
                             generators.push_back(value);
                         }
                     }
@@ -115,7 +114,7 @@ pub fn run_generator_consumer(
             }
         }
 
-        if time_counter.elapsed().as_millis() > TIMEOUT{
+        if time_counter.elapsed().as_millis() > TIMEOUT {
             return Ok(generators);
         }
 
@@ -152,7 +151,7 @@ pub fn run_verifier_consumer(
         }
     };
     let mut time_counter = Instant::now();
-    info!("Verifier Consumer Connected to Kafka Broker");
+    debug!("Verifier Consumer Connected to Kafka Broker");
     let mut verifiers: LinkedList<Verifier> = LinkedList::new();
     loop {
         let message = consumer.poll();
@@ -179,19 +178,19 @@ pub fn run_verifier_consumer(
                 let result = result.unwrap();
 
                 if result.name.is_none() {
-                    warn!("No name");
+                    debug!("No name");
                     continue;
                 }
 
                 let name = result.name.unwrap();
-                info!("Name: {}", name.name);
+                debug!("Name: {}", name.name);
                 if name.namespace.is_none() {
-                    warn!("No namespace");
+                    debug!("No namespace");
                     continue;
                 }
                 let namespace = name.namespace.unwrap();
                 if namespace != NAMESPACE {
-                    warn!("Unknown namespace");
+                    debug!("Unknown namespace");
                     continue;
                 }
 
@@ -201,7 +200,7 @@ pub fn run_verifier_consumer(
                         if (stream_id.is_empty() || stream_id == value.stream_id)
                             && (mac_address.is_empty() || mac_address == value.mac_address)
                         {
-                            info!("Value: {:?}", value);
+                            debug!("Value: {:?}", value);
                             verifiers.push_back(value);
                         }
                     }

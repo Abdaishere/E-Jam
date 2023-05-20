@@ -213,7 +213,11 @@ pub struct StreamEntry {
     ## Constraints
     * Must be 0, 1 or 2
     "]
-    #[validate(range(min = 0, max = 2, message = "Payload Type must be 0 for IPV4, 1 for IPV6 or 2 for Random Bytes"))]
+    #[validate(range(
+        min = 0,
+        max = 2,
+        message = "Payload Type must be 0 for IPV4, 1 for IPV6 or 2 for Random Bytes"
+    ))]
     #[serde(default)]
     payload_type: u8,
 
@@ -1251,12 +1255,14 @@ this is used to update the stream with the new details passed in the stream entr
                 );
             }
 
-            let stream_stat = STREAM_STATUSES[(0..STREAM_STATUSES.len()).fake::<usize>()].to_owned();
+            let stream_stat =
+                STREAM_STATUSES[(0..STREAM_STATUSES.len()).fake::<usize>()].to_owned();
 
             let flow_t = FLOW_TYPE_ARR[(0..FLOW_TYPE_ARR.len()).fake::<usize>()].to_owned();
 
             let transport_layer_prot = TRANSPORT_LAYER_PROTOCOL_ARR
-                [(0..TRANSPORT_LAYER_PROTOCOL_ARR.len()).fake::<usize>()].to_owned();
+                [(0..TRANSPORT_LAYER_PROTOCOL_ARR.len()).fake::<usize>()]
+            .to_owned();
 
             let mut stream = StreamEntry {
                 stream_id: "".to_string(),

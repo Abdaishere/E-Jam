@@ -30,7 +30,7 @@ impl Generator {
             mac_address: mac,
             stream_id: id,
             packets_sent: (0..204800).fake::<u32>() as u64,
-            packets_errors:(0..204800).fake::<u32>() as u64,
+            packets_errors: (0..204800).fake::<u32>() as u64,
             timestamp: updates,
         }
     }
