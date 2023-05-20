@@ -1,0 +1,146 @@
+on:
+    pull_request:
+        branches:
+            - Admin-Client
+            - master
+    push:
+        branches:
+            - Admin-Client
+            - master
+    
+name: "Admin-Client CI/CD"
+jobs:
+    build-Linux-Web-APK:
+        name : "Build Flutter App"
+        runs-on: ubuntu-latest
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+
+            - name: "Setup Java"
+              uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+
+            - name: "Setup Flutter"
+              uses: subosito/flutter-action@v1
+              with:
+                    flutter-version: "3.10.1"
+
+            - name: "Go to Frontend"
+              run: cd Admin\ Client/e_jam_frontend/
+
+            - name: "Get Packages"
+              run: flutter pub get
+
+            - name: "Build APK"
+              run: flutter build apk --release
+
+            - name: "Build Linux"
+              run: flutter build linux --release
+
+            - name: "Build Web"
+              run: flutter build web --release
+
+            # - name: "Upload Linux"
+            #   uses: ncipollo/release-action@v1
+            #   with:
+            #     name: E-Jam
+            #     artifacts: "build/linux/release/*"
+            #     tag: v1.0.${{ github.run_number }}
+            #     token: ${{ secrets.GITHUB_TOKEN }}
+
+            # - name: "Upload Web"
+            #   uses: ncipollo/release-action@v1
+            #   with:
+            #         name: E-Jam
+            #         artifacts: "build/web/*"
+            #         tag: v1.0.${{ github.run_number }}
+            #         token: ${{ secrets.GITHUB_TOKEN }}
+
+            # - name: "Upload APK"
+            #   uses: ncipollo/release-action@v1
+            #   with:
+            #       name: E-Jam.apk
+            #       artifacts: "build/app/outputs/apk/release/*"
+            #       tag: v1.0.${{ github.run_number }}
+            #       token: ${{ secrets.GITHUB_TOKEN }}
+                  
+    build-MacOS-IOS:
+        name: "Deploy to MacOS and IOS"
+        runs-on: macos-latest
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+            
+            - name: "Setup IOS"
+              uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+
+            - name: "Setup Flutter"
+              uses: subosito/flutter-action@v1
+              with:
+                    flutter-version: "3.10.1"
+            
+            - name: "Get Packages"
+              run: flutter pub get
+
+            - name: "Build IOS"
+              run: flutter build ios --release
+
+            - name: "Build MacOS"
+              run: flutter build macos --release
+
+            # - name: "Upload IOS"
+            #   uses: ncipollo/release-action@v1
+            #   with:
+            #     name: E-Jam
+            #     artifacts: "build/ios/iphoneos/*"
+            #     tag: v1.0.${{ github.run_number }}
+            #     token: ${{ secrets.GITHUB_TOKEN }}
+            
+            # - name: "Upload MacOS"
+            #   uses: ncipollo/release-action@v1
+            #   with:
+            #     name: E-Jam
+            #     artifacts: "build/macos/Build/Products/Release/*"
+            #     tag: v1.0.${{ github.run_number }}
+            #     token: ${{ secrets.GITHUB_TOKEN }}
+
+    build-Windows:
+        name: "Deploy to Windows"
+        runs-on: windows-latest
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+            
+            - name: "Setup Java"
+              uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+
+            - name: "Setup Flutter"
+              uses: subosito/flutter-action@v1
+              with:
+                    flutter-version: "3.10.1"
+            
+            - name: "Get Packages"
+              run: flutter pub get
+
+            - name: "Build Windows"
+              run: flutter build windows --release
+
+            # - name: "Upload Windows"
+            #   uses: ncipollo/release-action@v1
+            #   with:
+            #     name: E-Jam
+            #     artifacts: "build/windows/runner/Release/*"
+            #     tag: v1.0.${{ github.run_number }}
+            #     token: ${{ secrets.GITHUB_TOKEN }}
+      
+
+
+
+    # push to Admin-Client Branch
+    # 
