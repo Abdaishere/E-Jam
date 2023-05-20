@@ -28,7 +28,7 @@ jobs:
                     flutter-version: "3.10.1"
 
             - name: "Go to Frontend"
-              run: cd Admin\ Client/e_jam_frontend/
+              run: "cd ./Admin Client/e_jam_frontend/"
 
             - name: "Get Packages"
               run: flutter pub get
@@ -83,6 +83,9 @@ jobs:
               with:
                     flutter-version: "3.10.1"
             
+            - name: "Go to Frontend"
+              run: "cd ./Admin Client/e_jam_frontend/"
+
             - name: "Get Packages"
               run: flutter pub get
 
@@ -125,6 +128,9 @@ jobs:
               with:
                     flutter-version: "3.10.1"
             
+            - name: "Go to Frontend"
+              run: "cd ./Admin Client/e_jam_frontend/"
+
             - name: "Get Packages"
               run: flutter pub get
 
