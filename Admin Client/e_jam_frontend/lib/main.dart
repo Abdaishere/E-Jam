@@ -244,93 +244,92 @@ class MenuScreen extends StatefulWidget {
 class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // back button to close drawer menu
-          Padding(
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: IconButton(
-              onPressed: () {
-                ZoomDrawer.of(context)!.close();
-              },
-              color: context.watch<ThemeModel>().colorScheme.secondary,
-              icon: const Icon(Icons.arrow_forward_ios_outlined),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // back button to close drawer menu
+        Padding(
+          padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+          child: IconButton(
+            onPressed: () {
+              ZoomDrawer.of(context)!.close();
+            },
+            color: context.watch<ThemeModel>().colorScheme.secondary,
+            icon: const Icon(Icons.arrow_forward_ios_outlined),
           ),
-          const SizedBox(height: 20),
-          // TODO: control panel with icons start and camera icon and export button
-          Container(
-            margin: const EdgeInsets.only(left: 5),
-            decoration: BoxDecoration(
-              border: Border.all(
-                  color: context.watch<ThemeModel>().colorScheme.secondary,
-                  width: 1),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            padding:
-                const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                StreamsStartStopControllerButtons(isStopping: false),
-                StreamsStartStopControllerButtons(isStopping: true),
-                GraphsControllerButton(),
-                ExportButton(),
-              ],
-            ),
+        ),
+        const SizedBox(height: 20),
+        // TODO: control panel with icons start and camera icon and export button
+        Container(
+          margin: const EdgeInsets.only(left: 5),
+          decoration: BoxDecoration(
+            border: Border.all(
+                color: context.watch<ThemeModel>().colorScheme.secondary,
+                width: 1),
+            borderRadius: BorderRadius.circular(18),
           ),
-          const SizedBox(height: 25),
-          ListTileTheme(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            style: ListTileStyle.drawer,
-            enableFeedback: true,
-            contentPadding: const EdgeInsets.only(left: 30),
-            child: menuList(),
+          padding:
+              const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamsStartStopControllerButtons(isStopping: false),
+              StreamsStartStopControllerButtons(isStopping: true),
+              GraphsControllerButton(),
+              ExportButton(),
+            ],
           ),
+        ),
+        const SizedBox(height: 25),
+        ListTileTheme(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          style: ListTileStyle.drawer,
+          dense: MediaQuery.of(context).size.height < 600,
+          enableFeedback: true,
+          contentPadding: const EdgeInsets.only(left: 30),
+          child: menuList(),
+        ),
 
-          const Spacer(),
-          Container(
-            margin: const EdgeInsets.only(right: 60),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                IconButton(
-                  tooltip: 'Change Server',
-                  icon: const Icon(MaterialCommunityIcons.server_network),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      HeroDialogRoute(
-                        builder: (BuildContext context) => const Center(
-                          child: ChangeServerIPScreen(),
-                        ),
-                        settings: const RouteSettings(name: 'ChangeServerView'),
+        const Spacer(),
+        Container(
+          margin: const EdgeInsets.only(right: 60),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                tooltip: 'Change Server',
+                icon: const Icon(MaterialCommunityIcons.server_network),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    HeroDialogRoute(
+                      builder: (BuildContext context) => const Center(
+                        child: ChangeServerIPScreen(),
                       ),
-                    );
-                  },
+                      settings: const RouteSettings(name: 'ChangeServerView'),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 25),
+              IconButton(
+                icon: Icon(
+                  context.watch<ThemeModel>().isDark
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
                 ),
-                const SizedBox(width: 25),
-                IconButton(
-                  icon: Icon(
-                    context.watch<ThemeModel>().isDark
-                        ? Icons.dark_mode
-                        : Icons.light_mode,
-                  ),
-                  onPressed: () async {
-                    context.read<ThemeModel>().toggleTheme();
-                  },
-                ),
-              ],
-            ),
+                onPressed: () async {
+                  context.read<ThemeModel>().toggleTheme();
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+      ],
     );
   }
 

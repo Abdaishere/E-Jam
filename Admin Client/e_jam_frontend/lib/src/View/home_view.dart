@@ -10,7 +10,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/extensions/treemap_drilldown_devices_load.dart';
 import 'package:provider/provider.dart';
 
-// should not be scrollable
 class DashBoardView extends StatefulWidget {
   const DashBoardView({super.key});
 

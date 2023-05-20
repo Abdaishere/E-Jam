@@ -103,7 +103,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   centerY: 0.5,
                   centerX: 0.25,
                   radiusFactor:
-                      MediaQuery.of(context).size.width > 450 ? 0.6 : 0.7,
+                      MediaQuery.of(context).size.width > 450 ? 0.6 : 0.65,
                   startAngle: 90,
                   endAngle: 360,
                   showLabels: false,
@@ -168,7 +168,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   centerY: 0.5,
                   centerX: 0.75,
                   radiusFactor:
-                      MediaQuery.of(context).size.width > 450 ? 0.6 : 0.7,
+                      MediaQuery.of(context).size.width > 450 ? 0.6 : 0.65,
                   startAngle: 180,
                   endAngle: 90,
                   showLabels: false,

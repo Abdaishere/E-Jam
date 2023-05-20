@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,8 +30,8 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      width: 500,
-      height: 500,
+      width: min(500, MediaQuery.of(context).size.width * 0.9),
+      height: min(500, MediaQuery.of(context).size.height * 0.9),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(15),
@@ -57,7 +59,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   SizedBox(
-                    width: 160,
+                    width: 150,
                     height: 120,
                     child: ElevatedButton(
                       onPressed: () {
@@ -86,9 +88,9 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 60),
+                  const VerticalDivider(),
                   SizedBox(
-                    width: 160,
+                    width: 150,
                     height: 120,
                     child: ElevatedButton(
                       onPressed: () {
@@ -122,6 +124,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(

@@ -49,7 +49,6 @@ class _SettingsViewState extends State<SettingsView> {
     return [
       const ListTile(
         leading: Icon(Icons.auto_graph_outlined),
-        iconColor: Colors.white,
         title: Text('Charts'),
       ),
       ListTile(
@@ -141,7 +140,6 @@ class _SettingsViewState extends State<SettingsView> {
     return [
       const ListTile(
         leading: FaIcon(FontAwesome.dashboard),
-        iconColor: Colors.white,
         title: Text('Dashboard'),
       ),
       ListTile(

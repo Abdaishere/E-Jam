@@ -6,7 +6,7 @@ import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-const double ballWidth = 200, ballHeight = 180;
+const double ballWidth = 160, ballHeight = 160;
 
 class BouncingBall extends StatefulWidget {
   const BouncingBall({Key? key}) : super(key: key);
