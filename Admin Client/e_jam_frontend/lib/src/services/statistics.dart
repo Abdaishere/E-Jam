@@ -10,9 +10,8 @@ class StatisticsService {
   Future<List<VerifierStatisticsInstance>>
       getAllVerifierStatisticsInstances() async {
     try {
-      final response = await client
-          .get(Uri.parse('$uri/statistics_all/verifier/earliest'))
-          .timeout(NetworkController.timeout);
+      final response =
+          await client.get(Uri.parse('$uri/statistics_all/verifier/earliest'));
       if (200 == response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => VerifierStatisticsInstance.fromJson(e))
@@ -30,9 +29,9 @@ class StatisticsService {
   Future<List<GeneratorStatisticsInstance>>
       getAllGeneratorStatisticsInstance() async {
     try {
-      final response = await client
-          .get(Uri.parse('$uri/statistics_all/generator/earliest'))
-          .timeout(NetworkController.timeout);
+      final response =
+          await client.get(Uri.parse('$uri/statistics_all/generator/earliest'));
+
       if (200 == response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => GeneratorStatisticsInstance.fromJson(e))

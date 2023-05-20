@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -11,7 +13,6 @@ import 'package:e_jam/src/controller/Streams/add_stream_controller.dart';
 import 'package:e_jam/src/controller/Streams/edit_stream_controller.dart';
 import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
-import 'package:e_jam/src/services/statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -76,6 +77,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => EditStreamController(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => StatisticsController(),
+        ),
       ],
       child: Consumer(
         builder: (context, ThemeModel themeModel, child) => MaterialApp(
@@ -100,6 +104,26 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Timer? _timer;
+  Timer? _timer2;
+  @override
+  void initState() {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await context.read<StatisticsController>().loadAllVerifierStatistics();
+    });
+    _timer2 = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await context.read<StatisticsController>().loadAllGeneratorStatistics();
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _timer2?.cancel();
+    super.dispose();
+  }
+
   int currentIndex = 0;
 
   Widget mainScreen() {

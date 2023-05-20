@@ -11,6 +11,7 @@ class VerifierStatisticsInstance {
   final int packetsErrors;
   final int packetsDropped;
   final int packetsOutOfOrder;
+  final DateTime timestamp;
 
   VerifierStatisticsInstance({
     required this.macAddress,
@@ -19,6 +20,7 @@ class VerifierStatisticsInstance {
     required this.packetsErrors,
     required this.packetsDropped,
     required this.packetsOutOfOrder,
+    required this.timestamp,
   });
 
   factory VerifierStatisticsInstance.fromRawJson(String str) =>
@@ -28,20 +30,23 @@ class VerifierStatisticsInstance {
 
   factory VerifierStatisticsInstance.fromJson(Map<String, dynamic> json) =>
       VerifierStatisticsInstance(
-        macAddress: json["mac_address"],
-        streamId: json["stream_id"],
-        packetsCorrect: json["packets_correct"],
-        packetsErrors: json["packets_errors"],
-        packetsDropped: json["packets_dropped"],
-        packetsOutOfOrder: json["packets_out_of_order"],
+        macAddress: json["macAddress"],
+        streamId: json["streamId"],
+        packetsCorrect: json["packetsCorrect"],
+        packetsErrors: json["packetsErrors"],
+        packetsDropped: json["packetsDropped"],
+        packetsOutOfOrder: json["packetsOutOfOrder"],
+        timestamp: DateTime.fromMillisecondsSinceEpoch(json["timestamp"] * 1000)
+            .toLocal(),
       );
 
   Map<String, dynamic> toJson() => {
-        "mac_address": macAddress,
-        "stream_id": streamId,
-        "packets_correct": packetsCorrect,
-        "packets_errors": packetsErrors,
-        "packets_dropped": packetsDropped,
-        "packets_out_of_order": packetsOutOfOrder,
+        "macAddress": macAddress,
+        "streamId": streamId,
+        "packetsCorrect": packetsCorrect,
+        "packetsErrors": packetsErrors,
+        "packetsDropped": packetsDropped,
+        "packetsOutOfOrder": packetsOutOfOrder,
+        "timestamp": timestamp,
       };
 }

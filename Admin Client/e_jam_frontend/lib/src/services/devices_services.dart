@@ -148,9 +148,9 @@ class DevicesServices {
           .get(Uri.parse('$uri/$deviceMac/statistics/verifier/earliest'))
           .timeout(NetworkController.timeout);
       if (200 == response.statusCode) {
-        return (jsonDecode(response.body) as List)
-            .map((e) => VerifierStatisticsInstance.fromJson(e))
-            .toList();
+        return (jsonDecode(response.body) as List).map((e) {
+          return VerifierStatisticsInstance.fromJson(e);
+        }).toList();
       } else if (204 == response.statusCode) {
         return [];
       } else {
@@ -168,9 +168,10 @@ class DevicesServices {
           .get(Uri.parse('$uri/$deviceMac/statistics/generator/earliest'))
           .timeout(NetworkController.timeout);
       if (200 == response.statusCode) {
-        return (jsonDecode(response.body) as List)
-            .map((e) => GeneratorStatisticsInstance.fromJson(e))
-            .toList();
+        return (jsonDecode(response.body) as List).map((e) {
+          print(e);
+          return GeneratorStatisticsInstance.fromJson(e);
+        }).toList();
       } else if (204 == response.statusCode) {
         return [];
       } else {

@@ -9,12 +9,14 @@ class GeneratorStatisticsInstance {
   final String streamId;
   final int packetsSent;
   final int packetsErrors;
+  final DateTime timestamp;
 
   GeneratorStatisticsInstance({
     required this.macAddress,
     required this.streamId,
     required this.packetsSent,
     required this.packetsErrors,
+    required this.timestamp,
   });
 
   factory GeneratorStatisticsInstance.fromRawJson(String str) =>
@@ -24,16 +26,19 @@ class GeneratorStatisticsInstance {
 
   factory GeneratorStatisticsInstance.fromJson(Map<String, dynamic> json) =>
       GeneratorStatisticsInstance(
-        macAddress: json["mac_address"],
-        streamId: json["stream_id"],
-        packetsSent: json["packets_sent"],
-        packetsErrors: json["packets_errors"],
+        macAddress: json["macAddress"],
+        streamId: json["streamId"],
+        packetsSent: json["packetsSent"],
+        packetsErrors: json["packetsErrors"],
+        timestamp: DateTime.fromMillisecondsSinceEpoch(json["timestamp"] * 1000)
+            .toLocal(),
       );
 
   Map<String, dynamic> toJson() => {
-        "mac_address": macAddress,
-        "stream_id": streamId,
-        "packets_sent": packetsSent,
-        "packets_errors": packetsErrors,
+        "macAddress": macAddress,
+        "streamId": streamId,
+        "packetsSent": packetsSent,
+        "packetsErrors": packetsErrors,
+        "timestamp": timestamp,
       };
 }

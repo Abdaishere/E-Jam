@@ -220,6 +220,7 @@ class StreamServices {
       final response = await client
           .get(Uri.parse('$uri/$streamId/statistics/verifier/earliest'))
           .timeout(NetworkController.timeout);
+
       if (200 == response.statusCode) {
         return (jsonDecode(response.body) as List)
             .map((e) => VerifierStatisticsInstance.fromJson(e))
@@ -238,12 +239,12 @@ class StreamServices {
       String streamId) async {
     try {
       final response = await client
-          .get(Uri.parse('$uri/$streamId/statistics/generator/earliest'))
-          .timeout(NetworkController.timeout);
+          .get(Uri.parse('$uri/$streamId/statistics/generator/earliest'));
+
       if (200 == response.statusCode) {
-        return (jsonDecode(response.body) as List)
-            .map((e) => GeneratorStatisticsInstance.fromJson(e))
-            .toList();
+        return (jsonDecode(response.body) as List).map((e) {
+          return GeneratorStatisticsInstance.fromJson(e);
+        }).toList();
       } else if (204 == response.statusCode) {
         return [];
       } else {

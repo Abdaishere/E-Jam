@@ -4,6 +4,13 @@
   "namespace": "com.ejam.systemapi.stats.SchemaRegistry",
   "fields": [
     {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
       "name": "macAddress",
       "type": {
         "type": "string",

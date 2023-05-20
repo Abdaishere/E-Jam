@@ -1,7 +1,10 @@
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class LineChartStream extends StatefulWidget {
@@ -14,6 +17,30 @@ class LineChartStream extends StatefulWidget {
 
 class _LineChartStreamState extends State<LineChartStream> {
   get id => widget.id;
+  List<GeneratorStatisticsInstance> _genChartData = [];
+  List<VerifierStatisticsInstance> _verChartData = [];
+  DateTime now = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    getStatistics();
+  }
+
+  getStatistics() async {
+    var data =
+        await context.read<StreamsController>().loadGeneratorStatistics(id);
+    if (!mounted) return;
+    var data2 =
+        await context.read<StreamsController>().loadVerifierStatistics(id);
+    if (!mounted) return;
+    setState(() {
+      _genChartData = data;
+      _verChartData = data2;
+      now = DateTime.now();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -41,7 +68,7 @@ class _LineChartStreamState extends State<LineChartStream> {
         labelIntersectAction: SystemSettings.fullChartsDetails
             ? AxisLabelIntersectAction.trim
             : AxisLabelIntersectAction.hide,
-        labelFormat: '{value} Sec',
+        labelFormat: '{value}',
       ),
       primaryYAxis: NumericAxis(
         labelStyle: TextStyle(
@@ -51,8 +78,7 @@ class _LineChartStreamState extends State<LineChartStream> {
                 SystemSettings.fullChartsDetails ? null : Colors.transparent),
         majorTickLines: const MajorTickLines(size: 1),
         labelIntersectAction: AxisLabelIntersectAction.hide,
-        // TODO: Make this show the Packets per second not the size of the packets
-        labelFormat: '{value}MB',
+        labelFormat: '{value}Pkt',
         labelRotation: 90,
       ),
       zoomPanBehavior: ZoomPanBehavior(
@@ -68,7 +94,7 @@ class _LineChartStreamState extends State<LineChartStream> {
       ),
       series: <ChartSeries>[
         // Renders Upload area chart
-        SplineAreaSeries<ChartData, int>(
+        SplineAreaSeries<GeneratorStatisticsInstance, int>(
           name: 'Upload',
           animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           borderColor: uploadColor,
@@ -85,14 +111,16 @@ class _LineChartStreamState extends State<LineChartStream> {
               ? SplineType.monotonic
               : SplineType.cardinal,
           cardinalSplineTension: 0.0,
-          dataSource: chartData(),
-          xValueMapper: (ChartData chartData, _) => chartData.date,
-          yValueMapper: (ChartData chartData, _) => chartData.value,
+          dataSource: _genChartData,
+          yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              chartData.packetsSent,
+          xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              now.difference(chartData.timestamp).inSeconds,
           color: uploadColor.withOpacity(0.2),
         ),
 
         // Renders Download area chart
-        SplineAreaSeries<ChartData, int>(
+        SplineAreaSeries<VerifierStatisticsInstance, int>(
           name: 'Download',
           animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
           borderColor: downloadColor,
@@ -109,14 +137,19 @@ class _LineChartStreamState extends State<LineChartStream> {
               ? SplineType.monotonic
               : SplineType.cardinal,
           cardinalSplineTension: 0.0,
-          dataSource: chartData2(),
-          xValueMapper: (ChartData chartData, _) => chartData.date,
-          yValueMapper: (ChartData chartData, _) => chartData.value,
+          dataSource: _verChartData,
+          yValueMapper: (VerifierStatisticsInstance chartData, _) =>
+              chartData.packetsCorrect +
+              chartData.packetsErrors +
+              chartData.packetsOutOfOrder,
+          // compare to now
+          xValueMapper: (VerifierStatisticsInstance chartData, _) =>
+              now.difference(chartData.timestamp).inSeconds,
           color: downloadColor.withOpacity(0.2),
         ),
 
         // Renders Error line chart
-        SplineSeries<ChartData, int>(
+        SplineSeries<GeneratorStatisticsInstance, int>(
           name: 'Error',
           animationDelay: SystemSettings.showChartsAnimation ? 1000 : 0,
           animationDuration: SystemSettings.showChartsAnimation ? 1000 : 0,
@@ -134,9 +167,11 @@ class _LineChartStreamState extends State<LineChartStream> {
               ? SplineType.monotonic
               : SplineType.cardinal,
           cardinalSplineTension: 0.0,
-          dataSource: chartData3(),
-          xValueMapper: (ChartData chartData, _) => chartData.date,
-          yValueMapper: (ChartData chartData, _) => chartData.value,
+          dataSource: _genChartData,
+          yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              chartData.packetsErrors,
+          xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              now.difference(chartData.timestamp).inSeconds,
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
@@ -160,18 +161,44 @@ class StreamsController extends ChangeNotifier {
   }
 }
 
-class StatisticsController {
+class StatisticsController extends ChangeNotifier {
   static final StatisticsService _statisticsService = StatisticsService();
+  static DateTime _lastRefresh1 = DateTime.now();
+  static DateTime _lastRefresh2 = DateTime.now();
+  List<VerifierStatisticsInstance>? _verifierStatistics;
+  List<GeneratorStatisticsInstance>? _generatorStatistics;
 
-  Future<List<VerifierStatisticsInstance>> loadAllVerifierStatistics() async {
-    return _statisticsService.getAllVerifierStatisticsInstances().then((value) {
-      return value;
-    });
+  List<VerifierStatisticsInstance>? get getVerifierStatistics =>
+      _verifierStatistics;
+  List<GeneratorStatisticsInstance>? get getGeneratorStatistics =>
+      _generatorStatistics;
+
+  StatisticsController() {
+    loadAllVerifierStatistics();
+    loadAllGeneratorStatistics();
   }
 
-  Future<List<GeneratorStatisticsInstance>> loadAllGeneratorStatistics() async {
-    return _statisticsService.getAllGeneratorStatisticsInstance().then((value) {
-      return value;
-    });
+  loadAllVerifierStatistics() async {
+    if (DateTime.now().difference(_lastRefresh1).inSeconds > 10) {
+      return _statisticsService
+          .getAllVerifierStatisticsInstances()
+          .then((value) {
+        _lastRefresh1 = DateTime.now();
+        _verifierStatistics = value;
+        notifyListeners();
+      });
+    }
+  }
+
+  loadAllGeneratorStatistics() async {
+    if (DateTime.now().difference(_lastRefresh2).inSeconds > 10) {
+      return _statisticsService
+          .getAllGeneratorStatisticsInstance()
+          .then((value) {
+        _lastRefresh2 = DateTime.now();
+        _generatorStatistics = value;
+        notifyListeners();
+      });
+    }
   }
 }

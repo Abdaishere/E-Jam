@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
+import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 
@@ -13,6 +15,7 @@ class Utils {
       num offset = (negA * scale) + toStart;
       num finalNumber = (sourceNumber * scale) + offset;
       num calcScale = pow(10, decimalPrecision);
+      print(finalNumber);
       return ((finalNumber * calcScale).round() / calcScale);
     } catch (e) {
       return 0;
@@ -64,4 +67,88 @@ class Utils {
         ? Utils.valueMapper(fromStartToNow, minStart, maxEnd, 0, 100, 2)
         : 0;
   }
+
+  // get speed approximation in bytes per second
+  static const upperBound =
+      404800; // 100 Mbps in bytes per second for default size per packet.
+  static SpeedInfoWrapper getUploadSpeed(
+      List<GeneratorStatisticsInstance> generatorStatistics,
+      List<VerifierStatisticsInstance> verifierStatistics) {
+    if (generatorStatistics.isEmpty || verifierStatistics.isEmpty) {
+      return SpeedInfoWrapper(upload: 0, download: 0, accepted: 0, errored: 0);
+    }
+    DateTime now = DateTime.now();
+    double totalUpSpeed = 0;
+    double totalUpErrors = 0;
+    int counter1 = 0;
+    for (int i = generatorStatistics.length - 1; i >= 0; i--) {
+      if (generatorStatistics[i]
+          .timestamp
+          .isAfter(now.subtract(const Duration(seconds: 10)))) {
+        counter1 += 1;
+        int upSpeed = generatorStatistics[i].packetsSent;
+        int upErrors = generatorStatistics[i].packetsErrors;
+        totalUpSpeed += upSpeed;
+        totalUpErrors += upErrors;
+      } else {
+        break;
+      }
+    }
+
+    double totalDownErrors = 0;
+    double totalDownSpeed = 0;
+    int counter2 = 0;
+    for (int i = verifierStatistics.length - 1; i >= 0; i--) {
+      if (verifierStatistics[i]
+          .timestamp
+          .isAfter(now.subtract(const Duration(seconds: 10)))) {
+        counter2 += 1;
+        int downSpeed = verifierStatistics[i].packetsCorrect +
+            verifierStatistics[i].packetsOutOfOrder +
+            verifierStatistics[i].packetsErrors;
+
+        int downErrors = verifierStatistics[i].packetsDropped +
+            verifierStatistics[i].packetsOutOfOrder +
+            verifierStatistics[i].packetsErrors;
+
+        totalDownSpeed += downSpeed;
+        totalDownErrors += downErrors;
+      } else {
+        break;
+      }
+    }
+    // print(
+    //     'totalUpSpeed: $totalUpSpeed, totalDownSpeed: $totalDownSpeed, totalUpErrors: $totalUpErrors, totalDownErrors: $totalDownErrors');
+    double upload =
+        valueMapper(totalUpSpeed / counter1, 0, upperBound, 0, 100, 10);
+    double download =
+        valueMapper(totalDownSpeed / counter2, 0, upperBound, 0, 100, 10);
+
+    double upError =
+        valueMapper(totalUpErrors / counter1, 0, upperBound, 0, 100, 10);
+    double downError =
+        valueMapper(totalDownErrors / counter2, 0, upperBound, 0, 100, 10);
+
+    // print(
+    //     'upload: $upload, download: $download, upError: $upError, downError: $downError');
+
+    return SpeedInfoWrapper(
+        upload: upload,
+        download: download,
+        accepted: 100 - upError,
+        errored: downError);
+  }
+}
+
+class SpeedInfoWrapper {
+  final double upload;
+  final double download;
+  final double accepted;
+  final double errored;
+
+  SpeedInfoWrapper(
+      {required this.upload,
+      required this.download,
+      required this.accepted,
+      required this.errored});
 }

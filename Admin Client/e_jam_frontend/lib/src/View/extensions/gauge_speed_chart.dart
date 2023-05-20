@@ -1,6 +1,8 @@
+import 'package:e_jam/src/Model/Classes/Statistics/utils.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -16,6 +18,9 @@ class GaugeSpeedChart extends StatefulWidget {
 class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
   @override
   Widget build(BuildContext context) {
+    SpeedInfoWrapper speedInfoWrapper = Utils.getUploadSpeed(
+        context.watch<StatisticsController>().getGeneratorStatistics ?? [],
+        context.watch<StatisticsController>().getVerifierStatistics ?? []);
     return SizedBox(
       width: MediaQuery.of(context).orientation == Orientation.portrait
           ? MediaQuery.of(context).size.width > 450
@@ -60,7 +65,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   ],
                   pointers: <GaugePointer>[
                     MarkerPointer(
-                      value: 90,
+                      value: speedInfoWrapper.accepted,
                       enableAnimation: SystemSettings.showDashboardAnimations,
                     ),
                   ],
@@ -115,7 +120,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   pointers: <GaugePointer>[
                     NeedlePointer(
                       needleColor: theme.colorScheme.secondary,
-                      value: 90,
+                      value: speedInfoWrapper.upload,
                       enableAnimation: SystemSettings.showDashboardAnimations,
                       needleStartWidth: 1,
                       needleEndWidth: 5,
@@ -179,7 +184,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   pointers: <GaugePointer>[
                     NeedlePointer(
                       needleColor: theme.colorScheme.secondary,
-                      value: 90,
+                      value: speedInfoWrapper.download,
                       enableAnimation: SystemSettings.showDashboardAnimations,
                       needleStartWidth: 1,
                       needleEndWidth: 5,
@@ -241,7 +246,7 @@ class _GaugeSpeedChartState extends State<GaugeSpeedChart> {
                   ],
                   pointers: <GaugePointer>[
                     MarkerPointer(
-                      value: 10,
+                      value: speedInfoWrapper.errored,
                       enableAnimation: SystemSettings.showDashboardAnimations,
                     ),
                   ],

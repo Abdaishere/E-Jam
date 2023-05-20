@@ -18,7 +18,7 @@ pub const SLEEP_TIME: u64 = 5;
 pub const GENERATOR_TOPIC: &str = "Generator";
 pub const VERIFIER_TOPIC: &str = "Verifier";
 const RETRIES: usize = 6;
-const TIMEOUT: u64 = 10;
+const TIMEOUT: u128 = 500;
 
 pub fn run_generator_consumer(
     stream_id: &str,
@@ -57,15 +57,24 @@ pub fn run_generator_consumer(
             error!("{:?}", message.as_ref().err());
             return Err(());
         }
+
+        if message.is_ok() && message.as_ref().unwrap().is_empty() {
+            if time_counter.elapsed().as_millis() > TIMEOUT {
+                return Ok(generators);
+            }
+            continue;
+        }
+
         for ms in message.unwrap().iter() {
             for m in ms.messages() {
+                
                 let result = decoder.decode(Some(m.value));
                 if result.is_err() {
                     error!("{:?}", result.err().unwrap());
                     continue;
                 }
                 let result = result.unwrap();
-
+                
                 if result.name.is_none() {
                     warn!("No name");
                     continue;
@@ -82,7 +91,7 @@ pub fn run_generator_consumer(
                     warn!("Unknown namespace");
                     continue;
                 }
-
+                
                 let value = from_value::<Generator>(&result.value);
                 match value {
                     Ok(value) => {
@@ -105,13 +114,13 @@ pub fn run_generator_consumer(
                 error!("{:?}", consumed.err());
             }
         }
-        if time_counter.elapsed().as_secs() > TIMEOUT && !generators.is_empty() {
-            break;
+
+        if time_counter.elapsed().as_millis() > TIMEOUT{
+            return Ok(generators);
         }
 
         time_counter = Instant::now();
     }
-    Ok(generators)
 }
 
 pub fn run_verifier_consumer(
@@ -152,6 +161,14 @@ pub fn run_verifier_consumer(
             error!("{:?}", message.as_ref().err());
             continue;
         }
+
+        if message.is_ok() && message.as_ref().unwrap().is_empty() {
+            if time_counter.elapsed().as_millis() > TIMEOUT {
+                return Ok(verifiers);
+            }
+            continue;
+        }
+
         for ms in message.unwrap().iter() {
             for m in ms.messages() {
                 let result = decoder.decode(Some(m.value));
@@ -199,10 +216,11 @@ pub fn run_verifier_consumer(
                 error!("{:?}", consumed.err());
             }
         }
-        if time_counter.elapsed().as_secs() > TIMEOUT && !verifiers.is_empty() {
-            break;
+
+        if time_counter.elapsed().as_millis() > TIMEOUT {
+            return Ok(verifiers);
         }
+
         time_counter = Instant::now();
     }
-    Ok(verifiers)
 }

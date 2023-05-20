@@ -43,6 +43,7 @@ async fn get_all_statistics_for_verifier(fetch_offset: web::Path<String>) -> imp
             ))
         }
     };
+
     let handle = RUNTIME.spawn_blocking(move || run_verifier_consumer("", "", offset));
     match handle.await {
                 Ok(verifiers) => match verifiers {
@@ -55,29 +56,18 @@ async fn get_all_statistics_for_verifier(fetch_offset: web::Path<String>) -> imp
 }
 
 #[doc = "Gets the earliest generator statistics for a stream"]
-#[get("/streams/{stream_id}/statistics/generator/{fetch_offset}")]
-async fn get_earliest_stream_statistics_for_generator(
+#[get("/streams/{stream_id}/statistics/generator/earliest")]
+async fn get_stream_statistics_for_generator(
     stream_id: web::Path<String>,
     data: web::Data<AppState>,
-    fetch_offset: web::Path<String>,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let stream_entry = data.stream_entries.lock().await.contains_key(&stream_id);
 
     match stream_entry {
         true => {
-            let fetch_offset = fetch_offset.into_inner();
-            let offset: FetchOffset = match fetch_offset.as_str() {
-                "earliest" => FetchOffset::Earliest,
-                "latest" => FetchOffset::Latest,
-                _ => {
-                    return HttpResponse::NotFound().body(String::from(
-                        "Invalid fetch offset. Please use 'earliest' or 'latest'",
-                    ))
-                }
-            };
             let handle =
-                RUNTIME.spawn_blocking(move || run_generator_consumer(&stream_id, "", offset));
+                RUNTIME.spawn_blocking(move || run_generator_consumer(&stream_id, "", FetchOffset::Earliest));
 
             match handle.await {
                 Ok(generators) => match generators {
@@ -95,29 +85,18 @@ async fn get_earliest_stream_statistics_for_generator(
 }
 
 #[doc = "Gets the earliest verifier statistics for a stream"]
-#[get("/streams/{stream_id}/statistics/verifier/{fetch_offset}")]
-async fn get_earliest_stream_statistics_for_verifier(
+#[get("/streams/{stream_id}/statistics/verifier/earliest")]
+async fn get_stream_statistics_for_verifier(
     stream_id: web::Path<String>,
     data: web::Data<AppState>,
-    fetch_offset: web::Path<String>,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
     let stream_entry = data.stream_entries.lock().await.contains_key(&stream_id);
 
     match stream_entry {
         true => {
-            let fetch_offset = fetch_offset.into_inner();
-            let offset: FetchOffset = match fetch_offset.as_str() {
-                "earliest" => FetchOffset::Earliest,
-                "latest" => FetchOffset::Latest,
-                _ => {
-                    return HttpResponse::NotFound().body(String::from(
-                        "Invalid fetch offset. Please use 'earliest' or 'latest'",
-                    ))
-                }
-            };
             let handle =
-                RUNTIME.spawn_blocking(move || run_verifier_consumer(&stream_id, "", offset));
+                RUNTIME.spawn_blocking(move || run_verifier_consumer(&stream_id, "", FetchOffset::Earliest));
 
             match handle.await {
                 Ok(verifiers) => match verifiers {
@@ -135,30 +114,18 @@ async fn get_earliest_stream_statistics_for_verifier(
 }
 
 #[doc = "Gets the earliest generator statistics for a device"]
-#[get("/devices/{device_mac}/statistics/generator/{fetch_offset}")]
-async fn get_earliest_device_statistics_for_generator(
+#[get("/devices/{device_mac}/statistics/generator/earliest")]
+async fn get_device_statistics_for_generator(
     device_mac: web::Path<String>,
     data: web::Data<AppState>,
-    fetch_offset: web::Path<String>,
 ) -> impl Responder {
     let device_mac = device_mac.into_inner();
     let device = data.device_list.lock().await.contains_key(&device_mac);
 
     match device {
         true => {
-            let fetch_offset = fetch_offset.into_inner();
-            let offset: FetchOffset = match fetch_offset.as_str() {
-                "earliest" => FetchOffset::Earliest,
-                "latest" => FetchOffset::Latest,
-                _ => {
-                    return HttpResponse::NotFound().body(String::from(
-                        "Invalid fetch offset. Please use 'earliest' or 'latest'",
-                    ))
-                }
-            };
-
             let handle =
-                RUNTIME.spawn_blocking(move || run_generator_consumer("", &device_mac, offset));
+                RUNTIME.spawn_blocking(move || run_generator_consumer("", &device_mac, FetchOffset::Earliest));
 
             match handle.await {
                 Ok(generators) => match generators {
@@ -176,30 +143,18 @@ async fn get_earliest_device_statistics_for_generator(
 }
 
 #[doc = "Gets the earliest verifier statistics for a device"]
-#[get("/devices/{device_mac}/statistics/verifier/{fetch_offset}")]
-async fn get_earliest_device_statistics_for_verifier(
+#[get("/devices/{device_mac}/statistics/verifier/earliest")]
+async fn get_device_statistics_for_verifier(
     device_mac: web::Path<String>,
     data: web::Data<AppState>,
-    fetch_offset: web::Path<String>,
 ) -> impl Responder {
     let device_mac = device_mac.into_inner();
     let device = data.device_list.lock().await.contains_key(&device_mac);
 
     match device {
         true => {
-            let fetch_offset = fetch_offset.into_inner();
-            let offset: FetchOffset = match fetch_offset.as_str() {
-                "earliest" => FetchOffset::Earliest,
-                "latest" => FetchOffset::Latest,
-                _ => {
-                    return HttpResponse::NotFound().body(String::from(
-                        "Invalid fetch offset. Please use 'earliest' or 'latest'",
-                    ))
-                }
-            };
-
             let handle =
-                RUNTIME.spawn_blocking(move || run_verifier_consumer("", &device_mac, offset));
+                RUNTIME.spawn_blocking(move || run_verifier_consumer("", &device_mac, FetchOffset::Earliest));
 
             match handle.await {
                 Ok(verifiers) => match verifiers {
