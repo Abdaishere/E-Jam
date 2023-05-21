@@ -11,7 +11,7 @@ on:
 name: "Admin-Client CI/CD"
 jobs:
     build-Linux-Web-APK:
-        name : "Build Flutter App"
+        name : "Build Flutter For Linux, Web and APK"
         runs-on: ubuntu-latest
         defaults:
           run:
@@ -47,26 +47,26 @@ jobs:
             - name: "Build Web"
               run: flutter build web --release --no-tree-shake-icons
 
-            - name: "Upload Linux"
-              uses: actions/upload-artifact@v2
-              with:
-                name: E-Jam Linux
-                path: "build/linux/release/*"
-                tag: v1.0.${{ github.run_number }}
+            # - name: "Upload Linux"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #     name: E-Jam Linux
+            #     path: "build/linux/release/*"
+            #     tag: v1.0.${{ github.run_number }}
 
-            - name: "Upload Web"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: E-Jam Web
-                  path: "build/web/*"
-                  tag: v1.0.${{ github.run_number }}
+            # - name: "Upload Web"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #       name: E-Jam Web
+            #       path: "build/web/*"
+            #       tag: v1.0.${{ github.run_number }}
 
-            - name: "Upload APK"
-              uses: actions/upload-artifact@v2
-              with:
-                  name: E-Jam.apk
-                  path: "build/app/outputs/apk/release/*"
-                  tag: v1.0.${{ github.run_number }}
+            # - name: "Upload APK"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #       name: E-Jam.apk
+            #       path: "build/app/outputs/apk/release/*"
+            #       tag: v1.0.${{ github.run_number }}
 
     # Needs Certificate as Secret Key To build IOS and MacOS 
     # build-MacOS-IOS:
@@ -115,7 +115,7 @@ jobs:
     #             token: ${{ secrets.GITHUB_TOKEN }}
 
     build-Windows:
-        name: "Deploy to Windows"
+        name: "Build Flutter For Windows"
         runs-on: windows-latest
         defaults:
           run:
@@ -140,12 +140,12 @@ jobs:
             - name: "Build Windows"
               run: flutter build windows --release
 
-            - name: "Upload Windows"
-              uses: actions/upload-artifact@v2
-              with:
-                name: E-Jam Windows
-                path: "build/windows/runner/Release/*"
-                tag: v1.0.${{ github.run_number }}
+            # - name: "Upload Windows"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #     name: E-Jam Windows
+            #     path: "build/windows/runner/Release/*"
+            #     tag: v1.0.${{ github.run_number }}
       
 
 
