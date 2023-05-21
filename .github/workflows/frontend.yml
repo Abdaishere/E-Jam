@@ -25,14 +25,10 @@ jobs:
               with:
                 java-version: "12.x"
 
+            - run: sudo apt-get update
+
             - name: "Install Tools"
-              run: sudo apt-get install build-essential
-            - run: sudo apt-get install cmake
-            - run: sudo apt-get install clang
-            - run: sudo apt-get install ninja-build
-            - run: sudo apt-get install pkg-config
-            - run: sudo apt-get install libgtk-3-dev
-            - run: sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev liblzma-dev liblzma5
+              run: sudo apt-get install build-essential cmake clang ninja-build pkg-config libgtk-3-dev liblzma5
 
             - name: "Setup Flutter"
               uses: subosito/flutter-action@v1
