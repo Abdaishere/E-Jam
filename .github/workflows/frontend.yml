@@ -45,19 +45,19 @@ jobs:
               run: flutter build linux --release
 
             - name: "Build Web"
-              run: flutter build web --release
+              run: flutter build web --release --no-tree-shake-icons
 
             - name: "Upload Linux"
               uses: actions/upload-artifact@v2
               with:
-                name: E-Jam
+                name: E-Jam Linux
                 path: "build/linux/release/*"
                 tag: v1.0.${{ github.run_number }}
 
             - name: "Upload Web"
               uses: actions/upload-artifact@v2
               with:
-                  name: E-Jam
+                  name: E-Jam Web
                   path: "build/web/*"
                   tag: v1.0.${{ github.run_number }}
 
@@ -101,7 +101,7 @@ jobs:
     #         - name: "Upload IOS"
     #           uses: ncipollo/release-action@v1
     #           with:
-    #             name: E-Jam
+    #             name: E-Jam IOS
     #             artifacts: "build/ios/iphoneos/*"
     #             tag: v1.0.${{ github.run_number }}
     #             token: ${{ secrets.GITHUB_TOKEN }}
@@ -109,7 +109,7 @@ jobs:
     #         - name: "Upload MacOS"
     #           uses: ncipollo/release-action@v1
     #           with:
-    #             name: E-Jam
+    #             name: E-Jam MacOS
     #             artifacts: "build/macos/Build/Products/Release/*"
     #             tag: v1.0.${{ github.run_number }}
     #             token: ${{ secrets.GITHUB_TOKEN }}
@@ -143,7 +143,7 @@ jobs:
             - name: "Upload Windows"
               uses: actions/upload-artifact@v2
               with:
-                name: E-Jam
+                name: E-Jam Windows
                 path: "build/windows/runner/Release/*"
                 tag: v1.0.${{ github.run_number }}
       
