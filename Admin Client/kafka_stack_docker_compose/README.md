@@ -3,6 +3,8 @@
 
 ## how to run kafka stack in docker
 
+the Following instructions can be applied on the CLI or using Conduktor Platform (recommended) which you can find out more about in the ##Full stack section
+
 Make sure you have docker and docker-compose installed on your machine
 
 ```bash
@@ -14,6 +16,13 @@ After that you can either open Conduktor Platform and add the two schemas to the
 ```bash
 conduktor schema-registry add --name Verifier --schema-file ./avro/verifiers.avsc --schema-type avro --schema-description "Verifier schema"
 conduktor schema-registry add --name Generator --schema-file ./avro/generators.avsc --schema-type avro --schema-description "Generator schema"
+```
+
+Don't forget to add the two Topics Verifier and Generator as well
+
+```bash
+conduktor topic add --name Verifier --partitions 1 --replication-factor 1
+conduktor topic add --name Generator --partitions 1 --replication-factor 1
 ```
 
 if all didn't work you can run a small version of the SystemApi that is responsible for producing the actual statistics which will automatically register the schemas in the schema registry
