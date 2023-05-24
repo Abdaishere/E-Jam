@@ -14,6 +14,27 @@ To view the E-Jam API documentation, run the following command:
 cargo doc --open
 ```
 
+## How to run the E-Jam API
+
+To run the E-Jam API, run the following command:
+
+```bash
+cargo run
+```
+
+## How to test the E-Jam API
+
+To test the E-Jam API, run the following command:
+
+```bash
+cargo run --features fake_data
+```
+
+This will run the E-Jam API with fake data and a random statics generator for both the generators and the verifiers of the system.
+Keep in mind that the Kafka server must be running and the schemas should be registered in the schema registry for the producer to work. (which you can find in the [E-Jam Kafka Docker](../kafka_stack_docker_compose/README.md))
+
+## INTRODUCTION
+
 This API is used to create and manage streams.
 The E-Jam API is a REST API that allows you to manage the list of streams in the E-Jam application.
 The API is implemented using the Actix Web framework and Rust.
@@ -23,22 +44,6 @@ The Raspberry Pi is connected to a 100 Mbps network.
 The Raspberry Pi is running Pie OS.
 
 The API is hosted on port 8084.
-
-### What's new
-
-- all endpoints are now asynchronous
-- added pinging to the devices
-- added Synchronization to the streams
-- tested All endpoints and fixed most bugs
-- tested All Communication between the System API and the Admin Client Center Point
-- Status of the streams and devices are now updated accordingly
-- if failure accrued in any thread the system will send a message to the admin client.
-
-### To Do
-
-- System testing of the Whole System at once
-- Implementation of Pre-Set Streams.
-- Validation of the data sent to the API (mac address, stream id, etc...) (only needs activation)
 
 ## The E-Jam System
 
@@ -262,11 +267,3 @@ The structure of the Device object as a table is as follows:
 - `ver_processes` - A u16 that represents the number of verification processes that are running on the device
 - `status` - A DeviceStatus that represents the status of the device (Offline, Idle, Running)
 - `mac_address` - A string that represents the mac address of the device (used for authentication) MAC_ADDRESS is a regex that is used to validate the mac address
-
-### Kafka REST Proxy
-
-<https://migratorydata.com/blog/migratorydata-with-flutter-and-kafka/>
-<https://migratorydata.com/solutions/kafka/>
-<https://medium.com/@stefentaime_10958/real-time-data-processing-and-analysis-with-kafka-connect-ksql-elasticsearch-and-flask-f55366032d78>
-<https://github.com/conduktor/kafka-stack-docker-compose>
-Bridging using the Admin client center point

@@ -1,0 +1,56 @@
+{
+  "type": "record",
+  "name": "Verifier",
+  "namespace": "com.ejam.systemapi.stats.SchemaRegistry",
+  "fields": [
+    {
+      "name": "timestamp",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "macAddress",
+      "type": {
+        "type": "string",
+        "pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
+      }
+    },
+    {
+      "name": "streamId",
+      "type": {
+        "type": "string",
+        "pattern": "^\\w{3}$"
+      }
+    },
+    {
+      "name": "packetsCorrect",
+      "type": {
+        "type": "long",
+        "logicalType": "unsigned"
+      }
+    },
+    {
+      "name": "packetsErrors",
+      "type": {
+        "type": "long",
+        "logicalType": "unsigned"
+      }
+    },
+    {
+      "name": "packetsDropped",
+      "type": {
+        "type": "long",
+        "logicalType": "unsigned"
+      }
+    },
+    {
+      "name": "packetsOutOfOrder",
+      "type": {
+        "type": "long",
+        "logicalType": "unsigned"
+      }
+    }
+  ]
+}

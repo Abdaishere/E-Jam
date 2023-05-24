@@ -1,7 +1,31 @@
+
 # A docker compose file to run Kafka with a graphical desktop user interface for Apache Kafka
+
+## how to run kafka stack in docker
+
+```bash
+docker-compose up -d # run in background
+```
+
+After that you can either open Conduktor Platform and add the two schemas to the Schema Registry, or you can use the Conduktor CLI to do it:
+
+```bash
+conduktor schema-registry add --name Verifier --schema-file ./avro/verifiers.avsc --schema-type avro --schema-description "Verifier schema"
+conduktor schema-registry add --name Generator --schema-file ./avro/generators.avsc --schema-type avro --schema-description "Generator schema"
+```
+
+if all didn't work you can run a small version of the SystemApi that is responsible for producing the actual statistics which will automatically register the schemas in the schema registry
+
+```bash
+cd SystemApi
+mvn clean install
+mvn exec:java
+```
 
 Once you have started your cluster, you can use Conduktor to easily manage it.
 Just connect against `localhost:9092`. If you are on Mac or Windows and want to connect from another container, use `host.docker.internal:29092`
+
+If you want more info checkout the rest of the readme.
 
 ## kafka-stack-docker-compose
 
@@ -53,7 +77,7 @@ password: `admin`
 - KSQL Server: `$DOCKER_HOST_IP:8088`
 - JMX port at `$DOCKER_HOST_IP:9001`
 
- Run with:
+ Stop with:
 
  ```bash
  docker-compose up
@@ -69,38 +93,3 @@ Some basic tests are included to verify that the stack is working once up.
 ```bash
 ./test.sh docker-compose.yml
 ```
-
-## Advanced usage
-
-## Create a consumer for Avro data in "my_avro_consumer_group" consumer group, starting at the beginning of the topic's
-
-## log and subscribe to a topic. Then consume some data from a topic, which is decoded, translated to
-
-## JSON, and included in the response. The schema used for deserialization is
-
-## fetched automatically from schema registry. Finally, clean up
-
-curl -X POST  -H "Content-Type: application/vnd.kafka.v2+json" \
-      --data '{"name": "my_consumer_instance", "format": "avro", "auto.offset.reset": "earliest"}' \
-      <http://localhost:8082/consumers/my_avro_consumer_group>
-
-## Expected output from preceding command
-
-  {"instance_id":"my_consumer_instance","base_uri":"<http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance"}>
-
-curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" --data '{"topics":["avrotest"]}' \
-      <http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance/subscription>
-
-## No content in response
-
-curl -X GET -H "Accept: application/vnd.kafka.avro.v2+json" \
-      <http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance/records>
-
-## Expected output from preceding command (note that the actual output will contain different data)
-
-  [{"key":null,"value":{"name":"testUser"},"partition":0,"offset":1,"topic":"avrotest"}]
-
-curl -X DELETE -H "Content-Type: application/vnd.kafka.v2+json" \
-      <http://localhost:8082/consumers/my_avro_consumer_group/instances/my_consumer_instance>
-
-## No content in response if successful
