@@ -3,7 +3,7 @@
 
 ## how to run kafka stack in docker
 
-the Following instructions can be applied on the CLI or using Conduktor Platform (recommended) which you can find out more about in the ##Full stack section
+the Following instructions can be applied on the CLI or using Conduktor Platform which you can find out more about in the Full stack section
 
 Make sure you have docker and docker-compose installed on your machine
 
