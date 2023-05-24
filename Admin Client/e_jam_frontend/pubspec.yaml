@@ -33,12 +33,10 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  google_fonts: ^4.0.3
   provider: ^6.0.5
   shared_preferences: ^2.1.1
   flutter_zoom_drawer: ^3.0.4+1
   font_awesome_flutter: ^10.4.0
-  cupertino_icons: ^1.0.5
   flutter_vector_icons: ^2.0.0
   syncfusion_flutter_charts: ^21.2.5
   syncfusion_flutter_gauges: ^21.2.5
@@ -46,9 +44,9 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   timeago: ^3.4.0
   http: ^0.13.6
-  ping_discover_network_forked: ^0.0.1
-  circular_motion: ^0.0.3
-  flutter_ripple: ^0.0.3
+  ping_discover_network_forked: ^0.0.1 # small package to ping network
+  circular_motion: ^0.0.3 # small package to for circular motion of widgets in radar view
+  flutter_ripple: ^0.0.3 # small package to for ripple effect of radar view
   collection: ^1.17.1
   
 
