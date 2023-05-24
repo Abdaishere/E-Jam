@@ -16,6 +16,8 @@ This is a GUI for Project E-Jam for Testing, Monitoring, and Debugging Switches.
 
 ## Installation
 
+Make Sure you have Flutter installed on your machine.
+
 To install, clone the repository and run `flutter pub get` to install dependencies. Then, run `flutter run` to run the app.
 
 ## Usage

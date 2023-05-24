@@ -16,6 +16,8 @@ cargo doc --open
 
 ## How to run the E-Jam API
 
+Make sure you have Rust installed on your machine.
+
 To run the E-Jam API, run the following command:
 
 ```bash

@@ -3,6 +3,8 @@
 
 ## how to run kafka stack in docker
 
+Make sure you have docker and docker-compose installed on your machine
+
 ```bash
 docker-compose up -d # run in background
 ```
