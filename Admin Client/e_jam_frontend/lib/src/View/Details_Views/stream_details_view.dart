@@ -5,7 +5,6 @@ import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
-import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -757,11 +756,20 @@ class StreamGraph extends StatefulWidget {
 }
 
 class _StreamGraphState extends State<StreamGraph> {
-  int _completed = 0;
-  int _failed = 0;
-  int _queued = 0;
-  int _running = 0;
-  int _stopped = 0;
+  // first item will be exploded in the chart if enabled
+  final Map<ProcessStatus, int> _processesCounterMap = {
+    ProcessStatus.failed: 0,
+    ProcessStatus.running: 0,
+    ProcessStatus.completed: 0,
+    ProcessStatus.queued: 0,
+    ProcessStatus.stopped: 0,
+  };
+  final Map<PacketStatus, num> _totalPacketsStatusMap = {
+    PacketStatus.error: 0,
+    PacketStatus.sent: 0,
+    PacketStatus.received: 0,
+    PacketStatus.dropped: 0,
+  };
   StreamEntry? get stream => widget.stream;
 
   @override
@@ -779,53 +787,32 @@ class _StreamGraphState extends State<StreamGraph> {
 
     if (stream?.runningGenerators != null) {
       stream?.runningGenerators?.processes.forEach((key, value) {
-        switch (value) {
-          case ProcessStatus.completed:
-            _completed++;
-            break;
-          case ProcessStatus.failed:
-            _failed++;
-            break;
-          case ProcessStatus.queued:
-            _queued++;
-            break;
-          case ProcessStatus.running:
-            _running++;
-            break;
-          case ProcessStatus.stopped:
-            _stopped++;
-            break;
-          default:
-            break;
-        }
+        _processesCounterMap[value] = _processesCounterMap[value]! + 1;
       });
     }
 
     if (stream?.runningVerifiers != null) {
       stream?.runningVerifiers?.processes.forEach((key, value) {
-        switch (value) {
-          case ProcessStatus.completed:
-            _completed++;
-            break;
-          case ProcessStatus.failed:
-            _failed++;
-            break;
-          case ProcessStatus.queued:
-            _queued++;
-            break;
-          case ProcessStatus.running:
-            _running++;
-            break;
-          case ProcessStatus.stopped:
-            _stopped++;
-            break;
-          default:
-            break;
-        }
+        _processesCounterMap[value] = _processesCounterMap[value]! + 1;
       });
     }
 
     setState(() {});
+  }
+
+  _countPackets(List<VerifierStatisticsInstance> streamVerifiers,
+      List<GeneratorStatisticsInstance> streamGenerators) {
+    if (stream == null) {
+      return;
+    }
+
+    for (var element in streamVerifiers) {
+      _addVerifierPacketsCount(element);
+    }
+
+    for (var element in streamGenerators) {
+      _addGeneratorPacketsCount(element);
+    }
   }
 
   @override
@@ -843,6 +830,7 @@ class _StreamGraphState extends State<StreamGraph> {
         .getGeneratorStatistics
         .where((element) => element.streamId == stream?.streamId)
         .toList();
+    _countPackets(streamVerifiers, streamGenerators);
 
     return _showChart(streamVerifiers, streamGenerators);
   }
@@ -862,16 +850,13 @@ class _StreamGraphState extends State<StreamGraph> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(child: DoughnutChartPackets(packetsState())),
+              // TODO: Apply the correct values
+              Expanded(
+                  child: DoughnutChartPackets(
+                      initPacketsCount(_totalPacketsStatusMap))),
               Expanded(
                 child: PieDevices(
-                  initRunningProcesses(
-                    completed: _completed,
-                    failed: _failed,
-                    queued: _queued,
-                    running: _running,
-                    stopped: _stopped,
-                  ),
+                  runningProcessesToList(_processesCounterMap),
                 ),
               ),
             ],
@@ -879,5 +864,28 @@ class _StreamGraphState extends State<StreamGraph> {
         ),
       ],
     );
+  }
+
+  _addGeneratorPacketsCount(GeneratorStatisticsInstance generator) {
+    _totalPacketsStatusMap[PacketStatus.sent] =
+        _totalPacketsStatusMap[PacketStatus.sent]! + generator.packetsSent;
+
+    _totalPacketsStatusMap[PacketStatus.error] =
+        _totalPacketsStatusMap[PacketStatus.error]! + generator.packetsErrors;
+  }
+
+  _addVerifierPacketsCount(VerifierStatisticsInstance verifier) {
+    _totalPacketsStatusMap[PacketStatus.received] =
+        _totalPacketsStatusMap[PacketStatus.received]! +
+            verifier.packetsCorrect +
+            verifier.packetsOutOfOrder;
+
+    _totalPacketsStatusMap[PacketStatus.dropped] =
+        _totalPacketsStatusMap[PacketStatus.dropped]! + verifier.packetsDropped;
+
+    _totalPacketsStatusMap[PacketStatus.error] =
+        _totalPacketsStatusMap[PacketStatus.error]! +
+            verifier.packetsErrors +
+            verifier.packetsOutOfOrder;
   }
 }

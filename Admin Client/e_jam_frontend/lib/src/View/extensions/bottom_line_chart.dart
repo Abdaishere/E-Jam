@@ -1,5 +1,6 @@
 import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
@@ -31,24 +32,29 @@ class _BottomLineChartState extends State<BottomLineChart> {
         labelPosition: ChartDataLabelPosition.inside,
       ),
       series: <ChartSeries>[
-        // Renders spline area chart
-
+        // Renders spline area chart for Upload
         SplineAreaSeries<GeneratorStatisticsInstance, int>(
           borderColor: uploadColor,
           borderWidth: 1,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
           dataSource:
               context.watch<StatisticsController>().getGeneratorStatistics,
           yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
               chartData.packetsSent,
           xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
-              now.difference(chartData.timestamp).inSeconds,
+              chartData.timestamp.difference(now).inSeconds,
           color: uploadColor.withOpacity(0.2),
         ),
 
-        // Renders spline area chart
+        // Renders spline area chart for Download
         SplineAreaSeries<VerifierStatisticsInstance, int>(
           borderColor: downloadColor,
           borderWidth: 1,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
           dataSource:
               context.watch<StatisticsController>().getVerifierStatistics,
           yValueMapper: (VerifierStatisticsInstance chartData, _) =>
@@ -56,8 +62,33 @@ class _BottomLineChartState extends State<BottomLineChart> {
               chartData.packetsErrors +
               chartData.packetsOutOfOrder,
           xValueMapper: (VerifierStatisticsInstance chartData, _) =>
-              now.difference(chartData.timestamp).inSeconds,
+              chartData.timestamp.difference(now).inSeconds,
           color: downloadColor.withOpacity(0.2),
+        ),
+
+        // Renders spline chart for Error
+        SplineSeries<GeneratorStatisticsInstance, int>(
+          name: 'Error',
+          color: packetErrorColor,
+          markerSettings: const MarkerSettings(
+            isVisible: true,
+            color: packetErrorColor,
+            borderColor: packetErrorColor,
+            borderWidth: 1,
+            height: 3,
+            width: 3,
+          ),
+          width: 2,
+          splineType: SystemSettings.lineGraphCurveSmooth
+              ? SplineType.monotonic
+              : SplineType.cardinal,
+          cardinalSplineTension: 0.0,
+          dataSource:
+              context.watch<StatisticsController>().getGeneratorStatistics,
+          yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              chartData.packetsErrors,
+          xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
+              chartData.timestamp.difference(now).inSeconds,
         ),
       ],
     );

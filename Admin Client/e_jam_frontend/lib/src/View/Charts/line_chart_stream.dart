@@ -32,12 +32,7 @@ class _LineChartStreamState extends State<LineChartStream> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        // TODO: Implement Pinned Charts
-      },
-      child: _lineChart(),
-    );
+    return _lineChart();
   }
 
   SfCartesianChart _lineChart() {
@@ -57,7 +52,7 @@ class _LineChartStreamState extends State<LineChartStream> {
         labelIntersectAction: SystemSettings.fullChartsDetails
             ? AxisLabelIntersectAction.trim
             : AxisLabelIntersectAction.hide,
-        labelFormat: '{value}',
+        labelFormat: ' ',
       ),
       primaryYAxis: NumericAxis(
         labelStyle: TextStyle(
@@ -104,7 +99,7 @@ class _LineChartStreamState extends State<LineChartStream> {
           yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
               chartData.packetsSent,
           xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
-              now.difference(chartData.timestamp).inSeconds,
+              chartData.timestamp.difference(now).inSeconds,
           color: uploadColor.withOpacity(0.2),
         ),
 
@@ -133,7 +128,7 @@ class _LineChartStreamState extends State<LineChartStream> {
               chartData.packetsOutOfOrder,
           // compare to now
           xValueMapper: (VerifierStatisticsInstance chartData, _) =>
-              now.difference(chartData.timestamp).inSeconds,
+              chartData.timestamp.difference(now).inSeconds,
           color: downloadColor.withOpacity(0.2),
         ),
 
@@ -160,7 +155,7 @@ class _LineChartStreamState extends State<LineChartStream> {
           yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
               chartData.packetsErrors,
           xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
-              now.difference(chartData.timestamp).inSeconds,
+              chartData.timestamp.difference(now).inSeconds,
         ),
       ],
     );

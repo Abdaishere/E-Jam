@@ -12,29 +12,12 @@ class RunningProcesses {
 }
 
 // if chart explode is enabled then the first index is exploded by default according to the insertion order
-List<RunningProcesses> initRunningProcesses({
-  required int completed,
-  required int failed,
-  required int queued,
-  required int running,
-  required int stopped,
-}) {
+List<RunningProcesses> runningProcessesToList(Map<ProcessStatus, int> data) {
   List<RunningProcesses> result = [];
-  if (failed != 0) {
-    result.add(RunningProcesses(ProcessStatus.failed, failed));
-  }
-  if (running != 0) {
-    result.add(RunningProcesses(ProcessStatus.running, running));
-  }
-  if (completed != 0) {
-    result.add(RunningProcesses(ProcessStatus.completed, completed));
-  }
-  if (queued != 0) {
-    result.add(RunningProcesses(ProcessStatus.queued, queued));
-  }
-  if (stopped != 0) {
-    result.add(RunningProcesses(ProcessStatus.stopped, stopped));
-  }
+
+  data.forEach((key, value) {
+    if (value > 0) result.add(RunningProcesses(key, value));
+  });
 
   return result;
 }
@@ -45,12 +28,7 @@ class PieDevices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        // TODO: Implement Pinned Charts
-      },
-      child: _buildDefaultPieChart(),
-    );
+    return _buildDefaultPieChart();
   }
 
   /// Returns the circular  chart with pie series.

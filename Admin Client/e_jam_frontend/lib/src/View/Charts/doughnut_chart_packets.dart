@@ -1,7 +1,30 @@
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
+enum PacketStatus {
+  sent,
+  error,
+  received,
+  dropped,
+}
+
+class PacketsState {
+  final PacketStatus state;
+  final num value;
+
+  PacketsState(this.state, this.value);
+}
+
+List<PacketsState> initPacketsCount(Map<PacketStatus, num> data) {
+  List<PacketsState> result = [];
+
+  data.forEach((key, value) {
+    if (value > 0) result.add(PacketsState(key, value));
+  });
+
+  return result;
+}
 
 class DoughnutChartPackets extends StatefulWidget {
   const DoughnutChartPackets(this.packetsState, {super.key});
@@ -15,12 +38,7 @@ class _DoughnutChartPacketsState extends State<DoughnutChartPackets> {
   get packetsState => widget.packetsState;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        // TODO: Implement Pinned Charts
-      },
-      child: _buildDefaultDoughnutChart(),
-    );
+    return _buildDefaultDoughnutChart();
   }
 
   /// Return the circular chart with default doughnut series.
@@ -56,11 +74,28 @@ class _DoughnutChartPacketsState extends State<DoughnutChartPackets> {
           explode: SystemSettings.chartsExplode,
           explodeOffset: '15%',
           dataSource: packetsState,
-          xValueMapper: (PacketsState data, _) => data.state,
+          xValueMapper: (PacketsState data, _) =>
+              packetStatusToString(data.state),
           yValueMapper: (PacketsState data, _) => data.value,
-          dataLabelMapper: (PacketsState data, _) => data.state,
+          dataLabelMapper: (PacketsState data, _) =>
+              packetStatusToString(data.state),
           enableTooltip: true,
           dataLabelSettings: const DataLabelSettings(isVisible: true))
     ];
+  }
+}
+
+String packetStatusToString(PacketStatus status) {
+  switch (status) {
+    case PacketStatus.sent:
+      return 'Sent';
+    case PacketStatus.error:
+      return 'Error';
+    case PacketStatus.received:
+      return 'Received';
+    case PacketStatus.dropped:
+      return 'Dropped';
+    default:
+      return 'Unknown';
   }
 }

@@ -549,7 +549,7 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
                   color: uploadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '$upload MB/s',
+                  '$upload Pkt/s',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
@@ -570,7 +570,7 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
                   color: downloadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '$download MB/s',
+                  '$download Pkt/s',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,

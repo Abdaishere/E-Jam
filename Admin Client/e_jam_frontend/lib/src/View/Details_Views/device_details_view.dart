@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
-import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -139,7 +138,9 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               children: [
                 Expanded(
                   flex: 4,
-                  child: DoughnutChartPackets(packetsState()),
+                  child: DevicePacketsCounterDoughnut(
+                    mac: device.macAddress,
+                  ),
                 ),
                 Expanded(
                   flex: 3,
@@ -177,6 +178,82 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
           ],
         ),
       );
+}
+
+class DevicePacketsCounterDoughnut extends StatefulWidget {
+  const DevicePacketsCounterDoughnut({
+    required this.mac,
+    super.key,
+  });
+
+  final String mac;
+  @override
+  State<DevicePacketsCounterDoughnut> createState() =>
+      _DevicePacketsCounterDoughnutState();
+}
+
+class _DevicePacketsCounterDoughnutState
+    extends State<DevicePacketsCounterDoughnut> {
+  String get mac => widget.mac;
+  final Map<PacketStatus, num> _totalPacketsStatusMap = {
+    PacketStatus.error: 0,
+    PacketStatus.sent: 0,
+    PacketStatus.received: 0,
+    PacketStatus.dropped: 0,
+  };
+
+  _countPackets(List<VerifierStatisticsInstance> streamVerifiers,
+      List<GeneratorStatisticsInstance> streamGenerators) {
+    for (var element in streamVerifiers) {
+      _addVerifierPacketsCount(element);
+    }
+
+    for (var element in streamGenerators) {
+      _addGeneratorPacketsCount(element);
+    }
+  }
+
+  _addGeneratorPacketsCount(GeneratorStatisticsInstance generator) {
+    _totalPacketsStatusMap[PacketStatus.sent] =
+        _totalPacketsStatusMap[PacketStatus.sent]! + generator.packetsSent;
+
+    _totalPacketsStatusMap[PacketStatus.error] =
+        _totalPacketsStatusMap[PacketStatus.error]! + generator.packetsErrors;
+  }
+
+  _addVerifierPacketsCount(VerifierStatisticsInstance verifier) {
+    _totalPacketsStatusMap[PacketStatus.received] =
+        _totalPacketsStatusMap[PacketStatus.received]! +
+            verifier.packetsCorrect +
+            verifier.packetsOutOfOrder;
+
+    _totalPacketsStatusMap[PacketStatus.dropped] =
+        _totalPacketsStatusMap[PacketStatus.dropped]! + verifier.packetsDropped;
+
+    _totalPacketsStatusMap[PacketStatus.error] =
+        _totalPacketsStatusMap[PacketStatus.error]! +
+            verifier.packetsErrors +
+            verifier.packetsOutOfOrder;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<VerifierStatisticsInstance> streamVerifiers = [];
+    streamVerifiers = context
+        .watch<StatisticsController>()
+        .getVerifierStatistics
+        .where((element) => element.macAddress == mac)
+        .toList();
+
+    List<GeneratorStatisticsInstance> streamGenerators = [];
+    streamGenerators = context
+        .watch<StatisticsController>()
+        .getGeneratorStatistics
+        .where((element) => element.macAddress == mac)
+        .toList();
+    _countPackets(streamVerifiers, streamGenerators);
+    return DoughnutChartPackets(initPacketsCount(_totalPacketsStatusMap));
+  }
 }
 
 class ProcessesCount extends StatelessWidget {
@@ -387,12 +464,12 @@ class SpeedMonitor extends StatefulWidget {
   });
 
   final String mac;
-
   @override
   State<SpeedMonitor> createState() => _SpeedMonitorState();
 }
 
 class _SpeedMonitorState extends State<SpeedMonitor> {
+  String get mac => widget.mac;
   @override
   Widget build(BuildContext context) {
     int upload = 0;
@@ -401,13 +478,13 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
     VerifierStatisticsInstance? verInfo = context
         .watch<StatisticsController>()
         .getVerifierStatistics
-        .lastWhereOrNull((element) => element.macAddress == widget.mac);
+        .lastWhereOrNull((element) => element.macAddress == mac);
     upload = verInfo != null ? verInfo.packetsCorrect : 0;
 
     GeneratorStatisticsInstance? genInfo = context
         .watch<StatisticsController>()
         .getGeneratorStatistics
-        .lastWhereOrNull((element) => element.macAddress == widget.mac);
+        .lastWhereOrNull((element) => element.macAddress == mac);
 
     download = genInfo != null ? genInfo.packetsSent : 0;
 
@@ -425,7 +502,7 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
                   color: uploadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '$upload MB/s',
+                  '$upload Pkt/s',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
@@ -446,7 +523,7 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
                   color: downloadColor, size: 35.0),
               SizedBox(
                 child: Text(
-                  '$download MB/s',
+                  '$download Pkt/s',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     height: 1.5,
