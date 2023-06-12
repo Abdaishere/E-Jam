@@ -115,7 +115,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
         {
             Ok(consumer) => break consumer,
             Err(_e) => {
-                error!("{:?}", _e);
+                error!("Kafka Connection for Generator faker{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
@@ -140,6 +140,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
                 };
                 let fake_statics = Generator::generate_fake_generator_data(id.to_owned(), mac);
                 info!("fake date for Generator: {:?}", &fake_statics);
+
                 // convert the fake_statics to a Value type data for avro encoding
                 let encoded_data = encoder.encode_struct(fake_statics, &strategy);
                 match encoded_data {
@@ -189,15 +190,15 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
         {
             Ok(consumer) => break consumer,
             Err(_e) => {
-                // error!("{:?}", _e);
+                error!("Kafka Connection for Verifier faker{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
     };
 
-    info!("fake data Generator for Generator type statistics connected to Kafka Broker");
+    info!("fake data Generator for Verifier type statistics connected to Kafka Broker");
     loop {
-        // encode a new generator struct with fake data then send it to the kafka broker
+        // encode a new verifier struct with fake data then send it to the kafka broker
         for device in devices_list.iter() {
             let pick: bool = Faker.fake();
             if pick {
@@ -215,6 +216,7 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
                 let fake_statics = Verifier::generate_fake_verifier_data(id.to_owned(), mac);
 
                 info!("fake date for verifier: {:?}", &fake_statics);
+
                 // convert the fake_statics to a Value type data for avro encoding
                 let encoded_data = encoder.encode_struct(fake_statics, &strategy);
                 match encoded_data {
