@@ -66,7 +66,7 @@ class _EditDeviceViewState extends State<EditDeviceView> {
               MediaQuery.of(context).size.width > 900
           ? EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.3,
-              vertical: 100)
+              vertical: MediaQuery.of(context).size.height * 0.1)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: widget.device.macAddress,

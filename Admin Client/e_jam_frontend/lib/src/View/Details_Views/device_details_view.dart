@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/device.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -16,6 +17,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DevicesDetailsView extends StatefulWidget {
@@ -49,7 +51,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               MediaQuery.of(context).size.width > 800
           ? EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.28,
-              vertical: 100)
+              vertical: MediaQuery.of(context).size.height * 0.05)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: device.macAddress,
@@ -70,6 +72,22 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
               centerTitle: true,
               actions: [
                 DevicePinger(mac: device.macAddress),
+                IconButton(
+                  icon: const Icon(MaterialCommunityIcons.chart_arc),
+                  color: Colors.orange,
+                  tooltip: 'Pin Device Chart',
+                  onPressed: () async {
+                    if (SystemSettings.pinnedElements
+                        .contains("D${device.macAddress}")) return;
+
+                    SystemSettings.pinnedElements.add("D${device.macAddress}");
+
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setStringList(
+                        'pinnedElements', SystemSettings.pinnedElements);
+                  },
+                ),
                 IconButton(
                   icon: const Icon(MaterialCommunityIcons.pencil),
                   color: Colors.green,
@@ -137,7 +155,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
             body: Column(
               children: [
                 Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: DevicePacketsCounterDoughnut(
                     mac: device.macAddress,
                   ),
@@ -151,7 +169,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
                   indent: 10,
                   endIndent: 10,
                 ),
-                SpeedMonitor(mac: device.macAddress),
+                DeviceSpeedMonitor(mac: device.macAddress),
                 const SizedBox(height: 10),
               ],
             ),
@@ -252,7 +270,7 @@ class _DevicePacketsCounterDoughnutState
         .where((element) => element.macAddress == mac)
         .toList();
     _countPackets(streamVerifiers, streamGenerators);
-    return DoughnutChartPackets(initPacketsCount(_totalPacketsStatusMap));
+    return DoughnutChartPackets(packetsCountMapToList(_totalPacketsStatusMap));
   }
 }
 
@@ -457,18 +475,18 @@ class NameAndAddress extends StatelessWidget {
   }
 }
 
-class SpeedMonitor extends StatefulWidget {
-  const SpeedMonitor({
+class DeviceSpeedMonitor extends StatefulWidget {
+  const DeviceSpeedMonitor({
     required this.mac,
     super.key,
   });
 
   final String mac;
   @override
-  State<SpeedMonitor> createState() => _SpeedMonitorState();
+  State<DeviceSpeedMonitor> createState() => _DeviceSpeedMonitorState();
 }
 
-class _SpeedMonitorState extends State<SpeedMonitor> {
+class _DeviceSpeedMonitorState extends State<DeviceSpeedMonitor> {
   String get mac => widget.mac;
   @override
   Widget build(BuildContext context) {
@@ -515,7 +533,6 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
             ],
           ),
         ),
-        const VerticalDivider(),
         Expanded(
           child: Column(
             children: <Widget>[

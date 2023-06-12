@@ -83,6 +83,8 @@ class SystemSettings {
     "1Elements",
     "1Performance"
   ];
+  // starts with D for device S for stream
+  static List<String> pinnedElements = [];
   static int defaultDevicesPort = 8000;
   static String defaultSystemApiSubnet = "192.168.0";
   static bool chartsAreRunning = true;
@@ -101,6 +103,7 @@ class SystemSettings {
     dashboardExtensionsOrder = pref.getStringList('dashboardExtensionsOrder') ??
         ["1Progress", "1Elements", "1Performance"];
 
+    pinnedElements = pref.getStringList('pinnedElements') ?? [];
     defaultDevicesPort = pref.getInt('defaultDevicesPort') ?? 8000;
     defaultSystemApiSubnet =
         pref.getString('defaultSystemApiSubnet') ?? "192.168.0";

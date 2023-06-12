@@ -67,16 +67,26 @@ class _StreamsListViewState extends State<StreamsListView> {
                         .watch<StreamsController>()
                         .getStreamsStatusDetails!
                         .isEmpty,
-                replacement: const Stack(
-                  children: [
-                    Center(
-                      child: Icon(
+                replacement: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
                         Icons.warning_amber_rounded,
                         color: Colors.redAccent,
                         size: 100.0,
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 10.0),
+                      Text(
+                        'Connection Error',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 child: const Center(
                   child: Column(
@@ -267,7 +277,7 @@ class _StreamCardState extends State<StreamCard> {
                   ],
                 ),
                 // upload and download speed
-                SpeedMonitor(id: stream.streamId),
+                StreamSpeedMonitor(id: stream.streamId),
 
                 // delay, start, stop, delete, edit, progress bar
                 // status icons should be the status of the stream (running, error, stopped, queued, finished, ready) and stream name (Alphanumeric 3 letters long names) and menu icon for more options and details
@@ -504,8 +514,8 @@ class MiniProgressBar extends StatelessWidget {
   }
 }
 
-class SpeedMonitor extends StatefulWidget {
-  const SpeedMonitor({
+class StreamSpeedMonitor extends StatefulWidget {
+  const StreamSpeedMonitor({
     required this.id,
     super.key,
   });
@@ -513,10 +523,10 @@ class SpeedMonitor extends StatefulWidget {
   final String id;
 
   @override
-  State<SpeedMonitor> createState() => _SpeedMonitorState();
+  State<StreamSpeedMonitor> createState() => _StreamSpeedMonitorState();
 }
 
-class _SpeedMonitorState extends State<SpeedMonitor> {
+class _StreamSpeedMonitorState extends State<StreamSpeedMonitor> {
   @override
   Widget build(BuildContext context) {
     int upload = 0;
@@ -562,7 +572,6 @@ class _SpeedMonitorState extends State<SpeedMonitor> {
             ],
           ),
         ),
-        const VerticalDivider(),
         Expanded(
           child: Column(
             children: <Widget>[

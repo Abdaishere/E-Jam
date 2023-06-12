@@ -1,13 +1,11 @@
-import 'dart:math';
-
 import 'package:e_jam/main.dart';
-import 'package:e_jam/src/Model/Classes/Statistics/fake_chart_data.dart';
-import 'package:e_jam/src/Model/Enums/processes.dart';
-import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_doughnut_chart_packets.dart';
-import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_line_chart_stream.dart';
-import 'package:e_jam/src/View/Charts/Dynamic%20Charts/dynamic_pie_chart_devices_per_stream.dart';
-import 'package:e_jam/src/View/Charts/pie_chart_devices_per_stream.dart';
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
+import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
+import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 
 // the User can attach a graph of a stream or a device or any other data source (Staggered Grid View)
 class GraphsListView extends StatefulWidget {
@@ -29,30 +27,96 @@ class _GraphsListViewState extends State<GraphsListView> {
         centerTitle: true,
         leading: const DrawerWidget(),
       ),
-      body: GridView.builder(
-        itemCount: 10,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount:
-              MediaQuery.of(context).orientation == Orientation.portrait
-                  ? 2
-                  : 3,
+      body: Visibility(
+        visible: SystemSettings.pinnedElements.isNotEmpty,
+        replacement: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                MaterialCommunityIcons.chart_arc,
+                size: 100.0,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 10.0),
+              Text(
+                'No Pinned Charts Selected',
+                style: TextStyle(
+                  fontSize: 20.0,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
         ),
-        itemBuilder: (BuildContext context, int index) {
-          Widget randomWidget = [
-            DynamicDoughnutChartPackets(packetsState()),
-            DynamicLineChartStream(index.toString()),
-            DynamicPieDevices(runningProcessesToList({
-              ProcessStatus.failed: 1,
-              ProcessStatus.running: 1,
-              ProcessStatus.completed: 1,
-              ProcessStatus.queued: 1,
-              ProcessStatus.stopped: 1,
-            })),
-          ][Random().nextInt(3)];
-          return Card(
-            child: Center(child: randomWidget),
-          );
-        },
+        child: GridView.builder(
+          padding: const EdgeInsets.all(8.0),
+          shrinkWrap: true,
+          itemCount: SystemSettings.pinnedElements.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 1,
+            childAspectRatio: 2,
+            mainAxisSpacing: 5.0,
+            crossAxisSpacing: 3.0,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            Widget graph;
+            if (SystemSettings.pinnedElements[index].startsWith("D")) {
+              String macAddress =
+                  SystemSettings.pinnedElements[index].substring(1);
+              graph = Column(
+                children: [
+                  Text(
+                    "Device $macAddress",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Expanded(
+                    child: DevicePacketsCounterDoughnut(
+                      mac: macAddress,
+                    ),
+                  ),
+                  const Divider(),
+                  DeviceSpeedMonitor(mac: macAddress),
+                ],
+              );
+            } else if (SystemSettings.pinnedElements[index].startsWith("S")) {
+              String streamId =
+                  SystemSettings.pinnedElements[index].substring(1);
+              graph = Column(
+                children: [
+                  Text(
+                    "Stream $streamId",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Expanded(
+                    child: StreamGraph(
+                      streamId: streamId,
+                      runningGenerators: const Process.empty(),
+                      runningVerifiers: const Process.empty(),
+                    ),
+                  ),
+                  const Divider(),
+                  StreamSpeedMonitor(id: streamId),
+                ],
+              );
+            } else {
+              graph = const Text("Error");
+            }
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 8.0, left: 8.0, right: 8.0, bottom: 8.0),
+                child: graph,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

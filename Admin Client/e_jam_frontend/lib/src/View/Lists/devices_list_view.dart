@@ -75,10 +75,24 @@ class _DevicesListViewState extends State<DevicesListView> {
                           null &&
                       context.watch<DevicesController>().getDevices!.isEmpty,
                   replacement: const Center(
-                    child: Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.redAccent,
-                      size: 100.0,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.redAccent,
+                          size: 100.0,
+                        ),
+                        SizedBox(height: 10.0),
+                        Text(
+                          'Connection Error',
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   child: const Center(

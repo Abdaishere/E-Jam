@@ -16,7 +16,7 @@ class PacketsState {
   PacketsState(this.state, this.value);
 }
 
-List<PacketsState> initPacketsCount(Map<PacketStatus, num> data) {
+List<PacketsState> packetsCountMapToList(Map<PacketStatus, num> data) {
   List<PacketsState> result = [];
 
   data.forEach((key, value) {

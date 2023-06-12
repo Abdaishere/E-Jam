@@ -45,7 +45,7 @@ class _AddStreamViewState extends State<AddStreamView>
               MediaQuery.of(context).size.width > 900
           ? EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.2,
-              vertical: 100)
+              vertical: MediaQuery.of(context).size.height * 0.1)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: 'addStream',

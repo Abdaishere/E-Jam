@@ -110,10 +110,10 @@ class _HomeState extends State<Home> {
   Timer? _timer2;
   @override
   void initState() {
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+    _timer = Timer.periodic(const Duration(seconds: 8), (timer) async {
       await context.read<StatisticsController>().loadAllVerifierStatistics();
     });
-    _timer2 = Timer.periodic(const Duration(seconds: 10), (timer) async {
+    _timer2 = Timer.periodic(const Duration(seconds: 8), (timer) async {
       await context.read<StatisticsController>().loadAllGeneratorStatistics();
     });
     super.initState();

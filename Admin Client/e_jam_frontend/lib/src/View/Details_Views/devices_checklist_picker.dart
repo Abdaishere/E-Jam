@@ -67,7 +67,7 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
               MediaQuery.of(context).size.width > 800
           ? EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.3,
-              vertical: 100)
+              vertical: MediaQuery.of(context).size.height * 0.08)
           : const EdgeInsets.all(100),
       child: ClipRRect(
         borderRadius: const BorderRadius.all(

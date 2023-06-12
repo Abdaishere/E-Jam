@@ -5,6 +5,7 @@ import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.
 import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/processes.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
@@ -21,6 +22,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StreamDetailsView extends StatefulWidget {
   const StreamDetailsView(
@@ -76,7 +78,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               MediaQuery.of(context).size.width > 800
           ? EdgeInsets.symmetric(
               horizontal: MediaQuery.of(context).size.width * 0.08,
-              vertical: MediaQuery.of(context).size.height * 0.08)
+              vertical: MediaQuery.of(context).size.height * 0.07)
           : const EdgeInsets.all(20),
       child: Hero(
         tag: id,
@@ -101,6 +103,23 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               centerTitle: true,
               actions: stream != null
                   ? [
+                      IconButton(
+                        icon: const Icon(MaterialCommunityIcons.chart_arc),
+                        color: Colors.orange,
+                        tooltip: 'Pin Stream Charts',
+                        onPressed: () async {
+                          if (SystemSettings.pinnedElements
+                              .contains("S${stream?.streamId}")) return;
+
+                          SystemSettings.pinnedElements
+                              .add("S${stream?.streamId}");
+
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          prefs.setStringList(
+                              'pinnedElements', SystemSettings.pinnedElements);
+                        },
+                      ),
                       IconButton(
                         icon: const Icon(MaterialCommunityIcons.pencil),
                         color: Colors.green,
@@ -218,7 +237,13 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   size: 40,
                 ),
               ),
-              child: StreamGraph(stream: stream),
+              child: StreamGraph(
+                streamId: stream?.streamId ?? ' ',
+                runningGenerators:
+                    stream?.runningGenerators ?? const Process.empty(),
+                runningVerifiers:
+                    stream?.runningVerifiers ?? const Process.empty(),
+              ),
             ),
           ),
         ),
@@ -277,7 +302,13 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   size: 40,
                 ),
               ),
-              child: StreamGraph(stream: stream),
+              child: StreamGraph(
+                streamId: stream?.streamId ?? ' ',
+                runningGenerators:
+                    stream?.runningGenerators ?? const Process.empty(),
+                runningVerifiers:
+                    stream?.runningVerifiers ?? const Process.empty(),
+              ),
             ),
           ),
         ),
@@ -748,9 +779,16 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
 }
 
 class StreamGraph extends StatefulWidget {
-  const StreamGraph({super.key, required this.stream});
+  const StreamGraph({
+    super.key,
+    required this.streamId,
+    required this.runningGenerators,
+    required this.runningVerifiers,
+  });
 
-  final StreamEntry? stream;
+  final String streamId;
+  final Process runningGenerators;
+  final Process runningVerifiers;
   @override
   State<StreamGraph> createState() => _StreamGraphState();
 }
@@ -770,7 +808,9 @@ class _StreamGraphState extends State<StreamGraph> {
     PacketStatus.received: 0,
     PacketStatus.dropped: 0,
   };
-  StreamEntry? get stream => widget.stream;
+  Process get runningGenerators => widget.runningGenerators;
+  Process get runningVerifiers => widget.runningVerifiers;
+  String get streamId => widget.streamId;
 
   @override
   void initState() {
@@ -781,31 +821,19 @@ class _StreamGraphState extends State<StreamGraph> {
   }
 
   _countProcesses() {
-    if (stream == null) {
-      return;
-    }
+    runningGenerators.processes.forEach((key, value) {
+      _processesCounterMap[value] = _processesCounterMap[value]! + 1;
+    });
 
-    if (stream?.runningGenerators != null) {
-      stream?.runningGenerators?.processes.forEach((key, value) {
-        _processesCounterMap[value] = _processesCounterMap[value]! + 1;
-      });
-    }
-
-    if (stream?.runningVerifiers != null) {
-      stream?.runningVerifiers?.processes.forEach((key, value) {
-        _processesCounterMap[value] = _processesCounterMap[value]! + 1;
-      });
-    }
+    runningVerifiers.processes.forEach((key, value) {
+      _processesCounterMap[value] = _processesCounterMap[value]! + 1;
+    });
 
     setState(() {});
   }
 
   _countPackets(List<VerifierStatisticsInstance> streamVerifiers,
       List<GeneratorStatisticsInstance> streamGenerators) {
-    if (stream == null) {
-      return;
-    }
-
     for (var element in streamVerifiers) {
       _addVerifierPacketsCount(element);
     }
@@ -817,18 +845,22 @@ class _StreamGraphState extends State<StreamGraph> {
 
   @override
   Widget build(BuildContext context) {
+    if (streamId.isEmpty) {
+      return const Text('No stream Data Available');
+    }
+
     List<VerifierStatisticsInstance> streamVerifiers = [];
     streamVerifiers = context
         .watch<StatisticsController>()
         .getVerifierStatistics
-        .where((element) => element.streamId == stream?.streamId)
+        .where((element) => element.streamId == streamId)
         .toList();
 
     List<GeneratorStatisticsInstance> streamGenerators = [];
     streamGenerators = context
         .watch<StatisticsController>()
         .getGeneratorStatistics
-        .where((element) => element.streamId == stream?.streamId)
+        .where((element) => element.streamId == streamId)
         .toList();
     _countPackets(streamVerifiers, streamGenerators);
 
@@ -837,12 +869,15 @@ class _StreamGraphState extends State<StreamGraph> {
 
   Column _showChart(List<VerifierStatisticsInstance> streamVerifiers,
       List<GeneratorStatisticsInstance> streamGenerators) {
+    bool showProcessesPieChart = runningGenerators.processes.isNotEmpty ||
+        runningVerifiers.processes.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: LineChartStream(
-              id: stream?.streamId ?? '',
+              id: streamId,
               verChartData: streamVerifiers,
               genChartData: streamGenerators),
         ),
@@ -850,15 +885,19 @@ class _StreamGraphState extends State<StreamGraph> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // TODO: Apply the correct values
               Expanded(
-                  child: DoughnutChartPackets(
-                      initPacketsCount(_totalPacketsStatusMap))),
-              Expanded(
-                child: PieDevices(
-                  runningProcessesToList(_processesCounterMap),
+                child: DoughnutChartPackets(
+                  packetsCountMapToList(_totalPacketsStatusMap),
                 ),
               ),
+
+              // hide if no processes are provided
+              if (showProcessesPieChart)
+                Expanded(
+                  child: PieDevices(
+                    runningProcessesToList(_processesCounterMap),
+                  ),
+                ),
             ],
           ),
         ),

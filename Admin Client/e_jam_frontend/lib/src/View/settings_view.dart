@@ -128,12 +128,52 @@ class _SettingsViewState extends State<SettingsView> {
           },
         ),
       ),
+      ListTile(
+        title: const Text('Charts List View'),
+        trailing: CupertinoButton(
+          onPressed: () => _clearChartDialog(),
+          child: const Text(
+            'Clear',
+            style: TextStyle(
+                color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
+      ),
       const Divider(
         height: 15,
         indent: 10,
         endIndent: 10,
       ),
     ];
+  }
+
+  _clearChartDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Clear Charts'),
+        content:
+            const Text('Are you sure you want to clear ALL charts Pinned?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: const Text('Clear'),
+            onPressed: () async {
+              SystemSettings.pinnedElements.clear();
+              Navigator.pop(context);
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setStringList('pinnedElements', []);
+            },
+          ),
+        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+      ),
+    );
   }
 
   List<Widget> get _dashboardSettings {

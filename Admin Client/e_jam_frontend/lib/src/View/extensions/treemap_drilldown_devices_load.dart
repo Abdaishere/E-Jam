@@ -128,10 +128,24 @@ class _TreeMapDrillDownDevicesLoadState
       return SizedBox(
         height: MediaQuery.of(context).size.height * 0.45,
         child: const Center(
-          child: Icon(
-            Icons.stream_sharp,
-            color: Colors.redAccent,
-            size: 100.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.stream_sharp,
+                color: Colors.redAccent,
+                size: 100.0,
+              ),
+              SizedBox(height: 10.0),
+              Text(
+                'Connection Error',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
       );
