@@ -38,9 +38,9 @@ pub fn run_generator_consumer(
         {
             Ok(consumer) => break consumer,
             Err(e) => {
-                error!("{:?}", e);
+                error!("Kafka Error {:?}", e);
                 if counter == 0 {
-                    error!("{:?}", e);
+                    error!("Kafka Error {:?}", e);
                     return Err(());
                 }
                 counter -= 1;
@@ -54,7 +54,7 @@ pub fn run_generator_consumer(
     loop {
         let message = consumer.poll();
         if message.is_err() {
-            error!("{:?}", message.as_ref().err());
+            error!("Kafka Error  {:?}", message.as_ref().err());
             return Err(());
         }
 
@@ -69,7 +69,7 @@ pub fn run_generator_consumer(
             for m in ms.messages() {
                 let result = decoder.decode(Some(m.value));
                 if result.is_err() {
-                    error!("{:?}", result.err().unwrap());
+                    error!("Kafka Error  {:?}", result.err().unwrap());
                     continue;
                 }
                 let result = result.unwrap();
@@ -103,14 +103,14 @@ pub fn run_generator_consumer(
                         }
                     }
                     Err(e) => {
-                        error!("{:?}", e);
+                        error!("Kafka Error {:?}", e);
                     }
                 }
             }
 
             let consumed = consumer.consume_messageset(ms);
             if consumed.is_err() {
-                error!("{:?}", consumed.err());
+                error!("Kafka Error {:?}", consumed.err());
             }
         }
 
@@ -140,9 +140,9 @@ pub fn run_verifier_consumer(
         {
             Ok(consumer) => break consumer,
             Err(e) => {
-                error!("{:?}", e);
+                error!("Kafka Error {:?}", e);
                 if counter == 0 {
-                    error!("{:?}", e);
+                    error!("Kafka Error {:?}", e);
                     return Err(());
                 }
                 counter -= 1;
@@ -157,7 +157,7 @@ pub fn run_verifier_consumer(
         let message = consumer.poll();
 
         if message.is_err() {
-            error!("{:?}", message.as_ref().err());
+            error!("Kafka Error {:?}", message.as_ref().err());
             continue;
         }
 
@@ -172,7 +172,7 @@ pub fn run_verifier_consumer(
             for m in ms.messages() {
                 let result = decoder.decode(Some(m.value));
                 if result.is_err() {
-                    error!("{:?}", result.err().unwrap());
+                    error!("Kafka Error {:?}", result.err().unwrap());
                     continue;
                 }
                 let result = result.unwrap();
@@ -205,14 +205,14 @@ pub fn run_verifier_consumer(
                         }
                     }
                     Err(e) => {
-                        error!("{:?}", e);
+                        error!("Kafka Error {:?}", e);
                     }
                 }
             }
 
             let consumed = consumer.consume_messageset(ms);
             if consumed.is_err() {
-                error!("{:?}", consumed.err());
+                error!("Kafka Error {:?}", consumed.err());
             }
         }
 

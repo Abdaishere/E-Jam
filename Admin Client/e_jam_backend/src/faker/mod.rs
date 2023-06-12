@@ -2,7 +2,7 @@ use crate::models::statistics::{Generator, Verifier};
 use crate::{
     models::{device::Device, AppState, StreamEntry},
     services::statistics::{
-        GENERATOR_TOPIC, HOST, MAIN_BROKER_PORT, NAMESPACE, SCHEMA_REGISTRY_PORT, SLEEP_TIME,
+        GENERATOR_TOPIC, HOST, MAIN_BROKER_PORT, NAMESPACE, SCHEMA_REGISTRY_PORT,
         VERIFIER_TOPIC,
     },
 };
@@ -20,7 +20,7 @@ use tokio::sync::Mutex;
 
 const FAKE_DEVICES_COUNT: usize = 50;
 const FAKE_STREAM_ENTRIES_COUNT: usize = 100;
-
+pub const SLEEP_TIME: u64 = 10;
 pub async fn generate_fake_metrics(app_state: &Data<AppState>) {
     info!("Fake data feature enabled");
 
