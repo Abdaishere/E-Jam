@@ -1,13 +1,17 @@
 use super::models::{AppState, StreamEntry, StreamStatus};
-use crate::models::{self, device::get_devices_table, stream_details::StreamStatusDetails};
+use crate::{
+    models::{self, device::get_devices_table, stream_details::StreamStatusDetails},
+    services::utils::{handle_starting_connections, handle_stopping_connections},
+};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use chrono::Utc;
-use log::{debug, error, info, warn};
+use log::{debug, info, warn};
 use validator::Validate;
 
 mod device;
 mod pre_sets;
 pub(crate) mod statistics;
+mod utils;
 
 use self::{
     device::{
@@ -174,9 +178,7 @@ async fn update_stream(
     }
 
     let stream_id = stream_id.into_inner();
-
     let mut streams_entries = data.stream_entries.lock().await;
-
     let stream_entry = streams_entries.get_mut(&stream_id);
 
     match stream_entry {
@@ -185,90 +187,23 @@ async fn update_stream(
             if new_stream_entry.get_stream_id() != stream_entry.get_stream_id() {
                 return HttpResponse::BadRequest().body("Stream id cannot be changed in updating a stream please delete and add the stream again with the new id if you want to change the id of the stream");
             }
-
             let mut body = format!("stream {} ", stream_id);
 
-            let mut unqueued = 0;
-            let mut stopped = 0;
-            // Stop if running
-            if stream_entry.check_stream_status(StreamStatus::Running) {
-                warn!("Stream {} is already running", stream_id);
-                let connections = stream_entry.stop_stream(&data.device_list).await;
-                let mut results = Vec::with_capacity(connections.len());
-                for handler in connections.into_iter() {
-                    let info = handler.connections;
-                    let handle = handler.handle;
-                    match handle.await {
-                        Ok(response) => {
-                            let result = stream_entry
-                                .analyze_device_response(
-                                    info.to_owned(),
-                                    response,
-                                    &data.device_list,
-                                    false,
-                                )
-                                .await;
-                            match result {
-                                Ok(_) => {
-                                    body += &format!("stopped, {} ", info.1.to_owned());
-                                    stopped += 1;
-                                }
-                                Err(_) => {
-                                    error!("Failed to stop stream {} on {:?}", stream_id, info);
-                                }
-                            }
-                            results.push(result);
-                        }
-                        Err(e) => {
-                            error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                        }
-                    }
-                }
-                body += &format!("{} were Stopped ", stopped);
-                stream_entry
-                    .update_received_devices_result(false, results)
-                    .await;
-            }
             // dequeue if queued
-            else if stream_entry.check_stream_status(StreamStatus::Queued) {
+            if stream_entry.check_stream_status(StreamStatus::Queued) {
                 warn!("Stream {} is already queued", stream_id);
                 let connections = stream_entry
                     .try_remove_stream_from_queue(&data.device_list)
                     .await;
-                let mut results = Vec::with_capacity(connections.len());
-                for connection in connections.into_iter() {
-                    let info = connection.connections;
-                    let handle = connection.handle;
-                    match handle.await {
-                        Ok(response) => {
-                            let result = stream_entry
-                                .analyze_device_response(
-                                    info.to_owned(),
-                                    response,
-                                    &data.device_list,
-                                    false,
-                                )
-                                .await;
-                            match result {
-                                Ok(_) => {
-                                    body += &format!("Unqueued, {} ", info.1.to_owned());
-                                    unqueued += 1;
-                                }
-                                Err(_) => {
-                                    error!("Failed to Unqueues stream {} on {:?}", stream_id, info);
-                                }
-                            }
-                            results.push(result);
-                        }
-                        Err(e) => {
-                            error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                        }
-                    }
-                }
-                stream_entry
-                    .update_received_devices_result(false, results)
-                    .await;
-                body += &format!("{} removed from queue ", unqueued);
+                let dequeued = handle_stopping_connections(connections, stream_entry, &data).await;
+                body += &format!("{} were dequeued ", dequeued);
+            }
+            // Stop if running
+            else if stream_entry.check_stream_status(StreamStatus::Running) {
+                warn!("Stream {} is already running", stream_id);
+                let connections = stream_entry.stop_stream(&data.device_list).await;
+                let stopped = handle_stopping_connections(connections, stream_entry, &data).await;
+                body += &format!("{} were Stopped ", stopped);
             }
 
             // update the stream
@@ -312,39 +247,19 @@ async fn delete_stream(stream_id: web::Path<String>, data: web::Data<AppState>) 
             if stream_entry.check_stream_status(StreamStatus::Queued) {
                 data.queued_streams.lock().await.remove(&stream_id);
             }
-            for handler in connections {
-                let info = handler.connections;
-                let handle = handler.handle;
+            let counter = handle_stopping_connections(connections, stream_entry, &data).await;
 
-                match handle.await {
-                    Ok(response) => {
-                        match stream_entry
-                            .analyze_device_response(
-                                info.to_owned(),
-                                response,
-                                &data.device_list,
-                                true,
-                            )
-                            .await
-                        {
-                            Ok(_) => {
-                                info!("Stopped stream {} for Deletion on {}", stream_id, info.1)
-                            }
-                            Err(_) => {
-                                error!("{} Failed to analyze device response: ", info.1);
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                    }
-                }
-            }
             let id = stream_entry.get_stream_id().to_owned();
+
             streams_entries.remove(&id);
+
             info!("Deleted stream {}", stream_id);
-            info!("{}", "And every where that Mary went");
-            HttpResponse::Ok().body(format!("Deleted stream {} successfully", stream_id))
+            info!("{} in {} places", "And every where that Mary went", counter);
+
+            HttpResponse::Ok().body(format!(
+                "Deleted stream {} successfully, after stopping in {} devices",
+                stream_id, counter
+            ))
         }
         None => HttpResponse::NotFound().body(format!(
             "Stream with id {} not found, please try again with a the correct stream id",
@@ -391,38 +306,10 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                 // queue the stream in a different thread
                 let connections = stream_entry.try_queue_stream(&data.device_list).await;
 
-                // gather all results in main thread and analyze them by device type
-                let mut results = Vec::with_capacity(connections.len());
-                for handler in connections {
-                    let info = handler.connections;
-                    let handle = handler.handle;
-
-                    match handle.await {
-                        Ok(response) => {
-                            results.push(
-                                stream_entry
-                                    .analyze_device_response(
-                                        info,
-                                        response,
-                                        &data.device_list,
-                                        true,
-                                    )
-                                    .await,
-                            );
-                        }
-                        Err(e) => {
-                            error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                        }
-                    }
-                }
-
-                // get the number of devices that are running the stream and return it
-                let connects = stream_entry
-                    .update_received_devices_result(true, results)
-                    .await;
+                let connects = handle_starting_connections(connections, stream_entry, &data).await;
 
                 // add the thread to the queued streams list
-                if stream_entry.get_stream_status() == &StreamStatus::Sent {
+                if stream_entry.get_stream_status() == &StreamStatus::Sent && connects > 1 {
                     stream_entry.update_stream_status(StreamStatus::Queued);
                     data.queued_streams
                         .lock()
@@ -435,12 +322,15 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                     stream_entry.get_stream_status().to_string(),
                     stream_id
                 );
+
                 match stream_entry.get_stream_status() {
+
                     StreamStatus::Queued => HttpResponse::Ok().body(format!(
                         "Stream is queued to start after {} seconds for {} devices",
                         stream_entry.get_stream_delay_seconds(),
                         connects
                     )),
+
                     StreamStatus::Error => {
                         match connects {
                             0 => {
@@ -456,7 +346,7 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                         }
                     }
                     _ => HttpResponse::Ok().body(format!(
-                        "Stream {} is sent for {} devices with status {}",
+                        "Stream {} is sent for {} devices with status {}, but not queued",
                         stream_entry.get_stream_id(),
                         connects,
                         stream_entry.get_stream_status().to_string()
@@ -501,36 +391,11 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
             {
                 let connections = stream_entry.stop_stream(&data.device_list).await;
 
-                // gather all results in main thread and analyze them by device type
-                let mut results = Vec::with_capacity(connections.len());
-                for handler in connections {
-                    let info = handler.connections;
-                    let handle = handler.handle;
-                    match handle.await {
-                        Ok(response) => {
-                            results.push(
-                                stream_entry
-                                    .analyze_device_response(
-                                        info,
-                                        response,
-                                        &data.device_list,
-                                        false,
-                                    )
-                                    .await,
-                            );
-                        }
-                        Err(e) => {
-                            error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                        }
-                    }
-                }
-
-                // get the number of devices that are running the stream and return it
-                let connects = stream_entry
-                    .update_received_devices_result(false, results)
-                    .await;
+                let connects = handle_stopping_connections(connections, stream_entry, &data).await;
 
                 info!("Stopped stream {}", stream_id);
+
+                // the system marks the stream as stopped if the stream has at two or more connections stopped
                 if stream_entry.get_stream_status() == &StreamStatus::Stopped && connects > 1 {
                     HttpResponse::Ok().body(format!("Stream {} Stopped Successfully", stream_id))
                 } else {
@@ -547,6 +412,7 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
                 ))
             }
         }
+
         None => {
             HttpResponse::NotFound().body(format!("Stream {} not found, to stop it", stream_id))
         }
@@ -576,6 +442,7 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
     }
 
     let mut handles: Vec<Vec<models::Handler>> = Vec::with_capacity(streams_entries_keys.len());
+    let mut counter = 0;
     for stream_id in streams_entries_keys.iter() {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
@@ -583,70 +450,13 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         handles.push(connections);
     }
 
-    let mut counter: usize = 0;
-
     for (i, connections) in handles.into_iter().enumerate() {
         let stream_id = &streams_entries_keys[i];
-        if connections.is_empty() {
-            debug!("Stream {} is already running or queued", stream_id);
-            continue;
-        }
-
-        if connections.is_empty() {
-            debug!("Stream {} is already running or queued", stream_id);
-            continue;
-        }
-
-        info!(
-            "Running threads for Queuing stream {} are {} thread",
-            stream_id,
-            connections.len()
-        );
-
-        // If you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
-        // this will make the stream_entries locked for a shorter time, but will lock it more times
-        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons. (Using Kafka or not)
-        // If you don't want the stream_entries to be locked for each stream, comment this here, keep in mind that a device might notify that a process has started before the stream status is set to queued
-        // let mut stream_entries = data.stream_entries.lock().await;
-        // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
-
-        let mut results = Vec::with_capacity(connections.len());
-        for handler in connections.into_iter() {
-            let info = handler.connections;
-            let handle = handler.handle;
-            match handle.await {
-                Ok(response) => {
-                    let mut stream_entries = data.stream_entries.lock().await;
-                    let stream_entry = stream_entries.get_mut(stream_id).unwrap();
-                    // gather all results in main thread and analyze them by device type
-                    results.push(
-                        stream_entry
-                            .analyze_device_response(info, response, &data.device_list, true)
-                            .await,
-                    );
-                }
-                Err(e) => {
-                    error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                }
-            }
-        }
-
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
-        // get the number of devices that are running the stream and return it
-        let connects = stream_entry
-            .update_received_devices_result(true, results)
-            .await;
+        let connects = handle_starting_connections(connections, stream_entry, &data).await;
         if connects > 1 {
             counter += 1;
-        }
-
-        if stream_entry.get_stream_status() == &StreamStatus::Sent {
-            stream_entry.update_stream_status(StreamStatus::Queued);
-            data.queued_streams
-                .lock()
-                .await
-                .insert(stream_entry.get_stream_id().to_owned(), Utc::now());
         }
     }
 
@@ -677,94 +487,48 @@ async fn stop_all_streams(data: web::Data<AppState>) -> impl Responder {
         warn!("No streams to stop");
         return HttpResponse::NoContent().body("No streams to stop, Please add a stream first");
     }
-    let mut counter = 0;
-    let mut unqueued = 0;
+    let mut attempt = 0;
     let mut handles: Vec<Vec<models::Handler>> = Vec::with_capacity(streams_entries_keys.len());
+
     for stream_id in streams_entries_keys.iter() {
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
 
-        let connections: Vec<models::Handler>;
+        let connections: Vec<models::Handler> =
+            if stream_entry.check_stream_status(StreamStatus::Running) {
+                stream_entry.stop_stream(&data.device_list).await
+            } else {
+                stream_entry
+                    .try_remove_stream_from_queue(&data.device_list)
+                    .await
+            };
 
-        if stream_entry.check_stream_status(StreamStatus::Running) {
-            counter += 1;
-            connections = stream_entry.stop_stream(&data.device_list).await;
-        } else if stream_entry.check_stream_status(StreamStatus::Queued) {
-            unqueued += 1;
-            counter += 1;
-            connections = stream_entry
-                .try_remove_stream_from_queue(&data.device_list)
-                .await;
-        } else {
-            connections = stream_entry
-                .try_remove_stream_from_queue(&data.device_list)
-                .await;
+        if !connections.is_empty() {
+            attempt += 1;
         }
+
         handles.push(connections);
     }
 
+    let mut counter = 0;
     for (i, connections) in handles.into_iter().enumerate() {
         let stream_id = &streams_entries_keys[i];
-        if connections.is_empty() {
-            debug!("Stream {} is already running or queued", stream_id);
-            continue;
-        }
-
-        if connections.is_empty() {
-            debug!("Stream {} is already stopped or not queued", stream_id);
-            continue;
-        }
-
-        info!(
-            "Running threads for Stopping stream {} are {} thread",
-            stream_id,
-            connections.len()
-        );
-
-        // if you want to lock the stream_entries only when you receive a response from a device, move it inside a for loop and lock it again when get_received_devices is called
-        // this will make the stream_entries locked for a shorter time, but will lock it more times
-        // Keep in mind that you can also send data to the targeted device as a chunk which has it's own pros and cons. (using Kafka or not)
-        // If you want the stream_entries to be locked for each stream, comment this here.
-        // let mut stream_entries = data.stream_entries.lock().await;
-        // let stream_entry = stream_entries.get_mut(stream_id).unwrap();
-
-        let mut results = Vec::with_capacity(connections.len());
-        for handler in connections {
-            let info = handler.connections;
-            let handle = handler.handle;
-
-            match handle.await {
-                Ok(response) => {
-                    let mut stream_entries = data.stream_entries.lock().await;
-                    let stream_entry = stream_entries.get_mut(stream_id).unwrap();
-                    // gather all results in main thread and analyze them by device type
-                    results.push(
-                        stream_entry
-                            .analyze_device_response(info, response, &data.device_list, false)
-                            .await,
-                    );
-                }
-                Err(e) => {
-                    error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                }
-            }
-        }
 
         let mut stream_entries = data.stream_entries.lock().await;
         let stream_entry = stream_entries.get_mut(stream_id).unwrap();
-        // get the number of devices that are running the stream and return it
-        let connects = stream_entry
-            .update_received_devices_result(false, results)
-            .await;
-        if stream_entry.get_stream_status() == &StreamStatus::Stopped && connects > 1 {
+
+        let connects = handle_stopping_connections(connections, stream_entry, &data).await;
+
+        // the system marks the stream as stopped if the stream has at two or more connections stopped
+        if connects > 1 {
             counter += 1;
         }
     }
 
-    info!("Done Stopping all streams");
+    info!("Stopping all streams process finished");
     HttpResponse::Ok().body(format!(
-        "Stopped {} streams, {} were Unqueued",
-        counter, unqueued
+        "Stopped {} streams, after {} streams were attempted",
+        counter, attempt
     ))
 }
 
@@ -802,129 +566,28 @@ async fn force_start_stream(
             let mut streams_entries = data.stream_entries.lock().await;
             let stream_entry = streams_entries.get_mut(&stream_id).unwrap();
 
-            let mut counter = 0;
-            let mut unqueued = 0;
-            let mut stopped = 0;
-            // Stop if running
-            if stream_entry.check_stream_status(StreamStatus::Running) {
-                warn!("Stream {} is already running", stream_id);
-                let connections = stream_entry.stop_stream(&data.device_list).await;
-                let mut results = Vec::with_capacity(connections.len());
-                for handler in connections.into_iter() {
-                    let info = handler.connections;
-                    let handle = handler.handle;
-                    match handle.await {
-                        Ok(response) => {
-                            let result = stream_entry
-                                .analyze_device_response(
-                                    info.to_owned(),
-                                    response,
-                                    &data.device_list,
-                                    false,
-                                )
-                                .await;
-                            match result {
-                                Ok(_) => {
-                                    body += &format!("stopped, {} ", info.1.to_owned());
-                                    stopped += 1;
-                                }
-                                Err(_) => {
-                                    error!("Failed to stop stream {} on {:?}", stream_id, info);
-                                }
-                            }
-                            results.push(result);
-                        }
-                        Err(e) => {
-                            error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                        }
-                    }
-                }
-                body += &format!("{} were Stopped ", stopped);
-                stream_entry
-                    .update_received_devices_result(false, results)
-                    .await;
-            }
             // dequeue if queued
-            else if stream_entry.check_stream_status(StreamStatus::Queued) {
+            if stream_entry.check_stream_status(StreamStatus::Queued) {
                 warn!("Stream {} is already queued", stream_id);
                 let connections = stream_entry
                     .try_remove_stream_from_queue(&data.device_list)
                     .await;
-                let mut results = Vec::with_capacity(connections.len());
-                for connection in connections.into_iter() {
-                    let info = connection.connections;
-                    let handle = connection.handle;
-                    match handle.await {
-                        Ok(response) => {
-                            let result = stream_entry
-                                .analyze_device_response(
-                                    info.to_owned(),
-                                    response,
-                                    &data.device_list,
-                                    false,
-                                )
-                                .await;
-                            match result {
-                                Ok(_) => {
-                                    body += &format!("Unqueued, {} ", info.1.to_owned());
-                                    unqueued += 1;
-                                }
-                                Err(_) => {
-                                    error!("Failed to Unqueues stream {} on {:?}", stream_id, info);
-                                }
-                            }
-                            results.push(result);
-                        }
-                        Err(e) => {
-                            error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                        }
-                    }
-                }
-                stream_entry
-                    .update_received_devices_result(false, results)
-                    .await;
-                body += &format!("{} removed from queue ", unqueued);
+                let dequeued = handle_stopping_connections(connections, stream_entry, &data).await;
+                body += &format!("{} were dequeued ", dequeued);
+            }
+            // Stop if running
+            else if stream_entry.check_stream_status(StreamStatus::Running) {
+                warn!("Stream {} is already running", stream_id);
+                let connections = stream_entry.stop_stream(&data.device_list).await;
+                let stopped = handle_stopping_connections(connections, stream_entry, &data).await;
+                body += &format!("{} were Stopped ", stopped);
             }
 
             // force start the stream
             let connections = stream_entry.send_stream(true, &data.device_list).await;
-            let mut results = Vec::with_capacity(connections.len());
-            for handler in connections.into_iter() {
-                let info = handler.connections;
-                let handle = handler.handle;
-                match handle.await {
-                    Ok(response) => {
-                        let result = stream_entry
-                            .analyze_device_response(
-                                info.to_owned(),
-                                response,
-                                &data.device_list,
-                                true,
-                            )
-                            .await;
-                        match result {
-                            Ok(_) => {
-                                body += &format!("force started on, {} ", info.1.to_owned());
-                                counter += 1;
-                            }
-                            Err(_) => {
-                                error!("Failed to force start stream {} on {:?}", stream_id, info);
-                            }
-                        }
-                        results.push(result);
-                    }
-                    Err(e) => {
-                        error!(
-                            "Failed to force start stream {} on {:?}: {}",
-                            stream_id, info, e
-                        );
-                    }
-                }
-            }
-            stream_entry
-                .update_received_devices_result(true, results)
-                .await;
-            body += &format!("{} were force started ", counter);
+            let counter = handle_starting_connections(connections, stream_entry, &data).await;
+
+            body += &format!("{} devices were force started ", counter);
 
             info!("Stream {} force started", stream_id);
             match stream_entry.get_stream_status() {
@@ -985,43 +648,11 @@ async fn force_stop_stream(
     match stream_entry {
         Some(stream_entry) => {
             let mut body: String = format!("{} ", stream_id);
-            let mut stopped = 0;
 
             let connections = stream_entry.stop_stream(&data.device_list).await;
-            let mut results = Vec::with_capacity(connections.len());
-            for handler in connections.into_iter() {
-                let info = handler.connections;
-                let handle = handler.handle;
-                match handle.await {
-                    Ok(response) => {
-                        let result = stream_entry
-                            .analyze_device_response(
-                                info.to_owned(),
-                                response,
-                                &data.device_list,
-                                false,
-                            )
-                            .await;
-                        match result {
-                            Ok(_) => {
-                                body += &format!("stopped, {} ", info.1.to_owned());
-                                stopped += 1;
-                            }
-                            Err(_) => {
-                                error!("Failed to stop stream {} on {:?}", stream_id, info);
-                            }
-                        }
-                        results.push(result);
-                    }
-                    Err(e) => {
-                        error!("Failed to stop stream {} on {:?}: {}", stream_id, info, e);
-                    }
-                }
-            }
+            let stopped = handle_stopping_connections(connections, stream_entry, &data).await;
+
             body += &format!("{} were Stopped ", stopped);
-            stream_entry
-                .update_received_devices_result(false, results)
-                .await;
 
             info!("{}", body);
             if stream_entry.get_stream_status() == &StreamStatus::Stopped {
@@ -1096,7 +727,7 @@ async fn get_all_streams_status(data: web::Data<AppState>) -> impl Responder {
     HttpResponse::Ok().json(streams_status)
 }
 
-#[doc = r"INIT ROUTES
+#[doc = r"init ROUTES
 init all the routes for the server"]
 pub fn init_routes(config: &mut web::ServiceConfig) {
     config

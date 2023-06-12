@@ -421,8 +421,15 @@ changes the stream_status to Running and updates the device status to Running"]
                 /*
                 check if the device is a generator
                 if it is, mark the generator as Running
+                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
                 */
+                if self.stream_status == StreamStatus::Sent {
+                    self.running_generators
+                        .insert(card_mac.to_string(), ProcessStatus::Queued);
+                }
+
                 let process = self.running_generators.get(card_mac);
+
                 if process.is_some() {
                     self.running_generators
                         .get_mut(card_mac)
@@ -440,8 +447,16 @@ changes the stream_status to Running and updates the device status to Running"]
                     warn!("Generator not found");
                 }
 
-                // check if the device is a verifier
-                // if it is, mark the verifier as Running
+                /*
+                check if the device is a verifier
+                if it is, mark the verifier as Running
+                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+                */
+                if self.stream_status == StreamStatus::Sent {
+                    self.running_verifiers
+                        .insert(card_mac.to_string(), ProcessStatus::Queued);
+                }
+
                 let process = self.running_verifiers.get(card_mac);
                 if process.is_some() {
                     self.running_verifiers
@@ -496,6 +511,16 @@ if there are devices left, the stream status will be set to finished
 
         match device {
             Some(device) => {
+                /*
+                check if the device is a generator
+                if it is, mark the generator as completed
+                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+                */
+                if self.stream_status == StreamStatus::Sent {
+                    self.running_generators
+                        .insert(card_mac.to_string(), ProcessStatus::Running);
+                }
+
                 let process = self.running_generators.get(card_mac);
 
                 if process.is_some() {
@@ -516,8 +541,16 @@ if there are devices left, the stream status will be set to finished
                     warn!("Generator not found");
                 }
 
-                // check if the device is a verifier
-                // if it is, mark the verifier as completed
+                /*
+                check if the device is a verifier
+                if it is, mark the verifier as completed
+                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+                */
+                if self.stream_status == StreamStatus::Sent {
+                    self.running_verifiers
+                        .insert(card_mac.to_string(), ProcessStatus::Running);
+                }
+
                 let process = self.running_verifiers.get(card_mac);
                 if process.is_some() {
                     self.running_verifiers
@@ -849,7 +882,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                     StatusCode::OK => {
                         info!("Stream sent to device {}", device.get_device_mac());
 
-                        // set the receiver status to running
+                        // set the receiver status to process_status
                         device.update_device_status(&process_status, process_type);
 
                         match process_type {
@@ -871,6 +904,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                                     .insert(device.get_device_mac().to_string(), process_status);
                             }
                         }
+
                         if sending {
                             info!(
                                 "Stream sent to device: {}, process type: {:?}",
@@ -884,6 +918,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                                 self.get_stream_id()
                             );
                         }
+
                         return Ok(());
                     }
                     _ => {
@@ -979,8 +1014,8 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         &mut self,
         sending: bool,
         results: Vec<Result<(), ()>>,
-    ) -> usize {
-        let mut devices_received: usize = 0;
+    ) -> i32 {
+        let mut devices_received = 0;
         for result in results.into_iter() {
             match result {
                 Ok(_) => devices_received += 1,
@@ -1005,10 +1040,10 @@ The stop_stream_on_devices function is used to send the stop request to the devi
 
             if devices_received == 0 {
                 self.update_stream_status(StreamStatus::Error);
-                error!("No devices are running the stream")
+                error!("No devices are running the stream");
             } else if devices_received == 1 {
                 self.update_stream_status(StreamStatus::Error);
-                error!("Only one Process type is running the stream")
+                error!("Only one Process type is running the stream");
             } else {
                 info!("Stream sent to {} devices", devices_received);
                 self.update_stream_status(StreamStatus::Sent);
@@ -1307,11 +1342,12 @@ this is used to update the stream with the new details passed in the stream entr
 this enum represents the status of the stream
 ## Variants
 * `Created` - the stream has been created
-* `Stopped` - the stream has been stopped
+* `Sent` - the stream has been sent
+* `Queued` - the stream is queued
 * `Running` - the stream is running
 * `Finished` - the stream has finished
-* `Queued` - the stream is queued
 * `Error` - the stream has encountered an error
+* `Stopped` - the stream has been stopped
 ## Notes
 * the default variant is `Created`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq)]

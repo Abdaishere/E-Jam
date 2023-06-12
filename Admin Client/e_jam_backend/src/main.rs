@@ -32,6 +32,7 @@ async fn main() -> std::io::Result<()> {
             .values()
             .cloned()
             .collect();
+
         let devices: Vec<Device> = app_state
             .device_list
             .lock()
@@ -39,11 +40,13 @@ async fn main() -> std::io::Result<()> {
             .values()
             .cloned()
             .collect();
+
         let dev_s = devices.clone();
         let str_s = streams.clone();
         thread::spawn(|| {
             faker::run_generator_faker(dev_s, str_s);
         });
+
         let dev_s = devices;
         let str_s = streams.clone();
         thread::spawn(|| {
