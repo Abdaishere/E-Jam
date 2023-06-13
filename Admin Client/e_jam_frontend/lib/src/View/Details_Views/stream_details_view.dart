@@ -881,12 +881,14 @@ class _StreamGraphState extends State<StreamGraph> {
           Icon(
             MaterialCommunityIcons.chart_arc,
             color: Colors.grey,
+            size: 50.0,
           ),
           SizedBox(height: 8.0),
           Text(
-            'No Data Available',
+            'No Data Here',
             style: TextStyle(
               color: Colors.grey,
+              fontSize: 16.0,
             ),
           ),
         ],

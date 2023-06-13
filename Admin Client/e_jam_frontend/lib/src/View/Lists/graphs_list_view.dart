@@ -88,11 +88,11 @@ class _GraphsListViewState extends State<GraphsListView> {
             } else if (SystemSettings.pinnedElements[index].startsWith("S")) {
               String streamId =
                   SystemSettings.pinnedElements[index].substring(1);
+
               List<StreamEntry> streams =
                   context.read<StreamsController>().getStreams ?? [];
-
               StreamEntry? stream = streams
-                  .lastWhereOrNull((element) => element.streamId == streamId);
+                  .firstWhereOrNull((element) => element.streamId == streamId);
 
               late Process runningGenerators;
               late Process runningVerifiers;

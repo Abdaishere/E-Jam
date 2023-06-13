@@ -34,12 +34,12 @@ class _TreeMapDrillDownDevicesLoadState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => taskGetter());
     timer =
-        Timer.periodic(const Duration(seconds: 30), (Timer t) => taskGetter());
+        Timer.periodic(const Duration(seconds: 20), (Timer t) => taskGetter());
   }
 
   taskGetter() async {
     await context.read<DevicesController>().loadAllDevices(false);
-    if (mounted) await context.read<StreamsController>().loadAllStreams(false);
+    if (mounted) await context.read<StreamsController>().loadAllStreams();
     if (mounted) {
       final List<Device>? devices =
           context.read<DevicesController>().getDevices;

@@ -21,15 +21,8 @@ class StreamsController extends ChangeNotifier {
   bool get getIsLoading => _isLoading;
   StreamServices get getStreamServices => _streamServices;
 
-  Future loadAllStreams(bool forced) async {
+  Future loadAllStreams() async {
     _isLoading = true;
-    if (_streams != null &&
-        _streamsStatusDetails != null &&
-        !forced &&
-        DateTime.now().difference(_lastRefresh).inSeconds < 20) {
-      _isLoading = false;
-      return;
-    }
 
     _lastRefresh = DateTime.now();
     return _streamServices.getStreams().then((value) {

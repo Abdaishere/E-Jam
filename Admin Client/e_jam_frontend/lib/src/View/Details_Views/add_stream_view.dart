@@ -865,6 +865,7 @@ class AddPresetStream extends StatefulWidget {
 }
 
 class _AddPresetStreamState extends State<AddPresetStream> {
+  int selected = -1;
   @override
   Widget build(BuildContext context) {
     int totalItems = SystemSettings.savedStreams.length + 1;
@@ -911,10 +912,20 @@ class _AddPresetStreamState extends State<AddPresetStream> {
               title: Text(stream.name),
               subtitle: Text(stream.description),
               trailing: IconButton(
-                icon: const Icon(MaterialCommunityIcons.trash_can),
+                icon: FaIcon(
+                    selected == index
+                        ? FontAwesomeIcons.check
+                        : FontAwesomeIcons.solidTrashCan,
+                    size: 20),
                 color: Colors.red,
                 tooltip: 'Delete Preset',
                 onPressed: () async {
+                  if (selected != index) {
+                    selected = index;
+                    setState(() {});
+                    return;
+                  }
+                  selected = -1;
                   SystemSettings.savedStreams.removeAt(index);
                   setState(() {});
                   SharedPreferences prefs =
