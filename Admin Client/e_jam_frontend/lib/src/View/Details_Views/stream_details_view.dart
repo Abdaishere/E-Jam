@@ -687,7 +687,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            subtitle: Text(stream?.timeToLive.toString() ?? 'Unknown',
+            subtitle: Text(stream?.duration.toString() ?? 'Unknown',
                 overflow: TextOverflow.ellipsis),
           ),
         ),

@@ -113,46 +113,68 @@ class AddStreamController extends ChangeNotifier {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
-      List<String> generators = [];
-      List<String> verifiers = [];
-      _pickedGenerators.forEach((key, value) {
-        if (value) {
-          generators.add(key);
-        }
-      });
-
-      _pickedVerifiers.forEach((key, value) {
-        if (value) {
-          verifiers.add(key);
-        }
-      });
       if (context.mounted) {
         return context.read<StreamsController>().createNewStream(
-              StreamEntry(
-                name: _nameController.text,
-                description: _descriptionController.text,
-                delay: num.parse(_delayController.text).floor(),
-                streamId: _idController.text,
-                generatorsIds: generators,
-                verifiersIds: verifiers,
-                payloadType: _payloadType,
-                burstLength: num.parse(_burstLengthController.text).floor(),
-                burstDelay: num.parse(_burstDelayController.text).floor(),
-                numberOfPackets: num.parse(_packetsController.text).floor(),
-                payloadLength: num.parse(_payloadLengthController.text).floor(),
-                seed: num.parse(_seedController.text).floor(),
-                broadcastFrames:
-                    num.parse(_broadcastFramesController.text).floor(),
-                interFrameGap: num.parse(_interFrameGapController.text).floor(),
-                timeToLive: num.parse(_timeToLiveController.text).floor(),
-                transportLayerProtocol: _transportLayerProtocol,
-                flowType: _flowType,
-                checkContent: _checkContent,
-              ),
+              createStreamEntry(),
             );
       }
     }
     return null;
+  }
+
+  StreamEntry createStreamEntry() {
+    List<String> generators = [];
+    List<String> verifiers = [];
+    _pickedGenerators.forEach((key, value) {
+      if (value) {
+        generators.add(key);
+      }
+    });
+
+    _pickedVerifiers.forEach((key, value) {
+      if (value) {
+        verifiers.add(key);
+      }
+    });
+
+    return StreamEntry(
+      name: _nameController.text,
+      description: _descriptionController.text,
+      delay: num.parse(_delayController.text).floor(),
+      streamId: _idController.text,
+      generatorsIds: generators,
+      verifiersIds: verifiers,
+      payloadType: _payloadType,
+      burstLength: num.parse(_burstLengthController.text).floor(),
+      burstDelay: num.parse(_burstDelayController.text).floor(),
+      numberOfPackets: num.parse(_packetsController.text).floor(),
+      payloadLength: num.parse(_payloadLengthController.text).floor(),
+      seed: num.parse(_seedController.text).floor(),
+      broadcastFrames: num.parse(_broadcastFramesController.text).floor(),
+      interFrameGap: num.parse(_interFrameGapController.text).floor(),
+      duration: num.parse(_timeToLiveController.text).floor(),
+      transportLayerProtocol: _transportLayerProtocol,
+      flowType: _flowType,
+      checkContent: _checkContent,
+    );
+  }
+
+  loadAllFields(StreamEntry stream) {
+    _nameController.text = stream.name;
+    _descriptionController.text = stream.description;
+    _delayController.text = stream.delay.toString();
+    _timeToLiveController.text = stream.duration.toString();
+    _interFrameGapController.text = stream.interFrameGap.toString();
+    _payloadLengthController.text = stream.payloadLength.toString();
+    _burstLengthController.text = stream.burstLength.toString();
+    _burstDelayController.text = stream.burstDelay.toString();
+    _broadcastFramesController.text = stream.broadcastFrames.toString();
+    _packetsController.text = stream.numberOfPackets.toString();
+    _seedController.text = stream.seed.toString();
+    _flowType = stream.flowType;
+    _payloadType = stream.payloadType;
+    _transportLayerProtocol = stream.transportLayerProtocol;
+    _checkContent = stream.checkContent;
   }
 
   syncDevicesList() {

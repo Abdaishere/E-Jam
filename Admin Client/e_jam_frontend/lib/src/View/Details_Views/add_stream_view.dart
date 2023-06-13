@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:math';
 
+import 'package:e_jam/src/Model/Classes/stream_entry.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Details_Views/devices_checklist_picker.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
@@ -13,6 +16,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final formKey = GlobalKey<FormState>();
 
@@ -863,6 +867,70 @@ class AddPresetStream extends StatefulWidget {
 class _AddPresetStreamState extends State<AddPresetStream> {
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Add Preset Stream'));
+    int totalItems = SystemSettings.savedStreams.length + 1;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView.builder(
+        itemCount: totalItems,
+        itemBuilder: (context, index) {
+          if (index == totalItems - 1) {
+            return IconButton(
+              icon: const FaIcon(
+                FontAwesomeIcons.solidFloppyDisk,
+                size: 32,
+              ),
+              tooltip: 'Save Current Stream as Preset',
+              color: Colors.greenAccent.shade700,
+              onPressed: () async {
+                try {
+                  StreamEntry newStreamPreset =
+                      context.read<AddStreamController>().createStreamEntry();
+
+                  String streamJson = json.encode(newStreamPreset.toJson());
+                  SystemSettings.savedStreams.add(streamJson);
+                  if (mounted) setState(() {});
+
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setStringList(
+                      'savedStreams', SystemSettings.savedStreams);
+                } catch (e) {
+                  // Just do nothing in case of format exception
+                  return;
+                }
+              },
+            );
+          }
+
+          StreamEntry stream = StreamEntry.fromJson(
+              json.decode(SystemSettings.savedStreams[index]));
+          return Card(
+            child: ListTile(
+              leading: const Icon(Icons.dashboard, size: 26),
+              iconColor: Colors.blueAccent,
+              title: Text(stream.name),
+              subtitle: Text(stream.description),
+              trailing: IconButton(
+                icon: const Icon(MaterialCommunityIcons.trash_can),
+                color: Colors.red,
+                tooltip: 'Delete Preset',
+                onPressed: () async {
+                  SystemSettings.savedStreams.removeAt(index);
+                  setState(() {});
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.setStringList(
+                      'savedStreams', SystemSettings.savedStreams);
+                },
+              ),
+              onTap: () {
+                context.read<AddStreamController>().loadAllFields(stream);
+              },
+              isThreeLine: true,
+            ),
+          );
+        },
+      ),
+    );
   }
 }

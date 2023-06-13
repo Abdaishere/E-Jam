@@ -21,7 +21,7 @@ class StreamEntry {
     required this.seed,
     required this.broadcastFrames,
     required this.interFrameGap,
-    required this.timeToLive,
+    required this.duration,
     required this.transportLayerProtocol,
     required this.flowType,
     required this.checkContent,
@@ -47,7 +47,7 @@ class StreamEntry {
   final num seed;
   final num broadcastFrames;
   final num interFrameGap;
-  final num timeToLive;
+  final num duration;
   final TransportLayerProtocol transportLayerProtocol;
   final FlowType flowType;
   final bool checkContent;
@@ -63,9 +63,9 @@ class StreamEntry {
   factory StreamEntry.fromJson(Map<String, dynamic> json) => StreamEntry(
         name: json["name"],
         description: json["description"],
-        lastUpdated:
-            DateTime.fromMillisecondsSinceEpoch(json["lastUpdated"] * 1000)
-                .toLocal(),
+        lastUpdated: DateTime.fromMillisecondsSinceEpoch(
+                (json["lastUpdated"] ?? 0) * 1000)
+            .toLocal(),
         startTime:
             DateTime.fromMillisecondsSinceEpoch((json["startTime"] ?? 0) * 1000)
                 .toLocal(),
@@ -84,14 +84,14 @@ class StreamEntry {
         seed: num.tryParse(json["seed"].toString()) ?? -1,
         broadcastFrames: num.tryParse(json["broadcastFrames"].toString()) ?? -1,
         interFrameGap: num.tryParse(json["interFrameGap"].toString()) ?? -1,
-        timeToLive: num.tryParse(json["timeToLive"].toString()) ?? -1,
+        duration: num.tryParse(json["timeToLive"].toString()) ?? -1,
         transportLayerProtocol:
             transportLayerProtocolFromString(json["transportLayerProtocol"]),
         flowType: flowTypeFromString(json["flowType"]),
         checkContent: json["checkContent"],
-        runningGenerators: Process.fromJson(json["runningGenerators"]),
-        runningVerifiers: Process.fromJson(json["runningVerifiers"]),
-        streamStatus: streamStatusFromString(json["streamStatus"]),
+        runningGenerators: Process.fromJson(json["runningGenerators"] ?? {}),
+        runningVerifiers: Process.fromJson(json["runningVerifiers"] ?? {}),
+        streamStatus: streamStatusFromString(json["streamStatus"] ?? ''),
       );
 
   Map<String, dynamic> toJson() => {
@@ -112,7 +112,7 @@ class StreamEntry {
         "seed": seed,
         "broadcastFrames": broadcastFrames,
         "interFrameGap": interFrameGap,
-        "timeToLive": timeToLive,
+        "timeToLive": duration,
         "transportLayerProtocol":
             transportLayerProtocolToString(transportLayerProtocol),
         "flowType": flowTypeToString(flowType),
