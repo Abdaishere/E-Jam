@@ -270,6 +270,12 @@ class _DevicePacketsCounterDoughnutState
         .where((element) => element.macAddress == mac)
         .toList();
     _countPackets(streamVerifiers, streamGenerators);
+
+    num totalPackets = _totalPacketsStatusMap.values.reduce((a, b) => a + b);
+
+    if (totalPackets <= 0) {
+      return const SizedBox.shrink();
+    }
     return DoughnutChartPackets(packetsCountMapToList(_totalPacketsStatusMap));
   }
 }

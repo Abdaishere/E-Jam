@@ -872,24 +872,47 @@ class _StreamGraphState extends State<StreamGraph> {
     bool showProcessesPieChart = runningGenerators.processes.isNotEmpty ||
         runningVerifiers.processes.isNotEmpty;
 
+    num totalPackets = _totalPacketsStatusMap.values.reduce((a, b) => a + b);
+
+    if (totalPackets <= 0 && !showProcessesPieChart) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            MaterialCommunityIcons.chart_arc,
+            color: Colors.grey,
+          ),
+          SizedBox(height: 8.0),
+          Text(
+            'No Data Available',
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: LineChartStream(
-              id: streamId,
-              verChartData: streamVerifiers,
-              genChartData: streamGenerators),
-        ),
+        if (totalPackets > 0)
+          Expanded(
+            child: LineChartStream(
+                id: streamId,
+                verChartData: streamVerifiers,
+                genChartData: streamGenerators),
+          ),
         Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: DoughnutChartPackets(
-                  packetsCountMapToList(_totalPacketsStatusMap),
+              if (totalPackets > 0)
+                Expanded(
+                  child: DoughnutChartPackets(
+                    packetsCountMapToList(_totalPacketsStatusMap),
+                  ),
                 ),
-              ),
 
               // hide if no processes are provided
               if (showProcessesPieChart)

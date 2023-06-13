@@ -4,8 +4,11 @@ import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Details_Views/device_details_view.dart';
 import 'package:e_jam/src/View/Details_Views/stream_details_view.dart';
 import 'package:e_jam/src/View/Lists/streams_list_view.dart';
+import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
 // the User can attach a graph of a stream or a device or any other data source (Staggered Grid View)
 class GraphsListView extends StatefulWidget {
@@ -85,6 +88,19 @@ class _GraphsListViewState extends State<GraphsListView> {
             } else if (SystemSettings.pinnedElements[index].startsWith("S")) {
               String streamId =
                   SystemSettings.pinnedElements[index].substring(1);
+              List<StreamEntry> streams =
+                  context.read<StreamsController>().getStreams ?? [];
+
+              StreamEntry? stream = streams
+                  .lastWhereOrNull((element) => element.streamId == streamId);
+
+              late Process runningGenerators;
+              late Process runningVerifiers;
+
+              runningGenerators =
+                  stream?.runningGenerators ?? const Process.empty();
+              runningVerifiers =
+                  stream?.runningVerifiers ?? const Process.empty();
               graph = Column(
                 children: [
                   Text(
@@ -97,8 +113,8 @@ class _GraphsListViewState extends State<GraphsListView> {
                   Expanded(
                     child: StreamGraph(
                       streamId: streamId,
-                      runningGenerators: const Process.empty(),
-                      runningVerifiers: const Process.empty(),
+                      runningGenerators: runningGenerators,
+                      runningVerifiers: runningVerifiers,
                     ),
                   ),
                   const Divider(),

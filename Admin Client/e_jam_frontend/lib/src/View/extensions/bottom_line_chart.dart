@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
@@ -19,6 +21,20 @@ class _BottomLineChartState extends State<BottomLineChart> {
 
   @override
   Widget build(BuildContext context) {
+    return _bottomLineChart(context);
+  }
+
+  SfCartesianChart _bottomLineChart(BuildContext context) {
+    final generatorStatistics =
+        context.watch<StatisticsController>().getGeneratorStatistics;
+    final verifierStatistics =
+        context.watch<StatisticsController>().getVerifierStatistics;
+
+    final genChartData = generatorStatistics.sublist(max(
+        generatorStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0));
+    final verChartData = verifierStatistics.sublist(max(
+        generatorStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0));
+
     return SfCartesianChart(
       plotAreaBorderWidth: 0,
       primaryXAxis: NumericAxis(
@@ -39,8 +55,8 @@ class _BottomLineChartState extends State<BottomLineChart> {
           splineType: SystemSettings.lineGraphCurveSmooth
               ? SplineType.monotonic
               : SplineType.cardinal,
-          dataSource:
-              context.watch<StatisticsController>().getGeneratorStatistics,
+          cardinalSplineTension: 0.0,
+          dataSource: genChartData,
           yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
               chartData.packetsSent,
           xValueMapper: (GeneratorStatisticsInstance chartData, _) =>
@@ -55,12 +71,13 @@ class _BottomLineChartState extends State<BottomLineChart> {
           splineType: SystemSettings.lineGraphCurveSmooth
               ? SplineType.monotonic
               : SplineType.cardinal,
-          dataSource:
-              context.watch<StatisticsController>().getVerifierStatistics,
+          cardinalSplineTension: 0.0,
+          dataSource: verChartData,
           yValueMapper: (VerifierStatisticsInstance chartData, _) =>
               chartData.packetsCorrect +
               chartData.packetsErrors +
               chartData.packetsOutOfOrder,
+          // compare to now
           xValueMapper: (VerifierStatisticsInstance chartData, _) =>
               chartData.timestamp.difference(now).inSeconds,
           color: downloadColor.withOpacity(0.2),
@@ -83,8 +100,7 @@ class _BottomLineChartState extends State<BottomLineChart> {
               ? SplineType.monotonic
               : SplineType.cardinal,
           cardinalSplineTension: 0.0,
-          dataSource:
-              context.watch<StatisticsController>().getGeneratorStatistics,
+          dataSource: genChartData,
           yValueMapper: (GeneratorStatisticsInstance chartData, _) =>
               chartData.packetsErrors,
           xValueMapper: (GeneratorStatisticsInstance chartData, _) =>

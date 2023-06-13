@@ -3,6 +3,7 @@ import 'package:e_jam/src/Model/Classes/Statistics/generator_statistics_instance
 import 'package:e_jam/src/Model/Classes/Statistics/verifier_statistics_instance.dart';
 import 'package:e_jam/src/Model/Classes/stream_status_details.dart';
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
+import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 
 class Utils {
   static double valueMapper(num sourceNumber, num fromStart, num fromEnd,
@@ -45,7 +46,7 @@ class Utils {
     return 0;
   }
 
-  // get the oldest start time and the latest end time and calculate the progress
+  /// get the oldest start time and the latest end time and calculate the progress
   static double? getTotalProgress(List<StreamStatusDetails> streams) {
     DateTime epoch = DateTime.fromMicrosecondsSinceEpoch(0);
     num minStart = DateTime.now().difference(epoch).inSeconds;
@@ -67,7 +68,11 @@ class Utils {
         : 0;
   }
 
-  // get speed approximation in bytes per second
+  /// get speed approximation in bytes per second
+  /// Assuming that the statistics are collected every second and the packet size is 1500 bytes (default)
+  /// we can calculate the speed by dividing the number of packets sent by the number of seconds
+  /// and then multiplying by the packet size.
+  /// The speed is then mapped to a value between 0 and 100.
   static const upperBound =
       404800; // 100 Mbps in bytes per second for default size per packet.
   static SpeedInfoWrapper getUploadSpeed(
@@ -76,48 +81,39 @@ class Utils {
     if (generatorStatistics.isEmpty || verifierStatistics.isEmpty) {
       return SpeedInfoWrapper(upload: 0, download: 0, accepted: 0, errored: 0);
     }
-    DateTime now = DateTime.now();
+
     double totalUpSpeed = 0;
     double totalUpErrors = 0;
     int counter1 = 0;
-    for (int i = generatorStatistics.length - 1; i >= 0; i--) {
-      if (generatorStatistics[i]
-          .timestamp
-          .isAfter(now.subtract(const Duration(seconds: 10)))) {
-        counter1 += 1;
-        int upSpeed = generatorStatistics[i].packetsSent;
-        int upErrors = generatorStatistics[i].packetsErrors;
-        totalUpSpeed += upSpeed;
-        totalUpErrors += upErrors;
-      } else {
-        break;
-      }
+    int i = max(
+        generatorStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0);
+    for (; i < generatorStatistics.length; i++) {
+      counter1 += 1;
+      int upSpeed = generatorStatistics[i].packetsSent;
+      int upErrors = generatorStatistics[i].packetsErrors;
+      totalUpSpeed += upSpeed;
+      totalUpErrors += upErrors;
     }
 
     double totalDownErrors = 0;
     double totalDownSpeed = 0;
     int counter2 = 0;
-    for (int i = verifierStatistics.length - 1; i >= 0; i--) {
-      if (verifierStatistics[i]
-          .timestamp
-          .isAfter(now.subtract(const Duration(seconds: 10)))) {
-        counter2 += 1;
-        int downSpeed = verifierStatistics[i].packetsCorrect +
-            verifierStatistics[i].packetsOutOfOrder +
-            verifierStatistics[i].packetsErrors;
+    i = max(
+        verifierStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0);
+    for (; i < verifierStatistics.length; i++) {
+      counter2 += 1;
+      int downSpeed = verifierStatistics[i].packetsCorrect +
+          verifierStatistics[i].packetsOutOfOrder +
+          verifierStatistics[i].packetsErrors;
 
-        int downErrors = verifierStatistics[i].packetsDropped +
-            verifierStatistics[i].packetsOutOfOrder +
-            verifierStatistics[i].packetsErrors;
+      int downErrors = verifierStatistics[i].packetsDropped +
+          verifierStatistics[i].packetsOutOfOrder +
+          verifierStatistics[i].packetsErrors;
 
-        totalDownSpeed += downSpeed;
-        totalDownErrors += downErrors;
-      } else {
-        break;
-      }
+      totalDownSpeed += downSpeed;
+      totalDownErrors += downErrors;
     }
-    // print(
-    //     'totalUpSpeed: $totalUpSpeed, totalDownSpeed: $totalDownSpeed, totalUpErrors: $totalUpErrors, totalDownErrors: $totalDownErrors');
+
     double upload =
         valueMapper(totalUpSpeed / counter1, 0, upperBound, 0, 100, 10);
     double download =
@@ -127,9 +123,6 @@ class Utils {
         valueMapper(totalUpErrors / counter1, 0, upperBound, 0, 100, 10);
     double downError =
         valueMapper(totalDownErrors / counter2, 0, upperBound, 0, 100, 10);
-
-    // print(
-    //     'upload: $upload, download: $download, upError: $upError, downError: $downError');
 
     return SpeedInfoWrapper(
         upload: upload,

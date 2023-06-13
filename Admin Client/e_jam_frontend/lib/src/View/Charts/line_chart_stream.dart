@@ -37,6 +37,7 @@ class _LineChartStreamState extends State<LineChartStream> {
 
   SfCartesianChart _lineChart() {
     return SfCartesianChart(
+      plotAreaBorderWidth: 0,
       trackballBehavior: TrackballBehavior(
         enable: true,
         activationMode: ActivationMode.singleTap,
@@ -44,7 +45,6 @@ class _LineChartStreamState extends State<LineChartStream> {
           enable: true,
         ),
       ),
-      plotAreaBorderWidth: 0,
       primaryXAxis: NumericAxis(
         edgeLabelPlacement: EdgeLabelPlacement.shift,
         labelStyle: const TextStyle(fontSize: 10),

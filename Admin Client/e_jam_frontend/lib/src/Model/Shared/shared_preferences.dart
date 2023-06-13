@@ -72,6 +72,8 @@ class SystemSettings {
   static bool showChartsAnimation = true;
   static bool lineGraphCurveSmooth = true;
   static bool showBottomLineChart = true;
+  // maybe add this to the settings
+  static int lineGraphMaxDataPoints = 150;
   static bool showBackgroundBall = true;
   static bool fullChartsDetails = false;
   static bool chartsExplode = true;

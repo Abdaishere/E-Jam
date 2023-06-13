@@ -198,7 +198,10 @@ class BottomLineChartScaffold extends StatelessWidget {
       bottomNavigationBar: BottomAppBar(
         elevation: 0,
         padding: const EdgeInsets.only(left: 200),
-        height: 100,
+        height: 90,
+        color: MediaQuery.of(context).orientation == Orientation.landscape
+            ? null
+            : Colors.transparent,
         child: MediaQuery.of(context).orientation == Orientation.landscape &&
                 context.watch<BottomLineChartNotifier>().showBottomLineChart
             ? const BottomLineChart()
