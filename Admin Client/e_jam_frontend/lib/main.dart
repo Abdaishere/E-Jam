@@ -23,6 +23,7 @@ import 'package:e_jam/src/View/home_view.dart';
 import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/View/settings_view.dart';
 import 'package:e_jam/src/View/Lists/devices_list_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -111,10 +112,14 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     _timer = Timer.periodic(const Duration(seconds: 8), (timer) async {
-      await context.read<StatisticsController>().loadAllVerifierStatistics();
+      if (SystemSettings.chartsAreRunning) {
+        await context.read<StatisticsController>().loadAllVerifierStatistics();
+      }
     });
     _timer2 = Timer.periodic(const Duration(seconds: 8), (timer) async {
-      await context.read<StatisticsController>().loadAllGeneratorStatistics();
+      if (SystemSettings.chartsAreRunning) {
+        await context.read<StatisticsController>().loadAllGeneratorStatistics();
+      }
     });
     super.initState();
   }
@@ -438,10 +443,12 @@ class _GraphsControllerButtonState extends State<GraphsControllerButton> {
     return IconButton(
       tooltip:
           SystemSettings.chartsAreRunning ? 'Freeze Graphs' : 'Unfreeze Graphs',
-      onPressed: () {
+      onPressed: () async {
         setState(() {
           SystemSettings.chartsAreRunning = !SystemSettings.chartsAreRunning;
         });
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('chartsAreRunning', SystemSettings.chartsAreRunning);
       },
       color: SystemSettings.chartsAreRunning
           ? context.watch<ThemeModel>().colorScheme.secondary

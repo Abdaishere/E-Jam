@@ -32,8 +32,9 @@ class _BottomLineChartState extends State<BottomLineChart> {
 
     final genChartData = generatorStatistics.sublist(max(
         generatorStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0));
+
     final verChartData = verifierStatistics.sublist(max(
-        generatorStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0));
+        verifierStatistics.length - SystemSettings.lineGraphMaxDataPoints, 0));
 
     return SfCartesianChart(
       plotAreaBorderWidth: 0,
