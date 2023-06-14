@@ -172,11 +172,8 @@ class _HomeState extends State<Home> {
     return ZoomDrawer(
       menuScreen: MenuScreen(
         setIndex: (index) {
-          if (mounted) {
-            setState(() {
-              currentIndex = index;
-            });
-          }
+          currentIndex = index;
+          setState(() {});
         },
       ),
       mainScreen: mainScreen(),
@@ -242,171 +239,182 @@ class GradientBackground extends StatelessWidget {
   }
 }
 
-class MenuScreen extends StatefulWidget {
+class MenuScreen extends StatelessWidget {
   const MenuScreen({Key? key, required this.setIndex}) : super(key: key);
 
   final ValueSetter setIndex;
   @override
-  State<MenuScreen> createState() => _MenuScreenState();
-}
-
-class _MenuScreenState extends State<MenuScreen> {
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // back button to close drawer menu
-        Padding(
-          padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-          child: IconButton(
-            onPressed: () {
-              ZoomDrawer.of(context)!.close();
-            },
-            color: context.watch<ThemeModel>().colorScheme.secondary,
-            icon: const Icon(Icons.arrow_forward_ios_outlined),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // back button to close drawer menu
+          Padding(
+            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+            child: IconButton(
+              onPressed: () {
+                ZoomDrawer.of(context)!.close();
+              },
+              color: context.watch<ThemeModel>().colorScheme.secondary,
+              icon: const Icon(Icons.arrow_forward_ios_outlined),
+            ),
           ),
-        ),
-        const SizedBox(height: 20),
-        Container(
-          margin: const EdgeInsets.only(left: 5),
-          decoration: BoxDecoration(
-            border: Border.all(
-                color: context.watch<ThemeModel>().colorScheme.secondary,
-                width: 1),
-            borderRadius: BorderRadius.circular(18),
+          const SizedBox(height: 20),
+          Container(
+            margin: const EdgeInsets.only(left: 5),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  color: context.watch<ThemeModel>().colorScheme.secondary,
+                  width: 1),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            padding:
+                const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                StreamsStartStopControllerButtons(isStopping: false),
+                StreamsStartStopControllerButtons(isStopping: true),
+                GraphsControllerButton(),
+                ExportButton(),
+              ],
+            ),
           ),
-          padding:
-              const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              StreamsStartStopControllerButtons(isStopping: false),
-              StreamsStartStopControllerButtons(isStopping: true),
-              GraphsControllerButton(),
-              ExportButton(),
-            ],
-          ),
-        ),
-        const SizedBox(height: 25),
-        ListTileTheme(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          style: ListTileStyle.drawer,
-          dense: MediaQuery.of(context).size.height < 600,
-          enableFeedback: true,
-          contentPadding: const EdgeInsets.only(left: 30),
-          child: menuList(),
-        ),
+          const SizedBox(height: 25),
+          MenuList(setIndex: setIndex),
+          const Spacer(),
 
-        const Spacer(),
-        Container(
-          margin: const EdgeInsets.only(right: 60),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              IconButton(
-                tooltip: 'Change Server',
-                icon: const Icon(MaterialCommunityIcons.server_network),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    HeroDialogRoute(
-                      builder: (BuildContext context) => const Center(
-                        child: ChangeServerIPScreen(),
+          Container(
+            margin: const EdgeInsets.only(right: 60),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  tooltip: 'Change Server',
+                  icon: const Icon(MaterialCommunityIcons.server_network),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      HeroDialogRoute(
+                        builder: (BuildContext context) => const Center(
+                          child: ChangeServerIPScreen(),
+                        ),
+                        settings: const RouteSettings(name: 'ChangeServerView'),
                       ),
-                      settings: const RouteSettings(name: 'ChangeServerView'),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(width: 25),
-              IconButton(
-                icon: Icon(
-                  context.watch<ThemeModel>().isDark
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
+                    );
+                  },
                 ),
-                onPressed: () async {
-                  context.read<ThemeModel>().toggleTheme();
-                },
-              ),
-            ],
+                const SizedBox(width: 25),
+                IconButton(
+                  icon: Icon(
+                    context.watch<ThemeModel>().isDark
+                        ? Icons.dark_mode
+                        : Icons.light_mode,
+                  ),
+                  onPressed: () async {
+                    context.read<ThemeModel>().toggleTheme();
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 20),
-      ],
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
+}
 
-  Column menuList() {
-    const double size = 21;
-    return Column(
-      children: [
-        ListTile(
-          leading: const FaIcon(FontAwesome.dashboard, size: size),
-          iconColor: Colors.white,
-          title: const Text('Dashboard'),
-          onTap: () {
-            widget.setIndex(0);
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.dashboard),
-          iconColor: Colors.blueAccent,
-          title: const Text('Streams'),
-          onTap: () {
-            widget.setIndex(1);
-          },
-        ),
-        ListTile(
-          leading: const FaIcon(FontAwesomeIcons.microchip, size: size),
-          iconColor: Colors.deepOrangeAccent,
-          title: const Text('Devices'),
-          onTap: () {
-            widget.setIndex(2);
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.auto_graph_outlined),
-          iconColor: Colors.deepPurpleAccent,
-          title: const Text('Charts'),
-          onTap: () {
-            widget.setIndex(3);
-          },
-        ),
-        ListTile(
-          leading: const FaIcon(FontAwesomeIcons.gears, size: size),
-          iconColor: Colors.blueGrey.shade500,
-          title: const Text('Settings'),
-          onTap: () {
-            widget.setIndex(4);
-          },
-        ),
-        AboutListTile(
-          icon: const Icon(MaterialCommunityIcons.information, size: size),
-          applicationName: "E-Jam",
-          applicationVersion: "1.0.2",
-          applicationIcon:
-              Image.asset("assets/Icon-logo.ico", width: 100, height: 100),
-          applicationLegalese: "© 2023 E-Jam",
-          aboutBoxChildren: const <Widget>[
-            Text(
-                'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
-                style: TextStyle(fontSize: 15)),
-            Text('Developed by:',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            Text('\tAbdullah Elbelkasy'),
-            Text('\tMohamed Elhagery'),
-            Text('\tKhaled Waleed'),
-            Text('\tIslam Wagih'),
-            Text('\tMostafa Abdullah'),
-          ],
-          child: const Text('About'),
-        ),
-      ],
+class MenuList extends StatelessWidget {
+  const MenuList({
+    super.key,
+    required this.setIndex,
+  });
+
+  static const double size = 21;
+  final ValueSetter setIndex;
+  @override
+  Widget build(BuildContext context) {
+    return ListTileTheme(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      style: ListTileStyle.drawer,
+      dense: MediaQuery.of(context).size.height < 600,
+      enableFeedback: true,
+      contentPadding: const EdgeInsets.only(left: 30),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            leading: const FaIcon(FontAwesome.dashboard, size: size),
+            iconColor: Colors.white,
+            title: const Text('Dashboard'),
+            onTap: () {
+              setIndex(0);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.dashboard),
+            iconColor: Colors.blueAccent,
+            title: const Text('Streams'),
+            onTap: () {
+              setIndex(1);
+            },
+          ),
+          ListTile(
+            leading: const FaIcon(FontAwesomeIcons.microchip, size: size),
+            iconColor: Colors.deepOrangeAccent,
+            title: const Text('Devices'),
+            onTap: () {
+              setIndex(2);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.auto_graph_outlined),
+            iconColor: Colors.deepPurpleAccent,
+            title: const Text('Charts'),
+            onTap: () {
+              setIndex(3);
+            },
+          ),
+          ListTile(
+            leading: const FaIcon(FontAwesomeIcons.gears, size: size),
+            iconColor: Colors.blueGrey.shade500,
+            title: const Text('Settings'),
+            onTap: () {
+              setIndex(4);
+            },
+          ),
+          AboutListTile(
+            icon: const Icon(MaterialCommunityIcons.information, size: size),
+            applicationName: "E-Jam",
+            applicationVersion: "1.0.2",
+            applicationIcon:
+                Image.asset("assets/Icon-logo.ico", width: 100, height: 100),
+            applicationLegalese: "© 2023 E-Jam",
+            aboutBoxChildren: const <Widget>[
+              Text(
+                  'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
+                  style: TextStyle(fontSize: 15)),
+              Text('Developed by:',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              Text('\tAbdullah Elbelkasy'),
+              Text('\tMohamed Elhagery'),
+              Text('\tKhaled Waleed'),
+              Text('\tIslam Wagih'),
+              Text('\tMostafa Abdullah'),
+            ],
+            child: const Text('About'),
+          ),
+        ],
+      ),
     );
   }
 }

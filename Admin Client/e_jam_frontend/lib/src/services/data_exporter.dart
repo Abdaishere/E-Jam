@@ -34,15 +34,15 @@ class DataExporter {
     // add header
     rows.add([
       'Device Name',
-      'Device Description',
-      'Device Location',
-      'Device IP',
-      'Device Port',
-      'Device Mac Address',
-      'Device Processes Generating',
-      'Device Processes Verifying',
+      'Description',
+      'Location',
+      'IP',
+      'Port Number',
+      'Mac Address',
+      'Processes Generating',
+      'Processes Verifying',
       'Device Status',
-      'Device Last Updated',
+      'Last Updated',
     ]);
 
     List<Device> devices = context.read<DevicesController>().getDevices ?? [];
