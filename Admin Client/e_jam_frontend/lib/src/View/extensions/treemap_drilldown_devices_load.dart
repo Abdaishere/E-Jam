@@ -26,18 +26,19 @@ class TreeMapDrillDownDevicesLoad extends StatefulWidget {
 class _TreeMapDrillDownDevicesLoadState
     extends State<TreeMapDrillDownDevicesLoad> {
   List<ProcessInfo> _source = [];
+  bool _offline = false;
   bool _isLoading = true;
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => taskGetter());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _getSources());
     timer =
-        Timer.periodic(const Duration(seconds: 20), (Timer t) => taskGetter());
+        Timer.periodic(const Duration(seconds: 20), (Timer t) => _getSources());
   }
 
-  taskGetter() async {
+  _getSources() async {
     await context.read<DevicesController>().loadAllDevices(false);
     if (mounted) await context.read<StreamsController>().loadAllStreams();
     if (mounted) {
@@ -46,6 +47,8 @@ class _TreeMapDrillDownDevicesLoadState
 
       final List<StreamEntry>? streams =
           context.read<StreamsController>().getStreams;
+
+      _offline = (streams == null && devices == null);
       getSources(devices ?? [], streams ?? []);
     }
   }
@@ -124,22 +127,23 @@ class _TreeMapDrillDownDevicesLoadState
           ),
         ),
       );
-    } else if (_source.isEmpty) {
+    }
+    if (_source.isEmpty) {
       return SizedBox(
         height: MediaQuery.of(context).size.height * 0.45,
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.stream_sharp,
                 color: Colors.redAccent,
                 size: 100.0,
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               Text(
-                'Connection Error',
-                style: TextStyle(
+                _offline ? 'Connection Error' : 'No Processes Available',
+                style: const TextStyle(
                   fontSize: 24.0,
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,
