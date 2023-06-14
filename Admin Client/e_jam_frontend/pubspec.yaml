@@ -16,10 +16,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+4
+version: 1.0.4+4
 
 environment:
-  sdk: ^3.0.0
+  sdk: '>=3.0.5 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -35,7 +35,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   provider: ^6.0.5
   shared_preferences: ^2.1.1
-  flutter_zoom_drawer: ^3.1.0
+  flutter_zoom_drawer: 3.0.3
   font_awesome_flutter: ^10.4.0
   flutter_vector_icons: ^2.0.0
   syncfusion_flutter_charts: ^21.2.5
@@ -45,7 +45,7 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   timeago: ^3.4.0
   intl: ^0.18.1
-  http: ^0.13.6
+  http: ^1.0.0
   ping_discover_network_forked: ^0.0.1 # small package to ping network
   circular_motion: ^0.0.3 # small package to for circular motion of widgets in radar view
   flutter_ripple: ^0.0.3 # small package to for ripple effect of radar view

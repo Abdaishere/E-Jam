@@ -209,10 +209,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_zoom_drawer
-      sha256: "222a0f24c52a2add15c9b8908c360364f8151f90879c28daf8258067ef7d59a5"
+      sha256: "93c4f2cfe1edfe2f9e48b94a7f9538520d2f2593e202b8e89c394b7d27137a8e"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.0.3"
   font_awesome_flutter:
     dependency: "direct main"
     description:
@@ -246,10 +246,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
+      sha256: "4c3f04bfb64d3efd508d06b41b825542f08122d30bda4933fb95c069d22a4fa3"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.6"
+    version: "1.0.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -837,5 +837,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.0.0 <4.0.0"
+  dart: ">=3.0.5 <4.0.0"
   flutter: ">=3.3.0"
