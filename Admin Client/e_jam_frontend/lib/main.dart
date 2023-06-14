@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/View/Animation/background_bouncing_ball.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/export_button.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/streams_start_stop_controller_buttons.dart';
 import 'package:e_jam/src/View/extensions/bottom_line_chart.dart';
 import 'package:e_jam/src/View/Lists/graphs_list_view.dart';
@@ -268,7 +269,6 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        // TODO: control panel with icons start and camera icon and export button
         Container(
           margin: const EdgeInsets.only(left: 5),
           decoration: BoxDecoration(
@@ -407,25 +407,6 @@ class _MenuScreenState extends State<MenuScreen> {
           child: const Text('About'),
         ),
       ],
-    );
-  }
-}
-
-class ExportButton extends StatelessWidget {
-  const ExportButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: 'Export as CSV or PDF',
-      onPressed: () async {},
-      color: context.watch<ThemeModel>().colorScheme.secondary,
-      icon: const FaIcon(
-        FontAwesomeIcons.solidFloppyDisk,
-        size: 21,
-      ),
     );
   }
 }

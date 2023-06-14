@@ -50,7 +50,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       _loadStream();
     });
     timer =
-        Timer.periodic(const Duration(seconds: 10), (Timer t) => _loadStream());
+        Timer.periodic(const Duration(seconds: 20), (Timer t) => _loadStream());
   }
 
   _loadStream() async {
@@ -845,10 +845,6 @@ class _StreamGraphState extends State<StreamGraph> {
 
   @override
   Widget build(BuildContext context) {
-    if (streamId.isEmpty) {
-      return const Text('No stream Data Available');
-    }
-
     List<VerifierStatisticsInstance> streamVerifiers = [];
     streamVerifiers = context
         .watch<StatisticsController>()

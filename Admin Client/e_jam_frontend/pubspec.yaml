@@ -41,13 +41,16 @@ dependencies:
   syncfusion_flutter_charts: ^21.2.5
   syncfusion_flutter_gauges: ^21.2.5
   syncfusion_flutter_treemap: ^21.2.5
+  syncfusion_flutter_pdf: ^21.2.10
   loading_animation_widget: ^1.2.0+4
   timeago: ^3.4.0
+  intl: ^0.18.1
   http: ^0.13.6
   ping_discover_network_forked: ^0.0.1 # small package to ping network
   circular_motion: ^0.0.3 # small package to for circular motion of widgets in radar view
   flutter_ripple: ^0.0.3 # small package to for ripple effect of radar view
   collection: ^1.17.1
+  csv: ^5.0.2
   
 
 dev_dependencies:

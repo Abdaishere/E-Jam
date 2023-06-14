@@ -20,7 +20,7 @@ use tokio::sync::Mutex;
 
 const FAKE_DEVICES_COUNT: usize = 50;
 const FAKE_STREAM_ENTRIES_COUNT: usize = 100;
-pub const SLEEP_TIME: u64 = 10;
+pub const SLEEP_TIME: u64 = 30;
 pub async fn generate_fake_metrics(app_state: &Data<AppState>) {
     info!("Fake data feature enabled");
 
