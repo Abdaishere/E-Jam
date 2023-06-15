@@ -58,11 +58,11 @@ class _TreeMapDrillDownDevicesLoadState
     for (final StreamEntry stream in streams) {
       for (final Device device in devices) {
         Map<ProcessStatus, ProcessInfo> deviceProcesses = {};
-        if (stream.runningGenerators?.processes
+        if (stream.runningGenerators?.processesMap
                 .containsKey(device.macAddress) ??
             false) {
           ProcessStatus? processStatus =
-              stream.runningGenerators?.processes[device.macAddress]!;
+              stream.runningGenerators?.processesMap[device.macAddress]!;
 
           if (processStatus != null) {
             deviceProcesses[processStatus] = ProcessInfo(
@@ -77,10 +77,11 @@ class _TreeMapDrillDownDevicesLoadState
           }
         }
 
-        if (stream.runningVerifiers?.processes.containsKey(device.macAddress) ??
+        if (stream.runningVerifiers?.processesMap
+                .containsKey(device.macAddress) ??
             false) {
           ProcessStatus? processStatus =
-              stream.runningVerifiers?.processes[device.macAddress]!;
+              stream.runningVerifiers?.processesMap[device.macAddress]!;
           if (processStatus != null) {
             deviceProcesses[processStatus] = ProcessInfo(
               deviceName: "${device.name} \n${device.macAddress} ",

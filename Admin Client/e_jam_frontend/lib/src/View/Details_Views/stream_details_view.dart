@@ -240,9 +240,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               child: StreamGraph(
                 streamId: stream?.streamId ?? ' ',
                 runningGenerators:
-                    stream?.runningGenerators ?? const Process.empty(),
+                    stream?.runningGenerators ?? const Processes.empty(),
                 runningVerifiers:
-                    stream?.runningVerifiers ?? const Process.empty(),
+                    stream?.runningVerifiers ?? const Processes.empty(),
               ),
             ),
           ),
@@ -305,9 +305,9 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               child: StreamGraph(
                 streamId: stream?.streamId ?? ' ',
                 runningGenerators:
-                    stream?.runningGenerators ?? const Process.empty(),
+                    stream?.runningGenerators ?? const Processes.empty(),
                 runningVerifiers:
-                    stream?.runningVerifiers ?? const Process.empty(),
+                    stream?.runningVerifiers ?? const Processes.empty(),
               ),
             ),
           ),
@@ -399,12 +399,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
               size: 30,
             ),
           ),
-          tooltip: stream?.runningGenerators?.processes == null ||
-                  stream!.runningGenerators!.processes.isEmpty
+          tooltip: stream?.runningGenerators?.processesMap == null ||
+                  stream!.runningGenerators!.processesMap.isEmpty
               ? 'No Generators'
-              : stream?.runningGenerators!.processes.length == 1
+              : stream?.runningGenerators!.processesMap.length == 1
                   ? '1 Generator'
-                  : '${stream?.runningGenerators!.processes.length} Generators',
+                  : '${stream?.runningGenerators!.processesMap.length} Generators',
           onPressed: () {
             Navigator.of(context).push(
               DialogRoute(
@@ -429,12 +429,12 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             color: downloadColor,
             size: 30,
           ),
-          tooltip: stream?.runningVerifiers?.processes == null ||
-                  stream!.runningVerifiers!.processes.isEmpty
+          tooltip: stream?.runningVerifiers?.processesMap == null ||
+                  stream!.runningVerifiers!.processesMap.isEmpty
               ? 'No Verifiers'
-              : stream?.runningVerifiers!.processes.length == 1
+              : stream?.runningVerifiers!.processesMap.length == 1
                   ? '1 Verifier'
-                  : '${stream?.runningVerifiers!.processes.length} Verifiers',
+                  : '${stream?.runningVerifiers!.processesMap.length} Verifiers',
           onPressed: () {
             Navigator.of(context).push(
               DialogRoute(
@@ -787,8 +787,8 @@ class StreamGraph extends StatefulWidget {
   });
 
   final String streamId;
-  final Process runningGenerators;
-  final Process runningVerifiers;
+  final Processes runningGenerators;
+  final Processes runningVerifiers;
   @override
   State<StreamGraph> createState() => _StreamGraphState();
 }
@@ -808,8 +808,8 @@ class _StreamGraphState extends State<StreamGraph> {
     PacketStatus.received: 0,
     PacketStatus.dropped: 0,
   };
-  Process get runningGenerators => widget.runningGenerators;
-  Process get runningVerifiers => widget.runningVerifiers;
+  Processes get runningGenerators => widget.runningGenerators;
+  Processes get runningVerifiers => widget.runningVerifiers;
   String get streamId => widget.streamId;
 
   @override
@@ -821,11 +821,11 @@ class _StreamGraphState extends State<StreamGraph> {
   }
 
   _countProcesses() {
-    runningGenerators.processes.forEach((key, value) {
+    runningGenerators.processesMap.forEach((key, value) {
       _processesCounterMap[value] = _processesCounterMap[value]! + 1;
     });
 
-    runningVerifiers.processes.forEach((key, value) {
+    runningVerifiers.processesMap.forEach((key, value) {
       _processesCounterMap[value] = _processesCounterMap[value]! + 1;
     });
 
@@ -865,8 +865,8 @@ class _StreamGraphState extends State<StreamGraph> {
 
   Column _showChart(List<VerifierStatisticsInstance> streamVerifiers,
       List<GeneratorStatisticsInstance> streamGenerators) {
-    bool showProcessesPieChart = runningGenerators.processes.isNotEmpty ||
-        runningVerifiers.processes.isNotEmpty;
+    bool showProcessesPieChart = runningGenerators.processesMap.isNotEmpty ||
+        runningVerifiers.processesMap.isNotEmpty;
 
     num totalPackets = _totalPacketsStatusMap.values.reduce((a, b) => a + b);
 

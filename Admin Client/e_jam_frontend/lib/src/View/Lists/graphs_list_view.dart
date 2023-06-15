@@ -94,13 +94,13 @@ class _GraphsListViewState extends State<GraphsListView> {
               StreamEntry? stream = streams
                   .firstWhereOrNull((element) => element.streamId == streamId);
 
-              late Process runningGenerators;
-              late Process runningVerifiers;
+              late Processes runningGenerators;
+              late Processes runningVerifiers;
 
               runningGenerators =
-                  stream?.runningGenerators ?? const Process.empty();
+                  stream?.runningGenerators ?? const Processes.empty();
               runningVerifiers =
-                  stream?.runningVerifiers ?? const Process.empty();
+                  stream?.runningVerifiers ?? const Processes.empty();
               graph = Column(
                 children: [
                   Text(

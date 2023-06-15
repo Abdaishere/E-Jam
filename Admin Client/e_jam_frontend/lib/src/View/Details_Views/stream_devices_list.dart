@@ -16,7 +16,7 @@ class StreamDevicesList extends StatefulWidget {
       required this.reloadStream});
 
   final bool areGenerators;
-  final Process? process;
+  final Processes? process;
   final TimelineAsyncFunction reloadStream;
 
   @override
@@ -69,7 +69,7 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
           ),
           body: Visibility(
             visible: widget.process != null &&
-                widget.process!.processes.isNotEmpty &&
+                widget.process!.processesMap.isNotEmpty &&
                 DevicesController.devices != null,
             replacement: Center(
               child: DevicesController.devices == null
@@ -77,10 +77,10 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
                   : const Text('No Devices Running'),
             ),
             child: ListView.builder(
-              itemCount: widget.process?.processes.length ?? 0,
+              itemCount: widget.process?.processesMap.length ?? 0,
               itemBuilder: (context, index) {
                 String macAddress =
-                    widget.process!.processes.keys.elementAt(index);
+                    widget.process!.processesMap.keys.elementAt(index);
                 index = DevicesController.devices!
                     .indexWhere((element) => element.macAddress == macAddress);
                 if (index == -1) {
@@ -100,10 +100,10 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
                       turns: const AlwaysStoppedAnimation(320 / 360),
                       child: Text(
                         processStatusToString(
-                            widget.process!.processes[macAddress]),
+                            widget.process!.processesMap[macAddress]),
                         style: TextStyle(
                           color: processStatusColorScheme(
-                              widget.process!.processes[macAddress]),
+                              widget.process!.processesMap[macAddress]),
                           fontSize: 15,
                         ),
                       ),
@@ -125,10 +125,10 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
                     turns: const AlwaysStoppedAnimation(320 / 360),
                     child: Text(
                       processStatusToString(
-                          widget.process!.processes[macAddress]),
+                          widget.process!.processesMap[macAddress]),
                       style: TextStyle(
                         color: processStatusColorScheme(
-                            widget.process!.processes[macAddress]),
+                            widget.process!.processesMap[macAddress]),
                         fontSize: 15,
                       ),
                     ),
