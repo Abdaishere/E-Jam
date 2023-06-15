@@ -121,15 +121,20 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
                     color: deviceStatusColorScheme(
                         DevicesController.devices![index].status),
                   ),
-                  trailing: RotationTransition(
-                    turns: const AlwaysStoppedAnimation(320 / 360),
-                    child: Text(
-                      processStatusToString(
-                          widget.process!.processesMap[macAddress]),
-                      style: TextStyle(
-                        color: processStatusColorScheme(
+                  trailing: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 1),
+                      child: Text(
+                        processStatusToString(
                             widget.process!.processesMap[macAddress]),
-                        fontSize: 15,
+                        style: TextStyle(
+                          color: processStatusColorScheme(
+                              widget.process!.processesMap[macAddress]),
+                        ),
                       ),
                     ),
                   ),
