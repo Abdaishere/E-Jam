@@ -71,32 +71,37 @@ class DeviceStatusIconButton extends StatelessWidget {
   }
 }
 
+// List of keywords to match with device name to get the icon
+const Map<String, IconData> _nameKeywords = {
+  'chip': MaterialCommunityIcons.chip,
+  'pine64': MaterialCommunityIcons.chip,
+  'raspberry': MaterialCommunityIcons.raspberry_pi,
+  'pi': MaterialCommunityIcons.raspberry_pi,
+  'mac': MaterialCommunityIcons.apple,
+  'apple': MaterialCommunityIcons.apple,
+  'linux': MaterialCommunityIcons.linux,
+  'windows': MaterialCommunityIcons.microsoft_windows,
+  'microsoft': MaterialCommunityIcons.microsoft_windows,
+  'localhost': MaterialCommunityIcons.home_variant,
+  'home': MaterialCommunityIcons.home_variant,
+  'pc': MaterialCommunityIcons.desktop_mac,
+  'desktop': MaterialCommunityIcons.desktop_mac,
+  'laptop': MaterialCommunityIcons.laptop,
+  'notebook': MaterialCommunityIcons.laptop,
+  'printer': MaterialCommunityIcons.printer,
+  'hub': MaterialCommunityIcons.hubspot,
+  'router': MaterialCommunityIcons.router_network,
+  'switch': MaterialCommunityIcons.router_network,
+  'security': MaterialCommunityIcons.security_network,
+  'firewall': MaterialCommunityIcons.security_network,
+};
+
 IconData getDeviceIcon(String name) {
   name = name.toLowerCase();
-  if (name.contains('chip') || name.contains('pine64')) {
-    return MaterialCommunityIcons.chip;
-  } else if (name.contains('raspberry') || name.contains('pi')) {
-    return MaterialCommunityIcons.raspberry_pi;
-  } else if (name.contains('mac') || name.contains('apple')) {
-    return MaterialCommunityIcons.apple;
-  } else if (name.contains('linux')) {
-    return MaterialCommunityIcons.linux;
-  } else if (name.contains('windows') || name.contains('microsoft')) {
-    return MaterialCommunityIcons.microsoft_windows;
-  } else if (name.contains('localhost') || name.contains('home')) {
-    return MaterialCommunityIcons.home_variant;
-  } else if (name.contains('pc') || name.contains('desktop')) {
-    return MaterialCommunityIcons.desktop_mac;
-  } else if (name.contains('laptop') || name.contains('notebook')) {
-    return MaterialCommunityIcons.laptop;
-  } else if (name.contains('printer')) {
-    return MaterialCommunityIcons.printer;
-  } else if (name.contains('hub')) {
-    return MaterialCommunityIcons.hubspot;
-  } else if (name.contains('router') || name.contains('switch')) {
-    return MaterialCommunityIcons.router_network;
-  } else if (name.contains('security') || name.contains('firewall')) {
-    return MaterialCommunityIcons.security_network;
+  for (String keyword in _nameKeywords.keys) {
+    if (name.contains(keyword)) {
+      return _nameKeywords[keyword]!;
+    }
   }
   return MaterialCommunityIcons.server;
 }
