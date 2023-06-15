@@ -27,6 +27,35 @@ class DataExporter {
       imageTopOffset = 70,
       imageLeftOffset = 180;
 
+  static const List<String> dataTypes = [
+    'Devices',
+    'Stream Status Details',
+    'Stream Entries',
+    'Generator Statistics',
+    'Verifier Statistics',
+  ];
+
+  static const List<Function> toListFunctions = [
+    devicesList,
+    streamStatusDetailsToList,
+    streamEntriesToList,
+    generatorInstancesToList,
+    verifierStatisticsInstanceToList,
+  ];
+
+  static const List<Function> saveAsFunctions = [saveAsCSV, saveAsPdf];
+
+  static exportSelectedData(
+      BuildContext context, List<bool> choices, int saveAs) {
+    // export the data root folder
+    for (int i = 0; i < choices.length; i++) {
+      if (choices[i]) {
+        toListFunctions[i](context)
+            .then((data) => saveAsFunctions[saveAs](data, dataTypes[i]));
+      }
+    }
+  }
+
   static Future<List<List<dynamic>>> devicesList(BuildContext context) async {
     // devices
     List<List<dynamic>> rows = [];
@@ -80,10 +109,8 @@ class DataExporter {
       'End Time',
     ]);
 
-    // add data
     List<StreamStatusDetails> streamStatusDetails =
         context.read<StreamsController>().getStreamsStatusDetails ?? [];
-
     for (var streamStatusDetail in streamStatusDetails) {
       rows.add([
         streamStatusDetail.name,
@@ -131,10 +158,8 @@ class DataExporter {
       'Stream Status',
     ]);
 
-    // add data
     List<StreamEntry> streamEntries =
         context.read<StreamsController>().getStreams ?? [];
-
     // Add data
     for (var streamEntry in streamEntries) {
       rows.add([
@@ -167,7 +192,7 @@ class DataExporter {
     return rows;
   }
 
-  static Future<List<List<dynamic>>> generatorStatisticsInstanceToList(
+  static Future<List<List<dynamic>>> generatorInstancesToList(
       BuildContext context) async {
     List<List<dynamic>> rows = [];
     // Add headers
@@ -180,6 +205,7 @@ class DataExporter {
       'Timestamp',
     ]);
 
+    // Get data
     List<GeneratorStatisticsInstance> generatorStatisticsInstanceList =
         context.read<StatisticsController>().getGeneratorStatistics;
 
@@ -231,11 +257,12 @@ class DataExporter {
     return rows;
   }
 
-  static saveAsCSV(List<List<dynamic>> data, String dist) async {
+  static saveAsCSV(List<List<dynamic>> data, String target) async {
     String csv = const ListToCsvConverter().convert(data);
-
+    //Create date now string
+    String dateNow = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
     // save file
-    File file = File('stream_entries.csv');
+    File file = File('${target}_$dateNow.csv');
     file.writeAsString(csv);
   }
 
@@ -353,7 +380,7 @@ class DataExporter {
             0, 0, page.getClientSize().width, page.getClientSize().height));
 
     // Save the document.
-    File(target).writeAsBytes(await document.save());
+    File('${target}_$dateNow.pdf').writeAsBytes(await document.save());
 
     // Dispose the document.
     document.dispose();

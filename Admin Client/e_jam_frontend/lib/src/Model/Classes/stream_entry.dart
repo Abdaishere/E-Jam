@@ -51,8 +51,8 @@ class StreamEntry {
   final TransportLayerProtocol transportLayerProtocol;
   final FlowType flowType;
   final bool checkContent;
-  final Process? runningGenerators;
-  final Process? runningVerifiers;
+  final Processes? runningGenerators;
+  final Processes? runningVerifiers;
   final StreamStatus? streamStatus;
 
   factory StreamEntry.fromRawJson(String str) =>
@@ -89,8 +89,8 @@ class StreamEntry {
             transportLayerProtocolFromString(json["transportLayerProtocol"]),
         flowType: flowTypeFromString(json["flowType"]),
         checkContent: json["checkContent"],
-        runningGenerators: Process.fromJson(json["runningGenerators"] ?? {}),
-        runningVerifiers: Process.fromJson(json["runningVerifiers"] ?? {}),
+        runningGenerators: Processes.fromJson(json["runningGenerators"] ?? {}),
+        runningVerifiers: Processes.fromJson(json["runningVerifiers"] ?? {}),
         streamStatus: streamStatusFromString(json["streamStatus"] ?? ''),
       );
 
@@ -123,26 +123,27 @@ class StreamEntry {
       };
 }
 
-class Process {
-  Process({
-    required this.processes,
+class Processes {
+  Processes({
+    required this.processesMap,
   });
 
-  const Process.empty() : processes = const {};
+  const Processes.empty() : processesMap = const {};
 
-  final Map<String, ProcessStatus> processes;
+  final Map<String, ProcessStatus> processesMap;
 
-  int get total => processes.length;
+  int get total => processesMap.length;
 
-  factory Process.fromRawJson(String str) => Process.fromJson(json.decode(str));
+  factory Processes.fromRawJson(String str) =>
+      Processes.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory Process.fromJson(Map<String, dynamic> json) => Process(
-        processes: Map.from(json).map((k, v) =>
+  factory Processes.fromJson(Map<String, dynamic> json) => Processes(
+        processesMap: Map.from(json).map((k, v) =>
             MapEntry<String, ProcessStatus>(k, processStatusFromString(v))),
       );
 
-  Map<String, dynamic> toJson() => Map.from(processes)
+  Map<String, dynamic> toJson() => Map.from(processesMap)
       .map((k, v) => MapEntry<String, dynamic>(k, processStatusToString(v)));
 }
