@@ -918,29 +918,7 @@ class _AddPresetStreamState extends State<AddPresetStream> {
               iconColor: Colors.blueAccent,
               title: Text(stream.name),
               subtitle: Text(stream.description),
-              trailing: IconButton(
-                icon: FaIcon(
-                    selected == index
-                        ? FontAwesomeIcons.check
-                        : FontAwesomeIcons.solidTrashCan,
-                    size: 20),
-                color: Colors.red,
-                tooltip: 'Delete Preset',
-                onPressed: () async {
-                  if (selected != index) {
-                    selected = index;
-                    setState(() {});
-                    return;
-                  }
-                  selected = -1;
-                  SystemSettings.savedStreams.removeAt(index);
-                  setState(() {});
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  prefs.setStringList(
-                      'savedStreams', SystemSettings.savedStreams);
-                },
-              ),
+              trailing: deleteButton(index),
               onTap: () {
                 context.read<AddStreamController>().loadAllFields(stream);
               },
@@ -949,6 +927,30 @@ class _AddPresetStreamState extends State<AddPresetStream> {
           );
         },
       ),
+    );
+  }
+
+  IconButton deleteButton(int index) {
+    return IconButton(
+      icon: FaIcon(
+          selected == index
+              ? FontAwesomeIcons.check
+              : FontAwesomeIcons.solidTrashCan,
+          size: 20),
+      color: selected == index ? Colors.green : Colors.red,
+      tooltip: 'Delete Preset',
+      onPressed: () async {
+        if (selected != index) {
+          selected = index;
+          setState(() {});
+          return;
+        }
+        selected = -1;
+        SystemSettings.savedStreams.removeAt(index);
+        setState(() {});
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setStringList('savedStreams', SystemSettings.savedStreams);
+      },
     );
   }
 }

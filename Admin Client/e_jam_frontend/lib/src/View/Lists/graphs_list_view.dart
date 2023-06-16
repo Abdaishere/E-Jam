@@ -7,8 +7,10 @@ import 'package:e_jam/src/View/Lists/streams_list_view.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // the User can attach a graph of a stream or a device or any other data source (Staggered Grid View)
 class GraphsListView extends StatefulWidget {
@@ -19,6 +21,31 @@ class GraphsListView extends StatefulWidget {
 }
 
 class _GraphsListViewState extends State<GraphsListView> {
+  int selected = -1;
+  IconButton deleteButton(int index) {
+    return IconButton(
+      icon: FaIcon(
+          selected == index
+              ? FontAwesomeIcons.check
+              : FontAwesomeIcons.solidTrashCan,
+          size: 20),
+      color: selected == index ? Colors.green : Colors.red,
+      tooltip: 'Unpin Chart',
+      onPressed: () async {
+        if (selected != index) {
+          selected = index;
+          setState(() {});
+          return;
+        }
+        selected = -1;
+        SystemSettings.pinnedElements.removeAt(index);
+        setState(() {});
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setStringList('pinnedElements', SystemSettings.pinnedElements);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,12 +96,19 @@ class _GraphsListViewState extends State<GraphsListView> {
                   SystemSettings.pinnedElements[index].substring(1);
               graph = Column(
                 children: [
-                  Text(
-                    "Device $macAddress",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SizedBox.shrink(),
+                      Text(
+                        "Device $macAddress",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      deleteButton(index),
+                    ],
                   ),
                   Expanded(
                     child: DevicePacketsCounterDoughnut(
@@ -103,12 +137,19 @@ class _GraphsListViewState extends State<GraphsListView> {
                   stream?.runningVerifiers ?? const Processes.empty();
               graph = Column(
                 children: [
-                  Text(
-                    "Stream $streamId",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const SizedBox.shrink(),
+                      Text(
+                        "Stream $streamId",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      deleteButton(index),
+                    ],
                   ),
                   Expanded(
                     child: StreamGraph(

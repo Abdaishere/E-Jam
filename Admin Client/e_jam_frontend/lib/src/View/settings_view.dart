@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -244,35 +245,39 @@ class _SettingsViewState extends State<SettingsView> {
             color: Colors.grey,
           ),
         ),
-        child: ReorderableListView(
-          header: const Text(
-            'Dashboard Extensions',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            textAlign: TextAlign.center,
+        child: AbsorbPointer(
+          // if the drawer is open, absorb pointer to prevent bouncing while reordering
+          absorbing: ZoomDrawer.of(context)?.isOpen() ?? false,
+          child: ReorderableListView(
+            header: const Text(
+              'Dashboard Extensions',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            footer: const Text(
+              'Drag and drop to reorder, click icon to enable/disable.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12),
+            ),
+            children: SystemSettings.dashboardExtensionsOrder
+                .map(
+                  (e) => _extensionTile(e),
+                )
+                .toList(),
+            onReorder: (int oldIndex, int newIndex) async {
+              setState(() {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                final String item =
+                    SystemSettings.dashboardExtensionsOrder.removeAt(oldIndex);
+                SystemSettings.dashboardExtensionsOrder.insert(newIndex, item);
+              });
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setStringList('dashboardExtensionsOrder',
+                  SystemSettings.dashboardExtensionsOrder);
+            },
           ),
-          footer: const Text(
-            'Drag and drop to reorder, click icon to enable/disable.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 12),
-          ),
-          children: SystemSettings.dashboardExtensionsOrder
-              .map(
-                (e) => _extensionTile(e),
-              )
-              .toList(),
-          onReorder: (int oldIndex, int newIndex) async {
-            setState(() {
-              if (newIndex > oldIndex) {
-                newIndex -= 1;
-              }
-              final String item =
-                  SystemSettings.dashboardExtensionsOrder.removeAt(oldIndex);
-              SystemSettings.dashboardExtensionsOrder.insert(newIndex, item);
-            });
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setStringList('dashboardExtensionsOrder',
-                SystemSettings.dashboardExtensionsOrder);
-          },
         ),
       ),
     );

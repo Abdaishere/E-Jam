@@ -183,6 +183,8 @@ class _HomeState extends State<Home> {
       shadowLayer1Color: shadowColor,
       angle: 0.0,
       slideWidth: 280.0,
+      mainScreenScale: 0.28,
+      mainScreenAbsorbPointer: false,
       openCurve: Curves.easeIn,
       closeCurve: Curves.easeOut,
     );
