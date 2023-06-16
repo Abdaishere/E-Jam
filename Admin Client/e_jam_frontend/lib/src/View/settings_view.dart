@@ -18,25 +18,6 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  ZoomDrawerState? zoomDrawerState;
-  @override
-  initState() {
-    super.initState();
-    // set Listener to update the list when the drawer is opened/closed to enable/disable the AbsorbPointer
-    zoomDrawerState = ZoomDrawer.of(context);
-    zoomDrawerState?.stateNotifier.addListener(_reloader);
-  }
-
-  @override
-  void dispose() {
-    zoomDrawerState?.stateNotifier.removeListener(_reloader);
-    super.dispose();
-  }
-
-  void _reloader() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -242,7 +223,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
       ),
       const SizedBox(height: 10),
-      _dashboardExtensionsOrder(),
+      const DashboardExtensionsOrder(),
       const SizedBox(height: 15),
       const Divider(
         height: 15,
@@ -250,86 +231,6 @@ class _SettingsViewState extends State<SettingsView> {
         endIndent: 10,
       ),
     ];
-  }
-
-  Center _dashboardExtensionsOrder() {
-    return Center(
-      child: Container(
-        height: 190,
-        width: 350,
-        padding: const EdgeInsets.all(12),
-        foregroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(
-            color: Colors.grey,
-          ),
-        ),
-        child: AbsorbPointer(
-          // if the drawer is open, absorb pointer to prevent bouncing while reordering
-          absorbing: ZoomDrawer.of(context)?.isOpen() ?? false,
-          child: ReorderableListView(
-            header: const Text(
-              'Dashboard Extensions',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            footer: const Text(
-              'Drag and drop to reorder, click icon to enable/disable.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12),
-            ),
-            children: SystemSettings.dashboardExtensionsOrder
-                .map(
-                  (e) => _extensionTile(e),
-                )
-                .toList(),
-            onReorder: (int oldIndex, int newIndex) async {
-              setState(() {
-                if (newIndex > oldIndex) {
-                  newIndex -= 1;
-                }
-                final String item =
-                    SystemSettings.dashboardExtensionsOrder.removeAt(oldIndex);
-                SystemSettings.dashboardExtensionsOrder.insert(newIndex, item);
-              });
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setStringList('dashboardExtensionsOrder',
-                  SystemSettings.dashboardExtensionsOrder);
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  ListTile _extensionTile(String e) {
-    return ListTile(
-      leading: IconButton(
-        icon: const Icon(MaterialIcons.extension),
-        color: e[0] == '1' ? Colors.green : Colors.red,
-        onPressed: () async {
-          setState(() {
-            int index = SystemSettings.dashboardExtensionsOrder.indexOf(e);
-            if (e[0] == '1') {
-              SystemSettings.dashboardExtensionsOrder.removeAt(index);
-              e = '0${e.substring(1)}';
-              SystemSettings.dashboardExtensionsOrder.insert(index, e);
-            } else {
-              SystemSettings.dashboardExtensionsOrder.removeAt(index);
-              e = '1${e.substring(1)}';
-              SystemSettings.dashboardExtensionsOrder.insert(index, e);
-            }
-          });
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setStringList('dashboardExtensionsOrder',
-              SystemSettings.dashboardExtensionsOrder);
-        },
-      ),
-      key: Key(e),
-      title: Text(e.substring(1)),
-      textColor: e[0] == '1' ? null : Colors.red,
-      dense: true,
-    );
   }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -439,5 +340,115 @@ class _SettingsViewState extends State<SettingsView> {
         ),
       )
     ];
+  }
+}
+
+class DashboardExtensionsOrder extends StatefulWidget {
+  const DashboardExtensionsOrder({super.key});
+
+  @override
+  State<DashboardExtensionsOrder> createState() =>
+      _DashboardExtensionsOrderState();
+}
+
+class _DashboardExtensionsOrderState extends State<DashboardExtensionsOrder> {
+  ZoomDrawerState? zoomDrawerState;
+  @override
+  initState() {
+    super.initState();
+    // set Listener to update the list when the drawer is opened/closed to enable/disable the AbsorbPointer
+    zoomDrawerState = ZoomDrawer.of(context);
+    zoomDrawerState?.stateNotifier.addListener(_reloader);
+  }
+
+  @override
+  void dispose() {
+    zoomDrawerState?.stateNotifier.removeListener(_reloader);
+    super.dispose();
+  }
+
+  void _reloader() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        height: 190,
+        width: 350,
+        padding: const EdgeInsets.all(12),
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+            color: Colors.grey,
+          ),
+        ),
+        child: AbsorbPointer(
+          // if the drawer is open, absorb pointer to prevent bouncing while reordering
+          absorbing: ZoomDrawer.of(context)?.isOpen() ?? false,
+          child: ReorderableListView(
+            header: const Text(
+              'Dashboard Extensions',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+            footer: const Text(
+              'Drag and drop to reorder, click icon to enable/disable.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 12),
+            ),
+            children: SystemSettings.dashboardExtensionsOrder
+                .map(
+                  (e) => _extensionTile(e),
+                )
+                .toList(),
+            onReorder: (int oldIndex, int newIndex) async {
+              setState(() {
+                if (newIndex > oldIndex) {
+                  newIndex -= 1;
+                }
+                final String item =
+                    SystemSettings.dashboardExtensionsOrder.removeAt(oldIndex);
+                SystemSettings.dashboardExtensionsOrder.insert(newIndex, item);
+              });
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setStringList('dashboardExtensionsOrder',
+                  SystemSettings.dashboardExtensionsOrder);
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  ListTile _extensionTile(String e) {
+    return ListTile(
+      leading: IconButton(
+        icon: const Icon(MaterialIcons.extension),
+        color: e[0] == '1' ? Colors.green : Colors.red,
+        onPressed: () async {
+          setState(() {
+            int index = SystemSettings.dashboardExtensionsOrder.indexOf(e);
+            if (e[0] == '1') {
+              SystemSettings.dashboardExtensionsOrder.removeAt(index);
+              e = '0${e.substring(1)}';
+              SystemSettings.dashboardExtensionsOrder.insert(index, e);
+            } else {
+              SystemSettings.dashboardExtensionsOrder.removeAt(index);
+              e = '1${e.substring(1)}';
+              SystemSettings.dashboardExtensionsOrder.insert(index, e);
+            }
+          });
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setStringList('dashboardExtensionsOrder',
+              SystemSettings.dashboardExtensionsOrder);
+        },
+      ),
+      key: Key(e),
+      title: Text(e.substring(1)),
+      textColor: e[0] == '1' ? null : Colors.red,
+      dense: true,
+    );
   }
 }
