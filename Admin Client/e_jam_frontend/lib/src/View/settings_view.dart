@@ -234,6 +234,12 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   Center _dashboardExtensionsOrder() {
+    // set Listener to update the list when the drawer is opened/closed to enable/disable the AbsorbPointer
+    ZoomDrawerState? zoomDrawerState = ZoomDrawer.of(context);
+    zoomDrawerState?.stateNotifier.addListener(() {
+      setState(() {});
+    });
+
     return Center(
       child: Container(
         height: 190,

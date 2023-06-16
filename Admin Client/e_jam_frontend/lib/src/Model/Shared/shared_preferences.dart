@@ -94,6 +94,7 @@ class SystemSettings {
   static bool chartsAreRunning = true;
 
   static init() async {
+    WidgetsFlutterBinding.ensureInitialized();
     final pref = await SharedPreferences.getInstance();
 
     showChartsAnimation = pref.getBool('showChartsAnimation') ?? true;

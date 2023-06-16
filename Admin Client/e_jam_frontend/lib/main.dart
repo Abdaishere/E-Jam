@@ -39,8 +39,6 @@ void main() async {
       ),
     );
   };
-
-  WidgetsFlutterBinding.ensureInitialized();
   // init shared preferences
   SystemSettings.init();
 
