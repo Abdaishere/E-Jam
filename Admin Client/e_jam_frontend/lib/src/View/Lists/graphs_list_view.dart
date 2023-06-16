@@ -30,7 +30,7 @@ class _GraphsListViewState extends State<GraphsListView> {
               : FontAwesomeIcons.solidTrashCan,
           size: 20),
       color: selected == index ? Colors.green : Colors.red,
-      tooltip: 'Unpin Chart',
+      tooltip: selected == index ? 'Apply' : 'Unpin Chart',
       onPressed: () async {
         if (selected != index) {
           selected = index;

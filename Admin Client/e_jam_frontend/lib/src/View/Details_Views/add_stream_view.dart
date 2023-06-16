@@ -938,7 +938,7 @@ class _AddPresetStreamState extends State<AddPresetStream> {
               : FontAwesomeIcons.solidTrashCan,
           size: 20),
       color: selected == index ? Colors.green : Colors.red,
-      tooltip: 'Delete Preset',
+      tooltip: selected == index ? 'Apply' : 'Delete Preset',
       onPressed: () async {
         if (selected != index) {
           selected = index;
