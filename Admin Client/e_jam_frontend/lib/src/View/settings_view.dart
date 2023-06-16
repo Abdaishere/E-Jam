@@ -18,6 +18,25 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
+  ZoomDrawerState? zoomDrawerState;
+  @override
+  initState() {
+    super.initState();
+    // set Listener to update the list when the drawer is opened/closed to enable/disable the AbsorbPointer
+    zoomDrawerState = ZoomDrawer.of(context);
+    zoomDrawerState?.stateNotifier.addListener(_reloader);
+  }
+
+  @override
+  void dispose() {
+    zoomDrawerState?.stateNotifier.removeListener(_reloader);
+    super.dispose();
+  }
+
+  void _reloader() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,12 +253,6 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   Center _dashboardExtensionsOrder() {
-    // set Listener to update the list when the drawer is opened/closed to enable/disable the AbsorbPointer
-    ZoomDrawerState? zoomDrawerState = ZoomDrawer.of(context);
-    zoomDrawerState?.stateNotifier.addListener(() {
-      setState(() {});
-    });
-
     return Center(
       child: Container(
         height: 190,
