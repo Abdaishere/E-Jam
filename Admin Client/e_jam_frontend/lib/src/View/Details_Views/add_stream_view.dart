@@ -866,6 +866,7 @@ class AddPresetStream extends StatefulWidget {
 
 class _AddPresetStreamState extends State<AddPresetStream> {
   int selected = -1;
+  bool failed = false;
   @override
   Widget build(BuildContext context) {
     int totalItems = SystemSettings.savedStreams.length + 1;
@@ -880,10 +881,15 @@ class _AddPresetStreamState extends State<AddPresetStream> {
                 FontAwesomeIcons.solidFloppyDisk,
                 size: 32,
               ),
-              tooltip: 'Save Current Stream as Preset',
-              color: Colors.greenAccent.shade700,
+              tooltip: failed
+                  ? 'Failed to save stream, please check your inputs'
+                  : 'Save Current Stream as Preset',
+              color: failed
+                  ? Colors.redAccent.shade700
+                  : Colors.greenAccent.shade700,
               onPressed: () async {
                 try {
+                  failed = false;
                   StreamEntry newStreamPreset =
                       context.read<AddStreamController>().createStreamEntry();
 
@@ -896,7 +902,8 @@ class _AddPresetStreamState extends State<AddPresetStream> {
                   prefs.setStringList(
                       'savedStreams', SystemSettings.savedStreams);
                 } catch (e) {
-                  // Just do nothing in case of format exception
+                  failed = true;
+                  setState(() {});
                   return;
                 }
               },

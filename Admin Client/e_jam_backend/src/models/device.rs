@@ -1,5 +1,5 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
-use log::info;
+use log::{info, warn};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, time::Duration};
 use tokio::{sync::Mutex, task::JoinHandle};
@@ -185,7 +185,7 @@ this function is used to update the device status according to the status of the
                     _ => self.status.to_owned(),
                 }
             }
-            // if for some reason the number of processes is less than 0 then set the status of the device to offline
+            // if for some reason the number of processes is less than 0 then set the status of the device to offline (this should never happen)
             _ => self.status = DeviceStatus::Offline,
         }
 
@@ -238,9 +238,12 @@ this function is used to update the device status according to the status of the
     }
 
     pub fn remove_gen_process(&mut self) {
+    
         if self.gen_processes > 0 {
             self.gen_processes -= 1
-        };
+        } else {
+            warn!("Device {} has no generation processes to remove", self.get_device_mac());
+        }
     }
 
     pub fn add_ver_processes(&mut self) {
@@ -250,7 +253,9 @@ this function is used to update the device status according to the status of the
     pub fn remove_ver_processes(&mut self) {
         if self.ver_processes > 0 {
             self.ver_processes -= 1
-        };
+        } else {
+            warn!("Device {} has no verification processes to remove", self.get_device_mac());
+        }
     }
 
     #[doc = r"Find the device by name, ip address or mac address and return the device if found else return None
@@ -505,8 +510,7 @@ This is used to represent the status of the device
 * `Running` - the device is running a process
 * `Idle` - the device is idle
 ## Notes
-* `Offline` is the default value
-* `Online` is not used
+* `Online` is the default value
 * `Running` is used when the device is running a process
 * `Idle` is used when the device is idle and not running any process
 * `Offline` is used when the device is offline and unreachable"]
@@ -514,8 +518,8 @@ This is used to represent the status of the device
 #[serde(rename_all = "PascalCase")]
 pub enum DeviceStatus {
     #[default]
-    Offline,
     Online,
+    Offline,
     Running,
     Idle,
 }
