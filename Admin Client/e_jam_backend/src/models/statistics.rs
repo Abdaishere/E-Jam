@@ -1,6 +1,14 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+#[doc="## Generator Statistics
+The Generator Statistics represents the statistics of a generator process in a specific device and stream at a specific time.
+## Variants
+* `Mac Address` - The mac address of the device that is running the generator process
+* `Stream Id` - The id of the stream that the generator process is generating
+* `Packets Sent` - The number of packets that the generator process has sent
+* `Packets Errors` - The number of packets that the generator process has sent with errors
+* `Timestamp` - The time that the statistics were generated"]
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Generator {
@@ -36,6 +44,16 @@ impl Generator {
     }
 }
 
+#[doc="## Verifier Statistics
+The Verifier Statistics represents the statistics of a verifier process in a specific device and stream at a specific time.
+## Variants
+* `Mac Address` - The mac address of the device that is running the verifier process
+* `Stream Id` - The id of the stream that the verifier process is verifying
+* `Packets Correct` - The number of packets that the verifier process has verified as correct
+* `Packets Errors` - The number of packets that the verifier process has verified as errors
+* `Packets Dropped` - The number of packets that the verifier process has verified as dropped
+* `Packets Out Of Order` - The number of packets that the verifier process has verified as out of order
+* `Timestamp` - The time that the statistics were generated"]
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Verifier {

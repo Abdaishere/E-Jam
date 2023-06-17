@@ -1,9 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-#[doc = r"Processes that are running on the device either a verification process or a generation process
-each process has a status (Type: ProcessStatus) that can be one of the following
-Idle, Running, Offline, Paused, Completed, Failed
-each process has a name that is a string that represents both the name of the process and the device that is running the process (Device IP address + Port number)
+#[doc = r" ## ProcessType
+Processes that are running on the device either a verification process or a generation process or both
 ## Variants
 * `Generation` (the process is a generation process)
 * `Verification` (the process is a verification process)
@@ -16,11 +14,11 @@ pub enum ProcessType {
     GeneratingAndVerification,
 }
 
-#[doc = r"process status
+#[doc = r"## ProcessStatus
 a process has a status that represents the current state of the stream in the specific device
 each process has a type (Type: ProcessType) that can be one of the following
 Generation, Verification, GenerationAndVerification
-each process has a name that is a string that represents both the name of the process and the device that is running the process (Device IP address + Port number)
+each process has a Mac Address (MacAddress: string) that represents the mac address of the device that is running the process.
 ## Variants
 * `Queued` (the process is idle and waiting to be started)
 * `Running` (the process is running) 
