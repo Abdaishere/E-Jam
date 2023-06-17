@@ -2,8 +2,7 @@ use crate::models::statistics::{Generator, Verifier};
 use crate::{
     models::{device::Device, AppState, StreamEntry},
     services::statistics::{
-        GENERATOR_TOPIC, HOST, MAIN_BROKER_PORT, NAMESPACE, SCHEMA_REGISTRY_PORT,
-        VERIFIER_TOPIC,
+        GENERATOR_TOPIC, HOST, MAIN_BROKER_PORT, NAMESPACE, SCHEMA_REGISTRY_PORT, VERIFIER_TOPIC,
     },
 };
 use actix_web::web::Data;

@@ -1,7 +1,7 @@
 use chrono::{serde::ts_seconds, DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[doc="## Generator Statistics
+#[doc = "## Generator Statistics
 The Generator Statistics represents the statistics of a generator process in a specific device and stream at a specific time.
 ## Variants
 * `Mac Address` - The mac address of the device that is running the generator process
@@ -44,7 +44,7 @@ impl Generator {
     }
 }
 
-#[doc="## Verifier Statistics
+#[doc = "## Verifier Statistics
 The Verifier Statistics represents the statistics of a verifier process in a specific device and stream at a specific time.
 ## Variants
 * `Mac Address` - The mac address of the device that is running the verifier process

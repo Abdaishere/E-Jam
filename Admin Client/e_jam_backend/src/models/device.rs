@@ -87,7 +87,10 @@ pub struct Device {
     * check the IP_ADDRESS regex for more information
     "]
     #[validate(
-        regex(path = "IP_ADDRESS", message = "Device IP Address must be a valid ip address"),
+        regex(
+            path = "IP_ADDRESS",
+            message = "Device IP Address must be a valid ip address"
+        ),
         length(
             min = 7,
             max = 15,
@@ -140,7 +143,6 @@ pub struct Device {
     #[serde(default, skip_deserializing)]
     status: DeviceStatus,
 }
-
 
 impl Device {
     #[doc = r" ## Update The Device Status
@@ -226,11 +228,13 @@ this function is used to update the device status according to the status of the
     }
 
     pub fn remove_gen_process(&mut self) {
-    
         if self.gen_processes > 0 {
             self.gen_processes -= 1
         } else {
-            warn!("Device {} has no generation processes to remove", self.get_device_mac());
+            warn!(
+                "Device {} has no generation processes to remove",
+                self.get_device_mac()
+            );
         }
     }
 
@@ -242,7 +246,10 @@ this function is used to update the device status according to the status of the
         if self.ver_processes > 0 {
             self.ver_processes -= 1
         } else {
-            warn!("Device {} has no verification processes to remove", self.get_device_mac());
+            warn!(
+                "Device {} has no verification processes to remove",
+                self.get_device_mac()
+            );
         }
     }
 
@@ -308,7 +315,7 @@ this is used to get the device connection address in a tuple format (ip address,
         )
     }
 
-#[doc = r"## Send Stream
+    #[doc = r"## Send Stream
 this is used to send a stream to the device to start processing the stream and return the response from the device
 this is awaited in another thread to not block the main thread
 # Arguments
@@ -337,7 +344,7 @@ this is awaited in another thread to not block the main thread
         })
     }
 
-#[doc = r"## Stop Stream
+    #[doc = r"## Stop Stream
 this is used to stop a stream that is currently being processed by the device and return the response from the device
 this is awaited in another thread to not block the main thread
 # Arguments

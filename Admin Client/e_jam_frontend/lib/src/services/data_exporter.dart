@@ -257,16 +257,18 @@ class DataExporter {
     return rows;
   }
 
-  static saveAsCSV(List<List<dynamic>> data, String target) async {
+  static saveAsCSV(List<List<dynamic>> data, String dataType) async {
     String csv = const ListToCsvConverter().convert(data);
     //Create date now string
     String dateNow = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    String fileName = '${dataType}_$dateNow';
+
     // save file
-    File file = File('${target}_$dateNow.csv');
+    File file = File('$fileName.csv');
     file.writeAsString(csv);
   }
 
-  static saveAsPdf(List<List<dynamic>> data, String target) async {
+  static saveAsPdf(List<List<dynamic>> data, String dataType) async {
     if (data.isEmpty) {
       return;
     }
@@ -280,10 +282,11 @@ class DataExporter {
 
     //Create date now string
     String dateNow = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    String fileName = '${dataType}_$dateNow';
 
     //Draw text in the header.
     headerTemplate.graphics.drawString(
-      'E Jam for monitoring, testing, and debugging Switches.\n\t$dateNow',
+      'E Jam for monitoring, testing, and debugging Switches.\n\t$fileName',
       PdfStandardFont(PdfFontFamily.helvetica, 12),
       brush: PdfSolidBrush(PdfColor(36, 34, 34)),
       bounds: const Rect.fromLTWH(0, 0, 515, 50),
@@ -380,7 +383,7 @@ class DataExporter {
             0, 0, page.getClientSize().width, page.getClientSize().height));
 
     // Save the document.
-    File('${target}_$dateNow.pdf').writeAsBytes(await document.save());
+    File('$fileName.pdf').writeAsBytes(await document.save());
 
     // Dispose the document.
     document.dispose();
