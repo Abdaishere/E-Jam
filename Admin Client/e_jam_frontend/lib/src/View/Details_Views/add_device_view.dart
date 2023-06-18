@@ -346,7 +346,10 @@ class _MacAddressFieldState extends State<MacAddressField> {
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please enter a mac address for the Device';
-        } else if (!RegExp(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
+        } else if (RegExp(r"[._-]").hasMatch(value) ||
+            RegExp(r"^[0-9A-Fa-f]{12}$").hasMatch(value)) {
+          return 'Please enter a mac address with colons as separators';
+        } else if (!RegExp(r"^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$")
             .hasMatch(value)) {
           return 'Please enter a valid mac address for the Device';
         }

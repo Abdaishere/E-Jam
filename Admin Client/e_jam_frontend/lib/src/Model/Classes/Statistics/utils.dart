@@ -68,13 +68,12 @@ class Utils {
         : 0;
   }
 
-  /// get speed approximation in bytes per second
-  /// Assuming that the statistics are collected every second and the packet size is 1500 bytes (default)
-  /// we can calculate the speed by dividing the number of packets sent by the number of seconds
-  /// and then multiplying by the packet size.
-  /// The speed is then mapped to a value between 0 and 100.
-  static const upperBound =
-      404800; // 100 Mbps in bytes per second for default size per packet.
+// Assuming a standard Ethernet frame size of 1500 bytes,
+// a 10/100/1000 Ethernet port can transfer up to approximately 1.48 million packets per second at 10 Mbps,
+// up to approximately 14.88 million packets per second at 100 Mbps,
+// and up to approximately 148.81 million packets per second at 1000 Mbps (or 1 Gbps).
+// Maybe add a setting for the max packets per second for upper bound
+  static const upperBound = 1e5;
   static SpeedInfoWrapper getUploadSpeed(
       List<GeneratorStatisticsInstance> generatorStatistics,
       List<VerifierStatisticsInstance> verifierStatistics) {
