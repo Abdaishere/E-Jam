@@ -306,7 +306,7 @@ this is also use to mimic the behavior of another device by changing the name of
     #[doc = r"## Get the Device Connection Address
 this is used to get the device connection address in a tuple format (ip address, port, mac address)
 # Returns
-* `(String, u16, String)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
+* `(ip address, port, mac address)` - the device connection address Ip of the device host and port of the device host and the MAC address of the card used in testing"]
     pub fn get_device_info_tuple(&self) -> (String, u16, String) {
         (
             self.get_ip_address().to_owned(),

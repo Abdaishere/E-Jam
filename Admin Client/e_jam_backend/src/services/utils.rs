@@ -47,7 +47,7 @@ pub async fn handle_starting_connections(
 
     // get the number of devices that are running the stream and return it
     let counter = stream_entry
-        .update_received_devices_result(true, results)
+        .update_received_devices_result(results, true)
         .await;
 
     if stream_entry.get_stream_status() == &StreamStatus::Sent {
@@ -105,6 +105,6 @@ pub async fn handle_stopping_connections(
 
     // get the number of devices that are running the stream and return it
     stream_entry
-        .update_received_devices_result(false, results)
+        .update_received_devices_result(results, false)
         .await
 }

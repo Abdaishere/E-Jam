@@ -1,3 +1,4 @@
+use chrono::Duration;
 use log::{debug, error, info, warn};
 
 use tokio::task::JoinHandle;
@@ -21,13 +22,13 @@ use tokio::sync::Mutex;
 use validator::Validate;
 
 lazy_static! {
-    #[doc = r"Regex for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters example of a valid stream id: 123, abc, 1a2, 1A2, 1aB, 1Ab, 1AB, _1A, _1a, _1_, _1a2, _1A2, _1aB, _1Ab, _1AB"]
+    #[doc = r"Regex for the stream id that is used to identify the stream to user. URL-friendly max is 3 characters. Example of a valid stream id: 123, abc, 1a2, 1A2, 1aB, 1Ab, 1AB, _1A, _1a, _1_, _1a2, _1A2, _1aB, _1Ab, _1AB"]
     static ref STREAM_ID : Regex = Regex::new(r"^[A-Za-z0-9_~-]{3}$").unwrap();
 
-    #[doc = r"Regex for the mac address of the device's mac address example of a valid mac address: 00:00:00:00:00:00, 00-00-00-00-00-00"]
-    static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$").unwrap();
+    #[doc = r"Regex for the mac address of the device's mac address. Example of a valid mac address: 00:00:00:00:00:00, AA:AA:AA:AA:AA:AA"]
+    static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$").unwrap();
 
-    #[doc = r"Regex for the ip address of the device's ip address example of a valid ip address: 192.168.01.1, 192.168.1.00"]
+    #[doc = r"Regex for the ip address of the device's ip address. Example of a valid ip address: 192.168.01.1, 192.168.1.00"]
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();
 
     #[doc="Runtime that is used to spawn the threads that are used to send the requests to the systemAPI"]
@@ -35,10 +36,10 @@ lazy_static! {
 }
 
 #[doc = " # handler
-this is a holder for tuple that contains the device details and the JoinHandle for the thread that is used to send the request to the device
+this is a holder for a tuple that contains the device details and the JoinHandle for the thread that is used to send the request to that device
 ## Values
-* `(String, u16, String, ProcessType)` - A tuple that contains the device details (ip address, port, mac address and process type)
-*  the JoinHandle for the thread that is used to send the request to the device
+* `connections` - A tuple that contains the device details `(ip,  mac, process_type)`
+*  `handle` - the JoinHandle for the thread that is used to send the request to the device
 "]
 pub struct Handler {
     pub connections: (String, String, ProcessType),
@@ -47,25 +48,25 @@ pub struct Handler {
 
 #[doc = r" # App State
 The state of the Server that is shared between all the threads of the server
-This is used to store the list of all the devices that are connected to the server and the list of all the streams and the list of all the streams that are currently Queued to be started on the devices
-This is also used to store the counter for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters
+This is used to store the list of all the devices that are connected to the server, and the list of all the stream entries, and the list of all the streams that are currently Queued to be started on the devices
+This is also used to store the counter for the stream id, that is used to identify the stream in the device
 All the values are wrapped in a Mutex to allow for thread safe access to the values from all the threads of the server.
 ## Values
-* `streams_entries` - A HashMap of StreamEntry struct that represents the list of all the streams that are currently running on the devices
-* `queued_streams` - A HashMap of Strings that represents the list of all the streams that are currently Queued to be started on the devices
-* `device_list` - A HashMap of Device struct that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
-* `stream_id_counter` - A u32 that represents the counter for the stream id that is used to identify the stream in the device must be 3 URL-friendly characters"]
+* `Streams Entries` - A HashMap of StreamEntry struct that represents the list of all the streams that are currently running on the devices (stream id, stream entry)
+* `Queued Streams` - A HashMap of Strings that represents the list of all the streams that are currently Queued to be started on the devices
+* `Device List` - A HashMap of Device struct that represents the list of all the devices that are currently connected to the server (mac address, device name and ip address)
+* `Stream Id Counter` - A Number that represents the counter for the stream id that is used to identify the stream"]
 pub struct AppState {
     pub stream_entries: Mutex<HashMap<String, StreamEntry>>,
 
-    #[doc = r"List of all the streams that are currently Queued to be started on the devices"]
+    #[doc = r"List of all the streams that are currently Queued to be started on the devices (stream id, stream entry)"]
     pub queued_streams: Mutex<HashMap<String, DateTime<Utc>>>,
 
     #[doc = r"List of all the devices that are currently connected to the server (mac address, device name and ip address)"]
     pub device_list: Mutex<HashMap<String, Device>>,
 
-    #[doc = r"Counter for the stream id that is used to identify the stream in the device must be URL-friendly max is 3 characters"]
-    pub stream_id_counter: Mutex<usize>,
+    #[doc = r"Counter for the stream id that is used to identify the stream in the device"]
+    pub stream_id_counter: Mutex<u32>,
 }
 
 impl Default for AppState {
@@ -79,109 +80,92 @@ impl Default for AppState {
     }
 }
 
-#[doc = r" # Stream Entry
-The StreamEntry struct is used to store the information about the stream with its status and the status of the devices that are running the stream
-Notice: The stream Data is sent in camelCase naming style
-
+#[doc = r" ## Stream Entry
+The Stream Entry struct is used to store the information about the stream with its status, and the status of the processes that are running the stream
 ## Values
-
-- `stream_id` - A String that represents the id of the stream that is used to identify the stream in the device, must be URL-friendly, max is 3 bytes (36^3 = 46656)
-- `name` - A String that represents the name of the stream (used for clarification)
-- `description` - A String that represents the description of the stream (used for clarification)
-- `last_updated` - A DateTime in Utc that represents the last time that the stream was updated (used for clarification)
-- `start_time` - A DateTime in Utc that represents the time that the stream will start (notified by the systemAPI)
-- `end_time` - A DateTime in Utc that represents the time that the stream will end (is predicted by the server)
-- `delay` - A u64 that represents the time in ms that the stream will wait before starting
-- `time_to_live` - A u64 that represents the time to live that will be used for the stream
-- `broadcast_frames` - A u64 that represents the number of broadcast frames that will be sent in the stream
-- `generators_ids` - A Vec of Strings that represents the ids of the devices that will generate the stream (priority of ID is in this order (LTR), mac, ip, name)
-- `verifiers_ids` - A Vec of Strings that represents the ids of the devices that will verify the stream (priority of ID is in this order (LTR), mac, ip, name)
-- `number_of_packets` - A u64 that represents the number of packets that will be sent in the stream
-- `flow_type` - A FlowType that represents the flow type that will be used for the stream (BtB, Bursts) **changes through the stream**
-- `payload_length` - A u16 that represents the length of the payload that will be used in the stream **changes through the stream**
-- `payload_type` - A u8 that represents the type of the payload that will be used in the stream (0, 1, 2)
-- `burst_length` - A u64 that represents the length of the burst that will be used in the stream
-- `burst_delay` - A u64 that represents the delay between each burst that will be used in the stream
-- `seed` - A u64 that represents the seed that will be used to generate the payload
-- `inter_frame_gap` - A u64 that represents the time in ms that will be waited between each frame **changes through the stream**
-- `transport_layer_protocol` - A TransportLayerProtocol that represents the transport layer protocol that will be used for the stream (TCP, UDP)
-- `check_content` - A bool that represents if the content of the packets will be checked
-- `running_generators` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status) (used for clarification)
-- `running_verifiers` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a verifier and their status (mac address of the card used in testing, Process Status) (used for clarification)
-- `stream_status` - A StreamStatus that represents the status of the stream.
+- `Stream Id` - A String that represents the id of the stream that is used to identify the stream in the system
+- `Name` - A String that represents the name of the stream (used for clarification)
+- `Description` - A String that represents the description of the stream (used for clarification)
+- `Last Updated` - A DateTime in Utc that represents the last time that the stream was updated (used for clarification)
+- `Start Time` - A DateTime in Utc that represents the time that the stream will start (notified by the systemAPI)
+- `End Time` - A DateTime in Utc that represents the time that the stream will end (is predicted by the server)
+- `Delay` - A Number that represents the time in ms that the stream will wait before starting
+- `Time To Live` - A Number that represents the time to live that will be used for the stream also known as the duration of the stream
+- `Broadcast Frames` - A Number that represents the number of broadcast frames that will be sent in the stream
+- `Generators Ids` - A Vec of Strings that represents the ids of the devices that will generate the stream (priority of ID when searching is in this order (LTR), mac, ip, name)
+- `Verifiers Ids` - A Vec of Strings that represents the ids of the devices that will verify the stream (priority of ID when searching is in this order (LTR), mac, ip, name)
+- `Number Of Packets` - A Number that represents the number of packets that will be sent in the stream
+- `Flow Type` - A Flow Type Enumerator that represents the flow type that will be used for the stream (BtB, Bursts)
+- `Payload Length` - A Number that represents the length of the payload that will be used in the stream
+- `Payload Type` - A Number that represents the type of the payload that will be used in the stream (0, 1, 2)
+- `Burst Length` - A Number that represents the length of the burst that will be used in the stream
+- `Burst_Delay` - A Number that represents the delay between each burst that will be used in the stream
+- `Seed` - A Number that represents the seed that will be used to generate the payload
+- `Inter Frame Gap` - A Number that represents the time in ms that will be waited between each frame
+- `Transport Layer Protocol` - A Transport Layer Protocol Enumerator that represents the transport layer protocol that will be used for the stream (TCP, UDP)
+- `Check Content` - A boolean that represents if the content of the packets will be checked
+- `Running Generators` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a generator and their status (mac address of the card used in testing, Process Status) (used for clarification)
+- `Running Verifiers` - A HashMap (String, ProcessStatus) that represents the list of all the devices that are currently running the stream as a verifier and their status (mac address of the card used in testing, Process Status) (used for clarification)
+- `Stream Status` - A Stream Status Enumerator that represents the status of the stream (Check the Stream Status Enumerator for more information)
 "]
 #[derive(Validate, Serialize, Deserialize, Default, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct StreamEntry {
     #[doc = r" ## Name
-    Name of the stream (used for clarification)
+    Name of the stream (used for clarification).
     ## Constraints
-    * The name must be greater than 0 characters long
-    * The name must be less than 50 characters long
-    "]
-    #[validate(length(
-        min = 0,
-        max = 50,
-        message = "Name must be between 0 and 50 characters long"
-    ))]
+    * The name must be less than 50 characters long"]
+    #[validate(length(max = 50, message = "Name must be less than 50 characters long"))]
     #[serde(default)]
     name: String,
 
     #[doc = r" ## Description
-    Description of the stream (used for clarification)
+    Description of the stream (used for clarification).
     ## Constraints
-    * The description must be greater than 1 characters long
-    * The description must be less than 255 characters long
-    "]
+    * The description must be less than 255 characters long"]
     #[validate(length(
-        min = 0,
         max = 255,
-        message = "Description must be between 0 and 255 characters long"
+        message = "Description must be less than 255 characters long"
     ))]
     #[serde(default)]
     description: String,
 
     #[doc = r" ## Last Updated
-    Last time that the stream was updated
-    this is updated when the stream Status is updated by the server
-    "]
+    Last time that the stream was updated.
+    this is updated when the stream Status is updated by the server."]
     #[serde(with = "ts_seconds", default = "Utc::now", skip_deserializing)]
     last_updated: DateTime<Utc>,
 
     #[doc = r" ## Start Time
-    This is updated when the stream is started with the time the first device starts the stream
-    This is an optional field and can be left empty and will be updated automatically when the stream is first started
-    "]
+    This is updated when the stream is started with the time the first device starts the stream.
+    This is an optional field and can be left empty and will be updated automatically when the stream is first started."]
     #[serde(default, skip_deserializing)]
     #[serde(with = "ts_seconds_option")]
     start_time: Option<DateTime<Utc>>,
 
     #[doc = r" ## End Time
-    This is updated when the stream is finished with the time the last device finishes the stream
-    This is an optional field and can be left empty and will be updated automatically when the stream is last finished
-    "]
+    This is updated when the stream is finished with the time the last device finishes the stream.
+    This is an optional field and can be left empty and will be updated automatically by the server as a prediction when the stream will end."]
     #[serde(default, skip_deserializing)]
     #[serde(with = "ts_seconds_option")]
     end_time: Option<DateTime<Utc>>,
 
     #[doc = r" ## Delay
     This the delay in ms that the stream will wait before starting it
-    (can be 0 for no delay or force start the stream)
+    (can be 0 for no delay, or to force start the stream).
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[serde(default)]
     #[validate(range(min = 0, message = "Delay must be greater than or equal to 0"))]
     delay: u64,
 
     #[doc = r" ## Stream ID
-    This is the id of the stream that is used to identify the stream in the device, must be URL-friendly, max is 3 characters
-    The stream id is generated by the server and is unique or can be given by the user (if the user gives the id it must be unique)
+    This is the id of the stream that is used to identify the stream in the device. Must be URL-friendly. Length is 3 characters.
+    The stream id is generated by the server, and is unique or can be given by the user (if the user gives the id, it must be unique).
     ## Constraints
     * Must be given (length is 3)
-    * Must be URL-friendly ((\w) by user, (A-Za-z0-9_~) by the server)
-    * check the regex `STREAM_ID` for more details
-    "]
+    * Must be URL-friendly ([\w] by user, [A-Za-z0-9_~] by the server)
+    * check the regex `STREAM_ID` for more details on the constraints"]
     #[validate(regex(
         path = "STREAM_ID",
         message = "Stream ID must be URL-friendly and 3 characters long"
@@ -191,28 +175,25 @@ pub struct StreamEntry {
 
     #[doc = r" ## Generators IDs
     This is the list of all the devices that will generate the stream insured by the user
-    (priority of ID is in this order (LTR), mac, ip, name)
+    (priority of ID when searching a device is in this order (LTR), mac, ip, name).
     ## Constraints
-    * Must be given (min length is 1)
-    "]
-    #[validate(length(min = 1, message = "number of Generators must be greater than 0"))]
+    * Must be given (min length is 1)"]
+    #[validate(length(min = 1, message = "Number of Generators must be greater than 0"))]
     generators_ids: Vec<String>,
 
     #[doc = r" ## Verifiers IDs
     This is the list of all the devices that will verify the stream insured by the user
-    (priority of ID is in this order (LTR), mac, ip, name)
+    (priority of ID when searching a device is in this order (LTR), mac, ip, name).
     ## Constraints
-    * Must be given (min length is 1)
-    "]
-    #[validate(length(min = 1, message = "number of Verifiers must be greater than 0"))]
+    * Must be given (min length is 1)"]
+    #[validate(length(min = 1, message = "Number of Verifiers must be greater than 0"))]
     verifiers_ids: Vec<String>,
 
     #[doc = r" ## Payload Type
-    This is the type of payload that will be used during the stream
-    0 for IPV4, 1 for IPV6 or 2 for Random Bytes
+    This is the type of payload that will be used during the stream (IPV4, IPV6, Random Bytes),
+    0 for IPV4, 1 for IPV6 or 2 for Random Bytes.
     ## Constraints
-    * Must be 0, 1 or 2
-    "]
+    * Must be 0, 1 or 2"]
     #[validate(range(
         min = 0,
         max = 2,
@@ -224,8 +205,7 @@ pub struct StreamEntry {
     #[doc = r" ## Burst Length
     This is the length of the burst that will be generated in the stream (in ms)
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(min = 0, message = "Burst Length must be greater than or equal to 0"))]
     #[serde(default)]
     burst_length: u64,
@@ -233,17 +213,15 @@ pub struct StreamEntry {
     #[doc = r" ## Burst Delay
     This is the delay between bursts that will be generated in the stream (in ms)
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(min = 0, message = "Burst Delay must be greater than or equal to 0"))]
     #[serde(default)]
     burst_delay: u64,
 
     #[doc = r" ## Number of Packets
-    This is the number of packets that will be sent in the stream
+    This is the number of packets that will be sent during the stream execution (0 for infinite)
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(
         min = 0,
         message = "Number of Packets must be greater than or equal to 0"
@@ -254,8 +232,7 @@ pub struct StreamEntry {
     #[doc = r" ## Payload Length
     This is the length of the payload that will be used in the stream
     ## Constraints
-    * Must be between 0 and 1500
-    "]
+    * Must be between 0 and 1500"]
     #[validate(range(
         min = 0,
         max = 1500,
@@ -265,20 +242,18 @@ pub struct StreamEntry {
     payload_length: u64,
 
     #[doc = r" ## Seed
-    This is the seed that will be used to generate the packets during the stream
+    This is the seed that will be used to generate the packets during the stream execution
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(min = 0, message = "Seed must be greater than or equal to 0"))]
     #[serde(default)]
     seed: u64,
 
     #[doc = r" ## Broadcast Frames
-    This is the number of broadcast frames that will be sent during the stream
-    send broadcast frames every broadcast_frames packets
+    This is the number of broadcast frames that will be sent during the stream execution (also known as Broadcast Frames Frequency).
+    Send broadcast frames every broadcast_frames.
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(
         min = 0,
         message = "Broadcast Frames must be greater than or equal to 0"
@@ -290,8 +265,7 @@ pub struct StreamEntry {
     This is the inter frame gap between packets in the stream
     Inter frame gap in milliseconds
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(
         min = 0,
         message = "Inter Frame Gap must be greater than or equal to 0"
@@ -299,54 +273,48 @@ pub struct StreamEntry {
     #[serde(default)]
     inter_frame_gap: u64,
 
-    #[doc = r" ## Time to Live for the packets (also called Time to run)
-    This is the time the stream will live for in the device
-    time to live in milliseconds
+    #[doc = r" ## Time to Live
+    This is the time the stream will live for in the device (also called Duration).
+    time to live in milliseconds (0 for infinite)
     ## Constraints
-    * Must be greater than or equal to 0
-    "]
+    * Must be greater than or equal to 0"]
     #[validate(range(min = 0, message = "Time to Live must be greater than or equal to 0"))]
     time_to_live: u64,
 
     #[doc = r" ## Transport Layer Protocol
-    This is the transport layer protocol that will be used in the stream
+    This is the transport layer protocol that will be used to send the packets in the stream (TCP, UDP).
     ## Constraints
-    * Must be TCP, UDP
-    "]
+    * Must be TCP, UDP"]
     #[serde(default)]
     transport_layer_protocol: TransportLayerProtocol,
 
     #[doc = r" ## Flow Type
-    This is the Flow Type that will be used in the stream
+    This is the Type of flow that will be used to send the packets in the stream (BtB, Burst).
     ## Constraints
-    * Must be BtB, Burst
-    "]
+    * Must be BtB, Burst"]
     #[serde(default)]
     flow_type: FlowType,
 
     #[doc = r" ## Check Content
-    This is the check content that will be used in the stream
-    check the content of the payload or not
+    This is the boolean that will be used to determine if the verifier should
+    check the content of the payload or not.
     ## Constraints
-    * Must be boolean
-    "]
+    * Must be boolean"]
     #[serde(default)]
     check_content: bool,
 
     #[doc = r" ## Running Generators
-    This is the list of all the Process that are generating the stream (mac_address of the device, process status)
-    "]
+    This is the HashMap of all the Processes that are generating the stream (mac_address of the device, process status)"]
     #[serde(default, skip_deserializing)]
     running_generators: HashMap<String, ProcessStatus>,
 
     #[doc = r" ## Running Verifiers
-    This is the list of all the Process that are verifying the stream (mac_address of the device, process status)
-    "]
+    This is the HashMap of all the Processes that are verifying the stream (mac_address of the device, process status)"]
     #[serde(default, skip_deserializing)]
     running_verifiers: HashMap<String, ProcessStatus>,
 
     #[doc = r" ## Stream Status
-    This is the state that the stream is in at any given time in the system (see the state machine below)
+    This is the state that the stream is in at any given time in the system, which is used to determine what to do with the stream.
     ## see also
     The stream state machine: ./docs/stream_state_machine.png"]
     #[serde(default, skip_deserializing)]
@@ -356,18 +324,16 @@ pub struct StreamEntry {
 #[doc = r" # Implementation of the StreamEntry struct that contains all the information about the stream and the functions that are used to manipulate the stream"]
 impl StreamEntry {
     #[doc = r" ## Generate New Stream ID
-This function is used to generate a new id for the stream and check if the id is unique.
-The function uses the nanoid crate to generate a random id of length 3.
-The Id is random to lower the chances of having the same id for two different streams (reducing hits).
-In other words being random is less predictable than being sequential and the user is able to add random Id (Always act like the user).
-## Arguments
-* `stream_id_counter` - A reference to a Mutex for u32 that is used to generate the id of the stream
-* `streams_entries` - A reference to a Mutex for Vec of StreamEntry that is used to check if the id of the stream is unique
-## Returns
-changes the stream_id of the stream to a new id"]
+    This function is used to generate a new id for the stream and check if the id is unique.
+    The function uses the nanoid crate to generate a random id of length 3.
+    The Id is random to lower the chances of having the same id for two different streams (reducing hits).
+    In other words being random is less predictable than being sequential and the user adds random Ids (act like the user).
+    ## Arguments
+    * `stream_id_counter` - How many stream ids have been generated so far
+    * `streams_entries` - A reference to a Mutex for Vec of StreamEntry that is used to check if the id of the stream is unique"]
     pub async fn generate_stream_id(
         &mut self,
-        stream_id_counter: &Mutex<usize>,
+        stream_id_counter: &Mutex<u32>,
         streams_entries: &Mutex<HashMap<String, StreamEntry>>,
     ) {
         debug!("Generating stream id for stream");
@@ -390,8 +356,8 @@ changes the stream_id of the stream to a new id"]
                     let mut generated_stream_ids_counter = stream_id_counter.lock().await;
 
                     *generated_stream_ids_counter += 1;
-                    debug!(
-                        "generated id {}, total ids generated {}",
+                    info!(
+                        "Generated stream id {}, total ids generated {}",
                         id, *generated_stream_ids_counter
                     );
                     self.stream_id = id;
@@ -402,19 +368,17 @@ changes the stream_id of the stream to a new id"]
     }
 
     #[doc = r" ## Notify Process Running
-The notify_process_running function is used to update the stream status to Running and update the devices that are notifying the server that they have started the stream.
-The Device notifies once if it was both a generator and verifier in the specified stream.
-## Arguments
-* `card_mac` - the mac address of the card used in testing and has Started
-* `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server
-## Returns
-changes the stream_status to Running and updates the device status to Running"]
+    The notify_process_running function is used to update the stream status to Running and update the devices that are notifying the server that they have started the stream.
+    The Device notifies once if it was both a generator and verifier in the specified stream.
+    ## Arguments
+    * `device_mac` - The mac address of the device used in the stream that has Started
+    * `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server"]
     pub async fn notify_process_running(
         &mut self,
-        card_mac: &str,
+        device_mac: &str,
         device_list: &Mutex<HashMap<String, Device>>,
     ) {
-        let device = Device::find_device(card_mac, device_list).await;
+        let device = Device::find_device(device_mac, device_list).await;
 
         match device {
             Some(device) => {
@@ -425,14 +389,14 @@ changes the stream_status to Running and updates the device status to Running"]
                 */
                 if self.stream_status == StreamStatus::Sent {
                     self.running_generators
-                        .insert(card_mac.to_string(), ProcessStatus::Queued);
+                        .insert(device_mac.to_string(), ProcessStatus::Queued);
                 }
 
-                let process = self.running_generators.get(card_mac);
+                let process = self.running_generators.get(device_mac);
 
                 if process.is_some() {
                     self.running_generators
-                        .get_mut(card_mac)
+                        .get_mut(device_mac)
                         .unwrap()
                         .clone_from(&ProcessStatus::Running);
 
@@ -454,13 +418,13 @@ changes the stream_status to Running and updates the device status to Running"]
                 */
                 if self.stream_status == StreamStatus::Sent {
                     self.running_verifiers
-                        .insert(card_mac.to_string(), ProcessStatus::Queued);
+                        .insert(device_mac.to_string(), ProcessStatus::Queued);
                 }
 
-                let process = self.running_verifiers.get(card_mac);
+                let process = self.running_verifiers.get(device_mac);
                 if process.is_some() {
                     self.running_verifiers
-                        .get_mut(card_mac)
+                        .get_mut(device_mac)
                         .unwrap()
                         .clone_from(&ProcessStatus::Running);
 
@@ -485,17 +449,15 @@ changes the stream_status to Running and updates the device status to Running"]
     }
 
     #[doc = r" ## Notify Process Completed
-this will update the stream status according to the devices that are still running
-if there are no devices left, the stream status will be set to stopped
-if there are devices left, the stream status will be set to finished
-## Arguments
-* `card_mac` - the mac address of the card used in testing and has finished
-* `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server
-## Panics
-* `Error: Failed to lock the device list` - if the device list is locked"]
+    This will update the stream status according to the devices that are still running
+    if there are no devices left, the stream status will be set to stopped
+    if there are devices left, the stream status will be set to finished
+    ## Arguments
+    * `device_mac` - The mac address of the device used in the stream that has finished
+    * `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server"]
     pub async fn notify_process_completed(
         &mut self,
-        card_mac: &str,
+        device_mac: &str,
         device_list: &Mutex<HashMap<String, Device>>,
     ) {
         /*
@@ -507,7 +469,7 @@ if there are devices left, the stream status will be set to finished
         if it is, mark the generator as completed
         */
 
-        let device = Device::find_device(card_mac, device_list).await;
+        let device = Device::find_device(device_mac, device_list).await;
 
         match device {
             Some(device) => {
@@ -518,14 +480,14 @@ if there are devices left, the stream status will be set to finished
                 */
                 if self.stream_status == StreamStatus::Sent {
                     self.running_generators
-                        .insert(card_mac.to_string(), ProcessStatus::Running);
+                        .insert(device_mac.to_string(), ProcessStatus::Running);
                 }
 
-                let process = self.running_generators.get(card_mac);
+                let process = self.running_generators.get(device_mac);
 
                 if process.is_some() {
                     self.running_generators
-                        .get_mut(card_mac)
+                        .get_mut(device_mac)
                         .unwrap()
                         .clone_from(&ProcessStatus::Completed);
 
@@ -548,13 +510,13 @@ if there are devices left, the stream status will be set to finished
                 */
                 if self.stream_status == StreamStatus::Sent {
                     self.running_verifiers
-                        .insert(card_mac.to_string(), ProcessStatus::Running);
+                        .insert(device_mac.to_string(), ProcessStatus::Running);
                 }
 
-                let process = self.running_verifiers.get(card_mac);
+                let process = self.running_verifiers.get(device_mac);
                 if process.is_some() {
                     self.running_verifiers
-                        .get_mut(card_mac)
+                        .get_mut(device_mac)
                         .unwrap()
                         .clone_from(&ProcessStatus::Completed);
 
@@ -582,23 +544,11 @@ if there are devices left, the stream status will be set to finished
     }
 
     #[doc = r" ## Sync Stream Status
-The sync_stream_status function is used to update the stream status according to the devices that are still running
-if there are no devices left, the stream status will be set to stopped"]
+    The sync_stream_status function is used to update the stream status according to the devices that are still running
+    if there are no devices left, the stream status will be set to stopped"]
     fn sync_stream_status(&mut self) {
         // check if there are any other generators running in the stream
         // if there are no other generators running, set the stream status to Stopped
-        let working_generators = self
-            .running_generators
-            .values()
-            .filter(|x| **x == ProcessStatus::Running)
-            .count();
-
-        let working_verifiers = self
-            .running_verifiers
-            .values()
-            .filter(|x| **x == ProcessStatus::Running)
-            .count();
-
         let finished_generators = self
             .running_generators
             .values()
@@ -611,7 +561,21 @@ if there are no devices left, the stream status will be set to stopped"]
             .filter(|x| **x == ProcessStatus::Completed)
             .count();
 
-        if finished_generators + finished_verifiers > 0 {
+        let working_generators = self
+            .running_generators
+            .values()
+            .filter(|x| **x == ProcessStatus::Running || **x == ProcessStatus::Queued)
+            .count();
+
+        let working_verifiers = self
+            .running_verifiers
+            .values()
+            .filter(|x| **x == ProcessStatus::Running || **x == ProcessStatus::Queued)
+            .count();
+
+        if finished_generators + finished_verifiers > 0
+            && working_generators + working_verifiers == 0
+        {
             self.update_stream_status(StreamStatus::Finished);
         } else if working_generators + working_verifiers == 0 {
             self.update_stream_status(StreamStatus::Stopped);
@@ -619,12 +583,12 @@ if there are no devices left, the stream status will be set to stopped"]
     }
 
     #[doc = r" ## Send Stream
-The send_stream function is used to send the stream to the devices that will generate and verify the stream
-## Arguments
-* `delayed` - A bool that represents if the stream will be delayed or not
-* `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
-## Errors
-* `reqwest::Error` - An error that is returned if the request failed"]
+    The send_stream function is used to send the stream to the devices that will generate or verify the stream
+    ## Arguments
+    * `delayed` - A bool that represents if the stream will be delayed or not
+    * `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
+    ## Returns
+    * `Vec<Handler>` - A vector of Handler struct that contains the result of the requests sent to the devices with device info and join handle for the request"]
     pub async fn send_stream(
         &mut self,
         delayed: bool,
@@ -656,15 +620,17 @@ The send_stream function is used to send the stream to the devices that will gen
 
             verifiers_macs.push(mac);
 
-            if let std::collections::hash_map::Entry::Vacant(e) =
-                target_devices_pool.entry(ip_address.to_owned())
-            {
-                e.insert(vec![(receiver, ProcessType::Verification)]);
-            } else {
+            // add the device to the list of devices that need to receive the request if it already exists, it will be overwritten
+            if target_devices_pool.contains_key(&ip_address) {
                 target_devices_pool
                     .get_mut(&ip_address)
                     .unwrap()
                     .push((receiver, ProcessType::Verification));
+            } else {
+                target_devices_pool.insert(
+                    ip_address.to_owned(),
+                    vec![(receiver, ProcessType::Verification)],
+                );
             }
         }
 
@@ -688,31 +654,34 @@ The send_stream function is used to send the stream to the devices that will gen
             generators_macs.push(mac);
 
             // add the device to the list of devices that need to receive the request if it already exists, it will be overwritten
-            if let std::collections::hash_map::Entry::Vacant(e) =
-                target_devices_pool.entry(ip_address.to_owned())
-            {
-                e.insert(vec![(receiver, ProcessType::Generation)]);
-            } else {
+            if target_devices_pool.contains_key(&ip_address) {
                 target_devices_pool
                     .get_mut(&ip_address)
                     .unwrap()
                     .push((receiver, ProcessType::Generation));
+            } else {
+                target_devices_pool.insert(
+                    ip_address.to_owned(),
+                    vec![(receiver, ProcessType::Generation)],
+                );
             }
         }
+
         self.update_stream_status(StreamStatus::Sent);
+
         let stream_details = self.get_stream_details(delayed, generators_macs, verifiers_macs);
         self.send_stream_to_devices(target_devices_pool, device_list, stream_details)
             .await
     }
 
     #[doc = r" ## Send Stream To Devices
-The send_stream_to_devices function is used to send the stream to the devices that will generate and verify the stream and return a list of JoinHandles
-## Arguments
-* `target_devices_pool` - A HashMap that contains the IP address of the devices as keys and a Vec of tuples that contain the index of the device in the device list and the ProcessType as values
-* `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
-* `stream_details` - A StreamDetails struct that contains the details of the stream
-## Returns
-* `Vec<JoinHandle<()>>` - A list of JoinHandles that can be used to wait for the threads to finish"]
+    The send_stream_to_devices function is used to send the stream to the devices that will generate and verify the stream and return a list of JoinHandles
+    ## Arguments
+    * `target_devices_pool` - A HashMap that contains the IP address of the devices as keys and a Vec of tuples that contain the index of the device in the device list and the ProcessType as values
+    * `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
+    * `stream_details` - A StreamDetails struct that contains the details of the stream
+    ## Returns
+    * `Vec<Handler>` - A list of JoinHandles that can be used to wait for the threads to finish"]
     pub async fn send_stream_to_devices(
         &self,
         target_devices_pool: HashMap<String, Vec<(String, ProcessType)>>,
@@ -721,42 +690,39 @@ The send_stream_to_devices function is used to send the stream to the devices th
     ) -> Vec<Handler> {
         let mut handles: Vec<Handler> = Vec::with_capacity(target_devices_pool.len());
         let stream_id = stream_details.stream_id.clone();
-        let stream_json =
+        let stream_details_json =
             serde_json::to_string(&stream_details).expect("Failed to serialize stream details");
-        drop(stream_details);
-        for receivers in target_devices_pool.into_iter() {
-            let receiver = receivers.1.first().unwrap();
-            let device_list = device_list.lock().await;
-            let device = device_list.get(&receiver.0).unwrap();
 
-            let handle = device.send_stream(&stream_id, &stream_json);
-            let device_info_tuple = device.get_device_info_tuple().to_owned();
-            // the info is (ip,  mac, process_type)
-            let connections = (
-                device_info_tuple.0,
-                device_info_tuple.2,
-                receiver.1.to_owned(),
-            );
-            handles.push(Handler {
-                connections,
-                handle,
-            });
+        for (_, processes) in target_devices_pool.into_iter() {
+            // the processes to the list of handles for each process type
+            for (receiver, process) in processes.into_iter() {
+                // get the device from the device list
+                let device_list = device_list.lock().await;
+                let device = device_list.get(&receiver).unwrap();
+
+                // send the stream to the device and get the handle for the request
+                let handle = device.send_stream(&stream_id, &stream_details_json);
+                let (ip, _, mac) = device.get_device_info_tuple().to_owned();
+
+                // get the info of device (ip,  mac, process_type)
+                let connections = (ip, mac, process);
+
+                // add the handle to the list of handles
+                handles.push(Handler {
+                    connections: connections.clone(),
+                    handle,
+                });
+            }
         }
         handles
     }
 
     #[doc = r" ## Stop Stream
-stops the stream on all the devices that are running it and Marks the process as Idle
-if the request fails, the device status will be set to Offline
-## Arguments
-* `device_list` - the list of devices that are running the stream
-## Logs
-* `Could not Stop Generator: {}, skipping` - if the generator is not found in the device list
-* `Could not Stop Verifier: {}, skipping` - if the verifier is not found in the device list
-* `Stopping stream {}...` - the stream id
-* `generators error: {}` - if the request to the generator fails
-* `verifiers error: {}` - if the request to the verifier fails
-* `stream {} stopped` - the stream id"]
+    Get the list of devices that are running the stream and send a stop request to all of them and return a list of JoinHandles
+    ## Arguments
+    * `device_list` - the list of devices that are running the stream
+    ## Returns
+    * `Vec<Handler>` - A list of JoinHandles that can be used to wait for the threads to finish"]
     pub async fn stop_stream(
         &mut self,
         device_list: &Mutex<HashMap<String, Device>>,
@@ -771,6 +737,7 @@ if the request fails, the device status will be set to Offline
 
         // stop the generators
         for target_process in &self.running_generators {
+            // find the device in the device list
             let key = Device::find_device(target_process.0, device_list).await;
             if key.is_none() {
                 warn!(
@@ -779,6 +746,7 @@ if the request fails, the device status will be set to Offline
                 );
                 continue;
             }
+
             target_devices_pool.insert(
                 target_process.0.to_string(),
                 (key.unwrap(), ProcessType::Generation),
@@ -786,6 +754,7 @@ if the request fails, the device status will be set to Offline
         }
 
         for target_process in &self.running_verifiers {
+            // find the device in the device list
             let index = Device::find_device(target_process.0, device_list).await;
             if index.is_none() {
                 warn!(
@@ -795,6 +764,7 @@ if the request fails, the device status will be set to Offline
                 continue;
             }
 
+            // if the device is also running the generation process, set the process type to GeneratingAndVerification
             if target_devices_pool.contains_key(target_process.0) {
                 target_devices_pool.insert(
                     target_process.0.to_string(),
@@ -813,12 +783,12 @@ if the request fails, the device status will be set to Offline
     }
 
     #[doc = r" ## Stop Stream On Devices
-The stop_stream_on_devices function is used to send the stop request to the devices that are running the stream and return a list of JoinHandles
-## Arguments
-* `target_devices_pool` - A HashMap that contains the IP address of the devices as keys and a tuple that contain the index of the device in the device list and the ProcessType as values
-* `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
-## Returns
-* `Vec<JoinHandle<()>>` - A list of JoinHandles that can be used to wait for the threads to finish"]
+    The stop_stream_on_devices function is used to send the stop request to the devices that are running the stream and return a list of JoinHandles
+    ## Arguments
+    * `target_devices_pool` - A HashMap that contains the IP address of the devices as keys and a tuple that contain the index of the device in the device list and the ProcessType as values
+    * `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
+    ## Returns
+    * `Vec<Handler>` - A list of JoinHandles that can be used to wait for the threads to finish"]
     pub async fn stop_stream_on_devices(
         &self,
         target_devices_pool: HashMap<String, (String, ProcessType)>,
@@ -826,19 +796,19 @@ The stop_stream_on_devices function is used to send the stop request to the devi
     ) -> Vec<Handler> {
         let mut handles: Vec<Handler> = Vec::with_capacity(target_devices_pool.len());
 
-        for receivers in target_devices_pool.into_iter() {
-            let receiver = receivers.1;
+        for (_, (mac, process_type)) in target_devices_pool.into_iter() {
+            // get the device from the device list
             let device_list = device_list.lock().await;
-            let device = device_list.get(&receiver.0).unwrap();
+            let device = device_list.get(&mac).unwrap();
 
+            // send the stop request to the device and get the handle for the request
             let handle = device.stop_stream(self.get_stream_id());
-            let device_info_tuple = device.get_device_info_tuple().to_owned();
+            let (ip, _, mac) = device.get_device_info_tuple().to_owned();
+
             // the info is (ip, mac, process_type)
-            let connections = (
-                device_info_tuple.0,
-                device_info_tuple.2,
-                receiver.1.to_owned(),
-            );
+            let connections = (ip, mac, process_type);
+
+            // add the handle to the list of handles
             handles.push(Handler {
                 connections,
                 handle,
@@ -850,40 +820,42 @@ The stop_stream_on_devices function is used to send the stop request to the devi
 
     #[doc = r" ## Analyze Response
     The analyze_response function is used to analyze the response of the request sent to the device weather it is a start or stop request and update the device status accordingly
-    if the request failed, the device status will be set to offline (generically)
+    If the request failed, the device status will be set to offline (generically)
     ## Arguments
-    * `response` - A Result of Response and reqwest::Error that contains the response of the request
-    * `process_type` - A ProcessType that represents the type of process that the request was sent to
-    * `device` - A reference to a Device that contains the device that the request was sent to
-    * `sending` - A bool that represents if the request was a start or stop request
-    ## Errors
-    * `reqwest::Error` - An error that is returned if the request failed (will set the device status to offline)"]
+    * `info` - A tuple that contains the IP address of the device, the MAC address of the device and the ProcessType.
+    * `response` - The response of the request sent to the device
+    * `device_list` - A reference to a Mutex for Vec of Device that contains all the devices that are connected to the server
+    * `sending` - A boolean that indicates if the request is a start request or a stop request
+    ## Returns
+    * `Result<(), ()>` - Returns Ok if the request was successful and Err if the request failed"]
     pub async fn analyze_device_response(
         &mut self,
-        info: (String, String, ProcessType),
+        (_, mac, process_type): (String, String, ProcessType),
         response: Result<reqwest::Response, reqwest::Error>,
         device_list: &Mutex<HashMap<String, Device>>,
         sending: bool,
     ) -> Result<(), ()> {
-        // info tuple is (device ip, device port, device mac, process type)
         let mut device = device_list.lock().await;
-        let device = device.get_mut(&info.1).unwrap();
-        let process_type = &info.2;
+        let device = device.get_mut(&mac).unwrap();
 
         match response {
             Ok(_response) => {
-                let process_status = if sending {
-                    ProcessStatus::Queued
-                } else {
-                    ProcessStatus::Stopped
-                };
-
                 match _response.status() {
                     StatusCode::OK => {
-                        info!("Stream sent to device {}", device.get_device_mac());
+                        let process_status = if sending {
+                            ProcessStatus::Queued
+                        } else {
+                            ProcessStatus::Stopped
+                        };
+
+                        info!(
+                            "request sent to device {}, {:?}",
+                            device.get_device_mac(),
+                            process_status
+                        );
 
                         // set the receiver status to process_status
-                        device.update_device_status(&process_status, process_type);
+                        device.update_device_status(&process_status, &process_type);
 
                         match process_type {
                             ProcessType::Generation => {
@@ -928,7 +900,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                             process_type
                         );
                         // set the receiver status to offline (generic error)
-                        device.update_device_status(&ProcessStatus::Failed, process_type);
+                        device.update_device_status(&ProcessStatus::Failed, &process_type);
 
                         // add the device to the running devices list with a failed status
                         match process_type {
@@ -978,7 +950,7 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                 error!("Connection Error: {}", _error);
 
                 // set the receiver status to offline (generic error)
-                device.update_device_status(&ProcessStatus::Failed, process_type);
+                device.update_device_status(&ProcessStatus::Failed, &process_type);
 
                 // add the device to the running devices list with a failed status
                 match process_type {
@@ -1004,16 +976,20 @@ The stop_stream_on_devices function is used to send the stop request to the devi
         Err(())
     }
 
-    #[doc = r" ## Get the Stream ID
-    this is used to identify the stream"]
     pub fn get_stream_id(&self) -> &String {
         &self.stream_id
     }
-
+    #[doc = " ## Update Received Devices Result
+    This function updates the status of the devices that received the stream and returns the number of devices that received the stream successfully
+    ## Arguments
+    * `results` - A vector of Result<(), ()> that contains the result of the requests sent to all the devices
+    * `sending` - A boolean that indicates if the request is a start request or a stop request
+    ## Returns
+    * `i32` - Returns the number of devices that received the stream successfully"]
     pub async fn update_received_devices_result(
         &mut self,
-        sending: bool,
         results: Vec<Result<(), ()>>,
+        sending: bool,
     ) -> i32 {
         let mut devices_received = 0;
         for result in results.into_iter() {
@@ -1022,50 +998,55 @@ The stop_stream_on_devices function is used to send the stop request to the devi
                 Err(_) => continue,
             }
         }
+
         if sending {
-            // check if the devices are running the stream and set the stream status accordingly (error if only one type of devices is running the stream)
-            let mut devices_received = 0;
+            /*
+            If the number of devices that received the stream successfully is 0, then the stream status is set to Error (no devices are running the stream)
+            If the number of devices that received the stream successfully is 1, then the stream status is set to Error (only one Process type is running the stream)
+            If the number of devices that received the stream successfully is greater than 1, then the stream status is set to Queued (the stream is ready to run)
+            */
+            let mut devices_running = 0;
             for device in self.running_generators.iter() {
                 if device.1 == &ProcessStatus::Queued {
-                    devices_received += 1;
-                    break;
-                }
-            }
-            for device in self.running_verifiers.iter() {
-                if device.1 == &ProcessStatus::Queued {
-                    devices_received += 1;
+                    devices_running += 1;
                     break;
                 }
             }
 
-            if devices_received == 0 {
+            for device in self.running_verifiers.iter() {
+                if device.1 == &ProcessStatus::Queued {
+                    devices_running += 1;
+                    break;
+                }
+            }
+
+            if devices_running == 0 {
                 self.update_stream_status(StreamStatus::Error);
                 error!("No devices are running the stream");
-            } else if devices_received == 1 {
+            } else if devices_running == 1 {
                 self.update_stream_status(StreamStatus::Error);
                 error!("Only one Process type is running the stream");
             } else {
-                info!("Stream sent to {} devices", devices_received);
-                self.update_stream_status(StreamStatus::Sent);
+                info!("Stream sent to {} devices", devices_running);
+                self.update_stream_status(StreamStatus::Queued);
             }
         } else {
-            info!("{} devices received the stop request", devices_received);
-            // set the stream status to stopped
+            info!(
+                "Stream {} stopped, {} devices received the stop request",
+                self.get_stream_id(),
+                devices_received
+            );
             self.update_stream_status(StreamStatus::Stopped);
-            info!("Stream {} stopped", self.get_stream_id());
-            self.sync_stream_status();
         }
         devices_received
     }
 
     #[doc = r" ## Queue Stream
-this will add the stream to the queue
-locking the stream_entries mutex will help prevent racing conditions if the system is under heavy load and multiple streams are being queued at the same time
-the stream will only unlock once it gets a response from all devices then it continues to the next stream in the queue
-## Arguments
-* `device_list` - the list of devices that are in the system
-## Logs
-* `Stream queued to start in {} seconds` - the delay in seconds before the stream starts (the delay is set by the user)"]
+    this will try to add the stream to the queue if the stream is not already queued or running
+    ## Arguments
+    * `device_list` - the list of devices that are in the system
+    ## Returns
+    * `Vec<Handler>` - Returns a vector of handlers that are used to send the stream to the devices"]
     pub async fn try_queue_stream(
         &mut self,
         device_list: &Mutex<HashMap<String, Device>>,
@@ -1074,27 +1055,23 @@ the stream will only unlock once it gets a response from all devices then it con
         {
             return vec![];
         }
-        // log the start time
+
         info!(
             "queueing stream {} to start in {} seconds",
             self.get_stream_id(),
-            self.delay / 1000
+            self.delay as f32 / 1000.0
         );
 
         // send the stream to the client to update the stream status to queued
-
         self.send_stream(true, device_list).await
     }
 
     #[doc = r" ## Remove Stream From Queue
-this will remove the stream from the queue
-## Arguments
-* `device_list` - the list of devices that are in the system
-## Panics
-* `Error: Failed to lock the queued streams list for removing the stream from the queue {}` - if the queued streams list is locked
-## Logs
-* `Error: {}` - if the stream fails to stop
-* `Error: Could not find the stream {} in the queued streams list` - if the stream is not found in the queued streams list"]
+    this will remove the stream from the queue if the stream is queued and not running
+    ## Arguments
+    * `device_list` - the list of devices that are in the system
+    ## Returns
+    * `Vec<Handler>` - Returns a vector of handlers that are used to send the stream to the devices"]
     pub async fn try_remove_stream_from_queue(
         &mut self,
         device_list: &Mutex<HashMap<String, Device>>,
@@ -1102,43 +1079,61 @@ this will remove the stream from the queue
         if self.stream_status != StreamStatus::Queued {
             return vec![];
         }
+
         info!("removing stream {} from the queue", self.get_stream_id());
+
         // stop the stream
         self.stop_stream(device_list).await
     }
 
     #[doc = r" ## Update Stream Status
-this is used to update the stream status (running, stopped, finished) and the start and end times of the stream if the stream is running or finished respectively
-if the stream is stopped, the start and end times are set to None
-and the last updated time is set to the current time all the time
-## Arguments
-* `status` - the new stream status"]
-    pub fn update_stream_status(&mut self, status: StreamStatus) {
-        if status == self.stream_status && status != StreamStatus::Error {
+    this is used to update the stream status, and the start and end times of the stream if the stream is running or finished respectively.
+    If the stream is stopped, the start and end times are set to None.
+    and the last updated time is set to the current time all the time
+    ## Arguments
+    * `status` - the new stream status"]
+    pub fn update_stream_status(&mut self, new_status: StreamStatus) {
+        if new_status == self.stream_status && new_status != StreamStatus::Error {
             return;
         }
-        self.stream_status = status;
+
+        self.stream_status = new_status;
         self.last_updated = Utc::now();
 
-        // update the start and end times (you can add a message about the stream and append it to the description field but this not needed for now)
+        // update the start and end time. (you can add a message about the stream and append it to the description field but this not needed for now)
         match self.stream_status {
+            StreamStatus::Queued => {
+                let duration = Duration::milliseconds(self.delay.try_into().unwrap_or_default());
+                self.start_time = Some(Utc::now() + duration);
+            }
             StreamStatus::Running => {
                 self.start_time = Some(Utc::now());
+
+                // If the time to live is not 0, then set the end time to the current time + the time to live
+                // If the time to live is 0, then set the end time to the current time + the average time to deliver number_of_packets
+                if self.time_to_live != 0 {
+                    let duration =
+                        Duration::milliseconds(self.time_to_live.try_into().unwrap_or_default());
+
+                    self.end_time = Some(Utc::now() + duration);
+                } else {
+                    let duration =
+                        Duration::milliseconds(self.number_of_packets as i64 / 1e7 as i64);
+
+                    self.end_time = Some(Utc::now() + duration);
+                }
             }
             StreamStatus::Finished => {
                 self.end_time = Some(Utc::now());
             }
-            _ => {
+            StreamStatus::Sent => {
                 self.start_time = None;
                 self.end_time = None;
             }
+            _ => {}
         }
     }
 
-    #[doc = r" ## Check Stream Status
-this is used to check if the stream status is the same as the status passed
-## Arguments
-* `status` - the status to check against"]
     pub fn check_stream_status(&self, status: StreamStatus) -> bool {
         self.stream_status == status
     }
@@ -1148,7 +1143,8 @@ this is used to check if the stream status is the same as the status passed
     }
 
     #[doc = r" ## Get Stream Status Card
-    this is used to get the stream status card for the stream which contains simple details about the stream (stream id, stream status, start time, end time, last updated, name)"]
+    this is used to get the stream status card for the stream, which contains simple details about the stream.
+    (stream id, stream status, start time, end time, last updated, name)"]
     pub fn get_stream_status_card(&self) -> StreamStatusDetails {
         StreamStatusDetails {
             stream_id: self.stream_id.to_owned(),
@@ -1161,8 +1157,8 @@ this is used to check if the stream status is the same as the status passed
     }
 
     #[doc = r" ## Get Stream Details
-this is used to get the stream details for the stream which contains all the details about the stream (stream id, delay, generators, verifiers, payload type, number of packets, payload length, burst delay, burst length, seed, broadcast frames, inter frame gap, time to live, transport layer protocol, name).
-The Details are required and used by the systemAPI to be executed on the targeted devices"]
+    this is used to get the stream details for the stream, which contains all the details about the stream required to execute it on the devices.
+    The Details are used by the systemAPI to execute on the targeted devices"]
     pub fn get_stream_details(
         &self,
         delayed: bool,
@@ -1194,7 +1190,8 @@ The Details are required and used by the systemAPI to be executed on the targete
     }
 
     #[doc = r" ## Update Stream
-this is used to update the stream with the new details passed in the stream entry, ignoring the stream id and the stream status as they are not allowed to be changed by the user"]
+    This is used to update the stream with the new details passed in the stream entry, 
+    ignoring the stream id and the stream status as they are not allowed to be changed by the user."]
     pub fn update(&mut self, stream: &StreamEntry) {
         self.name = stream.name.to_owned();
         self.description = stream.description.to_owned();
@@ -1338,8 +1335,8 @@ this is used to update the stream with the new details passed in the stream entr
     }
 }
 
-#[doc = r"# Stream Status
-this enum represents the status of the stream
+#[doc = r"## Stream Status
+This enum represents the status of the stream.
 ## Variants
 * `Created` - the stream has been created
 * `Sent` - the stream has been sent
@@ -1377,11 +1374,11 @@ impl ToString for StreamStatus {
     }
 }
 
-#[doc = r"# Transport Layer Protocol Type
-this enum represents the transport layer protocol type
+#[doc = r"## Transport Layer Protocol
+This enum represents the transport layer protocol type.
 ## Variants
-* `TCP` - the transport layer protocol is TCP
-* `UDP` - the transport layer protocol is UDP
+* `TCP` - the transport layer protocol is Transmission Control Protocol
+* `UDP` - the transport layer protocol is User Data gram Protocol
 ## Notes
 * the default variant is `TCP`"]
 #[derive(Serialize, Deserialize, Default, Debug, Clone)]
@@ -1395,7 +1392,7 @@ enum TransportLayerProtocol {
 }
 
 #[doc = r"# Flow Type
-this enum represents the flow type
+This enum represents the flow type.
 ## Variants
 * `BtB` - the flow type is BtB (back to back)
 * `Bursts` - the flow type is Bursts
