@@ -1037,6 +1037,7 @@ impl StreamEntry {
                 devices_received
             );
             self.update_stream_status(StreamStatus::Stopped);
+            self.sync_stream_status();
         }
         devices_received
     }
