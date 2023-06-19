@@ -294,7 +294,8 @@ async fn start_stream(stream_id: web::Path<String>, data: web::Data<AppState>) -
                     handle_starting_connections(connections, stream_entry, &data.device_list).await;
 
                 // add the thread to the queued streams list
-                if stream_entry.check_stream_status(StreamStatus::Queued) {
+                if stream_entry.check_stream_status(StreamStatus::Sent) {
+                    stream_entry.update_stream_status(StreamStatus::Queued);
                     data.queued_streams
                         .lock()
                         .await
@@ -366,12 +367,13 @@ async fn stop_stream(stream_id: web::Path<String>, data: web::Data<AppState>) ->
             if stream_entry.check_stream_status(StreamStatus::Running)
                 || stream_entry.check_stream_status(StreamStatus::Queued)
             {
-                let connections =  if stream_entry.check_stream_status(StreamStatus::Queued) {
-                    stream_entry.try_remove_stream_from_queue(&data.device_list).await
+                let connections = if stream_entry.check_stream_status(StreamStatus::Queued) {
+                    stream_entry
+                        .try_remove_stream_from_queue(&data.device_list)
+                        .await
                 } else {
                     stream_entry.stop_stream(&data.device_list).await
                 };
-
 
                 let connects =
                     handle_stopping_connections(connections, stream_entry, &data.device_list).await;
@@ -440,7 +442,8 @@ async fn start_all_streams(data: web::Data<AppState>) -> impl Responder {
         handle_starting_connections(connections, stream_entry, &data.device_list).await;
 
         // add the thread to the queued streams list
-        if stream_entry.check_stream_status(StreamStatus::Queued) {
+        if stream_entry.check_stream_status(StreamStatus::Sent) {
+            stream_entry.update_stream_status(StreamStatus::Queued);
             counter += 1;
             data.queued_streams
                 .lock()

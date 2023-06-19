@@ -20,7 +20,7 @@ each process has a type (Type: ProcessType) that can be one of the following
 Generation, Verification, GenerationAndVerification
 each process has a Mac Address (MacAddress: string) that represents the mac address of the device that is running the process.
 ## Variants
-* `Queued` (the process is idle and waiting to be started)
+* `Queued` (the process is Queued and waiting to be started by the device)
 * `Running` (the process is running) 
 * `Stopped` (the process is Stopped)
 * `Completed` (the process is successfully completed)

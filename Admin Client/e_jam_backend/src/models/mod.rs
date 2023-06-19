@@ -387,11 +387,6 @@ impl StreamEntry {
                 if it is, mark the generator as Running
                 special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
                 */
-                if self.stream_status == StreamStatus::Sent {
-                    self.running_generators
-                        .insert(device_mac.to_string(), ProcessStatus::Queued);
-                }
-
                 let process = self.running_generators.get(device_mac);
 
                 if process.is_some() {
@@ -416,11 +411,6 @@ impl StreamEntry {
                 if it is, mark the verifier as Running
                 special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
                 */
-                if self.stream_status == StreamStatus::Sent {
-                    self.running_verifiers
-                        .insert(device_mac.to_string(), ProcessStatus::Queued);
-                }
-
                 let process = self.running_verifiers.get(device_mac);
                 if process.is_some() {
                     self.running_verifiers
@@ -478,11 +468,6 @@ impl StreamEntry {
                 if it is, mark the generator as completed
                 special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
                 */
-                if self.stream_status == StreamStatus::Sent {
-                    self.running_generators
-                        .insert(device_mac.to_string(), ProcessStatus::Running);
-                }
-
                 let process = self.running_generators.get(device_mac);
 
                 if process.is_some() {
@@ -508,12 +493,8 @@ impl StreamEntry {
                 if it is, mark the verifier as completed
                 special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
                 */
-                if self.stream_status == StreamStatus::Sent {
-                    self.running_verifiers
-                        .insert(device_mac.to_string(), ProcessStatus::Running);
-                }
-
                 let process = self.running_verifiers.get(device_mac);
+
                 if process.is_some() {
                     self.running_verifiers
                         .get_mut(device_mac)
@@ -683,7 +664,7 @@ impl StreamEntry {
     ## Returns
     * `Vec<Handler>` - A list of JoinHandles that can be used to wait for the threads to finish"]
     pub async fn send_stream_to_devices(
-        &self,
+        &mut self,
         target_devices_pool: HashMap<String, Vec<(String, ProcessType)>>,
         device_list: &Mutex<HashMap<String, Device>>,
         stream_details: StreamDetails,
@@ -703,6 +684,21 @@ impl StreamEntry {
                 // send the stream to the device and get the handle for the request
                 let handle = device.send_stream(&stream_id, &stream_details_json);
                 let (ip, _, mac) = device.get_device_info_tuple().to_owned();
+
+                // add the device to the list of running devices and mark it as Queued
+                if process == ProcessType::Generation
+                    || process == ProcessType::GeneratingAndVerification
+                {
+                    self.running_generators
+                        .insert(device.get_device_mac().to_string(), ProcessStatus::Queued);
+                }
+
+                if process == ProcessType::Verification
+                    || process == ProcessType::GeneratingAndVerification
+                {
+                    self.running_verifiers
+                        .insert(device.get_device_mac().to_string(), ProcessStatus::Queued);
+                }
 
                 // get the info of device (ip,  mac, process_type)
                 let connections = (ip, mac, process);
@@ -854,29 +850,9 @@ impl StreamEntry {
                             process_status
                         );
 
-                        // set the receiver status to process_status
+                        // set the device status to process_status 
+                        // leave the device status as is (Queued or Stopped) in the running devices list of the stream
                         device.update_device_status(&process_status, &process_type);
-
-                        match process_type {
-                            ProcessType::Generation => {
-                                self.running_generators
-                                    .insert(device.get_device_mac().to_string(), process_status);
-                            }
-                            ProcessType::Verification => {
-                                self.running_generators
-                                    .insert(device.get_device_mac().to_string(), process_status);
-                            }
-                            ProcessType::GeneratingAndVerification => {
-                                self.running_generators.insert(
-                                    device.get_device_mac().to_string(),
-                                    process_status.to_owned(),
-                                );
-
-                                self.running_generators
-                                    .insert(device.get_device_mac().to_string(), process_status);
-                            }
-                        }
-
                         if sending {
                             info!(
                                 "Stream sent to device: {}, process type: {:?}",
@@ -903,30 +879,18 @@ impl StreamEntry {
                         device.update_device_status(&ProcessStatus::Failed, &process_type);
 
                         // add the device to the running devices list with a failed status
-                        match process_type {
-                            ProcessType::Generation => {
-                                self.running_generators.insert(
-                                    device.get_device_mac().to_owned(),
-                                    ProcessStatus::Failed,
-                                );
-                            }
-                            ProcessType::Verification => {
-                                self.running_verifiers.insert(
-                                    device.get_device_mac().to_owned(),
-                                    ProcessStatus::Failed,
-                                );
-                            }
-                            ProcessType::GeneratingAndVerification => {
-                                self.running_generators.insert(
-                                    device.get_device_mac().to_owned(),
-                                    ProcessStatus::Failed,
-                                );
+                        if process_type == ProcessType::Generation
+                            || process_type == ProcessType::GeneratingAndVerification
+                        {
+                            self.running_generators
+                                .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
+                        }
 
-                                self.running_generators.insert(
-                                    device.get_device_mac().to_owned(),
-                                    ProcessStatus::Failed,
-                                );
-                            }
+                        if process_type == ProcessType::Verification
+                            || process_type == ProcessType::GeneratingAndVerification
+                        {
+                            self.running_verifiers
+                                .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
                         }
 
                         if sending {
@@ -953,22 +917,18 @@ impl StreamEntry {
                 device.update_device_status(&ProcessStatus::Failed, &process_type);
 
                 // add the device to the running devices list with a failed status
-                match process_type {
-                    ProcessType::Generation => {
-                        self.running_generators
-                            .insert(device.get_device_mac().to_owned(), ProcessStatus::Failed);
-                    }
-                    ProcessType::Verification => {
-                        self.running_verifiers
-                            .insert(device.get_device_mac().to_owned(), ProcessStatus::Failed);
-                    }
-                    ProcessType::GeneratingAndVerification => {
-                        self.running_generators
-                            .insert(device.get_device_mac().to_owned(), ProcessStatus::Failed);
+                if process_type == ProcessType::Generation
+                    || process_type == ProcessType::GeneratingAndVerification
+                {
+                    self.running_generators
+                        .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
+                }
 
-                        self.running_generators
-                            .insert(device.get_device_mac().to_owned(), ProcessStatus::Failed);
-                    }
+                if process_type == ProcessType::Verification
+                    || process_type == ProcessType::GeneratingAndVerification
+                {
+                    self.running_verifiers
+                        .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
                 }
             }
         }
@@ -1001,20 +961,26 @@ impl StreamEntry {
 
         if sending {
             /*
-            If the number of devices that received the stream successfully is 0, then the stream status is set to Error (no devices are running the stream)
-            If the number of devices that received the stream successfully is 1, then the stream status is set to Error (only one Process type is running the stream)
-            If the number of devices that received the stream successfully is greater than 1, then the stream status is set to Queued (the stream is ready to run)
+            If the number of devices that received the stream successfully is 0,
+            then the stream status is set to Error (no devices are running the stream)
+
+            If the number of devices that received the stream successfully is 1,
+            then the stream status is set to Error (only one Process type is running the stream)
+
+            If the number of devices that received the stream successfully is greater than 1,
+            then the stream status is kept as Sent (the stream is ready to run, or be queued, or is running already)
             */
+
             let mut devices_running = 0;
-            for device in self.running_generators.iter() {
-                if device.1 == &ProcessStatus::Queued {
+            for (_, status) in self.running_generators.iter() {
+                if status == &ProcessStatus::Queued || status == &ProcessStatus::Running {
                     devices_running += 1;
                     break;
                 }
             }
 
-            for device in self.running_verifiers.iter() {
-                if device.1 == &ProcessStatus::Queued {
+            for (_, status) in self.running_verifiers.iter() {
+                if status == &ProcessStatus::Queued || status == &ProcessStatus::Running {
                     devices_running += 1;
                     break;
                 }
@@ -1027,8 +993,8 @@ impl StreamEntry {
                 self.update_stream_status(StreamStatus::Error);
                 error!("Only one Process type is running the stream");
             } else {
+                // leave the stream status as is.
                 info!("Stream sent to {} devices", devices_running);
-                self.update_stream_status(StreamStatus::Queued);
             }
         } else {
             info!(
