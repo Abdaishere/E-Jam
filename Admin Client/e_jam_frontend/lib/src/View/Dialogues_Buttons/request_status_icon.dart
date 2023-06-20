@@ -18,7 +18,28 @@ class RequestStatusIcon extends StatelessWidget {
         color: getColor(response.responseCode),
         size: 20.0,
       ),
-      onPressed: () {},
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Status Code ${response.responseCode}'),
+              content: Text('Info: ${response.message}'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
