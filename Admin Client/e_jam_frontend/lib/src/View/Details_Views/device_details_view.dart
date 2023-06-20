@@ -154,11 +154,8 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
             ),
             body: Column(
               children: [
-                Expanded(
-                  flex: 3,
-                  child: DevicePacketsCounterDoughnut(
-                    mac: device.macAddress,
-                  ),
+                DevicePacketsCounterDoughnut(
+                  mac: device.macAddress,
                 ),
                 Expanded(
                   flex: 3,
@@ -276,7 +273,12 @@ class _DevicePacketsCounterDoughnutState
     if (totalPackets <= 0) {
       return const SizedBox.shrink();
     }
-    return DoughnutChartPackets(packetsCountMapToList(_totalPacketsStatusMap));
+    return Expanded(
+      flex: 3,
+      child: DoughnutChartPackets(
+        packetsCountMapToList(_totalPacketsStatusMap),
+      ),
+    );
   }
 }
 
