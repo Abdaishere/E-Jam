@@ -736,7 +736,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
                   : null,
           tooltip: "Pause",
           onPressed: () {
-            context.read<StreamsController>().stopStream(id).then((success) {
+            context.read<StreamsController>().pauseStream(id).then((success) {
               if (mounted) {
                 _loadStream();
                 widget.refreshCard();
