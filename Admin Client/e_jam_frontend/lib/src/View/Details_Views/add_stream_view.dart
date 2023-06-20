@@ -200,7 +200,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.plus),
             color: Colors.greenAccent.shade700,
-            tooltip: 'Apply',
+            tooltip: 'Add',
             onPressed: () => addStream(),
           ),
         ],
