@@ -353,7 +353,7 @@ class MenuList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            leading: const FaIcon(FontAwesome.dashboard, size: size),
+            leading: const FaIcon(FontAwesomeIcons.gaugeHigh, size: size),
             iconColor: Colors.white,
             title: const Text('Dashboard'),
             onTap: () {

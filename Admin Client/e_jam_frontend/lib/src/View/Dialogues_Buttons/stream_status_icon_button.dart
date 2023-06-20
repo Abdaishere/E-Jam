@@ -1,7 +1,6 @@
 import 'package:e_jam/src/Model/Enums/stream_data_enums.dart';
 import 'package:e_jam/src/controller/Streams/streams_controller.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +28,7 @@ class StreamStatusIconButton extends StatelessWidget {
         padding: isDense ? EdgeInsets.zero : null,
         constraints: isDense ? const BoxConstraints() : null,
         tooltip: 'New Stream',
-        icon: FaIcon(
+        icon: Icon(
           Icons.new_releases,
           color: streamColorScheme(status),
           size: 20.0,
@@ -44,7 +43,7 @@ class StreamStatusIconButton extends StatelessWidget {
         constraints: isDense ? const BoxConstraints() : null,
         tooltip:
             '${streamStatusToString(status)}: ${timeago.format(lastUpdated)}',
-        icon: FaIcon(
+        icon: Icon(
           getIcon(status),
           color: streamColorScheme(status),
           size: 20.0,

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ChangeServerIPScreen extends StatefulWidget {
   const ChangeServerIPScreen({super.key});
@@ -77,7 +77,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                       child: const Column(
                         children: [
                           SizedBox(height: 10),
-                          Icon(FontAwesome.download,
+                          FaIcon(FontAwesomeIcons.download,
                               size: 50, color: Colors.green),
                           Divider(),
                           Text(
@@ -110,7 +110,7 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                       child: const Column(
                         children: [
                           SizedBox(height: 10),
-                          Icon(MaterialCommunityIcons.server_network,
+                          FaIcon(FontAwesomeIcons.server,
                               size: 50, color: Colors.orange),
                           Divider(),
                           Text(

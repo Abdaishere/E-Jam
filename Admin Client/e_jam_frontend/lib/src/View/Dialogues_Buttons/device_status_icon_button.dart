@@ -2,7 +2,6 @@ import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class DeviceStatusIconButton extends StatelessWidget {
@@ -25,7 +24,7 @@ class DeviceStatusIconButton extends StatelessWidget {
       constraints: isDense ? const BoxConstraints() : null,
       tooltip:
           '${deviceStatusToString(status)}: ${timeago.format(lastUpdated)}',
-      icon: FaIcon(
+      icon: Icon(
         getIcon(status),
         color: deviceStatusColorScheme(status),
         size: 20.0,

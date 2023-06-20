@@ -167,7 +167,7 @@ class _StreamsListViewState extends State<StreamsListView> {
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
           onPressed: () {
-            // TODO: add a dialog with the explanation
+            // TODO: Add a link to a youtube video for explaining the Device card
           },
         ),
       ],
@@ -329,7 +329,7 @@ class _StreamCardState extends State<StreamCard> {
       BuildContext context, StreamStatusDetails stream) {
     return PopupMenuButton(
       tooltip: 'More Options',
-      icon: const FaIcon(
+      icon: const Icon(
         Icons.more_vert,
         size: 20.0,
       ),

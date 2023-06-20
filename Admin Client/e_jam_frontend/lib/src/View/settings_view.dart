@@ -180,7 +180,7 @@ class _SettingsViewState extends State<SettingsView> {
   List<Widget> get _dashboardSettings {
     return [
       const ListTile(
-        leading: FaIcon(FontAwesome.dashboard),
+        leading: FaIcon(FontAwesomeIcons.gauge),
         title: Text('Dashboard'),
       ),
       ListTile(
@@ -246,7 +246,7 @@ class _SettingsViewState extends State<SettingsView> {
         SystemSettings.defaultSystemApiSubnet;
     return [
       const ListTile(
-        leading: Icon(FontAwesome.cogs),
+        leading: FaIcon(FontAwesomeIcons.gears),
         title: Text(
           'Defaults',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),

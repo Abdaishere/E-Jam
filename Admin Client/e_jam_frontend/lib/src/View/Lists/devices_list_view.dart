@@ -228,7 +228,7 @@ class _DevicesListViewState extends State<DevicesListView> {
           icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
           tooltip: 'Help',
           onPressed: () {
-            // TODO: Add a dialog box for explaining the Device card
+            // TODO: Add a link to a youtube video for explaining the Device card
           },
         ),
       ],
@@ -422,7 +422,7 @@ class _DeviceCardState extends State<DeviceCard> {
   PopupMenuButton<String> _popupMenuList(BuildContext context, Device device) {
     return PopupMenuButton(
       tooltip: 'More Options',
-      icon: const FaIcon(
+      icon: const Icon(
         Icons.more_vert,
         size: 20.0,
       ),
