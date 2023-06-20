@@ -170,6 +170,8 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             onPressed: () {
               if (formKey.currentState != null) formKey.currentState!.reset();
               context.read<AddStreamController>().clearAllFields();
+              _status = null;
+              setState(() {});
             },
           ),
           _status != null
