@@ -12,15 +12,9 @@ class StatisticsService {
     try {
       final response =
           await client.get(Uri.parse('$uri/statistics_all/verifier/earliest'));
-      if (200 == response.statusCode) {
-        return (jsonDecode(response.body) as List)
-            .map((e) => VerifierStatisticsInstance.fromJson(e))
-            .toList();
-      } else if (204 == response.statusCode) {
-        return [];
-      } else {
-        return [];
-      }
+      return (jsonDecode(response.body) as List)
+          .map((e) => VerifierStatisticsInstance.fromJson(e))
+          .toList();
     } catch (e) {
       return [];
     }
@@ -32,15 +26,9 @@ class StatisticsService {
       final response =
           await client.get(Uri.parse('$uri/statistics_all/generator/earliest'));
 
-      if (200 == response.statusCode) {
-        return (jsonDecode(response.body) as List)
-            .map((e) => GeneratorStatisticsInstance.fromJson(e))
-            .toList();
-      } else if (204 == response.statusCode) {
-        return [];
-      } else {
-        return [];
-      }
+      return (jsonDecode(response.body) as List)
+          .map((e) => GeneratorStatisticsInstance.fromJson(e))
+          .toList();
     } catch (e) {
       return [];
     }

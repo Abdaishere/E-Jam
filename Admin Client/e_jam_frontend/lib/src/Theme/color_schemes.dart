@@ -8,8 +8,6 @@ const uploadColor =
     Color.fromARGB(255, 0, 175, 228); // Color for Uploads indicators
 const downloadColor =
     Color.fromARGB(255, 224, 131, 0); // Color for Downloads indicators
-const backColor =
-    Color.fromARGB(255, 21, 0, 255); // Color for some Background buttons
 const packetErrorColor =
     Color(0xFFBA1A1A); // Color for Packet Errors indicators (charts only)
 
@@ -27,8 +25,10 @@ Color streamColorScheme(StreamStatus? status) {
       return Colors.red.shade600;
     case StreamStatus.finished:
       return Colors.blueAccent.shade700;
+    case StreamStatus.sent:
+      return Colors.blueGrey.shade800;
     default:
-      return Colors.blueGrey.shade600;
+      return Colors.blueGrey;
   }
 }
 
@@ -43,7 +43,7 @@ Color deviceStatusColorScheme(DeviceStatus? status) {
     case DeviceStatus.offline:
       return Colors.red.shade600;
     default:
-      return Colors.red.shade600;
+      return Colors.red;
   }
 }
 
@@ -60,7 +60,7 @@ Color processStatusColorScheme(ProcessStatus? status) {
     case ProcessStatus.failed:
       return Colors.red.shade400;
     default:
-      return Colors.blueGrey.shade700;
+      return Colors.blueGrey;
   }
 }
 
