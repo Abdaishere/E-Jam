@@ -107,19 +107,18 @@ class BottomOptionsBar extends StatefulWidget {
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
   Message? _status;
 
-  Future<bool?> _addDevice() async {
-    Device? device =
-        await context.read<AddDeviceController>().createNewDevice(formKey);
+  Future<bool> addDevice() async {
+    Message? status =
+        await context.read<AddDeviceController>().addDevice(formKey, context);
 
-    if (!mounted || device == null) return null;
-    Message? code =
-        await context.read<DevicesController>().addNewDevice(device);
-
-    if (!mounted) return null;
-    _status = code;
+    if (!mounted) return false;
+    _status = status;
     setState(() {});
-    context.read<DevicesController>().loadAllDevices(true);
-    return _status != null && _status!.responseCode <= 300;
+    if (status != null && status.responseCode < 300) {
+      context.read<DevicesController>().loadAllDevices(true);
+      return true;
+    }
+    return false;
   }
 
   @override
@@ -139,7 +138,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
               context.read<AddDeviceController>().clearAllFields();
             },
           ),
-          _status != null && _status!.responseCode >= 300
+          _status != null
               ? RequestStatusIcon(
                   response: _status!,
                 )
@@ -150,12 +149,9 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
             tooltip: 'OK',
-            onPressed: () async {
-              bool? value = await _addDevice();
-              if (value != null && value) {
-                if (mounted) Navigator.pop(context);
-              }
-            },
+            onPressed: () => addDevice().then((success) => {
+                  if (mounted && success) {Navigator.pop(context)}
+                }),
           ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.xmark),
@@ -169,7 +165,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             icon: const FaIcon(FontAwesomeIcons.plus),
             color: Colors.greenAccent.shade700,
             tooltip: 'Apply',
-            onPressed: () => _addDevice(),
+            onPressed: () => addDevice(),
           ),
         ],
       ),
@@ -381,11 +377,9 @@ class _DevicePingerState extends State<DevicePinger> {
       formKey.currentState!.save();
       _isPinging = true;
       setState(() {});
-      Device? device =
-          await context.read<AddDeviceController>().pingDevice(formKey);
-      if (!mounted || device == null) return;
-      bool result =
-          await context.read<DevicesController>().pingNewDevice(device);
+      bool? result = await context
+          .read<AddDeviceController>()
+          .pingDevice(formKey, context);
 
       _isPinged = result;
       _isPinging = false;

@@ -141,6 +141,20 @@ class BottomOptionsBar extends StatefulWidget {
 class _BottomOptionsBarState extends State<BottomOptionsBar> {
   Message? _status;
 
+  Future<bool> addStream() async {
+    Message? status =
+        await context.read<AddStreamController>().addStream(formKey, context);
+    if (!mounted) return false;
+
+    _status = status;
+    setState(() {});
+    if (status != null && status.responseCode < 300) {
+      context.read<StreamsController>().loadAllStreamStatus(true);
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
@@ -158,7 +172,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
               context.read<AddStreamController>().clearAllFields();
             },
           ),
-          _status != null && _status!.responseCode >= 300
+          _status != null
               ? RequestStatusIcon(
                   response: _status!,
                 )
@@ -169,20 +183,9 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             icon: const FaIcon(FontAwesomeIcons.check),
             color: Colors.blueAccent,
             tooltip: 'OK',
-            onPressed: () async {
-              Message? status = await context
-                  .read<AddStreamController>()
-                  .addStream(formKey, context);
-              if (status != null && context.mounted) {
-                if (status.responseCode < 300) {
-                  context.read<StreamsController>().loadAllStreamStatus(true);
-                  if (context.mounted) Navigator.pop(context);
-                } else {
-                  _status = status;
-                  setState(() {});
-                }
-              }
-            },
+            onPressed: () => addStream().then((success) => {
+                  if (mounted && success) {Navigator.pop(context)}
+                }),
           ),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.xmark),
@@ -196,18 +199,7 @@ class _BottomOptionsBarState extends State<BottomOptionsBar> {
             icon: const FaIcon(FontAwesomeIcons.plus),
             color: Colors.greenAccent.shade700,
             tooltip: 'Apply',
-            onPressed: () async {
-              Message? status = await context
-                  .read<AddStreamController>()
-                  .addStream(formKey, context);
-              if (status != null) {
-                _status = status;
-                setState(() {});
-                if (status.responseCode < 300 && context.mounted) {
-                  context.read<StreamsController>().loadAllStreamStatus(true);
-                }
-              }
-            },
+            onPressed: () => addStream(),
           ),
         ],
       ),

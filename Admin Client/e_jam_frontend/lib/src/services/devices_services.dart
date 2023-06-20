@@ -41,7 +41,7 @@ class DevicesServices {
     }
   }
 
-  Future<Message?> createDevice(Device device) async {
+  Future<Message> createDevice(Device device) async {
     try {
       final response = await client
           .post(uri,
@@ -51,7 +51,7 @@ class DevicesServices {
 
       return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
-      return null;
+      return Message(message: e.toString(), responseCode: 500);
     }
   }
 
@@ -107,21 +107,16 @@ class DevicesServices {
     }
   }
 
-  Future<bool> updateDevice(Device device) async {
+  Future<Message> updateDevice(Device device) async {
     try {
       final response = await client
           .put(Uri.parse('$uri/${device.macAddress}'),
               headers: {'Content-Type': 'application/json'},
               body: json.encode(device.toJson()))
           .timeout(NetworkController.timeout);
-
-      if (300 > response.statusCode) {
-        return true;
-      } else {
-        return false;
-      }
+      return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
-      return false;
+      return Message(message: e.toString(), responseCode: 500);
     }
   }
 

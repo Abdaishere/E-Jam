@@ -37,7 +37,7 @@ class StreamsController extends ChangeNotifier {
     });
   }
 
-  Future<Message?> createNewStream(StreamEntry stream) async {
+  Future<Message> createNewStream(StreamEntry stream) async {
     _isLoading = true;
     return _streamServices.createStream(stream).then((value) {
       _isLoading = false;
@@ -45,7 +45,7 @@ class StreamsController extends ChangeNotifier {
     });
   }
 
-  Future<Message?> updateStream(String id, StreamEntry stream) async {
+  Future<Message> updateStream(String id, StreamEntry stream) async {
     _isLoading = true;
     return _streamServices.updateStream(id, stream).then((value) {
       _isLoading = false;

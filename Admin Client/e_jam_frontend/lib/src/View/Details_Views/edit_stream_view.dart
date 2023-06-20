@@ -159,7 +159,7 @@ class _EditStreamViewState extends State<EditStreamView>
               Navigator.pop(context);
             },
           ),
-          _status != null && _status!.responseCode >= 300
+          _status != null
               ? RequestStatusIcon(
                   response: _status!,
                 )

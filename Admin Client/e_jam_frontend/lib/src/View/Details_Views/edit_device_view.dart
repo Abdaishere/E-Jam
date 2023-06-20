@@ -3,8 +3,8 @@ import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
 import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Dialogues_Buttons/device_status_icon_button.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
 import 'package:e_jam/src/controller/Devices/edit_device_controller.dart';
-import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -29,6 +29,8 @@ class EditDeviceView extends StatefulWidget {
 }
 
 class _EditDeviceViewState extends State<EditDeviceView> {
+  Message? _status;
+
   @override
   void initState() {
     super.initState();
@@ -39,24 +41,18 @@ class _EditDeviceViewState extends State<EditDeviceView> {
     });
   }
 
-  Future<bool?> _editDevice() async {
-    Device? device =
-        await context.read<EditDeviceController>().updateDevice(formKey);
-    if (!mounted || device == null) return null;
-    bool result =
-        await context.read<DevicesController>().updateDevice(device) ?? false;
+  _editDevice() async {
+    _status = await context
+        .read<EditDeviceController>()
+        .updateDevice(formKey, context);
 
-    if (mounted) {
+    if (!mounted) return;
+    if (_status != null && _status!.responseCode < 300) {
       widget.refresh();
-      if (result) {
-        Navigator.pop(context);
-        return true;
-      } else {
-        Navigator.pop(context);
-        return false;
-      }
+      Navigator.pop(context);
+    } else {
+      setState(() {});
     }
-    return null;
   }
 
   @override
@@ -105,6 +101,9 @@ class _EditDeviceViewState extends State<EditDeviceView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          _status != null
+              ? RequestStatusIcon(response: _status!)
+              : const SizedBox(),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.xmark),
             color: Colors.red,
@@ -153,10 +152,8 @@ class _DevicePingerState extends State<DevicePinger> {
   _pingDevice() async {
     _isPinging = true;
     setState(() {});
-    Device? device =
-        await context.read<EditDeviceController>().pingDevice(formKey);
-    if (!mounted || device == null) return;
-    bool value = await context.read<DevicesController>().pingNewDevice(device);
+    bool? value =
+        await context.read<EditDeviceController>().pingDevice(formKey, context);
 
     _isPinged = value;
     _isPinging = false;

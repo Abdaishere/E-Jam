@@ -41,7 +41,7 @@ class DevicesController extends ChangeNotifier {
     });
   }
 
-  Future<Message?> addNewDevice(Device device) async {
+  Future<Message> addNewDevice(Device device) async {
     _isLoading = true;
     return _devicesServices.createDevice(device).then((value) {
       _isLoading = false;
@@ -74,7 +74,7 @@ class DevicesController extends ChangeNotifier {
     });
   }
 
-  Future<bool?> updateDevice(Device device) async {
+  Future<Message?> updateDevice(Device device) async {
     _isLoading = true;
     return _devicesServices.updateDevice(device).then((value) {
       _isLoading = false;

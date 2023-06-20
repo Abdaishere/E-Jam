@@ -42,7 +42,7 @@ class StreamServices {
     }
   }
 
-  Future<Message?> createStream(StreamEntry stream) async {
+  Future<Message> createStream(StreamEntry stream) async {
     try {
       final response = await client
           .post(
@@ -55,11 +55,11 @@ class StreamServices {
           .timeout(NetworkController.timeout);
       return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
-      return null;
+      return Message(message: e.toString(), responseCode: 500);
     }
   }
 
-  Future<Message?> updateStream(String id, StreamEntry stream) async {
+  Future<Message> updateStream(String id, StreamEntry stream) async {
     try {
       final response = await client
           .put(
@@ -73,7 +73,7 @@ class StreamServices {
 
       return Message(message: response.body, responseCode: response.statusCode);
     } catch (e) {
-      return null;
+      return Message(message: e.toString(), responseCode: 500);
     }
   }
 

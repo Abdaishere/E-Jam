@@ -1,6 +1,9 @@
 import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
+import 'package:e_jam/src/View/Dialogues_Buttons/request_status_icon.dart';
+import 'package:e_jam/src/controller/Devices/devices_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AddDeviceController extends ChangeNotifier {
   static final TextEditingController _nameController = TextEditingController();
@@ -20,38 +23,40 @@ class AddDeviceController extends ChangeNotifier {
   TextEditingController get getPortController => _portController;
   TextEditingController get getMacController => _macController;
 
-  Future<Device?> createNewDevice(GlobalKey<FormState> formKey) async {
+  Future<Message?> addDevice(
+      GlobalKey<FormState> formKey, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
-      Device device = Device(
-        name: _nameController.text,
-        description: _descriptionController.text,
-        location: _locationController.text,
-        ipAddress: _ipController.text,
-        port: int.tryParse(_portController.text) ??
-            SystemSettings.defaultDevicesPort,
-        macAddress: _macController.text,
-      );
 
-      return device;
+      if (context.mounted) {
+        return context.read<DevicesController>().addNewDevice(
+              createNewDevice(),
+            );
+      }
     }
     return null;
   }
 
-  Future<Device?> pingDevice(GlobalKey<FormState> formKey) async {
+  Device createNewDevice() {
+    return Device(
+      name: _nameController.text,
+      description: _descriptionController.text,
+      location: _locationController.text,
+      ipAddress: _ipController.text,
+      port: int.tryParse(_portController.text) ??
+          SystemSettings.defaultDevicesPort,
+      macAddress: _macController.text,
+    );
+  }
+
+  Future<bool?> pingDevice(
+      GlobalKey<FormState> formKey, BuildContext context) async {
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
-      Device device = Device(
-        name: _nameController.text,
-        description: _descriptionController.text,
-        location: _locationController.text,
-        ipAddress: _ipController.text,
-        port: int.tryParse(_portController.text) ??
-            SystemSettings.defaultDevicesPort,
-        macAddress: _macController.text,
-      );
 
-      return device;
+      return context.read<DevicesController>().pingNewDevice(
+            createNewDevice(),
+          );
     }
     return null;
   }
