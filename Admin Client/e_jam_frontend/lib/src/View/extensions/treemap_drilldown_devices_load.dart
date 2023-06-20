@@ -136,17 +136,17 @@ class _TreeMapDrillDownDevicesLoadState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.stream_sharp,
-                color: Colors.redAccent,
+              Icon(
+                Icons.stream_rounded,
+                color: _offline ? Colors.redAccent : Colors.blueAccent.shade700,
                 size: 100.0,
               ),
               const SizedBox(height: 10.0),
               Text(
-                _offline ? 'Connection Error' : 'No Processes Available',
-                style: const TextStyle(
+                _offline ? 'Connection Error' : 'No Processes Running',
+                style: TextStyle(
                   fontSize: 24.0,
-                  color: Colors.redAccent,
+                  color: _offline ? Colors.redAccent : Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),
               ),

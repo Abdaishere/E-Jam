@@ -850,7 +850,7 @@ impl StreamEntry {
                             process_status
                         );
 
-                        // set the device status to process_status 
+                        // set the device status to process_status
                         // leave the device status as is (Queued or Stopped) in the running devices list of the stream
                         device.update_device_status(&process_status, &process_type);
                         if sending {

@@ -14,10 +14,10 @@ pub const NAMESPACE: &str = "com.ejam.systemapi.stats.SchemaRegistry";
 pub const SCHEMA_REGISTRY_PORT: &str = "8081";
 pub const MAIN_BROKER_PORT: &str = "9092";
 pub const HOST: &str = "localhost";
-pub const SLEEP_TIME: u64 = 1;
+pub const RETRY_SLEEP_TIME: u64 = 1;
+const RETRIES: usize = 7;
 pub const GENERATOR_TOPIC: &str = "Generator";
 pub const VERIFIER_TOPIC: &str = "Verifier";
-const RETRIES: usize = 6;
 const TIMEOUT: u128 = 600;
 
 pub fn run_generator_consumer(
@@ -38,13 +38,13 @@ pub fn run_generator_consumer(
         {
             Ok(consumer) => break consumer,
             Err(e) => {
-                error!("Kafka Error {:?}", e);
+                debug!("Kafka Error {:?}", e);
                 if counter == 0 {
                     error!("Kafka Error {:?}", e);
                     return Err(());
                 }
                 counter -= 1;
-                sleep(Duration::from_secs(SLEEP_TIME));
+                sleep(Duration::from_secs(RETRY_SLEEP_TIME));
             }
         }
     };
@@ -54,7 +54,7 @@ pub fn run_generator_consumer(
     loop {
         let message = consumer.poll();
         if message.is_err() {
-            error!("Kafka Error  {:?}", message.as_ref().err());
+            debug!("Kafka Error  {:?}", message.as_ref().err());
             return Err(());
         }
 
@@ -69,7 +69,7 @@ pub fn run_generator_consumer(
             for m in ms.messages() {
                 let result = decoder.decode(Some(m.value));
                 if result.is_err() {
-                    error!("Kafka Error  {:?}", result.err().unwrap());
+                    debug!("Kafka Error  {:?}", result.err().unwrap());
                     continue;
                 }
                 let result = result.unwrap();
@@ -103,14 +103,14 @@ pub fn run_generator_consumer(
                         }
                     }
                     Err(e) => {
-                        error!("Kafka Error {:?}", e);
+                        debug!("Kafka Error {:?}", e);
                     }
                 }
             }
 
             let consumed = consumer.consume_messageset(ms);
             if consumed.is_err() {
-                error!("Kafka Error {:?}", consumed.err());
+                debug!("Kafka Error {:?}", consumed.err());
             }
         }
 
@@ -140,13 +140,13 @@ pub fn run_verifier_consumer(
         {
             Ok(consumer) => break consumer,
             Err(e) => {
-                error!("Kafka Error {:?}", e);
+                debug!("Kafka Error {:?}", e);
                 if counter == 0 {
                     error!("Kafka Error {:?}", e);
                     return Err(());
                 }
                 counter -= 1;
-                sleep(Duration::from_secs(SLEEP_TIME));
+                sleep(Duration::from_secs(RETRY_SLEEP_TIME));
             }
         }
     };
@@ -157,7 +157,7 @@ pub fn run_verifier_consumer(
         let message = consumer.poll();
 
         if message.is_err() {
-            error!("Kafka Error {:?}", message.as_ref().err());
+            debug!("Kafka Error {:?}", message.as_ref().err());
             continue;
         }
 
@@ -172,7 +172,7 @@ pub fn run_verifier_consumer(
             for m in ms.messages() {
                 let result = decoder.decode(Some(m.value));
                 if result.is_err() {
-                    error!("Kafka Error {:?}", result.err().unwrap());
+                    debug!("Kafka Error {:?}", result.err().unwrap());
                     continue;
                 }
                 let result = result.unwrap();
@@ -205,14 +205,14 @@ pub fn run_verifier_consumer(
                         }
                     }
                     Err(e) => {
-                        error!("Kafka Error {:?}", e);
+                        debug!("Kafka Error {:?}", e);
                     }
                 }
             }
 
             let consumed = consumer.consume_messageset(ms);
             if consumed.is_err() {
-                error!("Kafka Error {:?}", consumed.err());
+                debug!("Kafka Error {:?}", consumed.err());
             }
         }
 
