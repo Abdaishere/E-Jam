@@ -42,100 +42,88 @@ class _StreamsListViewState extends State<StreamsListView> {
       appBar: streamsListViewAppBar(),
       body: Stack(
         children: [
-          Visibility(
-            visible: !context.watch<StreamsController>().getIsLoading,
-            replacement: Center(
-              child: LoadingAnimationWidget.threeArchedCircle(
-                color: Colors.grey,
-                size: 70.0,
-              ),
-            ),
-            child: Visibility(
-              visible:
-                  context.watch<StreamsController>().getStreamsStatusDetails !=
-                          null &&
-                      context
-                          .watch<StreamsController>()
-                          .getStreamsStatusDetails!
-                          .isNotEmpty,
-              replacement: Visibility(
-                visible: context
-                            .watch<StreamsController>()
-                            .getStreamsStatusDetails !=
-                        null &&
-                    context
-                        .watch<StreamsController>()
-                        .getStreamsStatusDetails!
-                        .isEmpty,
-                replacement: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: Colors.redAccent,
-                        size: 100.0,
-                      ),
-                      SizedBox(height: 10.0),
-                      Text(
-                        'Connection Error',
-                        style: TextStyle(
-                          fontSize: 24.0,
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+          context.watch<StreamsController>().getIsLoading
+              ? Center(
+                  child: LoadingAnimationWidget.threeArchedCircle(
+                    color: Colors.grey,
+                    size: 70.0,
                   ),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(
-                        FontAwesomeIcons.barsStaggered,
-                        size: 100.0,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(height: 10.0),
-                      Text(
-                        'No streams found',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              child: GridView.builder(
-                padding: const EdgeInsets.all(8.0),
-                shrinkWrap: true,
-                itemCount: context
-                    .watch<StreamsController>()
-                    .getStreamsStatusDetails
-                    ?.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      max(MediaQuery.of(context).size.width ~/ 280.0, 1),
-                  childAspectRatio: 3 / 2,
-                  mainAxisSpacing: 5.0,
-                  crossAxisSpacing: 3.0,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return StreamCard(
-                    stream: context
+                )
+              : LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    List<StreamStatusDetails>? streamsStatusDetails = context
                         .watch<StreamsController>()
-                        .getStreamsStatusDetails![index],
-                    loadStreamView: () => context
-                        .read<StreamsController>()
-                        .loadAllStreamStatus(true),
-                  );
-                },
-              ),
-            ),
-          ),
+                        .getStreamsStatusDetails;
+
+                    if (streamsStatusDetails == null ||
+                        streamsStatusDetails.isEmpty) {
+                      // if the list is empty, show a message
+                      // otherwise if the list is null, show a connection error
+                      return streamsStatusDetails == null
+                          ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Colors.redAccent,
+                                    size: 100.0,
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Text(
+                                    'Connection Error',
+                                    style: TextStyle(
+                                      fontSize: 24.0,
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.barsStaggered,
+                                    size: 100.0,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Text(
+                                    'No streams found',
+                                    style: TextStyle(
+                                      fontSize: 20.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                    }
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      shrinkWrap: true,
+                      itemCount: streamsStatusDetails.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount:
+                            max(MediaQuery.of(context).size.width ~/ 280.0, 1),
+                        childAspectRatio: 3 / 2,
+                        mainAxisSpacing: 5.0,
+                        crossAxisSpacing: 3.0,
+                      ),
+                      itemBuilder: (BuildContext context, int index) {
+                        return StreamCard(
+                          stream: streamsStatusDetails[index],
+                          loadStreamView: () => context
+                              .read<StreamsController>()
+                              .loadAllStreamStatus(true),
+                        );
+                      },
+                    );
+                  },
+                ),
           SafeArea(
             child: Container(
               alignment: Alignment.bottomRight,

@@ -106,21 +106,18 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                 child: CircularMotion.builder(
                   behavior: HitTestBehavior.opaque,
                   centerWidget: FlutterRipple(
-                    onTap: () {
-                      _radar();
-                    },
-                    child: Visibility(
-                      visible: !_isPinging,
-                      replacement: LoadingAnimationWidget.beat(
-                        size: 60,
-                        color: Colors.white,
-                      ),
-                      child: const Icon(
-                        Icons.refresh,
-                        size: 50,
-                      ),
-                    ),
-                  ),
+                      onTap: () {
+                        _radar();
+                      },
+                      child: _isPinging
+                          ? LoadingAnimationWidget.beat(
+                              size: 60,
+                              color: Colors.white,
+                            )
+                          : const Icon(
+                              Icons.refresh,
+                              size: 50,
+                            )),
                   itemCount: devices.length,
                   builder: (context, index) {
                     return _deviceIcon(index);

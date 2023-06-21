@@ -43,6 +43,14 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
   Timer? timer;
   bool isLoading = true;
 
+  final errorWidget = const Center(
+    child: Icon(
+      Icons.warning_amber_rounded,
+      color: Colors.redAccent,
+      size: 40,
+    ),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -189,13 +197,11 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
             body: Column(
               children: [
                 Expanded(
-                  child: Visibility(
-                    visible: MediaQuery.of(context).orientation ==
-                            Orientation.landscape &&
-                        MediaQuery.of(context).size.width > 1000,
-                    replacement: _columView(),
-                    child: _rowView(),
-                  ),
+                  child: MediaQuery.of(context).orientation ==
+                              Orientation.landscape &&
+                          MediaQuery.of(context).size.width > 1000
+                      ? _rowView()
+                      : _columView(),
                 ),
                 StreamProgressBar(
                   status: stream?.streamStatus,
@@ -220,32 +226,22 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       children: [
         Expanded(
           flex: 4,
-          child: Visibility(
-            visible: !isLoading,
-            replacement: Center(
-              child: LoadingAnimationWidget.threeArchedCircle(
-                color: Colors.grey,
-                size: 40.0,
-              ),
-            ),
-            child: Visibility(
-              visible: stream != null,
-              replacement: const Center(
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.redAccent,
-                  size: 40,
-                ),
-              ),
-              child: StreamGraph(
-                streamId: stream?.streamId ?? ' ',
-                runningGenerators:
-                    stream?.runningGenerators ?? const Processes.empty(),
-                runningVerifiers:
-                    stream?.runningVerifiers ?? const Processes.empty(),
-              ),
-            ),
-          ),
+          child: isLoading
+              ? Center(
+                  child: LoadingAnimationWidget.threeArchedCircle(
+                    color: Colors.grey,
+                    size: 40.0,
+                  ),
+                )
+              : stream == null
+                  ? errorWidget
+                  : StreamGraph(
+                      streamId: stream?.streamId ?? ' ',
+                      runningGenerators:
+                          stream?.runningGenerators ?? const Processes.empty(),
+                      runningVerifiers:
+                          stream?.runningVerifiers ?? const Processes.empty(),
+                    ),
         ),
         const VerticalDivider(
           width: 5,
@@ -255,26 +251,16 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         ),
         Expanded(
           flex: 2,
-          child: Visibility(
-            visible: !isLoading,
-            replacement: Center(
-              child: LoadingAnimationWidget.threeArchedCircle(
-                color: Colors.grey,
-                size: 40.0,
-              ),
-            ),
-            child: Visibility(
-              visible: stream != null,
-              replacement: const Center(
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.redAccent,
-                  size: 40,
-                ),
-              ),
-              child: _streamFieldsDetails(),
-            ),
-          ),
+          child: isLoading
+              ? Center(
+                  child: LoadingAnimationWidget.threeArchedCircle(
+                    color: Colors.grey,
+                    size: 40.0,
+                  ),
+                )
+              : stream == null
+                  ? errorWidget
+                  : _streamFieldsDetails(),
         ),
       ],
     );
@@ -285,32 +271,22 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
       children: [
         Expanded(
           flex: 4,
-          child: Visibility(
-            visible: !isLoading,
-            replacement: Center(
-              child: LoadingAnimationWidget.threeArchedCircle(
-                color: Colors.grey,
-                size: 40.0,
-              ),
-            ),
-            child: Visibility(
-              visible: stream != null,
-              replacement: const Center(
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.redAccent,
-                  size: 40,
-                ),
-              ),
-              child: StreamGraph(
-                streamId: stream?.streamId ?? ' ',
-                runningGenerators:
-                    stream?.runningGenerators ?? const Processes.empty(),
-                runningVerifiers:
-                    stream?.runningVerifiers ?? const Processes.empty(),
-              ),
-            ),
-          ),
+          child: isLoading
+              ? Center(
+                  child: LoadingAnimationWidget.threeArchedCircle(
+                    color: Colors.grey,
+                    size: 40.0,
+                  ),
+                )
+              : stream == null
+                  ? errorWidget
+                  : StreamGraph(
+                      streamId: stream?.streamId ?? ' ',
+                      runningGenerators:
+                          stream?.runningGenerators ?? const Processes.empty(),
+                      runningVerifiers:
+                          stream?.runningVerifiers ?? const Processes.empty(),
+                    ),
         ),
         const VerticalDivider(
           width: 5,
@@ -320,26 +296,16 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
         ),
         Expanded(
           flex: 2,
-          child: Visibility(
-            visible: !isLoading,
-            replacement: Center(
-              child: LoadingAnimationWidget.threeArchedCircle(
-                color: Colors.grey,
-                size: 40.0,
-              ),
-            ),
-            child: Visibility(
-              visible: stream != null,
-              replacement: const Center(
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.redAccent,
-                  size: 40,
-                ),
-              ),
-              child: _streamFieldsDetails(),
-            ),
-          ),
+          child: isLoading
+              ? Center(
+                  child: LoadingAnimationWidget.threeArchedCircle(
+                    color: Colors.grey,
+                    size: 40.0,
+                  ),
+                )
+              : stream == null
+                  ? errorWidget
+                  : _streamFieldsDetails(),
         ),
       ],
     );

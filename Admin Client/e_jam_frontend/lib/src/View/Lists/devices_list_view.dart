@@ -57,88 +57,82 @@ class _DevicesListViewState extends State<DevicesListView> {
       appBar: devicesListViewAppBar(),
       body: Stack(
         children: [
-          Visibility(
-            visible: !context.watch<DevicesController>().getIsLoading,
-            replacement: Center(
-              child: LoadingAnimationWidget.threeArchedCircle(
-                color: Colors.grey,
-                size: 70.0,
-              ),
-            ),
-            child: Visibility(
-              child: Visibility(
-                visible: context.watch<DevicesController>().getDevices !=
-                        null &&
-                    context.watch<DevicesController>().getDevices!.isNotEmpty,
-                replacement: Visibility(
-                  visible: context.watch<DevicesController>().getDevices !=
-                          null &&
-                      context.watch<DevicesController>().getDevices!.isEmpty,
-                  replacement: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.warning_amber_rounded,
-                          color: Colors.redAccent,
-                          size: 100.0,
-                        ),
-                        SizedBox(height: 10.0),
-                        Text(
-                          'Connection Error',
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+          context.watch<DevicesController>().getIsLoading
+              ? Center(
+                  child: LoadingAnimationWidget.threeArchedCircle(
+                    color: Colors.grey,
+                    size: 70.0,
                   ),
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(
-                          FontAwesomeIcons.computer,
-                          size: 100.0,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(height: 10.0),
-                        Text(
-                          'No Devices Found',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  shrinkWrap: true,
-                  itemCount:
-                      context.watch<DevicesController>().getDevices?.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: max(
-                        MediaQuery.of(context).copyWith().size.width ~/ 200.0,
-                        1),
-                    childAspectRatio: 2 / 3,
-                    mainAxisSpacing: 5.0,
-                    crossAxisSpacing: 3.0,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return DeviceCard(
-                      device:
-                          context.watch<DevicesController>().getDevices![index],
+                )
+              : LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    List<Device>? devices =
+                        context.watch<DevicesController>().getDevices;
+                    if (devices == null || devices.isEmpty) {
+                      return devices == null
+                          ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.warning_amber_rounded,
+                                    color: Colors.redAccent,
+                                    size: 100.0,
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Text(
+                                    'Connection Error',
+                                    style: TextStyle(
+                                      fontSize: 24.0,
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.computer,
+                                    size: 100.0,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Text(
+                                    'No Devices Found',
+                                    style: TextStyle(
+                                      fontSize: 20.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                    }
+                    return GridView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      shrinkWrap: true,
+                      itemCount: devices.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: max(
+                            MediaQuery.of(context).copyWith().size.width ~/
+                                200.0,
+                            1),
+                        childAspectRatio: 2 / 3,
+                        mainAxisSpacing: 5.0,
+                        crossAxisSpacing: 3.0,
+                      ),
+                      itemBuilder: (BuildContext context, int index) {
+                        return DeviceCard(
+                          device: devices[index],
+                        );
+                      },
                     );
                   },
                 ),
-              ),
-            ),
-          ),
           SafeArea(
             child: Container(
               alignment: Alignment.bottomRight,
@@ -186,33 +180,31 @@ class _DevicesListViewState extends State<DevicesListView> {
         ),
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
-          child: Visibility(
-            visible: !_isPinging,
-            replacement: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: LoadingAnimationWidget.beat(
-                color: Colors.lightBlue.shade300,
-                size: 20.0,
-              ),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                MaterialCommunityIcons.wifi_sync,
-                size: 20,
-              ),
-              onPressed: _pingAll,
-              tooltip: _isPinged == null
-                  ? 'Ping devices'
-                  : _isPinged!
-                      ? 'some Devices are online'
-                      : 'All Devices offline',
-              color: _isPinged == null
-                  ? Colors.lightBlue.shade300
-                  : _isPinged!
-                      ? deviceStatusColorScheme(DeviceStatus.online)
-                      : deviceStatusColorScheme(DeviceStatus.offline),
-            ),
-          ),
+          child: _isPinging
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: LoadingAnimationWidget.beat(
+                    color: Colors.lightBlue.shade300,
+                    size: 20.0,
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(
+                    MaterialCommunityIcons.wifi_sync,
+                    size: 20,
+                  ),
+                  onPressed: _pingAll,
+                  tooltip: _isPinged == null
+                      ? 'Ping devices'
+                      : _isPinged!
+                          ? 'some Devices are online'
+                          : 'All Devices offline',
+                  color: _isPinged == null
+                      ? Colors.lightBlue.shade300
+                      : _isPinged!
+                          ? deviceStatusColorScheme(DeviceStatus.online)
+                          : deviceStatusColorScheme(DeviceStatus.offline),
+                ),
         ),
         IconButton(
           icon: const FaIcon(

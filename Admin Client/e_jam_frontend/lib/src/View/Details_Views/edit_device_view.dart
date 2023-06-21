@@ -167,33 +167,31 @@ class _DevicePingerState extends State<DevicePinger> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
-      child: Visibility(
-        visible: !_isPinging,
-        replacement: Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: LoadingAnimationWidget.beat(
-            color: Colors.lightBlueAccent,
-            size: 20.0,
-          ),
-        ),
-        child: IconButton(
-          icon: const Icon(
-            MaterialCommunityIcons.wifi_sync,
-            size: 20,
-          ),
-          onPressed: () => _pingDevice(),
-          tooltip: _isPinged == null
-              ? 'Ping device'
-              : _isPinged!
-                  ? 'Device is online'
-                  : 'Device is offline',
-          color: _isPinged == null
-              ? Colors.lightBlueAccent
-              : _isPinged!
-                  ? deviceStatusColorScheme(DeviceStatus.online)
-                  : deviceStatusColorScheme(DeviceStatus.offline),
-        ),
-      ),
+      child: _isPinging
+          ? Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: LoadingAnimationWidget.beat(
+                color: Colors.lightBlueAccent,
+                size: 20.0,
+              ),
+            )
+          : IconButton(
+              icon: const Icon(
+                MaterialCommunityIcons.wifi_sync,
+                size: 20,
+              ),
+              onPressed: () => _pingDevice(),
+              tooltip: _isPinged == null
+                  ? 'Ping device'
+                  : _isPinged!
+                      ? 'Device is online'
+                      : 'Device is offline',
+              color: _isPinged == null
+                  ? Colors.lightBlueAccent
+                  : _isPinged!
+                      ? deviceStatusColorScheme(DeviceStatus.online)
+                      : deviceStatusColorScheme(DeviceStatus.offline),
+            ),
     );
   }
 }

@@ -595,33 +595,31 @@ class _DevicePingerState extends State<DevicePinger> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 4.0),
-      child: Visibility(
-        visible: !_isPinging,
-        replacement: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: LoadingAnimationWidget.beat(
-            color: Colors.lightBlueAccent,
-            size: 20.0,
-          ),
-        ),
-        child: IconButton(
-          icon: const Icon(
-            MaterialCommunityIcons.wifi_sync,
-            size: 20,
-          ),
-          onPressed: () => _pingDevice(),
-          tooltip: _isPinged == null
-              ? 'Ping Device'
-              : _isPinged!
-                  ? 'Device is Online'
-                  : 'Device is Offline',
-          color: _isPinged == null
-              ? Colors.lightBlueAccent
-              : _isPinged!
-                  ? deviceStatusColorScheme(DeviceStatus.online)
-                  : deviceStatusColorScheme(DeviceStatus.offline),
-        ),
-      ),
+      child: _isPinging
+          ? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: LoadingAnimationWidget.beat(
+                color: Colors.lightBlueAccent,
+                size: 20.0,
+              ),
+            )
+          : IconButton(
+              icon: const Icon(
+                MaterialCommunityIcons.wifi_sync,
+                size: 20,
+              ),
+              onPressed: () => _pingDevice(),
+              tooltip: _isPinged == null
+                  ? 'Ping Device'
+                  : _isPinged!
+                      ? 'Device is Online'
+                      : 'Device is Offline',
+              color: _isPinged == null
+                  ? Colors.lightBlueAccent
+                  : _isPinged!
+                      ? deviceStatusColorScheme(DeviceStatus.online)
+                      : deviceStatusColorScheme(DeviceStatus.offline),
+            ),
     );
   }
 }
@@ -643,27 +641,25 @@ class _MacAddressState extends State<MacAddress> {
       leading: const Icon(
         MaterialCommunityIcons.ethernet,
       ),
-      title: Visibility(
-        visible: macIsShown,
-        replacement: IconButton(
-          icon: const Icon(
-            MaterialCommunityIcons.lock,
-          ),
-          color: Colors.red,
-          tooltip: 'Show MAC Address',
-          onPressed: () {
-            macIsShown = true;
-            setState(() {});
-          },
-        ),
-        child: Text(
-          widget.macAddress,
-          textAlign: TextAlign.left,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      title: !macIsShown
+          ? IconButton(
+              icon: const Icon(
+                MaterialCommunityIcons.lock,
+              ),
+              color: Colors.red,
+              tooltip: 'Show MAC Address',
+              onPressed: () {
+                macIsShown = true;
+                setState(() {});
+              },
+            )
+          : Text(
+              widget.macAddress,
+              textAlign: TextAlign.left,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 }

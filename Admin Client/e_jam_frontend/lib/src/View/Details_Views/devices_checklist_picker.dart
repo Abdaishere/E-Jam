@@ -148,62 +148,59 @@ class _DevicesCheckListPickerState extends State<DevicesCheckListPicker> {
               ),
             ],
           ),
-          body: Visibility(
-            visible:
-                _devicesMap.isNotEmpty && DevicesController.devices != null,
-            replacement: Center(
-              child: DevicesController.devices == null
-                  ? const Text('Cannot Get Devices')
-                  : const Text('No Devices Found'),
-            ),
-            child: ListView.builder(
-              itemCount: _devicesMap.length,
-              itemBuilder: (context, index) {
-                if (index >= DevicesController.devices!.length) {
-                  return CheckboxListTile(
-                    title: const Text("Unknown Device"),
-                    subtitle: Text(
-                      _getName(index),
-                    ),
-                    value: true,
-                    secondary: const Icon(
-                      MaterialCommunityIcons.alert_box_outline,
-                      color: Colors.red,
-                    ),
-                    onChanged: (value) {
-                      _devicesMap.remove(_devicesMap.keys.elementAt(index));
-                      setState(() {});
-                    },
-                  );
-                }
-                return CheckboxListTile(
-                  title: Text(
-                    _getName(index),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                      '${DevicesController.devices![index].ipAddress}:${DevicesController.devices![index].port}'),
-                  value: _devicesMap.values.elementAt(index),
-                  secondary: Icon(
-                    getDeviceIcon(DevicesController.devices![index].name),
-                    color: deviceStatusColorScheme(
-                        DevicesController.devices![index].status),
-                  ),
-                  checkboxShape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(4),
-                    ),
-                  ),
-                  activeColor:
-                      widget.areGenerators ? uploadColor : downloadColor,
-                  onChanged: (value) {
-                    _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
-                    setState(() {});
+          body: DevicesController.devices == null || _devicesMap.isEmpty
+              ? Center(
+                  child: DevicesController.devices == null
+                      ? const Text('Cannot Get Devices')
+                      : const Text('No Devices Found'),
+                )
+              : ListView.builder(
+                  itemCount: _devicesMap.length,
+                  itemBuilder: (context, index) {
+                    if (index >= DevicesController.devices!.length) {
+                      return CheckboxListTile(
+                        title: const Text("Unknown Device"),
+                        subtitle: Text(
+                          _getName(index),
+                        ),
+                        value: true,
+                        secondary: const Icon(
+                          MaterialCommunityIcons.alert_box_outline,
+                          color: Colors.red,
+                        ),
+                        onChanged: (value) {
+                          _devicesMap.remove(_devicesMap.keys.elementAt(index));
+                          setState(() {});
+                        },
+                      );
+                    }
+                    return CheckboxListTile(
+                      title: Text(
+                        _getName(index),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                          '${DevicesController.devices![index].ipAddress}:${DevicesController.devices![index].port}'),
+                      value: _devicesMap.values.elementAt(index),
+                      secondary: Icon(
+                        getDeviceIcon(DevicesController.devices![index].name),
+                        color: deviceStatusColorScheme(
+                            DevicesController.devices![index].status),
+                      ),
+                      checkboxShape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(4),
+                        ),
+                      ),
+                      activeColor:
+                          widget.areGenerators ? uploadColor : downloadColor,
+                      onChanged: (value) {
+                        _devicesMap[_devicesMap.keys.elementAt(index)] = value!;
+                        setState(() {});
+                      },
+                    );
                   },
-                );
-              },
-            ),
-          ),
+                ),
           bottomNavigationBar: _bottomOptionsBar(),
         ),
       ),

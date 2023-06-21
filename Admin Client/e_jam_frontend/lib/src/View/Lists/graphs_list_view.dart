@@ -57,124 +57,123 @@ class _GraphsListViewState extends State<GraphsListView> {
         centerTitle: true,
         leading: const DrawerWidget(),
       ),
-      body: Visibility(
-        visible: SystemSettings.pinnedElements.isNotEmpty,
-        replacement: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                MaterialCommunityIcons.chart_arc,
-                size: 100.0,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 10.0),
-              Text(
-                'No Pinned Charts Selected',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-        ),
-        child: GridView.builder(
-          padding: const EdgeInsets.all(8.0),
-          shrinkWrap: true,
-          itemCount: SystemSettings.pinnedElements.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            childAspectRatio: 2,
-            mainAxisSpacing: 5.0,
-            crossAxisSpacing: 3.0,
-          ),
-          itemBuilder: (BuildContext context, int index) {
-            Widget graph;
-            if (SystemSettings.pinnedElements[index].startsWith("D")) {
-              String macAddress =
-                  SystemSettings.pinnedElements[index].substring(1);
-              graph = Column(
+      body: SystemSettings.pinnedElements.isEmpty
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const SizedBox.shrink(),
-                      Text(
-                        "Device $macAddress",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                      deleteButton(index),
-                    ],
+                  Icon(
+                    MaterialCommunityIcons.chart_arc,
+                    size: 100.0,
+                    color: Colors.grey,
                   ),
-                  Expanded(
-                    child: DevicePacketsCounterDoughnut(
-                      mac: macAddress,
+                  SizedBox(height: 10.0),
+                  Text(
+                    'No Pinned Charts Selected',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.grey,
                     ),
                   ),
-                  const Divider(),
-                  DeviceSpeedMonitor(mac: macAddress),
                 ],
-              );
-            } else if (SystemSettings.pinnedElements[index].startsWith("S")) {
-              String streamId =
-                  SystemSettings.pinnedElements[index].substring(1);
-
-              List<StreamEntry> streams =
-                  context.read<StreamsController>().getStreams ?? [];
-              StreamEntry? stream = streams
-                  .firstWhereOrNull((element) => element.streamId == streamId);
-
-              late Processes runningGenerators;
-              late Processes runningVerifiers;
-
-              runningGenerators =
-                  stream?.runningGenerators ?? const Processes.empty();
-              runningVerifiers =
-                  stream?.runningVerifiers ?? const Processes.empty();
-              graph = Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.all(8.0),
+              shrinkWrap: true,
+              itemCount: SystemSettings.pinnedElements.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                childAspectRatio: 2,
+                mainAxisSpacing: 5.0,
+                crossAxisSpacing: 3.0,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                Widget graph;
+                if (SystemSettings.pinnedElements[index].startsWith("D")) {
+                  String macAddress =
+                      SystemSettings.pinnedElements[index].substring(1);
+                  graph = Column(
                     children: [
-                      const SizedBox.shrink(),
-                      Text(
-                        "Stream $streamId",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox.shrink(),
+                          Text(
+                            "Device $macAddress",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          deleteButton(index),
+                        ],
+                      ),
+                      Expanded(
+                        child: DevicePacketsCounterDoughnut(
+                          mac: macAddress,
                         ),
                       ),
-                      deleteButton(index),
+                      const Divider(),
+                      DeviceSpeedMonitor(mac: macAddress),
                     ],
+                  );
+                } else if (SystemSettings.pinnedElements[index]
+                    .startsWith("S")) {
+                  String streamId =
+                      SystemSettings.pinnedElements[index].substring(1);
+
+                  List<StreamEntry> streams =
+                      context.read<StreamsController>().getStreams ?? [];
+                  StreamEntry? stream = streams.firstWhereOrNull(
+                      (element) => element.streamId == streamId);
+
+                  late Processes runningGenerators;
+                  late Processes runningVerifiers;
+
+                  runningGenerators =
+                      stream?.runningGenerators ?? const Processes.empty();
+                  runningVerifiers =
+                      stream?.runningVerifiers ?? const Processes.empty();
+                  graph = Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox.shrink(),
+                          Text(
+                            "Stream $streamId",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          deleteButton(index),
+                        ],
+                      ),
+                      Expanded(
+                        child: StreamGraph(
+                          streamId: streamId,
+                          runningGenerators: runningGenerators,
+                          runningVerifiers: runningVerifiers,
+                        ),
+                      ),
+                      const Divider(),
+                      StreamSpeedMonitor(id: streamId),
+                    ],
+                  );
+                } else {
+                  graph = const Text("Error");
+                }
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 8.0, left: 8.0, right: 8.0, bottom: 8.0),
+                    child: graph,
                   ),
-                  Expanded(
-                    child: StreamGraph(
-                      streamId: streamId,
-                      runningGenerators: runningGenerators,
-                      runningVerifiers: runningVerifiers,
-                    ),
-                  ),
-                  const Divider(),
-                  StreamSpeedMonitor(id: streamId),
-                ],
-              );
-            } else {
-              graph = const Text("Error");
-            }
-            return Card(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 8.0, left: 8.0, right: 8.0, bottom: 8.0),
-                child: graph,
-              ),
-            );
-          },
-        ),
-      ),
+                );
+              },
+            ),
     );
   }
 }

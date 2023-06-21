@@ -67,81 +67,79 @@ class _StreamDevicesListState extends State<StreamDevicesList> {
               ),
             ],
           ),
-          body: Visibility(
-            visible: widget.process != null &&
-                widget.process!.processesMap.isNotEmpty &&
-                DevicesController.devices != null,
-            replacement: Center(
-              child: DevicesController.devices == null
-                  ? const Text('Cannot Get Devices List')
-                  : const Text('No Devices Running'),
-            ),
-            child: ListView.builder(
-              itemCount: widget.process?.processesMap.length ?? 0,
-              itemBuilder: (context, index) {
-                String macAddress =
-                    widget.process!.processesMap.keys.elementAt(index);
-                index = DevicesController.devices!
-                    .indexWhere((element) => element.macAddress == macAddress);
-                if (index == -1) {
-                  return ListTile(
-                    title: Text(
-                      macAddress,
-                    ),
-                    subtitle: const Text(
-                      'Unknown Device',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.red),
-                    ),
-                    leading: const Icon(
-                      MaterialCommunityIcons.help_network,
-                    ),
-                    trailing: RotationTransition(
-                      turns: const AlwaysStoppedAnimation(320 / 360),
-                      child: Text(
-                        processStatusToString(
-                            widget.process!.processesMap[macAddress]),
-                        style: TextStyle(
-                          color: processStatusColorScheme(
-                              widget.process!.processesMap[macAddress]),
-                          fontSize: 15,
+          body: widget.process == null ||
+                  DevicesController.devices == null ||
+                  widget.process!.processesMap.isEmpty
+              ? Center(
+                  child: DevicesController.devices == null
+                      ? const Text('Cannot Get Devices List')
+                      : const Text('No Devices Running'),
+                )
+              : ListView.builder(
+                  itemCount: widget.process?.processesMap.length ?? 0,
+                  itemBuilder: (context, index) {
+                    String macAddress =
+                        widget.process!.processesMap.keys.elementAt(index);
+                    index = DevicesController.devices!.indexWhere(
+                        (element) => element.macAddress == macAddress);
+                    if (index == -1) {
+                      return ListTile(
+                        title: Text(
+                          macAddress,
+                        ),
+                        subtitle: const Text(
+                          'Unknown Device',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.red),
+                        ),
+                        leading: const Icon(
+                          MaterialCommunityIcons.help_network,
+                        ),
+                        trailing: RotationTransition(
+                          turns: const AlwaysStoppedAnimation(320 / 360),
+                          child: Text(
+                            processStatusToString(
+                                widget.process!.processesMap[macAddress]),
+                            style: TextStyle(
+                              color: processStatusColorScheme(
+                                  widget.process!.processesMap[macAddress]),
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return ListTile(
+                      title: Text(
+                        DevicesController.devices![index].name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(macAddress),
+                      leading: Icon(
+                        getDeviceIcon(DevicesController.devices![index].name),
+                        color: deviceStatusColorScheme(
+                            DevicesController.devices![index].status),
+                      ),
+                      trailing: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          child: Text(
+                            processStatusToString(
+                                widget.process!.processesMap[macAddress]),
+                            style: TextStyle(
+                              color: processStatusColorScheme(
+                                  widget.process!.processesMap[macAddress]),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
-                return ListTile(
-                  title: Text(
-                    DevicesController.devices![index].name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(macAddress),
-                  leading: Icon(
-                    getDeviceIcon(DevicesController.devices![index].name),
-                    color: deviceStatusColorScheme(
-                        DevicesController.devices![index].status),
-                  ),
-                  trailing: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 1),
-                      child: Text(
-                        processStatusToString(
-                            widget.process!.processesMap[macAddress]),
-                        style: TextStyle(
-                          color: processStatusColorScheme(
-                              widget.process!.processesMap[macAddress]),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+                    );
+                  },
+                ),
         ),
       ),
     );
