@@ -40,7 +40,7 @@ pub async fn generate_fake_stream_entries(
     stream_entries: &Mutex<HashMap<String, StreamEntry>>,
     devices_list: &Mutex<HashMap<String, Device>>,
     count: usize,
-    stream_id_counter: &Mutex<usize>,
+    stream_id_counter: &Mutex<u32>,
     streams_entries: &Mutex<HashMap<String, StreamEntry>>,
 ) {
     let mut devices_list = devices_list.lock().await;

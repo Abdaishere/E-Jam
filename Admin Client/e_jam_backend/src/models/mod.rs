@@ -1184,14 +1184,11 @@ impl StreamEntry {
     pub async fn generate_fake_stream_entry(
         generators_macs: Vec<String>,
         verifiers_macs: Vec<String>,
-        stream_id_counter: &Mutex<usize>,
+        stream_id_counter: &Mutex<u32>,
         streams_entries: &Mutex<HashMap<String, StreamEntry>>,
     ) -> StreamEntry {
-        use chrono::{prelude::*, Duration};
-        use fake::{
-            faker::internet::en::{UserAgent, Username},
-            Fake, Faker,
-        };
+        use chrono::prelude::*;
+        use fake::{faker::company::en::Buzzword, faker::internet::en::UserAgent, Fake, Faker};
 
         let start_time = Utc::now() - Duration::minutes(40);
         let end_time = Utc::now() + Duration::minutes(40);
@@ -1265,7 +1262,7 @@ impl StreamEntry {
 
             let mut stream = StreamEntry {
                 stream_id: "".to_string(),
-                name: Username().fake::<String>(),
+                name: Buzzword().fake::<String>(),
                 description: UserAgent().fake::<String>(),
                 delay: Faker.fake(),
                 generators_ids: generators_macs.to_owned(),
