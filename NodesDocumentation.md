@@ -9,8 +9,6 @@ The packets will consist of normal ethernet packets with the addition of some fi
 
 -Stream ID (2-byte field)
 
--GeneratorID (2-byte field)
-
 -Sequence Number (8-byte field)
 
 -Data
