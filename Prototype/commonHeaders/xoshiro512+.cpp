@@ -9,6 +9,7 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
 #define XOROSHIRO
 #include <stdint.h>
 #include <string.h>
+#include <iostream>
 
 /* This is xoshiro512+ 1.0, our generator for floating-point numbers with
    increased state size. We suggest to use its upper bits for
@@ -32,11 +33,11 @@ class XOSHIRO_PRNG {
     uint64_t s[8];
 public:
 
-    void setSeed(uint64_t x){
-        memset(s, 0, sizeof s);
-        s[0] = x;
+    void setSeed(uint64_t* x){
+        memcpy(s, x, sizeof s);
     }
 
+    //Complexity : 12 operations
     uint64_t next(void) {
         const uint64_t result = s[0] + s[2];
 
@@ -80,12 +81,33 @@ public:
         memcpy(s, t, sizeof s);
     }
 
+    void jump(uint64_t* newS, const uint64_t* oldS){
+        static const uint64_t JUMP[] = {0x33ed89b6e7a353f9, 0x760083d7955323be, 0x2837f2fbb5f22fae, 0x4b8c5674d309511c,
+                                        0xb11ac47a7ba28c25, 0xf1be7667092bcc1c, 0x53851efdb6df0aaf, 0x1ebbc8b23eaf25db};
+
+        memcpy(s, oldS, sizeof s);
+        uint64_t t[sizeof s / sizeof *s];
+        memset(t, 0, sizeof t);
+        for (int i = 0; i < sizeof JUMP / sizeof *JUMP; i++)
+            for (int b = 0; b < 64; b++) {
+                if (JUMP[i] & UINT64_C(1) << b)
+                    for (int w = 0; w < sizeof s / sizeof *s; w++)
+                        t[w] ^= s[w];
+                next();
+            }
+
+
+        memcpy(newS, t, sizeof t);
+    }
+
 
 /* This is the long-jump function for the generator. It is equivalent to
    2^384 calls to next(); it can be used to generate 2^128 starting points,
    from each of which jump() will generate 2^128 non-overlapping
    subsequences for parallel distributed computations. */
 
+    //Complexity : LONG_JUMP size * 64 * state size = 8 * 64 * 8 = 4096 operations
+    //width of each partition is 2^384 which includes 2^(384-256) = 2^128 partitions of the standard jump
     void long_jump(void) {
         static const uint64_t LONG_JUMP[] = {0x11467fef8f921d28, 0xa2a819f2e79c8ea8, 0xa8299fc284b3959a,
                                              0xb4d347340ca63ee1, 0x1cb0940bedbff6ce, 0xd956c5c4fa1f8e17,

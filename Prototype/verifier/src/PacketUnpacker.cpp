@@ -25,9 +25,14 @@ PacketUnpacker::PacketUnpacker(int verID, Configuration configuration)
     std::sort(srcMacAddresses.begin(), srcMacAddresses.end());
 
     int genNum = (int)senders.size();
-    frameVerifier = std::vector<FrameVerifier> (genNum, FrameVerifier(configuration));
-    payloadVerifier = std::vector<PayloadVerifier> (genNum, PayloadVerifier(configuration));
-    seqChecker = std::vector<SeqChecker> (genNum, SeqChecker());
+    frameVerifier = std::vector<FrameVerifier> ();
+    payloadVerifier = std::vector<PayloadVerifier> ();
+    seqChecker = std::vector<SeqChecker> ();
+    for(int i=0; i<genNum; i++){
+        frameVerifier.emplace_back(configuration);
+        payloadVerifier.emplace_back(configuration, i);
+        seqChecker.emplace_back();
+    }
 
 	statsManager = StatsManager::getInstance(configuration,verID, false);
 }
@@ -93,7 +98,7 @@ void PacketUnpacker::verifiyPacket()
 
 	if(configuration.getCheckContent())
 	{
-		bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex);
+		bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex, seqNum);
 		pcktVerified &=payloadStatus;
 		//must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
 		if(!frameStatus)

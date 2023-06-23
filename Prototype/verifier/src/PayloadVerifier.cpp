@@ -1,11 +1,18 @@
 #include "PayloadVerifier.h"
 
-PayloadVerifier::PayloadVerifier(Configuration configuration)
+PayloadVerifier::PayloadVerifier(Configuration configuration, int genID)
 {
+    gen_global_ID = genID;
+    if(configuration.getPayloadType() == RANDOM){
+        rng.setSeed(configuration.getSeed());
+        for(int i=0; i<gen_global_ID; i++)
+            rng.long_jump();
+        rng.fillTable(1);
+    }
     this->configuration = configuration;
 }
 
-bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray>& packet, int startIndex, int endIndex)
+bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray>& packet, int startIndex, int endIndex, int packetNumber)
 {
     bool status = true;
     switch(configuration.getPayloadType())
@@ -38,10 +45,15 @@ bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray>& packet, int startIndex
             }
             break;
         }
-        case RANDOM:
-            //TODO check random payload type
+        case RANDOM: {
+            rng.goTo(packetNumber);
             status = true;
+            for (int i = startIndex; i <= endIndex; i++) {
+                if (packet->at(i) != rng.gen())
+                    status = false;
+            }
             break;
+        }
     }
     if(!status)
     {

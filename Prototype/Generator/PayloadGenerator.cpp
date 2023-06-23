@@ -2,7 +2,7 @@
 #include "PayloadGenerator.h"
 
 PayloadGenerator::PayloadGenerator(Configuration configuration) {
-    int seed = configuration.getSeed();
+    uint64_t seed = configuration.getSeed();
     this->rng.setSeed(seed);
 
     int payloadLength = configuration.getPayloadLength();
@@ -10,13 +10,26 @@ PayloadGenerator::PayloadGenerator(Configuration configuration) {
     payloadType = configuration.getPayloadType();
 }
 
-void PayloadGenerator::generateRandomCharacters() {
+PayloadGenerator::PayloadGenerator(Configuration configuration, int global_id):global_id(global_id) {
+    //initialize RNG
+    uint64_t seed = configuration.getSeed();
+    this->rng.setSeed(seed);
+    for(int i=0; i<global_id; ++i)
+        this->rng.long_jump();
+    rng.fillTable(1);
+
+    int payloadLength = configuration.getPayloadLength();
+    payload = ByteArray(payloadLength, 'a');
+    payloadType = configuration.getPayloadType();
+}
+
+void PayloadGenerator::generateRandomCharacters(int packetNumber) {
+    rng.goTo(packetNumber);
     for (int i = 0; i < payload.size(); i++)
         payload.at(i) = rng.gen();
 }
 
-void PayloadGenerator::regeneratePayload() {
-    //heuristic for payload type
+void PayloadGenerator::regeneratePayload(uint64_t seqNum) {
     switch (payloadType) {
         case FIRST:
             generateFirstAlphabet(); //first half of alphabet a--m
@@ -25,7 +38,7 @@ void PayloadGenerator::regeneratePayload() {
             generateSecondAlphabet(); //second half of alphabet n--z
             break;
         default:
-            generateRandomCharacters(); //random chars
+            generateRandomCharacters(seqNum); //random chars
     }
 }
 

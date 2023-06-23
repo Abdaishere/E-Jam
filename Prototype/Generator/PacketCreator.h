@@ -29,7 +29,7 @@ private:
     Configuration configuration;
     EthernetConstructor ethernetConstructor;
     int global_id;
-    XOSHIRO_PRNG rng;
+    uint64_t seqNum;
 public:
     PacketCreator(Configuration, int id = 0);
     static std::mutex mtx;
