@@ -74,6 +74,22 @@ public:
         return filePath != nullptr;
     }
 
+
+
+	//DEBUG FUNCTIONS
+	//#######################################
+	void setMacAddress(ByteArray newAdd)
+	{
+		myMacAddress = newAdd;
+	}
+	void setFilePath(char* path)
+	{
+		filePath = path;
+	}
+	//##############################################
+
+
+
     //Discover the mac address of this machine
     ByteArray discoverMyMac()
     {
@@ -247,8 +263,18 @@ public:
         }
     }
 
+    //get my global id for generator (amongst all generators in the stream)
+    int getID(ByteArray mac){
+        int sendersSize = senders.size();
+        for(int i=0; i<sendersSize; i++){
+            if(senders[i] == mac)
+                return i;
+        }
+        return -1;
+    }
+
     //getters and setters
-    
+
     std::vector<ByteArray>& getSenders()
     {
         return senders;
@@ -259,7 +285,7 @@ public:
         Configuration::senders = inSenders;
     }
 
-    std::vector<ByteArray>& getReceivers() 
+    std::vector<ByteArray>& getReceivers()
     {
         return receivers;
     }
@@ -362,6 +388,14 @@ public:
     }
 
 
+    ull getBurstLength()
+    {
+        return burstLen;
+    }
+    ull getBurstDelay()
+    {
+        return burstDelay;
+    }
     //Printing for debugging only
     void print()
     {
@@ -397,6 +431,8 @@ public:
         printf("bcFramesNum: %llu\n", bcFramesNum);
         printf("interFrameGap: %llu\n", interFrameGap);
         printf("lifeTime: %llu\n", lifeTime);
+        printf("BurstDelay: %llu\n", burstDelay);
+        printf("BurstLength: %llu\n", burstLen);
 
         switch (transportProtocol)
         {

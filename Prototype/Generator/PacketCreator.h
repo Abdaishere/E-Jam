@@ -11,7 +11,7 @@
 #include "FrameConstructor.h"
 #include "EthernetConstructor.h"
 #include "PacketSender.h"
-
+#include "xoshiro512+.cpp"
 struct segmentConstructorInfo{
     //some relevant values regarding the headers of the protocol
     //payload
@@ -28,8 +28,10 @@ private:
     PayloadGenerator payloadGenerator;
     Configuration configuration;
     EthernetConstructor ethernetConstructor;
+    int global_id;
+    uint64_t seqNum;
 public:
-    PacketCreator(Configuration);
+    PacketCreator(Configuration, int id = 0);
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
     void createPacket(int);

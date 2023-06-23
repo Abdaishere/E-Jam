@@ -43,11 +43,7 @@ public class UTILs {
     }
 
     public static Set<String> listFiles(String dir) {
-        File absPath = new File(System.getProperty("user.dir"));
-        String curDir = absPath.getParent();
-        StringBuilder sb = new StringBuilder();
-        sb = sb.append(curDir).append(dir);
-        dir = sb.toString();
+        System.out.println(dir);
         return Stream.of(new File(dir).listFiles())
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)

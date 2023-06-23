@@ -8,7 +8,7 @@
         <version>2.6.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>com.ejam</groupId>
     <artifactId>SystemApi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SystemApi</name>
@@ -48,7 +48,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.example</groupId>
+            <groupId>com.ejam</groupId>
             <artifactId>SystemApi</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -87,12 +87,6 @@
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <version>7.3.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-            <version>1.0.2</version>
         </dependency>
 
         <dependency>

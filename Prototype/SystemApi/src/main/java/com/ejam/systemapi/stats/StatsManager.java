@@ -63,19 +63,16 @@ public class StatsManager implements Runnable {
     }
 
     private void fillGenStats() {
-        System.out.println(verifierStats.size());
-        generatorStats.clear();
-
         //Open pipes that start with sgen_*
-        String parentFolder = "/Executables/genStats/";
+        String parentFolder = "/etc/EJam/stats/genStats/";
 
         ArrayList<BufferedReader> readers = new ArrayList<>();
         Set<String> dirs = UTILs.listFiles(parentFolder);
         ArrayList<String> data = new ArrayList<>();
         for (String dir : dirs) {
-            System.out.println("Dir = " + dir);
+            System.out.println("Dir = " + (parentFolder + dir));
             try {
-                readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(dir))));
+                readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(parentFolder + dir))));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -85,8 +82,10 @@ public class StatsManager implements Runnable {
             public void run() {
                 try {
                     for (BufferedReader reader : readers) {
-                        String line = reader.readLine();
-                        data.add(line);
+                        String line = "";
+                        while ((line = reader.readLine()) != null) {
+                            data.add(line);
+                        }
                         reader.close();
                     }
                 } catch (IOException e) {
@@ -100,19 +99,15 @@ public class StatsManager implements Runnable {
     }
 
     private void fillVerStats() {
-        System.out.println(verifierStats.size());
-        verifierStats.clear();
-
-
         //Open pipes that start with sver_*
-        String parentFolder = "/Executables/verStats/";
+        String parentFolder = "/etc/EJam/stats/verStats/";
 
         ArrayList<BufferedReader> readers = new ArrayList<>();
         Set<String> dirs = UTILs.listFiles(parentFolder);
         ArrayList<String> data = new ArrayList<>();
         for (String dir : dirs) {
             try {
-                readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(dir))));
+                readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(parentFolder + dir))));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -121,8 +116,10 @@ public class StatsManager implements Runnable {
             public void run() {
                 try {
                     for (BufferedReader reader : readers) {
-                        String line = reader.readLine();
-                        data.add(line);
+                        String line = "";
+                        while ((line = reader.readLine()) != null) {
+                            data.add(line);
+                        }
                         reader.close();
                     }
                 } catch (IOException e) {
@@ -209,7 +206,11 @@ public class StatsManager implements Runnable {
                     .setPacketsOutOfOrder(aggregatedPacketsOutOfOrder)
                     .build());
         }
+        generatorStats.clear();
+        verifierStats.clear();
     }
+
+
 
     /**
      *
@@ -222,6 +223,7 @@ public class StatsManager implements Runnable {
                 fillGenStats();
                 fillVerStats();
 
+                System.out.println("After filling");
                 try {
                     genStatsThread.join();
                     verStatsThread.join();
@@ -229,12 +231,14 @@ public class StatsManager implements Runnable {
                     throw new RuntimeException(e);
                 }
 
-                System.out.println("sending");
+                System.out.println("sending size is " + generatorStats.size());
                 sendStatistics();
                 sleep((long) sendFrequency);
             }
-        } catch (RuntimeException | InterruptedException e) {
+        } catch (RuntimeException e) {
             run();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

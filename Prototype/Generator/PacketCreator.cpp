@@ -23,7 +23,7 @@ void PacketCreator::createPacket(int rcvInd)
     //TODO move ByteArray creating inside each constructor class
     ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
 
-    payloadGenerator.regeneratePayload();
+    payloadGenerator.regeneratePayload(seqNum);
     ByteArray payload = payloadGenerator.getPayload();
 
     ByteArray innerProtocol = ByteArray(2, '0');
@@ -32,8 +32,8 @@ void PacketCreator::createPacket(int rcvInd)
     ethernetConstructor.setType(innerProtocol);
     ethernetConstructor.setDestinationAddress(destinationAddress);
     ethernetConstructor.setPayload(payload);
-    ethernetConstructor.constructFrame();
-    writeToFile("constructed message xdddd\n");
+    ethernetConstructor.constructFrame(seqNum);
+    writeToFile("constructed message\n");
     //TODO delete the values inside created ByteArray*
     //lock the mutex and push to queue then unlock it
     mtx.lock();
@@ -41,8 +41,10 @@ void PacketCreator::createPacket(int rcvInd)
     mtx.unlock();
 }
 
-PacketCreator::PacketCreator(Configuration configuration): payloadGenerator(configuration), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
+PacketCreator::PacketCreator(Configuration configuration, int id): payloadGenerator(configuration, id), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
     sender = PacketSender::getInstance();
+    global_id = id;
+    seqNum = 1;
     this->configuration = configuration;
 }
 
