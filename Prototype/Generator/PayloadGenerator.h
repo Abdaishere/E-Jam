@@ -15,16 +15,18 @@ private:
     ByteArray payload;
     void generateFirstAlphabet(); // a -- m
     void generateSecondAlphabet(); // n -- z
-    void generateRandomCharacters();
+    void generateRandomCharacters(int);
     void addStreamId();
     RNG rng;
     PayloadType payloadType;
+    int global_id;
     void generateAlphabet();
 public:
     //must specify the length of the payload and its type
     PayloadGenerator(Configuration);
+    PayloadGenerator(Configuration, int);
     ByteArray getPayload();
-    void regeneratePayload();
+    void regeneratePayload(uint64_t);
 };
 
 

@@ -1,16 +1,13 @@
 
 #include "EthernetConstructor.h"
 
-long long EthernetConstructor::seqNum = 1;
-
 
 EthernetConstructor::EthernetConstructor(ByteArray sourceAddress,
                                          ByteArray streamID) : FrameConstructor(sourceAddress){
     this->streamID = streamID;
-    seqNum = 1;
 }
 
-void EthernetConstructor::constructFrame() {
+void EthernetConstructor::constructFrame(uint64_t& seqNum) {
 
     preamble = ByteArray(this->pre, 8);
     frame.clear();

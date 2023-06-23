@@ -20,43 +20,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c3084ef-716a-4e4b-859b-e23ce8a1a071" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../Executables/Gateway" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Executables/Generator" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/Generator" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Executables/verifier" beforeDir="false" afterPath="$PROJECT_DIR$/../Executables/verifier" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/PacketReceiver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/PacketReceiver.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/PacketReceiver.h" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/PacketReceiver.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/PacketSender.h" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/PacketSender.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gateway/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Gateway/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacketSender.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/PacketSender.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/out/production/SystemApi/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/InstanceControl/Communicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/InstanceControl/Communicator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/InstanceControl/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/InstanceControl/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/stats/StatsManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../SystemApi/src/main/java/com/ejam/systemapi/stats/StatsManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/Configuration.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/Configuration.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/ConfigurationManager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/StatsManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/StatsManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/StatsManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/StatsManager.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/Utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/Utils.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/Utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/Utils.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/DatagramVerifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/DatagramVerifier.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/ErrorHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/ErrorHandler.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/PacketReceiver.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/PacketReceiver.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/PacketUnpacker.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/PacketUnpacker.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/PayloadVerifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/PayloadVerifier.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/SegmentVerifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/SegmentVerifier.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../verifier/src/SeqChecker.h" beforeDir="false" afterPath="$PROJECT_DIR$/../verifier/src/SeqChecker.h" afterDir="false" />
-    </list>
+    <list default="true" id="8c3084ef-716a-4e4b-859b-e23ce8a1a071" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,6 +31,11 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/../.." value="send-stats-with-kafka" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="HighlightingSettingsPerFile">
@@ -82,21 +51,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.reader.mode&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.reader.mode",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="Generator" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="0 etc/EJam/config_000.txt" REDIRECT_INPUT="false" ELEVATE="true" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Generator" TARGET_NAME="Generator" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Generator" RUN_TARGET_NAME="Generator">
       <method v="2">
