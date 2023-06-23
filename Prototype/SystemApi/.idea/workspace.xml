@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Fixed kafka issues">
-      <change beforePath="$PROJECT_DIR$/../Generator/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Generator/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../StatsManagerTester/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../StatsManagerTester/CMakeLists.txt" afterDir="false" />
+    <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Edit mac address format">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/GlobalVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/GlobalVariables.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/UTILs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/UTILs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/GeneratorProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/GeneratorProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/StatsManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/StatsManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../commonHeaders/StatsManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../commonHeaders/StatsManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/VerifierProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/VerifierProducer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

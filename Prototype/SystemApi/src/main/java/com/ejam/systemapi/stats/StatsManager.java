@@ -91,8 +91,10 @@ public class StatsManager implements Runnable {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                for (String s : data)
+                for (String s : data) {
+                    System.out.println(s);
                     generatorStats.add(GeneratorProducer.rebuildFromString(s));
+                }
             }
         });
         genStatsThread.start();
@@ -148,6 +150,8 @@ public class StatsManager implements Runnable {
      * ``sendFrequency`` can be set using the function ``setSendFrequency(float)``
      */
     void sendStatistics() throws IOException {
+
+
         // aggregate stats
         Map<String, ArrayList<Generator>> aggregatedGenStats = new HashMap<>();
         for (Generator generator : generatorStats) {
