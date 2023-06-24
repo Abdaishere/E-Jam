@@ -82,7 +82,9 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                           Divider(),
                           Text(
                             'Same Device',
-                            style: TextStyle(fontSize: 15, color: Colors.green),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green),
                           ),
                         ],
                       ),
@@ -115,8 +117,9 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
                           Divider(),
                           Text(
                             'Other Device',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.orange),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange),
                           ),
                         ],
                       ),

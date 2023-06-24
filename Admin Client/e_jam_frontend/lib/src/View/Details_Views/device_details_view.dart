@@ -362,9 +362,9 @@ class DeviceDetailsSection extends StatelessWidget {
     return Expanded(
       child: SingleChildScrollView(
         child: ListTileTheme(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-          horizontalTitleGap: 5,
-          minVerticalPadding: 0,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          horizontalTitleGap: 10,
+          minVerticalPadding: 10,
           dense: true,
           child: Column(
             children: [
@@ -393,7 +393,6 @@ class Description extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(
-        textAlign: TextAlign.left,
         ((device.description.isEmpty) ? 'No Description' : device.description),
       ),
     );
@@ -416,7 +415,6 @@ class Location extends StatelessWidget {
       ),
       title: Text(
         device.location,
-        textAlign: TextAlign.left,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
@@ -655,9 +653,9 @@ class _MacAddressState extends State<MacAddress> {
             )
           : Text(
               widget.macAddress,
-              textAlign: TextAlign.left,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
+                fontSize: 15.0,
               ),
             ),
     );
