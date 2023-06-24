@@ -534,65 +534,62 @@ async fn force_start_stream(
 
     let stream_entry = data.stream_entries.lock().await.contains_key(&stream_id);
 
-    match stream_entry {
-        true => {
-            let mut body = format!("stream {} ", stream_id);
-            let mut streams_entries = data.stream_entries.lock().await;
-            let stream_entry = streams_entries.get_mut(&stream_id).unwrap();
-
-            // dequeue if queued
-            if stream_entry.check_stream_status(StreamStatus::Queued) {
-                warn!("Stream {} is already queued", stream_id);
-                let connections = stream_entry
-                    .try_remove_stream_from_queue(&data.device_list)
-                    .await;
-                let dequeued =
-                    handle_stopping_connections(connections, stream_entry, &data.device_list).await;
-                body += &format!("{} were dequeued ", dequeued);
-            }
-            // Stop if running
-            else if stream_entry.check_stream_status(StreamStatus::Running) {
-                warn!("Stream {} is already running", stream_id);
-                let connections = stream_entry.stop_stream(&data.device_list).await;
-                let stopped =
-                    handle_stopping_connections(connections, stream_entry, &data.device_list).await;
-                body += &format!("{} were Stopped ", stopped);
-            }
-
-            // force start the stream
-            let connections = stream_entry.send_stream(false, &data.device_list).await;
-            let counter =
-                handle_starting_connections(connections, stream_entry, &data.device_list).await;
-
-            body += &format!("{} devices were force started ", counter);
-
-            info!("Stream {} force started", stream_id);
-            match stream_entry.get_stream_status() {
-                StreamStatus::Queued => HttpResponse::Ok().body(body),
-                StreamStatus::Error => {
-                    if counter == 0 {
-                        HttpResponse::InternalServerError()
-                            .body("No devices are running the stream")
-                    } else if counter == 1 {
-                        HttpResponse::InternalServerError()
-                            .body("Only one Process type is running the stream")
-                    } else {
-                        HttpResponse::InternalServerError()
-                                .body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
-                                stream_entry.get_stream_status().to_string()))
-                    }
-                }
-                _ => HttpResponse::Ok().body(format!(
-                    "{} sent for {} devices with status {}",
-                    body,
-                    counter,
-                    stream_entry.get_stream_status().to_string()
-                )),
-            }
-        }
-        false => HttpResponse::NotFound().body(format!(
+    if !stream_entry {
+        return HttpResponse::NotFound().body(format!(
             "stream {} not found in streams, please check the stream id and try again",
             stream_id
+        ));
+    }
+    
+    let mut body = format!("stream {} ", stream_id);
+    let mut streams_entries = data.stream_entries.lock().await;
+    let stream_entry = streams_entries.get_mut(&stream_id).unwrap();
+
+    // dequeue if queued
+    if stream_entry.check_stream_status(StreamStatus::Queued) {
+        warn!("Stream {} is already queued", stream_id);
+        let connections = stream_entry
+            .try_remove_stream_from_queue(&data.device_list)
+            .await;
+        let dequeued =
+            handle_stopping_connections(connections, stream_entry, &data.device_list).await;
+        body += &format!("{} were dequeued ", dequeued);
+    }
+    // Stop if running
+    else if stream_entry.check_stream_status(StreamStatus::Running) {
+        warn!("Stream {} is already running", stream_id);
+        let connections = stream_entry.stop_stream(&data.device_list).await;
+        let stopped =
+            handle_stopping_connections(connections, stream_entry, &data.device_list).await;
+        body += &format!("{} were Stopped ", stopped);
+    }
+
+    // force start the stream
+    let connections = stream_entry.send_stream(false, &data.device_list).await;
+    let counter = handle_starting_connections(connections, stream_entry, &data.device_list).await;
+
+    body += &format!("{} devices were force started ", counter);
+
+    info!("Stream {} force started", stream_id);
+    match stream_entry.get_stream_status() {
+        StreamStatus::Queued => HttpResponse::Ok().body(body),
+        StreamStatus::Error => {
+            if counter == 0 {
+                HttpResponse::InternalServerError().body("No devices are running the stream")
+            } else if counter == 1 {
+                HttpResponse::InternalServerError()
+                    .body("Only one Process type is running the stream")
+            } else {
+                HttpResponse::InternalServerError()
+                                .body(format!("Stream {}: {} While Queueing the stream, please check the server for more info", stream_id,
+                                stream_entry.get_stream_status().to_string()))
+            }
+        }
+        _ => HttpResponse::Ok().body(format!(
+            "{} sent for {} devices with status {}",
+            body,
+            counter,
+            stream_entry.get_stream_status().to_string()
         )),
     }
 }

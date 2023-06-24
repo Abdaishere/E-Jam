@@ -14,7 +14,6 @@ use chrono::{serde::ts_seconds, serde::ts_seconds_option, DateTime, Utc};
 use lazy_static::lazy_static;
 use nanoid::nanoid;
 use regex::Regex;
-use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tokio::runtime::Runtime;
@@ -342,28 +341,21 @@ impl StreamEntry {
             debug!("Checking if stream id {} is unique", id);
             let streams_entries_lock = streams_entries.lock().await;
             let checker = streams_entries_lock.get(&id);
-
-            match checker {
-                Some(stream) => {
-                    debug!(
-                        "Stream ID {} already used by stream {}, generating new id",
-                        id, stream.name
-                    );
-                    continue;
-                }
-                None => {
-                    debug!("Stream ID {} is unique", id);
-                    let mut generated_stream_ids_counter = stream_id_counter.lock().await;
-
-                    *generated_stream_ids_counter += 1;
-                    info!(
-                        "Generated stream id {}, total ids generated {}",
-                        id, *generated_stream_ids_counter
-                    );
-                    self.stream_id = id;
-                    break;
-                }
+            if checker.is_some() {
+                debug!("Stream ID {} already used by another stream", id);
+                continue;
             }
+
+            debug!("Stream ID {} is unique", id);
+            let mut generated_stream_ids_counter = stream_id_counter.lock().await;
+
+            *generated_stream_ids_counter += 1;
+            info!(
+                "Generated stream id {}, total ids generated {}",
+                id, *generated_stream_ids_counter
+            );
+            self.stream_id = id;
+            break;
         }
     }
 
@@ -375,67 +367,66 @@ impl StreamEntry {
     * `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server"]
     pub async fn notify_process_running(
         &mut self,
-        device_mac: &str,
+        device_mac: &String,
         device_list: &Mutex<HashMap<String, Device>>,
     ) {
         let device = Device::find_device(device_mac, device_list).await;
 
-        match device {
-            Some(device) => {
-                /*
-                check if the device is a generator
-                if it is, mark the generator as Running
-                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
-                */
-                let process = self.running_generators.get(device_mac);
-
-                if process.is_some() {
-                    self.running_generators
-                        .get_mut(device_mac)
-                        .unwrap()
-                        .clone_from(&ProcessStatus::Running);
-
-                    // then update the device status to Running
-                    device_list
-                        .lock()
-                        .await
-                        .get_mut(&device)
-                        .unwrap()
-                        .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
-                } else {
-                    warn!("Generator not found");
-                }
-
-                /*
-                check if the device is a verifier
-                if it is, mark the verifier as Running
-                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
-                */
-                let process = self.running_verifiers.get(device_mac);
-                if process.is_some() {
-                    self.running_verifiers
-                        .get_mut(device_mac)
-                        .unwrap()
-                        .clone_from(&ProcessStatus::Running);
-
-                    // then update the device status to Running
-                    device_list
-                        .lock()
-                        .await
-                        .get_mut(&device)
-                        .unwrap()
-                        .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
-                } else {
-                    warn!("Verifier not found");
-                }
-
-                // update the stream status to Running
-                self.update_stream_status(StreamStatus::Running);
-            }
-            None => {
-                warn!("Device not found");
-            }
+        if device.is_none() {
+            warn!("Device not found in the list of devices connected to the server while notifying that the process has started");
+            return;
         }
+
+        let device = device.unwrap();
+        /*
+        check if the device is a generator
+        if it is, mark the generator as Running
+        special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+        */
+        let process = self.running_generators.get(device_mac);
+
+        if process.is_some() {
+            self.running_generators
+                .get_mut(device_mac)
+                .unwrap()
+                .clone_from(&ProcessStatus::Running);
+
+            // then update the device status to Running
+            device_list
+                .lock()
+                .await
+                .get_mut(&device)
+                .unwrap()
+                .update_device_status(&ProcessStatus::Running, &ProcessType::Generation);
+        } else {
+            warn!("Generator not found");
+        }
+
+        /*
+        check if the device is a verifier
+        if it is, mark the verifier as Running
+        special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+        */
+        let process = self.running_verifiers.get(device_mac);
+        if process.is_some() {
+            self.running_verifiers
+                .get_mut(device_mac)
+                .unwrap()
+                .clone_from(&ProcessStatus::Running);
+
+            // then update the device status to Running
+            device_list
+                .lock()
+                .await
+                .get_mut(&device)
+                .unwrap()
+                .update_device_status(&ProcessStatus::Running, &ProcessType::Verification);
+        } else {
+            warn!("Verifier not found");
+        }
+
+        // update the stream status to Running
+        self.sync_stream_status();
     }
 
     #[doc = r" ## Notify Process Completed
@@ -447,7 +438,7 @@ impl StreamEntry {
     * `device_list` - A reference to a Mutex for Vec of Device struct that contains all the devices that are connected to the server"]
     pub async fn notify_process_completed(
         &mut self,
-        device_mac: &str,
+        device_mac: &String,
         device_list: &Mutex<HashMap<String, Device>>,
     ) {
         /*
@@ -460,68 +451,64 @@ impl StreamEntry {
         */
 
         let device = Device::find_device(device_mac, device_list).await;
-
-        match device {
-            Some(device) => {
-                /*
-                check if the device is a generator
-                if it is, mark the generator as completed
-                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
-                */
-                let process = self.running_generators.get(device_mac);
-
-                if process.is_some() {
-                    self.running_generators
-                        .get_mut(device_mac)
-                        .unwrap()
-                        .clone_from(&ProcessStatus::Completed);
-
-                    // then check if there are any other process running in the device
-                    // if there are no other generators running, set the DeviceStatus to Idle
-                    device_list
-                        .lock()
-                        .await
-                        .get_mut(&device)
-                        .unwrap()
-                        .update_device_status(&ProcessStatus::Completed, &ProcessType::Generation);
-                } else {
-                    warn!("Generator not found");
-                }
-
-                /*
-                check if the device is a verifier
-                if it is, mark the verifier as completed
-                special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
-                */
-                let process = self.running_verifiers.get(device_mac);
-
-                if process.is_some() {
-                    self.running_verifiers
-                        .get_mut(device_mac)
-                        .unwrap()
-                        .clone_from(&ProcessStatus::Completed);
-
-                    // then check if there are any other process running in the device
-                    // if there are no other generators running, set the DeviceStatus to Idle
-                    device_list
-                        .lock()
-                        .await
-                        .get_mut(&device)
-                        .unwrap()
-                        .update_device_status(
-                            &ProcessStatus::Completed,
-                            &ProcessType::Verification,
-                        );
-                } else {
-                    warn!("Verifier not found");
-                }
-
-                self.sync_stream_status();
-            }
-            None => {
-                warn!("Device not found");
-            }
+        if device.is_none() {
+            warn!("Device not found in the list of devices connected to the server (notify_process_completed)");
+            return;
         }
+
+        let device = device.unwrap();
+
+        /*
+        check if the device is a generator
+        if it is, mark the generator as completed
+        special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+        */
+        let process = self.running_generators.get(device_mac);
+
+        if process.is_some() {
+            self.running_generators
+                .get_mut(device_mac)
+                .unwrap()
+                .clone_from(&ProcessStatus::Completed);
+
+            // then check if there are any other process running in the device
+            // if there are no other generators running, set the DeviceStatus to Idle
+            device_list
+                .lock()
+                .await
+                .get_mut(&device)
+                .unwrap()
+                .update_device_status(&ProcessStatus::Completed, &ProcessType::Generation);
+        } else {
+            warn!("Generator not found");
+        }
+
+        /*
+        check if the device is a verifier
+        if it is, mark the verifier as completed
+        special case if the device is notifying after the stream has been sent and before analyzing the stream status (too early notification)
+        */
+        let process = self.running_verifiers.get(device_mac);
+
+        if process.is_some() {
+            self.running_verifiers
+                .get_mut(device_mac)
+                .unwrap()
+                .clone_from(&ProcessStatus::Completed);
+
+            // then check if there are any other process running in the device
+            // if there are no other generators running, set the DeviceStatus to Idle
+            device_list
+                .lock()
+                .await
+                .get_mut(&device)
+                .unwrap()
+                .update_device_status(&ProcessStatus::Completed, &ProcessType::Verification);
+        } else {
+            warn!("Verifier not found");
+        }
+
+        self.sync_stream_status();
     }
 
     #[doc = r" ## Sync Stream Status
@@ -560,6 +547,8 @@ impl StreamEntry {
             self.update_stream_status(StreamStatus::Finished);
         } else if working_generators + working_verifiers == 0 {
             self.update_stream_status(StreamStatus::Stopped);
+        } else {
+            self.update_stream_status(StreamStatus::Running);
         }
     }
 
@@ -834,106 +823,97 @@ impl StreamEntry {
         let mut device = device_list.lock().await;
         let device = device.get_mut(&mac).unwrap();
 
-        match response {
-            Ok(_response) => {
-                match _response.status() {
-                    StatusCode::OK => {
-                        let process_status = if sending {
-                            ProcessStatus::Queued
-                        } else {
-                            ProcessStatus::Stopped
-                        };
+        if response.is_err() || !response.as_ref().unwrap().status().is_success() {
+            info!(
+                "Stream failed to send to device: {}, process type: {:?}",
+                device.get_device_mac(),
+                process_type
+            );
 
-                        info!(
-                            "request sent to device {}, {:?}",
-                            device.get_device_mac(),
-                            process_status
-                        );
+            if response.is_err() {
+                error!("Connection Error: {}", response.err().unwrap());
+            }
+            // set the receiver status to offline (generic error)
+            device.update_device_status(&ProcessStatus::Failed, &process_type);
 
-                        // set the device status to process_status
-                        // leave the device status as is (Queued or Stopped) in the running devices list of the stream
-                        device.update_device_status(&process_status, &process_type);
-                        if sending {
-                            info!(
-                                "Stream sent to device: {}, process type: {:?}",
-                                device.get_device_mac(),
-                                process_type
-                            );
-                        } else {
-                            info!(
-                                "device {} stopped stream {} successfully",
-                                device.get_device_mac(),
-                                self.get_stream_id()
-                            );
-                        }
-
-                        return Ok(());
-                    }
-                    _ => {
-                        info!(
-                            "Stream failed to send to device: {}, process type: {:?}",
-                            device.get_device_mac(),
-                            process_type
-                        );
-                        // set the receiver status to offline (generic error)
-                        device.update_device_status(&ProcessStatus::Failed, &process_type);
-
-                        // add the device to the running devices list with a failed status
-                        if process_type == ProcessType::Generation
-                            || process_type == ProcessType::GeneratingAndVerification
-                        {
-                            self.running_generators
-                                .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
-                        }
-
-                        if process_type == ProcessType::Verification
-                            || process_type == ProcessType::GeneratingAndVerification
-                        {
-                            self.running_verifiers
-                                .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
-                        }
-
-                        if sending {
-                            error!(
-                                "Stream not sent to device: {} process type: {:?}",
-                                device.get_device_mac(),
-                                process_type
-                            );
-                        } else {
-                            error!(
-                                "device {} failed to stop stream {}",
-                                device.get_device_mac(),
-                                self.get_stream_id()
-                            );
-                        }
-                    }
-                }
+            // add the device to the running devices list with a failed status
+            if process_type == ProcessType::Generation
+                || process_type == ProcessType::GeneratingAndVerification
+            {
+                self.running_generators
+                    .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
             }
 
-            Err(_error) => {
-                error!("Connection Error: {}", _error);
-
-                // set the receiver status to offline (generic error)
-                device.update_device_status(&ProcessStatus::Failed, &process_type);
-
-                // add the device to the running devices list with a failed status
-                if process_type == ProcessType::Generation
-                    || process_type == ProcessType::GeneratingAndVerification
-                {
-                    self.running_generators
-                        .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
-                }
-
-                if process_type == ProcessType::Verification
-                    || process_type == ProcessType::GeneratingAndVerification
-                {
-                    self.running_verifiers
-                        .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
-                }
+            if process_type == ProcessType::Verification
+                || process_type == ProcessType::GeneratingAndVerification
+            {
+                self.running_verifiers
+                    .insert(device.get_device_mac().to_string(), ProcessStatus::Failed);
             }
+
+            if sending {
+                error!(
+                    "Stream not sent to device: {} process type: {:?}",
+                    device.get_device_mac(),
+                    process_type
+                );
+            } else {
+                error!(
+                    "device {} failed to stop stream {}",
+                    device.get_device_mac(),
+                    self.get_stream_id()
+                );
+            }
+
+            return Err(());
         }
 
-        Err(())
+        let process_status = if sending {
+            ProcessStatus::Queued
+        } else {
+            ProcessStatus::Stopped
+        };
+
+        info!(
+            "request sent to device {}, {:?}",
+            device.get_device_mac(),
+            process_status
+        );
+
+        // set the device status to process_status
+        if (process_type == ProcessType::Generation
+            || process_type == ProcessType::GeneratingAndVerification)
+            && !self
+                .running_generators
+                .contains_key(device.get_device_mac())
+        {
+            device.update_device_status(&process_status, &process_type);
+        }
+
+        if (process_type == ProcessType::Verification
+            || process_type == ProcessType::GeneratingAndVerification)
+            && !self.running_verifiers.contains_key(device.get_device_mac())
+        {
+            device.update_device_status(&process_status, &process_type);
+        }
+
+        self.update_stream_status(self.stream_status.clone());
+
+        if sending {
+            info!(
+                "Stream sent to device: {}, process type: {:?}",
+                device.get_device_mac(),
+                process_type
+            );
+        } else {
+            info!(
+                "device {} stopped stream {} successfully",
+                device.get_device_mac(),
+                self.get_stream_id()
+            );
+        }
+
+        Ok(())
     }
 
     pub fn get_stream_id(&self) -> &String {
@@ -953,10 +933,7 @@ impl StreamEntry {
     ) -> i32 {
         let mut devices_received = 0;
         for result in results.into_iter() {
-            match result {
-                Ok(_) => devices_received += 1,
-                Err(_) => continue,
-            }
+            devices_received += result.is_ok() as i32;
         }
 
         if sending {
@@ -1177,6 +1154,8 @@ impl StreamEntry {
         self.transport_layer_protocol = stream.transport_layer_protocol.to_owned();
         self.flow_type = stream.flow_type.to_owned();
         self.check_content = stream.check_content;
+        self.running_generators.clear();
+        self.running_verifiers.clear();
         self.last_updated = Utc::now();
     }
 
@@ -1215,16 +1194,16 @@ impl StreamEntry {
             );
 
         const DEV_STATUS: [ProcessStatus; 5] = [
-            ProcessStatus::Queued,
             ProcessStatus::Running,
+            ProcessStatus::Queued,
             ProcessStatus::Stopped,
             ProcessStatus::Completed,
             ProcessStatus::Failed,
         ];
         const STREAM_STATUSES: [StreamStatus; 6] = [
+            StreamStatus::Running,
             StreamStatus::Created,
             StreamStatus::Queued,
-            StreamStatus::Running,
             StreamStatus::Finished,
             StreamStatus::Error,
             StreamStatus::Stopped,

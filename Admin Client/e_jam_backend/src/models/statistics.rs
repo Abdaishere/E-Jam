@@ -38,7 +38,7 @@ impl Generator {
             mac_address: mac,
             stream_id: id,
             packets_sent: (0..204800).fake::<u32>() as u64,
-            packets_errors: (0..204800).fake::<u32>() as u64,
+            packets_errors: (0..10400).fake::<u32>() as u64,
             timestamp: updates,
         }
     }
@@ -84,10 +84,10 @@ impl Verifier {
         Verifier {
             mac_address: mac,
             stream_id: id,
-            packets_correct: (0..204800).fake::<u32>() as u64,
-            packets_errors: (0..204800).fake::<u32>() as u64,
-            packets_dropped: (0..204800).fake::<u32>() as u64,
-            packets_out_of_order: (0..204800).fake::<u32>() as u64,
+            packets_correct: (0..9800).fake::<u32>() as u64,
+            packets_errors: (0..8800).fake::<u32>() as u64,
+            packets_dropped: (0..1000).fake::<u32>() as u64,
+            packets_out_of_order: (0..1800).fake::<u32>() as u64,
             timestamp: updates,
         }
     }

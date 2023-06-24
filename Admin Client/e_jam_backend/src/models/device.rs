@@ -198,28 +198,26 @@ this function is used to update the device status according to the status of the
     }
 
     fn update_device_processes(&mut self, status: &ProcessStatus, type_of_process: &ProcessType) {
-        match type_of_process {
-            ProcessType::Generation => match status {
+        if type_of_process == &ProcessType::Generation
+            || type_of_process == &ProcessType::GeneratingAndVerification
+        {
+            match status {
+                ProcessStatus::Queued => self.add_gen_process(),
+                ProcessStatus::Stopped => self.remove_gen_process(),
+                ProcessStatus::Completed => self.remove_gen_process(),
+                _ => {}
+            }
+        }
+
+        if type_of_process == &ProcessType::Verification
+            || type_of_process == &ProcessType::GeneratingAndVerification
+        {
+            match status {
                 ProcessStatus::Queued => self.add_ver_processes(),
-                ProcessStatus::Running => {}
-                _ => self.remove_gen_process(),
-            },
-            ProcessType::Verification => match status {
-                ProcessStatus::Queued => self.add_ver_processes(),
-                ProcessStatus::Running => {}
-                _ => self.remove_ver_processes(),
-            },
-            ProcessType::GeneratingAndVerification => match status {
-                ProcessStatus::Queued => {
-                    self.add_gen_process();
-                    self.add_ver_processes();
-                }
-                ProcessStatus::Running => {}
-                _ => {
-                    self.remove_gen_process();
-                    self.remove_ver_processes();
-                }
-            },
+                ProcessStatus::Stopped => self.remove_ver_processes(),
+                ProcessStatus::Completed => self.remove_ver_processes(),
+                _ => {}
+            }
         }
     }
 
@@ -410,12 +408,10 @@ this is awaited in another thread to not block the main thread
                 .post(url)
                 .header("mac-address", mac_address)
                 .timeout(Duration::from_secs(5))
-                .send();
+                .send()
+                .await;
 
-            match request.await {
-                Ok(request) => request.status().is_success(),
-                Err(_) => false,
-            }
+            request.is_ok() && request.unwrap().status().is_success()
         })
     }
 
@@ -493,7 +489,7 @@ this is used to update the device details with the new details
                 mac_address: MACAddress().fake(),
                 ip_address: IP().fake(),
                 last_updated: updates,
-                port: Faker.fake(),
+                port: (0..65535).fake::<u16>(),
                 gen_processes: 0,
                 ver_processes: 0,
                 status: STATUSES[(0..4).fake::<usize>()].to_owned(),

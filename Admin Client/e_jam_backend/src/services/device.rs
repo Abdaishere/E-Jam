@@ -101,7 +101,16 @@ async fn ping_device(device_mac: web::Path<String>, data: web::Data<AppState>) -
         }
     };
 
-    let response = device.ping_device().await.is_ok();
+    let response = match device.ping_device().await {
+        Ok(status) => status,
+        Err(_) => {
+            return HttpResponse::InternalServerError().body(format!(
+                "Could not ping device {}, please check the device and try again",
+                device_mac
+            ))
+        }
+    };
+
     device.set_reachable(response);
 
     match response {
@@ -136,7 +145,15 @@ async fn check_new_device(device: web::Json<Device>) -> impl Responder {
     }
 
     let mut device = device.into_inner();
-    let response = device.ping_device().await.is_ok();
+    let response = match device.ping_device().await {
+        Ok(status) => status,
+        Err(_) => {
+            return HttpResponse::InternalServerError().body(format!(
+                "Could not ping device {}, please check the device and try again",
+                device.get_device_mac()
+            ))
+        }
+    };
     device.set_reachable(response);
     match response {
         true => HttpResponse::Ok()
@@ -297,7 +314,7 @@ async fn stream_finished(
     req: HttpRequest,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
-    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
+    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap().to_uppercase();
 
     let mut streams_entries = data.stream_entries.lock().await;
     let stream_entry = streams_entries.get_mut(&stream_id);
@@ -309,7 +326,7 @@ async fn stream_finished(
                 let ip = val.ip().to_string();
 
                 stream_entry
-                    .notify_process_completed(mac_address, &data.device_list)
+                    .notify_process_completed(&mac_address, &data.device_list)
                     .await;
                 info!(
                     "stream finished {} by {}, for the device {}",
@@ -339,7 +356,7 @@ async fn stream_started(
     req: HttpRequest,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
-    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap();
+    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap().to_uppercase();
 
     let mut streams_entries = data.stream_entries.lock().await;
     let stream_entry = streams_entries.get_mut(&stream_id);
@@ -349,7 +366,7 @@ async fn stream_started(
             if let Some(val) = req.peer_addr() {
                 // get the ip address of the client
                 stream_entry
-                    .notify_process_running(mac_address, &data.device_list)
+                    .notify_process_running(&mac_address, &data.device_list)
                     .await;
                 info!(
                     "Address {} notified of starting the stream {}, for the device {}",
