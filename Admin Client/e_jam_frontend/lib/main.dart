@@ -395,21 +395,22 @@ class MenuList extends StatelessWidget {
           AboutListTile(
             icon: const Icon(MaterialCommunityIcons.information, size: size),
             applicationName: "E-Jam",
-            applicationVersion: "1.0.2",
+            applicationVersion: "1.1.2",
             applicationIcon:
                 Image.asset("assets/Icon-logo.ico", width: 100, height: 100),
             applicationLegalese: "© 2023 E-Jam",
             aboutBoxChildren: const <Widget>[
               Text(
-                  'E-Jam is a System Environment for Testing, Monitoring, and Debugging Switches.\n',
-                  style: TextStyle(fontSize: 15)),
-              Text('Developed by:',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              Text('\tAbdullah Elbelkasy'),
-              Text('\tMohamed Elhagery'),
-              Text('\tKhaled Waleed'),
-              Text('\tIslam Wagih'),
-              Text('\tMostafa Abdullah'),
+                  'Introducing E-Jam - the ultimate system environment for testing, monitoring, and debugging switches.'),
+              Text(
+                  '\n\nOur team of experts, including Abdullah Elbelkasy, Mohamed Elhagery, Khaled Waleed, Islam Wagih, and Mostafa Abdullah, has developed this tool to help you in the way you manage your Network Switches.'),
+              Text(
+                  "\nWith E-Jam, you'll have access to a powerful suite of features that make monitoring, testing, and debugging switches a breeze."),
+              Text(
+                  '\nOur user-friendly front-end application is designed to provide you with real-time insights and analytics, making it easier than ever to identify and resolve issues.'),
+              Text(
+                  "\nWhether you're a seasoned IT professional or just starting out, E-Jam is the perfect tool for streamlining your workflow and maximizing your productivity. ",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ],
             child: const Text('About'),
           ),
