@@ -156,17 +156,23 @@ class _HomeState extends State<Home> {
         const GradientBackground(),
         if (context.watch<BackgroundBallNotifier>().showBackgroundBall)
           const BouncingBall(),
-        const BottomLineChartScaffold(),
-        frontBody(
-          context.watch<ThemeModel>().isDark
-              ? const Color.fromARGB(183, 255, 197, 117)
-              : const Color.fromARGB(183, 2, 105, 240),
-        ),
+        // first check if the server ip is not empty when the app is first opened
+        NetworkController.serverIpAddress.host.isNotEmpty
+            ? const BottomLineChartScaffold()
+            : const SizedBox.shrink(),
+        NetworkController.serverIpAddress.host.isNotEmpty
+            ? frontBody()
+            : Center(child: ChangeServerIPScreen(reloader: () {
+                setState(() {});
+              }))
       ],
     );
   }
 
-  ZoomDrawer frontBody(Color shadowColor) {
+  ZoomDrawer frontBody() {
+    Color shadowColor = context.watch<ThemeModel>().isDark
+        ? const Color.fromARGB(183, 255, 197, 117)
+        : const Color.fromARGB(183, 2, 105, 240);
     return ZoomDrawer(
       menuScreen: MenuScreen(
         setIndex: (index) {

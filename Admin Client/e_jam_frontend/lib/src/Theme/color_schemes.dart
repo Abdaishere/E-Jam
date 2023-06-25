@@ -67,6 +67,7 @@ Color processStatusColorScheme(ProcessStatus? status) {
 final gradientColorLight = [
   const Color.fromARGB(255, 253, 209, 146),
   const Color.fromARGB(255, 255, 197, 117),
+  const Color.fromARGB(255, 216, 151, 86),
   const Color.fromARGB(255, 255, 117, 117),
 ];
 
@@ -74,6 +75,7 @@ final gradientColorDark = [
   const Color.fromARGB(255, 0, 21, 48),
   const Color.fromARGB(255, 0, 27, 61),
   const Color.fromARGB(255, 0, 48, 98),
+  const Color.fromARGB(255, 0, 128, 255),
 ];
 
 const lightColorScheme = ColorScheme(

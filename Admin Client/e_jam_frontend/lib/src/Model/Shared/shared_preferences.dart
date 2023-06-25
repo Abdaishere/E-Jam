@@ -43,14 +43,11 @@ class ThemePreferences {
 }
 
 class NetworkController {
-  static Uri serverIpAddress = Uri.parse('http://127.0.0.1:8084');
+  static Uri serverIpAddress = Uri.parse('');
   static final client = http.Client();
   static Duration timeout = const Duration(minutes: 60);
 
   static changeServerIpAddress(String newIpAddress, String newPort) async {
-    if (newIpAddress == "") {
-      newIpAddress = "127.0.0.1";
-    }
     if (newPort == "") {
       newPort = "8084";
     }
