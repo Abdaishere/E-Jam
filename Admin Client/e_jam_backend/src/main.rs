@@ -1,6 +1,7 @@
 use actix_web::{web, App, HttpServer};
 use log::info;
 
+use std::env;
 #[cfg(feature = "fake_data")]
 use std::thread;
 #[cfg(feature = "fake_data")]
@@ -8,11 +9,22 @@ mod faker;
 mod models;
 mod services;
 
-const PORT: u16 = 8084;
-const HOST: &str = "localhost";
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let args: Vec<String> = env::args().collect();
+
+    // Default values for host and port
+    let mut host = String::from("localhost");
+    let mut port = 8084;
+
+    // Check if command line arguments were provided
+    if args.len() > 1 {
+        host = args[1].clone();
+    }
+    if args.len() > 2 {
+        port = args[2].parse().unwrap();
+    }
+
     log4rs::init_file("logger.yml", Default::default()).unwrap();
 
     let app_state = web::Data::new(models::AppState::default());
@@ -54,14 +66,14 @@ async fn main() -> std::io::Result<()> {
         });
     }
 
-    info!("running on http://{}:{}", HOST, PORT);
+    info!("running on http://{}:{}", host, port);
     HttpServer::new(move || {
         App::new()
             .app_data(app_state.clone())
             .service(services::index)
             .configure(services::init_routes)
     })
-    .bind(format!("{}:{}", HOST, PORT))?
+    .bind(format!("{}:{}", host, port))?
     .run()
     .await
 }
