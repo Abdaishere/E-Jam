@@ -116,7 +116,7 @@ class SystemSettings {
 
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",
-        pref.getInt('serverPort')?.toString() ?? "");
+        pref.getInt('serverPort')?.toString() ?? "8084");
   }
 }
 
