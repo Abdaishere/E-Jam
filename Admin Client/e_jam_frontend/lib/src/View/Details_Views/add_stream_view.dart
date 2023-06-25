@@ -893,7 +893,7 @@ class _AddPresetStreamState extends State<AddPresetStream> {
 
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
-                  prefs.setStringList(
+                  await prefs.setStringList(
                       'savedStreams', SystemSettings.savedStreams);
                 } catch (e) {
                   failed = true;
@@ -943,7 +943,7 @@ class _AddPresetStreamState extends State<AddPresetStream> {
         SystemSettings.savedStreams.removeAt(index);
         setState(() {});
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setStringList('savedStreams', SystemSettings.savedStreams);
+        await prefs.setStringList('savedStreams', SystemSettings.savedStreams);
       },
     );
   }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/services/data_exporter.dart';
 import 'package:flutter/material.dart';
@@ -49,10 +47,12 @@ class _ExportDataViewState extends State<ExportDataView> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLandScape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      width: min(500, MediaQuery.of(context).size.width * 0.8),
-      height: min(280, MediaQuery.of(context).size.height * 0.8),
+      width: isLandScape ? 500 : MediaQuery.of(context).size.width,
+      height: isLandScape ? 280 : MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(15),

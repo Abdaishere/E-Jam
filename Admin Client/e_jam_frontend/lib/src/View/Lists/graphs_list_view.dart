@@ -41,7 +41,8 @@ class _GraphsListViewState extends State<GraphsListView> {
         SystemSettings.pinnedElements.removeAt(index);
         setState(() {});
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setStringList('pinnedElements', SystemSettings.pinnedElements);
+        await prefs.setStringList(
+            'pinnedElements', SystemSettings.pinnedElements);
       },
     );
   }

@@ -32,9 +32,10 @@ class _SettingsViewState extends State<SettingsView> {
       body: Center(
         child: SingleChildScrollView(
           child: ListTileTheme(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 40),
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.04),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: _chartsSettings + _dashboardSettings + _defaults,
@@ -58,10 +59,9 @@ class _SettingsViewState extends State<SettingsView> {
           value: SystemSettings.showChartsAnimation,
           onChanged: (value) async {
             SystemSettings.showChartsAnimation = value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('showChartsAnimation', value);
-
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('showChartsAnimation', value);
           },
         ),
       ),
@@ -71,9 +71,9 @@ class _SettingsViewState extends State<SettingsView> {
           value: SystemSettings.lineGraphCurveSmooth,
           onChanged: (value) async {
             SystemSettings.lineGraphCurveSmooth = value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('lineGraphCurveSmooth', value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('lineGraphCurveSmooth', value);
           },
         ),
       ),
@@ -85,9 +85,9 @@ class _SettingsViewState extends State<SettingsView> {
             context
                 .read<BackgroundBallNotifier>()
                 .changeShowBackgroundBall(value);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('showBackgroundBall', value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('showBackgroundBall', value);
           },
         ),
       ),
@@ -99,9 +99,9 @@ class _SettingsViewState extends State<SettingsView> {
             context
                 .read<BottomLineChartNotifier>()
                 .changeShowBottomLineChart(value);
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('showBottomLineChart', value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('showBottomLineChart', value);
           },
         ),
       ),
@@ -111,9 +111,9 @@ class _SettingsViewState extends State<SettingsView> {
           value: !SystemSettings.fullChartsDetails,
           onChanged: (value) async {
             SystemSettings.fullChartsDetails = !value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('fullChartsDetails', !value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('fullChartsDetails', !value);
           },
         ),
       ),
@@ -123,9 +123,9 @@ class _SettingsViewState extends State<SettingsView> {
           value: SystemSettings.chartsExplode,
           onChanged: (value) async {
             SystemSettings.chartsExplode = value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('chartsExplode', value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('chartsExplode', value);
           },
         ),
       ),
@@ -166,7 +166,7 @@ class _SettingsViewState extends State<SettingsView> {
               SystemSettings.pinnedElements.clear();
               Navigator.pop(context);
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setStringList('pinnedElements', []);
+              await prefs.setStringList('pinnedElements', []);
             },
           ),
         ],
@@ -189,9 +189,9 @@ class _SettingsViewState extends State<SettingsView> {
           value: SystemSettings.showDashboardAnimations,
           onChanged: (value) async {
             SystemSettings.showDashboardAnimations = value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('showDashboardAnimations', value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('showDashboardAnimations', value);
           },
         ),
       ),
@@ -201,9 +201,9 @@ class _SettingsViewState extends State<SettingsView> {
           value: SystemSettings.showTreeMap,
           onChanged: (value) async {
             SystemSettings.showTreeMap = value;
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setBool('showTreeMap', value);
             setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('showTreeMap', value);
           },
         ),
       ),
@@ -214,10 +214,10 @@ class _SettingsViewState extends State<SettingsView> {
           onChanged: SystemSettings.showTreeMap
               ? (value) async {
                   SystemSettings.fullTreeMap = !value;
+                  setState(() {});
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
-                  prefs.setBool('fullTreeMap', !value);
-                  setState(() {});
+                  await prefs.setBool('fullTreeMap', !value);
                 }
               : null,
         ),
@@ -321,13 +321,13 @@ class _SettingsViewState extends State<SettingsView> {
                               int.parse(_defaultDevicesPortController.text);
                           SystemSettings.defaultSystemApiSubnet =
                               _defaultSystemApiSubnetController.text;
+                          setState(() {});
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
-                          prefs.setInt('defaultDevicesPort',
+                          await prefs.setInt('defaultDevicesPort',
                               SystemSettings.defaultDevicesPort);
-                          prefs.setString('defaultSystemApiSubnet',
+                          await prefs.setString('defaultSystemApiSubnet',
                               SystemSettings.defaultSystemApiSubnet);
-                          setState(() {});
                         }
                       },
                       child: const Text('Save'),
@@ -413,7 +413,7 @@ class _DashboardExtensionsOrderState extends State<DashboardExtensionsOrder> {
                 SystemSettings.dashboardExtensionsOrder.insert(newIndex, item);
               });
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setStringList('dashboardExtensionsOrder',
+              await prefs.setStringList('dashboardExtensionsOrder',
                   SystemSettings.dashboardExtensionsOrder);
             },
           ),
@@ -441,7 +441,7 @@ class _DashboardExtensionsOrderState extends State<DashboardExtensionsOrder> {
             }
           });
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setStringList('dashboardExtensionsOrder',
+          await prefs.setStringList('dashboardExtensionsOrder',
               SystemSettings.dashboardExtensionsOrder);
         },
       ),

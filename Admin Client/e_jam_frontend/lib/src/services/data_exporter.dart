@@ -47,6 +47,28 @@ class DataExporter {
 
   static exportSelectedData(
       BuildContext context, List<bool> choices, int saveAs) {
+    // show error dialog if the platform is not supported
+    if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Platform not supported'),
+          content: const Text(
+              'Exporting data is only supported on Windows, Linux, and MacOS'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+      );
+      return;
+    }
+
     // export the data root folder
     for (int i = 0; i < choices.length; i++) {
       if (choices[i]) {

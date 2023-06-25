@@ -124,7 +124,7 @@ class _StreamDetailsViewState extends State<StreamDetailsView> {
 
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
-                          prefs.setStringList(
+                          await prefs.setStringList(
                               'pinnedElements', SystemSettings.pinnedElements);
                         },
                       ),

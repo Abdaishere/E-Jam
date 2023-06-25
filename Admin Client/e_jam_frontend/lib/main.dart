@@ -253,83 +253,88 @@ class MenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // back button to close drawer menu
-          Padding(
-            padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-            child: IconButton(
-              onPressed: () {
-                ZoomDrawer.of(context)!.close();
-              },
-              color: context.watch<ThemeModel>().colorScheme.secondary,
-              icon: const Icon(Icons.arrow_forward_ios_outlined),
+      body: SizedBox(
+        height: double.infinity,
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // back button to close drawer menu
+            Padding(
+              padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+              child: IconButton(
+                onPressed: () {
+                  ZoomDrawer.of(context)!.close();
+                },
+                color: context.watch<ThemeModel>().colorScheme.secondary,
+                icon: const Icon(Icons.arrow_forward_ios_outlined),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            margin: const EdgeInsets.only(left: 5),
-            decoration: BoxDecoration(
-              border: Border.all(
-                  color: context.watch<ThemeModel>().colorScheme.secondary,
-                  width: 1),
-              borderRadius: BorderRadius.circular(18),
+            const SizedBox(height: 20),
+            Container(
+              margin: const EdgeInsets.only(left: 5),
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: context.watch<ThemeModel>().colorScheme.secondary,
+                    width: 1),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              padding:
+                  const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  StreamsStartStopControllerButtons(isStopping: false),
+                  StreamsStartStopControllerButtons(isStopping: true),
+                  GraphsControllerButton(),
+                  ExportButton(),
+                ],
+              ),
             ),
-            padding:
-                const EdgeInsets.only(top: 1, left: 10, right: 10, bottom: 1),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                StreamsStartStopControllerButtons(isStopping: false),
-                StreamsStartStopControllerButtons(isStopping: true),
-                GraphsControllerButton(),
-                ExportButton(),
-              ],
-            ),
-          ),
-          const SizedBox(height: 25),
-          MenuList(setIndex: setIndex),
-          const Spacer(),
+            const SizedBox(height: 25),
+            MenuList(setIndex: setIndex),
+            const Spacer(),
 
-          Container(
-            margin: const EdgeInsets.only(right: 60),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                IconButton(
-                  tooltip: 'Change Server',
-                  icon: const Icon(MaterialCommunityIcons.server_network),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      HeroDialogRoute(
-                        builder: (BuildContext context) => const Center(
-                          child: ChangeServerIPScreen(),
+            Container(
+              margin: const EdgeInsets.only(right: 60),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  IconButton(
+                    tooltip: 'Change Server',
+                    icon: const Icon(MaterialCommunityIcons.server_network),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        HeroDialogRoute(
+                          builder: (BuildContext context) => const Center(
+                            child: ChangeServerIPScreen(),
+                          ),
+                          settings:
+                              const RouteSettings(name: 'ChangeServerView'),
                         ),
-                        settings: const RouteSettings(name: 'ChangeServerView'),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 25),
-                IconButton(
-                  icon: Icon(
-                    context.watch<ThemeModel>().isDark
-                        ? Icons.dark_mode
-                        : Icons.light_mode,
+                      );
+                    },
                   ),
-                  onPressed: () async {
-                    context.read<ThemeModel>().toggleTheme();
-                  },
-                ),
-              ],
+                  const SizedBox(width: 25),
+                  IconButton(
+                    icon: Icon(
+                      context.watch<ThemeModel>().isDark
+                          ? Icons.dark_mode
+                          : Icons.light_mode,
+                    ),
+                    onPressed: () async {
+                      context.read<ThemeModel>().toggleTheme();
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -444,7 +449,8 @@ class _GraphsControllerButtonState extends State<GraphsControllerButton> {
           SystemSettings.chartsAreRunning = !SystemSettings.chartsAreRunning;
         });
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setBool('chartsAreRunning', SystemSettings.chartsAreRunning);
+        await prefs.setBool(
+            'chartsAreRunning', SystemSettings.chartsAreRunning);
       },
       color: SystemSettings.chartsAreRunning
           ? context.watch<ThemeModel>().colorScheme.secondary

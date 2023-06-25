@@ -84,7 +84,7 @@ class _DevicesDetailsViewState extends State<DevicesDetailsView> {
 
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
-                    prefs.setStringList(
+                    await prefs.setStringList(
                         'pinnedElements', SystemSettings.pinnedElements);
                   },
                 ),

@@ -60,8 +60,8 @@ class NetworkController {
     DevicesServices.uri = Uri.parse('$serverIpAddress/devices');
     StreamServices.uri = Uri.parse('$serverIpAddress/streams');
     final pref = await SharedPreferences.getInstance();
-    pref.setString('serverIpAddress', serverIpAddress.host);
-    pref.setInt('serverPort', serverIpAddress.port);
+    await pref.setString('serverIpAddress', serverIpAddress.host);
+    await pref.setInt('serverPort', serverIpAddress.port);
   }
 }
 
@@ -116,7 +116,7 @@ class SystemSettings {
 
     NetworkController.changeServerIpAddress(
         pref.getString('serverIpAddress') ?? "",
-        pref.getInt('serverPort')?.toString() ?? "8084");
+        pref.getInt('serverPort')?.toString() ?? "");
   }
 }
 
