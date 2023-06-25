@@ -1,9 +1,6 @@
 import 'dart:async';
-
 import 'package:circular_motion/circular_motion.dart';
-import 'package:e_jam/src/Model/Classes/device.dart';
 import 'package:e_jam/src/Model/Shared/shared_preferences.dart';
-import 'package:e_jam/src/Theme/color_schemes.dart';
 import 'package:e_jam/src/View/Animation/custom_rest_tween.dart';
 import 'package:e_jam/src/View/Animation/hero_dialog_route.dart';
 import 'package:e_jam/src/View/Details_Views/add_device_view.dart';
@@ -91,10 +88,10 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.lightBlueAccent.withOpacity(0.1),
+                color: Colors.limeAccent.withOpacity(0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.lightBlueAccent.withOpacity(0.4),
+                  color: Colors.limeAccent.withOpacity(0.4),
                   width: 5,
                 ),
               ),
@@ -106,6 +103,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                 child: CircularMotion.builder(
                   behavior: HitTestBehavior.opaque,
                   centerWidget: FlutterRipple(
+                      rippleColor: Colors.limeAccent.withOpacity(0.05),
                       onTap: () {
                         _radar();
                       },
@@ -133,7 +131,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
 
   SizedBox _deviceIcon(int index) {
     return SizedBox(
-      height: 120,
+      height: 140,
       width: 120,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -142,7 +140,7 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
           IconButton(
             icon: const Icon(Icons.device_hub_rounded),
             iconSize: 75,
-            color: deviceStatusColorScheme(DeviceStatus.idle),
+            color: Colors.amberAccent,
             tooltip:
                 'Add ${devices.elementAt(index)}:${SystemSettings.defaultDevicesPort}',
             onPressed: () {

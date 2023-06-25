@@ -114,9 +114,9 @@ class SystemSettings {
 
     showTreeMap = pref.getBool('showTreeMap') ?? true;
 
-    NetworkController.changeServerIpAddress(
-        pref.getString('serverIpAddress') ?? "",
-        pref.getInt('serverPort')?.toString() ?? "");
+    String serverIpAddress = pref.getString('serverIpAddress') ?? "";
+    String serverPort = pref.getInt('serverPort')?.toString() ?? "";
+    NetworkController.changeServerIpAddress(serverIpAddress, serverPort);
   }
 }
 
