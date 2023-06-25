@@ -10,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
@@ -31,13 +34,24 @@ public class Communicator {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/connect")
-    public ResponseEntity connect(@RequestHeader("mac-address") String macAddress, @RequestHeader("admin-address") String adminAddress, @RequestHeader("admin-port") int adminPort) {
-        globalVariables.writeAdminConfig(adminAddress, adminPort);
-
-        System.out.println("Received mac address: " + macAddress);
+    @PostMapping("/handshake")
+    public Map<String, String> handshake(@RequestHeader("admin-address") String adminAddress, @RequestHeader("admin-port") int adminPort) {
         System.out.println("Received ip address: " + adminAddress);
         System.out.println("Received port number: " + adminPort);
+
+        globalVariables.writeAdminConfig(adminAddress, adminPort);
+        globalVariables.readAdminConfig();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mac-address", UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE)));
+
+        return response;
+    }
+
+    @PostMapping("/connect")
+    public ResponseEntity connect(@RequestHeader("mac-address") String macAddress) {
+        System.out.println("Received mac address: " + macAddress);
+
         String serverMacAddress = UTILs.convertToWithoutColonFormat(macAddress);
         System.out.println(macAddress);
         System.out.println(serverMacAddress);
