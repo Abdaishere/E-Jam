@@ -40,7 +40,7 @@ public class KafkaInitializer {
         prop.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
 
         GeneratorProducer.producer = new KafkaProducer<>(prop);
-//        VerifierProducer.producer = new KafkaProducer<>(prop);
+        VerifierProducer.producer = new KafkaProducer<>(prop);
 
         Thread statsManagerThread = new Thread(StatsManager.getInstance());
         statsManagerThread.start();

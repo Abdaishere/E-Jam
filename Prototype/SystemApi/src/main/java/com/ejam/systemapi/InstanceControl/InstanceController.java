@@ -143,8 +143,8 @@ public class InstanceController implements Runnable {
             if (waitFor) {
                 int exitVal = process.waitFor();
                 if (exitVal != 0) {
-//                    System.out.println("Could not execute command: " + command);
-                    throw new Exception("Could not execute command: " + command);
+                    System.out.println("Could not execute command: " + command);
+//                    throw new Exception("Could not execute command: " + command);
                 }
                 System.out.println(command + " " + pid + " exited");
             } else {

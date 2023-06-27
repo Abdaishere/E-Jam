@@ -145,6 +145,7 @@ void StatsManager::buildMsg(std::string& msg)
 		//Packets received out of order
 		msg += std::to_string(receivedOutOfOrderPckts);
 	}
+    writeToFile(msg);
 }
 
 void StatsManager::writeStatFile()
