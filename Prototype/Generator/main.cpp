@@ -86,15 +86,15 @@ void sendB2B(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull IFG = 0)
 
 
 /// \param delay in milliseconds
-/// \details send a specified number of packets in bursts of size burst
-void sendBurst(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull delay, int burst, ull IFG = 0)
+/// \details send a specified number of packets in bursts of size burstSize
+void sendBurst(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull delay, int burstSize, ull IFG = 0)
 {
     using namespace std::chrono;
     if(packetsToSend <= 0) return;
 
     while(packetsToSend > 0)
     {
-        int rem = std::min(burst, packetsToSend);
+        int rem = std::min(burstSize, packetsToSend);
         packetsToSend -= rem;
         while(rem--)
         {
@@ -183,14 +183,15 @@ int main(int argc, char** argv)
     std::thread statWriter(sendStatsFunction, sm);
     ull gap = currConfig.getInterFrameGap();
     FlowType flowType = currConfig.getFlowType();
-    int packetNumber = currConfig.getNumberOfPackets();
+    ull packetNumber = currConfig.getNumberOfPackets();
     currConfig.print();
     if(packetNumber > 0)
     {
-        creator = std::thread(createNumBased, pc, packetNumber, currConfig,15);
-        //TODO add burst delay and burst size from stream configuration
+        creator = std::thread(createNumBased, pc, packetNumber, currConfig,gap);
+        ull burstDelay = currConfig.getBurstDelay();
+        ull burstSize = currConfig.getBurstLength();
         if(flowType == BURSTY)
-            sender = std::thread(sendBurst, pc, packetNumber, (ull)20, 30,gap);
+            sender = std::thread(sendBurst, pc, packetNumber, burstDelay, burstSize,gap);
         else
             sender = std::thread(sendB2B, pc, packetNumber, gap);
     }
@@ -199,8 +200,7 @@ int main(int argc, char** argv)
         ull sendTime = currConfig.getLifeTime();
         ull burstDelay = currConfig.getBurstDelay();
         ull burstLength = currConfig.getBurstLength();
-        creator = std::thread(createTimeBased, pc, sendTime, currConfig,10);
-        //TODO add burst delay and burst size from stream configuration
+        creator = std::thread(createTimeBased, pc, sendTime, currConfig, gap);
         if(flowType == BURSTY)
             sender = std::thread(sendTimeBasedBurst, pc, sendTime, burstDelay,burstLength,gap);
         else

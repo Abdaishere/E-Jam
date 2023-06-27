@@ -99,7 +99,8 @@ public class UTILs {
         return macAddress;
     }
 
-    public static String convertMacAddressFormat(String macAddress) {
+    public static String convertToColonFormat(String macAddress) {
+        macAddress = macAddress.trim();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < macAddress.length(); i += 2) {
             sb.append(Character.toLowerCase(macAddress.charAt(i)));
@@ -108,5 +109,10 @@ public class UTILs {
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();
+    }
+
+    public static String convertToWithoutColonFormat(String macAddress) {
+        macAddress = macAddress.trim();
+        return macAddress.replaceAll(":", "");
     }
 }

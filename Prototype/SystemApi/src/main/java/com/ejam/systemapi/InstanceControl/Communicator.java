@@ -10,10 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
@@ -24,20 +27,40 @@ public class Communicator {
     /**
      * Get configuration from Admin GUI
      */
-    static GlobalVariables globalVariables = new GlobalVariables();
+    static GlobalVariables globalVariables = GlobalVariables.getInstance();
 
     @GetMapping("/")
     public ResponseEntity index() {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/handshake")
+    public Map<String, String> handshake(@RequestHeader("admin-address") String adminAddress, @RequestHeader("admin-port") int adminPort) {
+        System.out.println("Received ip address: " + adminAddress);
+        System.out.println("Received port number: " + adminPort);
+
+        globalVariables.writeAdminConfig(adminAddress, adminPort);
+        globalVariables.readAdminConfig();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mac-address", UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE)));
+
+        return response;
+    }
+
     @PostMapping("/connect")
     public ResponseEntity connect(@RequestHeader("mac-address") String macAddress) {
-//        System.out.println("Received mac address: " + macAddress);
-        if (macAddress.equals(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE))) {
-            return ResponseEntity.badRequest().build();
+        System.out.println("Received mac address: " + macAddress);
+
+        String serverMacAddress = UTILs.convertToWithoutColonFormat(macAddress);
+        System.out.println(macAddress);
+        System.out.println(serverMacAddress);
+        System.out.println(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE));
+
+        if (serverMacAddress.equals(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE))) {
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/start")
@@ -53,7 +76,7 @@ public class Communicator {
         Iterator<JsonNode> generatorsIterator = generatorsNode.elements();
         while (generatorsIterator.hasNext()) {
             JsonNode generator = generatorsIterator.next();
-            generators.add(generator.asText());
+            generators.add(UTILs.convertToWithoutColonFormat(generator.asText()));
         }
 
         ArrayList<String> verifiers = new ArrayList<>();
@@ -61,7 +84,7 @@ public class Communicator {
         Iterator<JsonNode> verifiersIterator = verifiersNode.elements();
         while (verifiersIterator.hasNext()) {
             JsonNode verifier = verifiersIterator.next();
-            verifiers.add(verifier.asText());
+            verifiers.add(UTILs.convertToWithoutColonFormat(verifier.asText()));
         }
 
         PayloadType payloadType = PayloadType.values()[jsonObj.get("payloadType").asInt()];
@@ -133,10 +156,15 @@ public class Communicator {
 
     // notify admin-client that stream has started or finished
     public static void notify(String streamId, String type) throws URISyntaxException {
+        globalVariables.readAdminConfig();
+
         URI uri = new URI(String.format("http://%s:%d/streams/%s/%s", globalVariables.ADMIN_ADDRESS, globalVariables.ADMIN_PORT, streamId, type));
+
+        System.out.println(uri);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("mac-address", UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE));
+        headers.set("mac-address", UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE)));
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(null, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(uri, request, String.class);

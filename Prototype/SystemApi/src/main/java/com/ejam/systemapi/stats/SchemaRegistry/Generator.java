@@ -14,526 +14,572 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class Generator extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-    private static final long serialVersionUID = -4370367674444955074L;
-    public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Generator\",\"namespace\":\"com.ejam.systemapi.stats.SchemaRegistry\",\"fields\":[{\"name\":\"macAddress\",\"type\":{\"type\":\"string\",\"pattern\":\"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$\"}},{\"name\":\"streamId\",\"type\":{\"type\":\"string\",\"pattern\":\"^\\\\w{3}$\"}},{\"name\":\"packetsSent\",\"type\":{\"type\":\"long\",\"logicalType\":\"unsigned\"}},{\"name\":\"packetsErrors\",\"type\":{\"type\":\"long\",\"logicalType\":\"unsigned\"}}]}");
-    public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
+  private static final long serialVersionUID = -5645764380665134908L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Generator\",\"namespace\":\"com.ejam.systemapi.stats.SchemaRegistry\",\"fields\":[{\"name\":\"timestamp\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"macAddress\",\"type\":{\"type\":\"string\",\"pattern\":\"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$\"}},{\"name\":\"streamId\",\"type\":{\"type\":\"string\",\"pattern\":\"^\\\\w{3}$\"}},{\"name\":\"packetsSent\",\"type\":{\"type\":\"long\",\"logicalType\":\"unsigned\"}},{\"name\":\"packetsErrors\",\"type\":{\"type\":\"long\",\"logicalType\":\"unsigned\"}}]}");
+  public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
-    private static SpecificData MODEL$ = new SpecificData();
+  private static SpecificData MODEL$ = new SpecificData();
+static {
+    MODEL$.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMillisConversion());
+  }
 
-    private static final BinaryMessageEncoder<Generator> ENCODER =
-            new BinaryMessageEncoder<Generator>(MODEL$, SCHEMA$);
+  private static final BinaryMessageEncoder<Generator> ENCODER =
+      new BinaryMessageEncoder<Generator>(MODEL$, SCHEMA$);
 
-    private static final BinaryMessageDecoder<Generator> DECODER =
-            new BinaryMessageDecoder<Generator>(MODEL$, SCHEMA$);
+  private static final BinaryMessageDecoder<Generator> DECODER =
+      new BinaryMessageDecoder<Generator>(MODEL$, SCHEMA$);
 
-    /**
-     * Return the BinaryMessageEncoder instance used by this class.
-     * @return the message encoder used by this class
-     */
-    public static BinaryMessageEncoder<Generator> getEncoder() {
-        return ENCODER;
+  /**
+   * Return the BinaryMessageEncoder instance used by this class.
+   * @return the message encoder used by this class
+   */
+  public static BinaryMessageEncoder<Generator> getEncoder() {
+    return ENCODER;
+  }
+
+  /**
+   * Return the BinaryMessageDecoder instance used by this class.
+   * @return the message decoder used by this class
+   */
+  public static BinaryMessageDecoder<Generator> getDecoder() {
+    return DECODER;
+  }
+
+  /**
+   * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
+   * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
+   * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
+   */
+  public static BinaryMessageDecoder<Generator> createDecoder(SchemaStore resolver) {
+    return new BinaryMessageDecoder<Generator>(MODEL$, SCHEMA$, resolver);
+  }
+
+  /**
+   * Serializes this Generator to a ByteBuffer.
+   * @return a buffer holding the serialized data for this instance
+   * @throws java.io.IOException if this instance could not be serialized
+   */
+  public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
+    return ENCODER.encode(this);
+  }
+
+  /**
+   * Deserializes a Generator from a ByteBuffer.
+   * @param b a byte buffer holding serialized data for an instance of this class
+   * @return a Generator instance decoded from the given buffer
+   * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
+   */
+  public static Generator fromByteBuffer(
+      java.nio.ByteBuffer b) throws java.io.IOException {
+    return DECODER.decode(b);
+  }
+
+   private java.time.Instant timestamp;
+   private java.lang.CharSequence macAddress;
+   private java.lang.CharSequence streamId;
+   private long packetsSent;
+   private long packetsErrors;
+
+  /**
+   * Default constructor.  Note that this does not initialize fields
+   * to their default values from the schema.  If that is desired then
+   * one should use <code>newBuilder()</code>.
+   */
+  public Generator() {}
+
+  /**
+   * All-args constructor.
+   * @param timestamp The new value for timestamp
+   * @param macAddress The new value for macAddress
+   * @param streamId The new value for streamId
+   * @param packetsSent The new value for packetsSent
+   * @param packetsErrors The new value for packetsErrors
+   */
+  public Generator(java.time.Instant timestamp, java.lang.CharSequence macAddress, java.lang.CharSequence streamId, java.lang.Long packetsSent, java.lang.Long packetsErrors) {
+    this.timestamp = timestamp.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
+    this.macAddress = macAddress;
+    this.streamId = streamId;
+    this.packetsSent = packetsSent;
+    this.packetsErrors = packetsErrors;
+  }
+
+  public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
+  public org.apache.avro.Schema getSchema() { return SCHEMA$; }
+  // Used by DatumWriter.  Applications should not call.
+  public java.lang.Object get(int field$) {
+    switch (field$) {
+    case 0: return timestamp;
+    case 1: return macAddress;
+    case 2: return streamId;
+    case 3: return packetsSent;
+    case 4: return packetsErrors;
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
+  }
 
-    /**
-     * Return the BinaryMessageDecoder instance used by this class.
-     * @return the message decoder used by this class
-     */
-    public static BinaryMessageDecoder<Generator> getDecoder() {
-        return DECODER;
+  private static final org.apache.avro.Conversion<?>[] conversions =
+      new org.apache.avro.Conversion<?>[] {
+      new org.apache.avro.data.TimeConversions.TimestampMillisConversion(),
+      null,
+      null,
+      null,
+      null,
+      null
+  };
+
+  @Override
+  public org.apache.avro.Conversion<?> getConversion(int field) {
+    return conversions[field];
+  }
+
+  // Used by DatumReader.  Applications should not call.
+  @SuppressWarnings(value="unchecked")
+  public void put(int field$, java.lang.Object value$) {
+    switch (field$) {
+    case 0: timestamp = (java.time.Instant)value$; break;
+    case 1: macAddress = (java.lang.CharSequence)value$; break;
+    case 2: streamId = (java.lang.CharSequence)value$; break;
+    case 3: packetsSent = (java.lang.Long)value$; break;
+    case 4: packetsErrors = (java.lang.Long)value$; break;
+    default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
+  }
 
-    /**
-     * Create a new BinaryMessageDecoder instance for this class that uses the specified {@link SchemaStore}.
-     * @param resolver a {@link SchemaStore} used to find schemas by fingerprint
-     * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
-     */
-    public static BinaryMessageDecoder<Generator> createDecoder(SchemaStore resolver) {
-        return new BinaryMessageDecoder<Generator>(MODEL$, SCHEMA$, resolver);
+  /**
+   * Gets the value of the 'timestamp' field.
+   * @return The value of the 'timestamp' field.
+   */
+  public java.time.Instant getTimestamp() {
+    return timestamp;
+  }
+
+
+  /**
+   * Sets the value of the 'timestamp' field.
+   * @param value the value to set.
+   */
+  public void setTimestamp(java.time.Instant value) {
+    this.timestamp = value.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
+  }
+
+  /**
+   * Gets the value of the 'macAddress' field.
+   * @return The value of the 'macAddress' field.
+   */
+  public java.lang.CharSequence getMacAddress() {
+    return macAddress;
+  }
+
+
+  /**
+   * Sets the value of the 'macAddress' field.
+   * @param value the value to set.
+   */
+  public void setMacAddress(java.lang.CharSequence value) {
+    this.macAddress = value;
+  }
+
+  /**
+   * Gets the value of the 'streamId' field.
+   * @return The value of the 'streamId' field.
+   */
+  public java.lang.CharSequence getStreamId() {
+    return streamId;
+  }
+
+
+  /**
+   * Sets the value of the 'streamId' field.
+   * @param value the value to set.
+   */
+  public void setStreamId(java.lang.CharSequence value) {
+    this.streamId = value;
+  }
+
+  /**
+   * Gets the value of the 'packetsSent' field.
+   * @return The value of the 'packetsSent' field.
+   */
+  public long getPacketsSent() {
+    return packetsSent;
+  }
+
+
+  /**
+   * Sets the value of the 'packetsSent' field.
+   * @param value the value to set.
+   */
+  public void setPacketsSent(long value) {
+    this.packetsSent = value;
+  }
+
+  /**
+   * Gets the value of the 'packetsErrors' field.
+   * @return The value of the 'packetsErrors' field.
+   */
+  public long getPacketsErrors() {
+    return packetsErrors;
+  }
+
+
+  /**
+   * Sets the value of the 'packetsErrors' field.
+   * @param value the value to set.
+   */
+  public void setPacketsErrors(long value) {
+    this.packetsErrors = value;
+  }
+
+  /**
+   * Creates a new Generator RecordBuilder.
+   * @return A new Generator RecordBuilder
+   */
+  public static com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder newBuilder() {
+    return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder();
+  }
+
+  /**
+   * Creates a new Generator RecordBuilder by copying an existing Builder.
+   * @param other The existing builder to copy.
+   * @return A new Generator RecordBuilder
+   */
+  public static com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder newBuilder(com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder other) {
+    if (other == null) {
+      return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder();
+    } else {
+      return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder(other);
     }
+  }
 
-    /**
-     * Serializes this Generator to a ByteBuffer.
-     * @return a buffer holding the serialized data for this instance
-     * @throws java.io.IOException if this instance could not be serialized
-     */
-    public java.nio.ByteBuffer toByteBuffer() throws java.io.IOException {
-        return ENCODER.encode(this);
+  /**
+   * Creates a new Generator RecordBuilder by copying an existing Generator instance.
+   * @param other The existing instance to copy.
+   * @return A new Generator RecordBuilder
+   */
+  public static com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder newBuilder(com.ejam.systemapi.stats.SchemaRegistry.Generator other) {
+    if (other == null) {
+      return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder();
+    } else {
+      return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder(other);
     }
+  }
 
-    /**
-     * Deserializes a Generator from a ByteBuffer.
-     * @param b a byte buffer holding serialized data for an instance of this class
-     * @return a Generator instance decoded from the given buffer
-     * @throws java.io.IOException if the given bytes could not be deserialized into an instance of this class
-     */
-    public static Generator fromByteBuffer(
-            java.nio.ByteBuffer b) throws java.io.IOException {
-        return DECODER.decode(b);
-    }
+  /**
+   * RecordBuilder for Generator instances.
+   */
+  @org.apache.avro.specific.AvroGenerated
+  public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<Generator>
+    implements org.apache.avro.data.RecordBuilder<Generator> {
 
+    private java.time.Instant timestamp;
     private java.lang.CharSequence macAddress;
     private java.lang.CharSequence streamId;
     private long packetsSent;
     private long packetsErrors;
 
+    /** Creates a new Builder */
+    private Builder() {
+      super(SCHEMA$);
+    }
+
     /**
-     * Default constructor.  Note that this does not initialize fields
-     * to their default values from the schema.  If that is desired then
-     * one should use <code>newBuilder()</code>.
+     * Creates a Builder by copying an existing Builder.
+     * @param other The existing Builder to copy.
      */
-    public Generator() {}
-
-    /**
-     * All-args constructor.
-     * @param macAddress The new value for macAddress
-     * @param streamId The new value for streamId
-     * @param packetsSent The new value for packetsSent
-     * @param packetsErrors The new value for packetsErrors
-     */
-    public Generator(java.lang.CharSequence macAddress, java.lang.CharSequence streamId, java.lang.Long packetsSent, java.lang.Long packetsErrors) {
-        this.macAddress = macAddress;
-        this.streamId = streamId;
-        this.packetsSent = packetsSent;
-        this.packetsErrors = packetsErrors;
-    }
-
-    public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
-    public org.apache.avro.Schema getSchema() { return SCHEMA$; }
-    // Used by DatumWriter.  Applications should not call.
-    public java.lang.Object get(int field$) {
-        switch (field$) {
-            case 0: return macAddress;
-            case 1: return streamId;
-            case 2: return packetsSent;
-            case 3: return packetsErrors;
-            default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
-        }
-    }
-
-    // Used by DatumReader.  Applications should not call.
-    @SuppressWarnings(value="unchecked")
-    public void put(int field$, java.lang.Object value$) {
-        switch (field$) {
-            case 0: macAddress = (java.lang.CharSequence)value$; break;
-            case 1: streamId = (java.lang.CharSequence)value$; break;
-            case 2: packetsSent = (java.lang.Long)value$; break;
-            case 3: packetsErrors = (java.lang.Long)value$; break;
-            default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
-        }
+    private Builder(com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder other) {
+      super(other);
+      if (isValidValue(fields()[0], other.timestamp)) {
+        this.timestamp = data().deepCopy(fields()[0].schema(), other.timestamp);
+        fieldSetFlags()[0] = other.fieldSetFlags()[0];
+      }
+      if (isValidValue(fields()[1], other.macAddress)) {
+        this.macAddress = data().deepCopy(fields()[1].schema(), other.macAddress);
+        fieldSetFlags()[1] = other.fieldSetFlags()[1];
+      }
+      if (isValidValue(fields()[2], other.streamId)) {
+        this.streamId = data().deepCopy(fields()[2].schema(), other.streamId);
+        fieldSetFlags()[2] = other.fieldSetFlags()[2];
+      }
+      if (isValidValue(fields()[3], other.packetsSent)) {
+        this.packetsSent = data().deepCopy(fields()[3].schema(), other.packetsSent);
+        fieldSetFlags()[3] = other.fieldSetFlags()[3];
+      }
+      if (isValidValue(fields()[4], other.packetsErrors)) {
+        this.packetsErrors = data().deepCopy(fields()[4].schema(), other.packetsErrors);
+        fieldSetFlags()[4] = other.fieldSetFlags()[4];
+      }
     }
 
     /**
-     * Gets the value of the 'macAddress' field.
-     * @return The value of the 'macAddress' field.
-     */
-    public java.lang.CharSequence getMacAddress() {
-        return macAddress;
-    }
-
-
-    /**
-     * Sets the value of the 'macAddress' field.
-     * @param value the value to set.
-     */
-    public void setMacAddress(java.lang.CharSequence value) {
-        this.macAddress = value;
-    }
-
-    /**
-     * Gets the value of the 'streamId' field.
-     * @return The value of the 'streamId' field.
-     */
-    public java.lang.CharSequence getStreamId() {
-        return streamId;
-    }
-
-
-    /**
-     * Sets the value of the 'streamId' field.
-     * @param value the value to set.
-     */
-    public void setStreamId(java.lang.CharSequence value) {
-        this.streamId = value;
-    }
-
-    /**
-     * Gets the value of the 'packetsSent' field.
-     * @return The value of the 'packetsSent' field.
-     */
-    public long getPacketsSent() {
-        return packetsSent;
-    }
-
-
-    /**
-     * Sets the value of the 'packetsSent' field.
-     * @param value the value to set.
-     */
-    public void setPacketsSent(long value) {
-        this.packetsSent = value;
-    }
-
-    /**
-     * Gets the value of the 'packetsErrors' field.
-     * @return The value of the 'packetsErrors' field.
-     */
-    public long getPacketsErrors() {
-        return packetsErrors;
-    }
-
-
-    /**
-     * Sets the value of the 'packetsErrors' field.
-     * @param value the value to set.
-     */
-    public void setPacketsErrors(long value) {
-        this.packetsErrors = value;
-    }
-
-    /**
-     * Creates a new Generator RecordBuilder.
-     * @return A new Generator RecordBuilder
-     */
-    public static com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder newBuilder() {
-        return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder();
-    }
-
-    /**
-     * Creates a new Generator RecordBuilder by copying an existing Builder.
-     * @param other The existing builder to copy.
-     * @return A new Generator RecordBuilder
-     */
-    public static com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder newBuilder(com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder other) {
-        if (other == null) {
-            return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder();
-        } else {
-            return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder(other);
-        }
-    }
-
-    /**
-     * Creates a new Generator RecordBuilder by copying an existing Generator instance.
+     * Creates a Builder by copying an existing Generator instance
      * @param other The existing instance to copy.
-     * @return A new Generator RecordBuilder
      */
-    public static com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder newBuilder(com.ejam.systemapi.stats.SchemaRegistry.Generator other) {
-        if (other == null) {
-            return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder();
-        } else {
-            return new com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder(other);
-        }
+    private Builder(com.ejam.systemapi.stats.SchemaRegistry.Generator other) {
+      super(SCHEMA$);
+      if (isValidValue(fields()[0], other.timestamp)) {
+        this.timestamp = data().deepCopy(fields()[0].schema(), other.timestamp);
+        fieldSetFlags()[0] = true;
+      }
+      if (isValidValue(fields()[1], other.macAddress)) {
+        this.macAddress = data().deepCopy(fields()[1].schema(), other.macAddress);
+        fieldSetFlags()[1] = true;
+      }
+      if (isValidValue(fields()[2], other.streamId)) {
+        this.streamId = data().deepCopy(fields()[2].schema(), other.streamId);
+        fieldSetFlags()[2] = true;
+      }
+      if (isValidValue(fields()[3], other.packetsSent)) {
+        this.packetsSent = data().deepCopy(fields()[3].schema(), other.packetsSent);
+        fieldSetFlags()[3] = true;
+      }
+      if (isValidValue(fields()[4], other.packetsErrors)) {
+        this.packetsErrors = data().deepCopy(fields()[4].schema(), other.packetsErrors);
+        fieldSetFlags()[4] = true;
+      }
     }
 
     /**
-     * RecordBuilder for Generator instances.
-     */
-    @org.apache.avro.specific.AvroGenerated
-    public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<Generator>
-            implements org.apache.avro.data.RecordBuilder<Generator> {
-
-        private java.lang.CharSequence macAddress;
-        private java.lang.CharSequence streamId;
-        private long packetsSent;
-        private long packetsErrors;
-
-        /** Creates a new Builder */
-        private Builder() {
-            super(SCHEMA$);
-        }
-
-        /**
-         * Creates a Builder by copying an existing Builder.
-         * @param other The existing Builder to copy.
-         */
-        private Builder(com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder other) {
-            super(other);
-            if (isValidValue(fields()[0], other.macAddress)) {
-                this.macAddress = data().deepCopy(fields()[0].schema(), other.macAddress);
-                fieldSetFlags()[0] = other.fieldSetFlags()[0];
-            }
-            if (isValidValue(fields()[1], other.streamId)) {
-                this.streamId = data().deepCopy(fields()[1].schema(), other.streamId);
-                fieldSetFlags()[1] = other.fieldSetFlags()[1];
-            }
-            if (isValidValue(fields()[2], other.packetsSent)) {
-                this.packetsSent = data().deepCopy(fields()[2].schema(), other.packetsSent);
-                fieldSetFlags()[2] = other.fieldSetFlags()[2];
-            }
-            if (isValidValue(fields()[3], other.packetsErrors)) {
-                this.packetsErrors = data().deepCopy(fields()[3].schema(), other.packetsErrors);
-                fieldSetFlags()[3] = other.fieldSetFlags()[3];
-            }
-        }
-
-        /**
-         * Creates a Builder by copying an existing Generator instance
-         * @param other The existing instance to copy.
-         */
-        private Builder(com.ejam.systemapi.stats.SchemaRegistry.Generator other) {
-            super(SCHEMA$);
-            if (isValidValue(fields()[0], other.macAddress)) {
-                this.macAddress = data().deepCopy(fields()[0].schema(), other.macAddress);
-                fieldSetFlags()[0] = true;
-            }
-            if (isValidValue(fields()[1], other.streamId)) {
-                this.streamId = data().deepCopy(fields()[1].schema(), other.streamId);
-                fieldSetFlags()[1] = true;
-            }
-            if (isValidValue(fields()[2], other.packetsSent)) {
-                this.packetsSent = data().deepCopy(fields()[2].schema(), other.packetsSent);
-                fieldSetFlags()[2] = true;
-            }
-            if (isValidValue(fields()[3], other.packetsErrors)) {
-                this.packetsErrors = data().deepCopy(fields()[3].schema(), other.packetsErrors);
-                fieldSetFlags()[3] = true;
-            }
-        }
-
-        /**
-         * Gets the value of the 'macAddress' field.
-         * @return The value.
-         */
-        public java.lang.CharSequence getMacAddress() {
-            return macAddress;
-        }
-
-
-        /**
-         * Sets the value of the 'macAddress' field.
-         * @param value The value of 'macAddress'.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setMacAddress(java.lang.CharSequence value) {
-            validate(fields()[0], value);
-            this.macAddress = value;
-            fieldSetFlags()[0] = true;
-            return this;
-        }
-
-        /**
-         * Checks whether the 'macAddress' field has been set.
-         * @return True if the 'macAddress' field has been set, false otherwise.
-         */
-        public boolean hasMacAddress() {
-            return fieldSetFlags()[0];
-        }
-
-
-        /**
-         * Clears the value of the 'macAddress' field.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearMacAddress() {
-            macAddress = null;
-            fieldSetFlags()[0] = false;
-            return this;
-        }
-
-        /**
-         * Gets the value of the 'streamId' field.
-         * @return The value.
-         */
-        public java.lang.CharSequence getStreamId() {
-            return streamId;
-        }
-
-
-        /**
-         * Sets the value of the 'streamId' field.
-         * @param value The value of 'streamId'.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setStreamId(java.lang.CharSequence value) {
-            validate(fields()[1], value);
-            this.streamId = value;
-            fieldSetFlags()[1] = true;
-            return this;
-        }
-
-        /**
-         * Checks whether the 'streamId' field has been set.
-         * @return True if the 'streamId' field has been set, false otherwise.
-         */
-        public boolean hasStreamId() {
-            return fieldSetFlags()[1];
-        }
-
-
-        /**
-         * Clears the value of the 'streamId' field.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearStreamId() {
-            streamId = null;
-            fieldSetFlags()[1] = false;
-            return this;
-        }
-
-        /**
-         * Gets the value of the 'packetsSent' field.
-         * @return The value.
-         */
-        public long getPacketsSent() {
-            return packetsSent;
-        }
-
-
-        /**
-         * Sets the value of the 'packetsSent' field.
-         * @param value The value of 'packetsSent'.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setPacketsSent(long value) {
-            validate(fields()[2], value);
-            this.packetsSent = value;
-            fieldSetFlags()[2] = true;
-            return this;
-        }
-
-        /**
-         * Checks whether the 'packetsSent' field has been set.
-         * @return True if the 'packetsSent' field has been set, false otherwise.
-         */
-        public boolean hasPacketsSent() {
-            return fieldSetFlags()[2];
-        }
-
-
-        /**
-         * Clears the value of the 'packetsSent' field.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearPacketsSent() {
-            fieldSetFlags()[2] = false;
-            return this;
-        }
-
-        /**
-         * Gets the value of the 'packetsErrors' field.
-         * @return The value.
-         */
-        public long getPacketsErrors() {
-            return packetsErrors;
-        }
-
-
-        /**
-         * Sets the value of the 'packetsErrors' field.
-         * @param value The value of 'packetsErrors'.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setPacketsErrors(long value) {
-            validate(fields()[3], value);
-            this.packetsErrors = value;
-            fieldSetFlags()[3] = true;
-            return this;
-        }
-
-        /**
-         * Checks whether the 'packetsErrors' field has been set.
-         * @return True if the 'packetsErrors' field has been set, false otherwise.
-         */
-        public boolean hasPacketsErrors() {
-            return fieldSetFlags()[3];
-        }
-
-
-        /**
-         * Clears the value of the 'packetsErrors' field.
-         * @return This builder.
-         */
-        public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearPacketsErrors() {
-            fieldSetFlags()[3] = false;
-            return this;
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public Generator build() {
-            try {
-                Generator record = new Generator();
-                record.macAddress = fieldSetFlags()[0] ? this.macAddress : (java.lang.CharSequence) defaultValue(fields()[0]);
-                record.streamId = fieldSetFlags()[1] ? this.streamId : (java.lang.CharSequence) defaultValue(fields()[1]);
-                record.packetsSent = fieldSetFlags()[2] ? this.packetsSent : (java.lang.Long) defaultValue(fields()[2]);
-                record.packetsErrors = fieldSetFlags()[3] ? this.packetsErrors : (java.lang.Long) defaultValue(fields()[3]);
-                return record;
-            } catch (org.apache.avro.AvroMissingFieldException e) {
-                throw e;
-            } catch (java.lang.Exception e) {
-                throw new org.apache.avro.AvroRuntimeException(e);
-            }
-        }
+      * Gets the value of the 'timestamp' field.
+      * @return The value.
+      */
+    public java.time.Instant getTimestamp() {
+      return timestamp;
     }
 
+
+    /**
+      * Sets the value of the 'timestamp' field.
+      * @param value The value of 'timestamp'.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setTimestamp(java.time.Instant value) {
+      validate(fields()[0], value);
+      this.timestamp = value.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
+      fieldSetFlags()[0] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'timestamp' field has been set.
+      * @return True if the 'timestamp' field has been set, false otherwise.
+      */
+    public boolean hasTimestamp() {
+      return fieldSetFlags()[0];
+    }
+
+
+    /**
+      * Clears the value of the 'timestamp' field.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearTimestamp() {
+      fieldSetFlags()[0] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'macAddress' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getMacAddress() {
+      return macAddress;
+    }
+
+
+    /**
+      * Sets the value of the 'macAddress' field.
+      * @param value The value of 'macAddress'.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setMacAddress(java.lang.CharSequence value) {
+      validate(fields()[1], value);
+      this.macAddress = value;
+      fieldSetFlags()[1] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'macAddress' field has been set.
+      * @return True if the 'macAddress' field has been set, false otherwise.
+      */
+    public boolean hasMacAddress() {
+      return fieldSetFlags()[1];
+    }
+
+
+    /**
+      * Clears the value of the 'macAddress' field.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearMacAddress() {
+      macAddress = null;
+      fieldSetFlags()[1] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'streamId' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getStreamId() {
+      return streamId;
+    }
+
+
+    /**
+      * Sets the value of the 'streamId' field.
+      * @param value The value of 'streamId'.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setStreamId(java.lang.CharSequence value) {
+      validate(fields()[2], value);
+      this.streamId = value;
+      fieldSetFlags()[2] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'streamId' field has been set.
+      * @return True if the 'streamId' field has been set, false otherwise.
+      */
+    public boolean hasStreamId() {
+      return fieldSetFlags()[2];
+    }
+
+
+    /**
+      * Clears the value of the 'streamId' field.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearStreamId() {
+      streamId = null;
+      fieldSetFlags()[2] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'packetsSent' field.
+      * @return The value.
+      */
+    public long getPacketsSent() {
+      return packetsSent;
+    }
+
+
+    /**
+      * Sets the value of the 'packetsSent' field.
+      * @param value The value of 'packetsSent'.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setPacketsSent(long value) {
+      validate(fields()[3], value);
+      this.packetsSent = value;
+      fieldSetFlags()[3] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'packetsSent' field has been set.
+      * @return True if the 'packetsSent' field has been set, false otherwise.
+      */
+    public boolean hasPacketsSent() {
+      return fieldSetFlags()[3];
+    }
+
+
+    /**
+      * Clears the value of the 'packetsSent' field.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearPacketsSent() {
+      fieldSetFlags()[3] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'packetsErrors' field.
+      * @return The value.
+      */
+    public long getPacketsErrors() {
+      return packetsErrors;
+    }
+
+
+    /**
+      * Sets the value of the 'packetsErrors' field.
+      * @param value The value of 'packetsErrors'.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder setPacketsErrors(long value) {
+      validate(fields()[4], value);
+      this.packetsErrors = value;
+      fieldSetFlags()[4] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'packetsErrors' field has been set.
+      * @return True if the 'packetsErrors' field has been set, false otherwise.
+      */
+    public boolean hasPacketsErrors() {
+      return fieldSetFlags()[4];
+    }
+
+
+    /**
+      * Clears the value of the 'packetsErrors' field.
+      * @return This builder.
+      */
+    public com.ejam.systemapi.stats.SchemaRegistry.Generator.Builder clearPacketsErrors() {
+      fieldSetFlags()[4] = false;
+      return this;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    private static final org.apache.avro.io.DatumWriter<Generator>
-            WRITER$ = (org.apache.avro.io.DatumWriter<Generator>)MODEL$.createDatumWriter(SCHEMA$);
-
-    @Override public void writeExternal(java.io.ObjectOutput out)
-            throws java.io.IOException {
-        WRITER$.write(this, SpecificData.getEncoder(out));
+    public Generator build() {
+      try {
+        Generator record = new Generator();
+        record.timestamp = fieldSetFlags()[0] ? this.timestamp : (java.time.Instant) defaultValue(fields()[0]);
+        record.macAddress = fieldSetFlags()[1] ? this.macAddress : (java.lang.CharSequence) defaultValue(fields()[1]);
+        record.streamId = fieldSetFlags()[2] ? this.streamId : (java.lang.CharSequence) defaultValue(fields()[2]);
+        record.packetsSent = fieldSetFlags()[3] ? this.packetsSent : (java.lang.Long) defaultValue(fields()[3]);
+        record.packetsErrors = fieldSetFlags()[4] ? this.packetsErrors : (java.lang.Long) defaultValue(fields()[4]);
+        return record;
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
+      } catch (java.lang.Exception e) {
+        throw new org.apache.avro.AvroRuntimeException(e);
+      }
     }
+  }
 
-    @SuppressWarnings("unchecked")
-    private static final org.apache.avro.io.DatumReader<Generator>
-            READER$ = (org.apache.avro.io.DatumReader<Generator>)MODEL$.createDatumReader(SCHEMA$);
+  @SuppressWarnings("unchecked")
+  private static final org.apache.avro.io.DatumWriter<Generator>
+    WRITER$ = (org.apache.avro.io.DatumWriter<Generator>)MODEL$.createDatumWriter(SCHEMA$);
 
-    @Override public void readExternal(java.io.ObjectInput in)
-            throws java.io.IOException {
-        READER$.read(this, SpecificData.getDecoder(in));
-    }
+  @Override public void writeExternal(java.io.ObjectOutput out)
+    throws java.io.IOException {
+    WRITER$.write(this, SpecificData.getEncoder(out));
+  }
 
-    @Override protected boolean hasCustomCoders() { return true; }
+  @SuppressWarnings("unchecked")
+  private static final org.apache.avro.io.DatumReader<Generator>
+    READER$ = (org.apache.avro.io.DatumReader<Generator>)MODEL$.createDatumReader(SCHEMA$);
 
-    @Override public void customEncode(org.apache.avro.io.Encoder out)
-            throws java.io.IOException
-    {
-        out.writeString(this.macAddress);
+  @Override public void readExternal(java.io.ObjectInput in)
+    throws java.io.IOException {
+    READER$.read(this, SpecificData.getDecoder(in));
+  }
 
-        out.writeString(this.streamId);
-
-        out.writeLong(this.packetsSent);
-
-        out.writeLong(this.packetsErrors);
-
-    }
-
-    @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
-            throws java.io.IOException
-    {
-        org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
-        if (fieldOrder == null) {
-            this.macAddress = in.readString(this.macAddress instanceof Utf8 ? (Utf8)this.macAddress : null);
-
-            this.streamId = in.readString(this.streamId instanceof Utf8 ? (Utf8)this.streamId : null);
-
-            this.packetsSent = in.readLong();
-
-            this.packetsErrors = in.readLong();
-
-        } else {
-            for (int i = 0; i < 4; i++) {
-                switch (fieldOrder[i].pos()) {
-                    case 0:
-                        this.macAddress = in.readString(this.macAddress instanceof Utf8 ? (Utf8)this.macAddress : null);
-                        break;
-
-                    case 1:
-                        this.streamId = in.readString(this.streamId instanceof Utf8 ? (Utf8)this.streamId : null);
-                        break;
-
-                    case 2:
-                        this.packetsSent = in.readLong();
-                        break;
-
-                    case 3:
-                        this.packetsErrors = in.readLong();
-                        break;
-
-                    default:
-                        throw new java.io.IOException("Corrupt ResolvingDecoder.");
-                }
-            }
-        }
-    }
 }
+
+
+
+
+
+
+
+
+
+
