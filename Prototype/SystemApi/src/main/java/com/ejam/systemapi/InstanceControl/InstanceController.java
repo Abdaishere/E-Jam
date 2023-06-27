@@ -15,7 +15,7 @@ public class InstanceController implements Runnable {
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pids = new ArrayList<>();
     Stream stream;
-    GlobalVariables globalVariables = new GlobalVariables();
+    GlobalVariables globalVariables = GlobalVariables.getInstance();
 
     public InstanceController(Stream stream) {
         myMacAddress = UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE);

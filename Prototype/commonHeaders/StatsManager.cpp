@@ -91,7 +91,7 @@ void StatsManager::buildMsg(std::string& msg)
 	{
 		//Target mac
 		//Stream ID
-		if (configuration.isSet())
+		if (!configuration.isSet())
 		{
 			msg += "00000000";
 			msg += delimiter;
@@ -116,7 +116,7 @@ void StatsManager::buildMsg(std::string& msg)
 	{
 		//Source mac
 		//Stream ID
-		if (configuration.isSet())
+		if (!configuration.isSet())
 		{
 			//fallback to identifity I can't reach the gen_id
 			msg += "00000000";
@@ -170,21 +170,16 @@ void StatsManager::writeStatFile()
 	{
         if (errno != EEXIST) //if the error was more than the file already existing
         {
-            writeToFile("Error in creating the FIFO file sgen_id");
             printf("Error in creating the FIFO file sgen_id\n");
             return;
         } else {
-            writeToFile("File already exists sgen_id, skipping creation...");
             printf("File already exists sgen_id, skipping creation...\n");
         }
     }
 
-    writeToFile("before writing to pipe.");
 	//Write on pipe
-    writeToFile("message is: " + msg);
     std::cerr << "message is: " + msg << "\n";
 	write(fd, msg.c_str(), sizeof(char)*msg.size());
     close(fd);
-    writeToFile("after writing to pipe.");
 }
 

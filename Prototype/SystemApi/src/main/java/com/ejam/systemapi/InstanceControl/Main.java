@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class Main {
     public static void main(String[] args) {
+        GlobalVariables globalVariables = GlobalVariables.getInstance();
+        System.out.println(globalVariables.ADMIN_ADDRESS);
+        System.out.println(globalVariables.ADMIN_PORT);
 //        System.out.println(UTILs.getMyMacAddress());
 //        BroadcastUtil.broadcastAlive(5);
 
