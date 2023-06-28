@@ -33,8 +33,6 @@ void PacketCreator::createPacket(int rcvInd)
     ethernetConstructor.setDestinationAddress(destinationAddress);
     ethernetConstructor.setPayload(payload);
     ethernetConstructor.constructFrame(seqNum);
-    writeToFile("constructed message\n");
-    //TODO delete the values inside created ByteArray*
     //lock the mutex and push to queue then unlock it
     mtx.lock();
     productQueue.push(ethernetConstructor.getFrame());
@@ -58,9 +56,8 @@ void PacketCreator::sendHead()
     ByteArray packet = productQueue.front();
     productQueue.pop();
     mtx.unlock();
-    writeToFile("transmitting packets \n");
+//    writeToFile("transmitting packets \n");
     sender->transmitPackets(packet);
 	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
 	statsManager->increaseSentPckts(1);
-	std::cerr << ("Packet transmitted\n");
 }

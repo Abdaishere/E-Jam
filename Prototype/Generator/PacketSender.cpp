@@ -48,7 +48,6 @@ void PacketSender::openFifo()
 
 void PacketSender::transmitPackets(const ByteArray& packet) const
 {
-    writeToFile("transmitting Packets nowww\n");
     int len = packet.size();
     write(fd, &len,4);
     write(fd, packet.c_str(), len);
