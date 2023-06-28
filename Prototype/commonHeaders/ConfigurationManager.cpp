@@ -62,12 +62,13 @@ void ConfigurationManager::initConfigurations()
 
     std::string ls= exec(lsStr.c_str());
     std::vector<std::string> directories = splitString(ls,'\n');
-
+    std::vector<std::string> configFiles;
     //Augment the parent directory
-    for(std::string& dir: directories)
-        dir = std::string(CONFIG_FOLDER)+"/"+dir;
-
-    for(const std::string& dir: directories)
+    for(std::string& dir: directories){
+        if(dir.substr(0,6) == "config")
+            configFiles.push_back(std::string(CONFIG_FOLDER)+"/"+dir);
+    }
+    for(const std::string& dir: configFiles)
     {
         if(dir.substr(dir.size()-3) == "txt")
             addConfiguration(dir.c_str());
