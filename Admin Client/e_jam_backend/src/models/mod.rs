@@ -25,7 +25,7 @@ lazy_static! {
     static ref STREAM_ID : Regex = Regex::new(r"^[A-Za-z0-9_~-]{3}$").unwrap();
 
     #[doc = r"Regex for the mac address of the device's mac address. Example of a valid mac address: 00:00:00:00:00:00, AA:AA:AA:AA:AA:AA"]
-    static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$").unwrap();
+    static ref MAC_ADDRESS : Regex = Regex::new(r"^([0-9A-F]{2}[:]){5}([0-9A-F]{2})$").unwrap();
 
     #[doc = r"Regex for the ip address of the device's ip address. Example of a valid ip address: 192.168.01.1, 192.168.1.00"]
     static ref IP_ADDRESS : Regex = Regex::new(r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$").unwrap();

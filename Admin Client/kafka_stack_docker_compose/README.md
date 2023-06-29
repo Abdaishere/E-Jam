@@ -11,30 +11,21 @@ Make sure you have docker and docker-compose installed on your machine
 docker-compose up -d # run in background
 ```
 
-After that you can either open Conduktor Platform and add the two schemas to the Schema Registry, or you can use the Conduktor CLI to do it:
+After that you can either open Conduktor Platform and add the two schemas to the Schema Registry.
 
-```bash
-conduktor schema-registry add --name Verifier --schema-file ./avro/verifiers.avsc --schema-type avro --schema-description "Verifier schema"
-conduktor schema-registry add --name Generator --schema-file ./avro/generators.avsc --schema-type avro --schema-description "Generator schema"
-```
-
-Don't forget to add the two Topics Verifier and Generator as well
-
-```bash
-conduktor topic add --name Verifier --partitions 1 --replication-factor 1
-conduktor topic add --name Generator --partitions 1 --replication-factor 1
-```
-
-if all didn't work you can run a small version of the SystemApi that is responsible for producing the actual statistics which will automatically register the schemas in the schema registry
+If you want you can run a small version of the SystemApi that is responsible for producing the actual statistics which will automatically register the schemas in the schema registry
 
 ```bash
 cd SystemApi
 mvn clean install
+mvn generate-sources
 mvn exec:java
 ```
 
+This will start the SystemApi and register the schemas in the schema registry automatically and start producing statistics to the kafka topics accordingly. You can also just wait for the statistics to be produced from actual data and then consume them from the topics.
+
 Once you have started your cluster, you can use Conduktor to easily manage it.
-Just connect against `localhost:9092`. If you are on Mac or Windows and want to connect from another container, use `host.docker.internal:29092`
+Just connect against `localhost:8080`. If you are on Mac or Windows and want to connect from another container, use `host.docker.internal:8080`.
 
 If you want more info checkout the rest of the readme.
 
@@ -69,7 +60,7 @@ For a UI tool to access your local Kafka cluster, use [Conduktor](https://www.co
 
 ## Requirements
 
-Kafka will be exposed on `127.0.0.1` or `DOCKER_HOST_IP` if set in the environment.
+Kafka will be exposed on `127.0.0.1` or `DOCKER_HOST_IP` if set in the [environment](.env).
 (You probably don't need to set it if you're not using Docker-Toolbox)
 
 ## Full stack

@@ -1,14 +1,13 @@
 FROM rust as builder
 
 RUN USER=root cargo new --bin e-jam-api
-WORKDIR /usr/src/e-jam-api
-COPY ./Cargo.toml ./Cargo.toml
+WORKDIR /e-jam-api
+COPY ./Cargo.lock ./Cargo.lock
 RUN cargo build --release
 RUN rm src/*.rs
 
 ADD . ./
-
-RUN rm ./target/release/deps/e-jam-api*
+RUN rm ./target/release/deps/e_jam_api*
 RUN cargo build --release
 
 
@@ -29,10 +28,13 @@ RUN groupadd $APP_USER \
     && mkdir -p ${APP}
 
 COPY --from=builder /e-jam-api/target/release/e-jam-api ${APP}/e-jam-api
+COPY ./logger.yml ${APP}/logger.yml
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
 USER $APP_USER
 WORKDIR ${APP}
 
-CMD ["./e-jam-api"]
+RUN ls -lah
+RUN chmod a+x e-jam-api
+CMD ["./e-jam-api", "0.0.0.0"]

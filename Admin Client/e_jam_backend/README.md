@@ -7,6 +7,14 @@
 ![Version](https://img.shields.io/badge/version-1.0.1-Green)
 ![Status](https://img.shields.io/badge/status-Testing-orange)
 
+## INTRODUCTION
+
+This API is used to create and manage streams.
+The E-Jam API is a REST API that allows you to manage the list of streams in the E-Jam application.
+The API is implemented using the Actix Web framework and Rust.
+
+The API is hosted on port 8084.
+
 ## The E-Jam API documentation
 
 To view the E-Jam API documentation, run the following command:
@@ -25,6 +33,22 @@ To run the E-Jam API, run the following command:
 cargo run
 ```
 
+## Running the E-Jam API in Docker container
+
+To run the E-Jam API in a Docker container, run the following command:
+
+```bash
+docker build -t center-point .
+sudo docker run -p 8084:8084 center-point
+```
+
+the API will be available on port 8084 on your machine.
+Or you can run the following command to run the API in the background:
+
+```bash
+sudo docker run -dp 8084:8084 center-point
+```
+
 ## How to test the E-Jam API
 
 To test the E-Jam API, run the following command:
@@ -36,17 +60,10 @@ cargo run --features fake_data
 This will run the E-Jam API with fake data and a random statics generator for both the generators and the verifiers of the system.
 Keep in mind that the Kafka server must be running and the schemas should be registered in the schema registry for the producer to work. (which you can find in the [E-Jam Kafka Docker](../kafka_stack_docker_compose/README.md))
 
-## INTRODUCTION
+## Logging in the API
 
-This API is used to create and manage streams.
-The E-Jam API is a REST API that allows you to manage the list of streams in the E-Jam application.
-The API is implemented using the Actix Web framework and Rust.
-
-The API is tested on a Raspberry Pi 4 Model B with 4GB of RAM.
-The Raspberry Pi is connected to a 100 Mbps network.
-The Raspberry Pi is running Pie OS.
-
-The API is hosted on port 8084.
+you can set the logger to your liking by setting the [logger.yml](logger.yml) file to your liking.
+For more information about the logger, check the [env_logger](https://docs.rs/log/latest/log/) and [log4rs](https://docs.rs/log4rs/latest/log4rs/) documentation.
 
 ## The E-Jam System
 

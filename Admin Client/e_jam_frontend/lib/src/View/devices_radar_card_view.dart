@@ -88,10 +88,10 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.limeAccent.withOpacity(0.1),
+                color: Colors.blue.withOpacity(0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.limeAccent.withOpacity(0.4),
+                  color: Colors.blue.withOpacity(0.4),
                   width: 5,
                 ),
               ),
@@ -103,7 +103,6 @@ class _DevicesRadarCardViewState extends State<DevicesRadarCardView> {
                 child: CircularMotion.builder(
                   behavior: HitTestBehavior.opaque,
                   centerWidget: FlutterRipple(
-                      rippleColor: Colors.limeAccent.withOpacity(0.05),
                       onTap: () {
                         _radar();
                       },

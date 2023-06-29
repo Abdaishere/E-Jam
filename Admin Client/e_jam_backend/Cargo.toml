@@ -1,6 +1,6 @@
 [package]
 name = "e-jam-api"
-authors = ["abdallahemohmad2002@gmail.com"]
+authors = ["Abdallah Elbelkasy <abdallahemohmad2002@gmail.com>"]
 version = "0.2.1"
 edition = "2021"
 description = "A tool handle streams between devices"
