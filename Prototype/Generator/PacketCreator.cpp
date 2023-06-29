@@ -18,7 +18,6 @@ void PacketCreator::createPacket(int rcvInd)
 {
     //Signal a packet created
     std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
-    statsManager->increaseSentPckts(1);
 
     //TODO move ByteArray creating inside each constructor class
     ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
@@ -48,10 +47,8 @@ PacketCreator::PacketCreator(Configuration configuration, int id): payloadGenera
 
 void PacketCreator::sendHead()
 {
-    if(productQueue.empty())
-    {
-        return;
-    }
+    //busy waiting to ensure that a packet is sent
+    while(productQueue.empty());
     mtx.lock();
     ByteArray packet = productQueue.front();
     productQueue.pop();

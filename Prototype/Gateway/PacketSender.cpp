@@ -82,10 +82,6 @@ void PacketSender::roundRobin() {
 }
 
 bool PacketSender::sendToSwitch(ByteArray payload) {
-    std::cerr << payload.size() << "\n";
-//    for(int i=0; i<payload.size();i++)
-//        cerr << (int)payload.at(i)<< " ";
-//    cerr <<"\n";
     // send the request
     // ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
     //                const struct sockaddr *dest_addr, socklen_t addrlen);
@@ -93,7 +89,6 @@ bool PacketSender::sendToSwitch(ByteArray payload) {
         cerr << "couldn't send frame " << errno << "\n";
         return false;
     }
-    cerr << "sent frame\n";
     return true;
 }
 
