@@ -12,14 +12,7 @@
 #include "EthernetConstructor.h"
 #include "PacketSender.h"
 #include "xoshiro512+.cpp"
-struct segmentConstructorInfo{
-    //some relevant values regarding the headers of the protocol
-    //payload
-    //time to live
-    //destination ip address
-    //source ip address
-    //
-};
+
 
 class PacketCreator
 {

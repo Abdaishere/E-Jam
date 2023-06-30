@@ -34,16 +34,15 @@ void PacketSender::openFifo()
     if(status == -1) {
         if (errno != EEXIST) //if the error was more than the file already existing
         {
-            printf("Error in creating the FIFO file\n");
+            writeToFile("Error in creating the FIFO file\n");
         } else {
-            printf("File already exists, skipping creation...\n");
+            writeToFile("File already exists, skipping creation...\n");
         }
     }
 
     //open pipe as file
-    // TODO
     fd = open((instance->pipeDir + std::to_string(instance->genID)).c_str(), O_WRONLY);
-    std::cerr << "File descriptor " << fd << "\n";
+    writeToFile("File descriptor " + std::to_string(fd) + "\n");
 }
 
 void PacketSender::transmitPackets(const ByteArray& packet) const

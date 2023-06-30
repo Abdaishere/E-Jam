@@ -3,6 +3,7 @@
 
 #include "../../commonHeaders/StatsManager.h"
 #include "../../commonHeaders/Byte.h"
+#include "../../commonHeaders/Utils.h"
 #include "FramVerifier.h"
 #include "PayloadVerifier.h"
 #include "PacketReceiver.h"
@@ -11,7 +12,6 @@
 #include "SeqChecker.h"
 #include <memory>
 #include <algorithm>
-
 // we dedicate frameVerifiers and payloadVerifiers and seqCheckers for each generator in the stream
 class PacketUnpacker
 {

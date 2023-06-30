@@ -10,9 +10,7 @@ using namespace std;
 //thread function for receiving packets
 void receive(std::shared_ptr<PacketUnpacker> pu)
 {
-//    int iters = 1000;
-    while(true)
-    {
+    while(true){
         pu->readPacket();
     }
 }
@@ -20,9 +18,7 @@ void receive(std::shared_ptr<PacketUnpacker> pu)
 //thread function to verifiy received packets
 void verify(std::shared_ptr<PacketUnpacker> pu)
 {
-//    int iters = 100000000;
-    while(true)
-    {
+    while(true){
         pu->verifiyPacket();
     }
 }

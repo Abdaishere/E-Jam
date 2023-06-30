@@ -16,11 +16,9 @@ private:
     void generateFirstAlphabet(); // a -- m
     void generateSecondAlphabet(); // n -- z
     void generateRandomCharacters(int);
-    void addStreamId();
     RNG rng;
     PayloadType payloadType;
     int global_id;
-    void generateAlphabet();
 public:
     //must specify the length of the payload and its type
     PayloadGenerator(Configuration);
