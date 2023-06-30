@@ -15,6 +15,7 @@
 #include <net/if.h>
 #include <netinet/in.h>
 #include "Byte.h"
+#include "../commonHeaders/Utils.h"
 using namespace std;
 
 
@@ -28,22 +29,22 @@ const int BUFFER_SIZE = 1600;
 class PacketSender {
 private:
     int genNum;
-    std::vector<queue<ByteArray>> payloads;
+    //queueing packets for each generator
+    std::vector<queue<ByteArray>> packets;
     int* fd;
     char IF_NAME[IF_NAMESIZE];
     unsigned char buffer[BUFFER_SIZE];
-    const char* DEFAULT_IF_NAME = "wlp0s20f3";
     int sock;
     struct ifreq ifr;
     int ifIndex;
     struct sockaddr_ll addr;
 public:
-    PacketSender(int genNum, const char* IF_NAME = nullptr);
+    PacketSender(int genNum, const char* IF_NAME);
     void openPipes();
     void closePipes();
     void checkPipes();
     void roundRobin();
-    bool sendToSwitch(ByteArray payload);
+    bool sendToSwitch(const ByteArray& packet);
     ~PacketSender();
 };
 

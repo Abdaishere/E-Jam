@@ -4,10 +4,7 @@ PacketReceiver::PacketReceiver(int verNum, const char* IF_NAME_P)
 {
     //initialize maximum number of verifiers and initialize the connection to pipes
     MAX_VERS = verNum;
-    if (IF_NAME_P != nullptr)
-        ::memcpy(this->IF_NAME, IF_NAME_P, IF_NAMESIZE);
-    else
-        ::memcpy(this->IF_NAME, DEFAULT_IF_NAME_REC, IF_NAMESIZE);
+    ::memcpy(this->IF_NAME, IF_NAME_P, IF_NAMESIZE);
     fd = new int[verNum];
     recBuffer = new unsigned char[BUFFER_SIZE_VER];
     forwardingBuffer = new unsigned char[BUFFER_SIZE_VER];
@@ -36,9 +33,8 @@ bool PacketReceiver::initializeSwitchConnection()
 
     //open socket
     sock = socket(AF_PACKET, SOCK_RAW, htons(ETHER_TYPE));
-    if (sock == -1)
-    {
-        std::cerr << "unable to open socket\n";
+    if (sock == -1){
+        writeToFile("Receiving gateway is unable to open socket\n");
         return false;
     }
 
@@ -110,11 +106,9 @@ void PacketReceiver::receiveFromSwitch()
     while(sizeLeft >= MTU)
     {
         int bytesRead = recvfrom(sock, recBuffer+totSizeRec, MTU, 0, nullptr, nullptr);
-        std::cerr<<bytesRead << " ";
         cnt++;
-        if (bytesRead == -1)
-        {
-            std::cerr << "not received\n";
+        if (bytesRead == -1){
+            writeToFile("not received\n");
             return;
         }
 
@@ -123,7 +117,7 @@ void PacketReceiver::receiveFromSwitch()
         recSizes[received++] = bytesRead;
     }
 
-    std::cerr << cnt << " packets received\n";
+    writeToFile(to_string(cnt) + " packets received\n");
 }
 
 //send payload to single verifier used in checkBuffer to send to all verifiers

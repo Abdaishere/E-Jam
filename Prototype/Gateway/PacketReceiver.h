@@ -36,7 +36,6 @@ private:
     int sock;
     int MAX_VERS;
     char IF_NAME[IF_NAMESIZE];
-    const char* DEFAULT_IF_NAME_REC = "wlp0s20f3";
     //double buffer for storing / consuming the actual packets
     unsigned char* recBuffer;
     unsigned char* forwardingBuffer;
@@ -48,7 +47,7 @@ private:
 
     int toForward;
 public:
-    PacketReceiver(int, const char* IF_NAME = nullptr);
+    PacketReceiver(int, const char* IF_NAME);
     void openPipes();
     void closePipes();
     bool initializeSwitchConnection();
