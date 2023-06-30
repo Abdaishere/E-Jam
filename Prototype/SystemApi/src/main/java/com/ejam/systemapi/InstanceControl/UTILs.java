@@ -71,9 +71,9 @@ public class UTILs {
         String dir = "/etc/EJam/";
         try {
             int index = 0;
-            String command = "ls -tr --time=birth " + dir;
+//            String command = "ls -tr --time=birth " + dir;
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command(command);
+            processBuilder.command("ls", "-tr", "--time=birth", dir);
 
             Process process = processBuilder.start();
 
