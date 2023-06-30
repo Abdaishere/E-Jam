@@ -71,7 +71,7 @@ public class UTILs {
         //TODO: write a function to get index of config file with a certain stream id in the directory /etc/EJam
         return 0;
 
-        return -1;
+//        return -1;
     }
 
     public static String getMyMacAddress(String interfaceName) {
