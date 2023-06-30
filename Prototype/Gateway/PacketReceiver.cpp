@@ -117,7 +117,7 @@ void PacketReceiver::receiveFromSwitch()
         recSizes[received++] = bytesRead;
     }
 
-    writeToFile(to_string(cnt) + " packets received\n");
+//    writeToFile(to_string(cnt) + " packets received\n");
 }
 
 //send payload to single verifier used in checkBuffer to send to all verifiers

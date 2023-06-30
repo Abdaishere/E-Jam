@@ -82,7 +82,7 @@ bool PacketSender::sendToSwitch(const ByteArray& packet) {
 
     //construct the correct ethernet address
     memcpy(addr.sll_addr, &(packet[0]), ETHER_ADDR_LEN);
-    writeToFile(byteArray_to_string(addr.sll_addr));
+//    writeToFile(byteArray_to_string(addr.sll_addr));
     if (sendto(sock, packet.c_str(), packet.size(), 0, (struct sockaddr *) &addr, sizeof(addr)) == -1) {
         writeToFile("couldn't send frame " + to_string(errno) + "\n");
         return false;
