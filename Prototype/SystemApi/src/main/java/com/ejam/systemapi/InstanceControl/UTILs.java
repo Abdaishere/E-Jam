@@ -68,10 +68,33 @@ public class UTILs {
     }
 
     public static int getStreamIndex(String streamID) {
-        //TODO: write a function to get index of config file with a certain stream id in the directory /etc/EJam
+        String dir = "/etc/EJam/";
+        try {
+            int index = 0;
+            String command = "ls -tr --time=birth " + dir;
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.command(command);
+
+            Process process = processBuilder.start();
+
+            InputStream inputStream = process.getInputStream();
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String fileName;
+                while ((fileName = bufferedReader.readLine()) != null) {
+                    if(fileName.startsWith("config")) {
+                        if(fileName.endsWith(streamID))
+                            return index;
+                        ++index;
+                    }
+                }
+
+            }
+            process.destroyForcibly();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0;
 
-//        return -1;
     }
 
     public static String getMyMacAddress(String interfaceName) {
