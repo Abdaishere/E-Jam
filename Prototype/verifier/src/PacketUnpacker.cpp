@@ -91,6 +91,7 @@ void PacketUnpacker::verifiyPacket()
     //by matching receiver and sender mac addresses and checking the CRCs
     int startIndex = 0, endIndex = packet->length();
     bool frameStatus = frameVerifier[ind].verifiy(packet, startIndex, endIndex);
+    pcktVerified &= frameStatus;
 
     //check for payload error
     //by matching payloads

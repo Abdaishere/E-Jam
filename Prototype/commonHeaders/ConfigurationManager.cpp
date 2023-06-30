@@ -1,6 +1,7 @@
 #include "ConfigurationManager.h"
 std::string ConfigurationManager::CONFIG_FOLDER = "etc/EJam";
 std::vector<ByteArray>ConfigurationManager::streamIDs = std::vector<ByteArray>();
+std::vector<Configuration>ConfigurationManager::configurations = std::vector<Configuration>();
 Configuration ConfigurationManager::getConfiguration(char* path)
 {
     Configuration currentConfiguration;
@@ -45,6 +46,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
         if(receivers == config.discoverMyMac())
         {
             streamIDs.push_back(config.getStreamIDVal());
+            configurations.push_back(config);
             return;
         }
     }
@@ -53,6 +55,7 @@ void ConfigurationManager::addConfiguration(const char * dir)
 void ConfigurationManager::initConfigurations()
 {
     streamIDs.clear();
+    configurations.clear();
     CONFIG_FOLDER = "";
     CONFIG_FOLDER+= CONFIG_DIR;
 

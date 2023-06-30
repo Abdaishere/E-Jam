@@ -32,6 +32,7 @@ PacketSender::PacketSender(int genNum, const char *IF_NAME_P) {
     addr.sll_ifindex = ifIndex;
     addr.sll_halen = ETHER_ADDR_LEN;
     addr.sll_protocol = htons(htons(protocol));
+    openPipes();
 }
 
 void PacketSender::openPipes() {

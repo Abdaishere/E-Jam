@@ -48,7 +48,6 @@ int main(int argc, char **argv) {
     if (mode == 0) {
         std::shared_ptr<PacketSender> packetSender;
         packetSender = std::make_shared<PacketSender>(num, IFName);
-        packetSender->openPipes();
 
         thread checker(checkingThread, packetSender);
         thread sender(sendingThread, packetSender);
@@ -63,11 +62,7 @@ int main(int argc, char **argv) {
     else {
         ConfigurationManager::initConfigurations();
         std::shared_ptr<PacketReceiver> packetReceiver;
-        if(IFName == nullptr)
-            packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams());
-        else
-            packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams(), IFName);
-
+        packetReceiver = std::make_shared<PacketReceiver>(ConfigurationManager::getNumberOfStreams(), IFName);
 
         while (true) {
             //synchronization without locks by swapping the two buffers

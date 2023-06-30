@@ -52,8 +52,7 @@ private:
     char* filePath;
 
     //convert int to corresponding hexa character
-    unsigned char hexSwitcher(int x)
-    {
+    unsigned char hexSwitcher(int x){
         if(x<10 && x>=0)
             return x+'0';
         else if(x>9 && x<16)
