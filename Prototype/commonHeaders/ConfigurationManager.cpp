@@ -60,7 +60,7 @@ void ConfigurationManager::initConfigurations()
     CONFIG_FOLDER+= CONFIG_DIR;
 
     //ensure that the config files are listed in order of their creation time (birth time)
-    std::string lsStr = "ls -tr --time=birth";
+    std::string lsStr = "ls -tr --time=birth ";
     std::string dirStr(CONFIG_FOLDER);
     lsStr+=dirStr;
 
