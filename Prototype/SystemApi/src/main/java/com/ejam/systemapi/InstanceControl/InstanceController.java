@@ -70,8 +70,10 @@ public class InstanceController implements Runnable {
     }
 
     //Start generators
+    //returns the number of started streams
     private int startGenerators(Stream stream) {
         int genID = 0;
+        int startedStreams = 0;
         // ensure that the generators are in sorted order to assign genID correctly
         // because verifiers rely on this fact
         //note: this for loop should only enter the if condition once
@@ -84,16 +86,18 @@ public class InstanceController implements Runnable {
                 String path = configDir + "/config_" + stream.streamID + ".txt";
                 String[] args = {Integer.toString(genID), path};
                 executeCommand(command, false, args);
+                ++startedStreams;
             }
             ++genID;
         }
-        return genID;
+        return startedStreams;
     }
 
     //Start Verifiers
     private int startVerifiers(Stream stream) {
         //verifier ID is the stream index in the list of streams on this node
         int verID = getStreamIndex(stream.streamID);
+        int startedVerifiers = 0;
 
         //note: this for loop should only enter the if condition once
         for (String receiver : stream.verifiers) {
@@ -102,9 +106,10 @@ public class InstanceController implements Runnable {
                 String path = configDir + "/config_" + stream.streamID + ".txt";
                 String[] args = {Integer.toString(verID), path};
                 executeCommand(command, false, args);
+                ++startedVerifiers;
             }
         }
-        return verID;
+        return startedVerifiers;
     }
 
     private void startGateway(int numGen, int numVer) {
