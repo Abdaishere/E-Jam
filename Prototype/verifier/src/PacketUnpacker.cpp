@@ -62,8 +62,8 @@ void PacketUnpacker::verifiyPacket()
     int sourceMac_startIndex = MAC_ADD_LEN;
     ByteArray currSrcMac = packet->substr(sourceMac_startIndex, MAC_ADD_LEN);
 //    print(&currSrcMac);
-    int ind = std::lower_bound(srcMacAddresses.begin(), srcMacAddresses.end(), currSrcMac) - srcMacAddresses.begin();
-    if(ind >= srcMacAddresses.size() || srcMacAddresses[ind] != currSrcMac)
+    int genID = std::lower_bound(srcMacAddresses.begin(), srcMacAddresses.end(), currSrcMac) - srcMacAddresses.begin();
+    if(genID >= srcMacAddresses.size() || srcMacAddresses[genID] != currSrcMac)
     {
         writeToFile("temp config null\n");
         std::shared_ptr<ErrorInfo> errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
@@ -81,16 +81,16 @@ void PacketUnpacker::verifiyPacket()
     int seqNumStartIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN+STREAMID_LEN;
     for(int i=0; i<8; i++)
         seqNum |= ((unsigned long long )packet->at(seqNumStartIndex+i) << (i*8));
-    seqChecker[ind].receive(seqNum);
+    seqChecker[genID].receive(seqNum);
 //    writeToFile("SeqNum: " +  std::to_string(seqNum));
-//    writeToFile("Missing : " + std::to_string(seqChecker[ind].getMissing()));
-//    writeToFile("Reordered:" + std::to_string(seqChecker[ind].getReordered()) + "\n");
+//    writeToFile("Missing : " + std::to_string(seqChecker[genID].getMissing()));
+//    writeToFile("Reordered:" + std::to_string(seqChecker[genID].getReordered()) + "\n");
 
 
     //check for frame errors
     //by matching receiver and sender mac addresses and checking the CRCs
     int startIndex = 0, endIndex = packet->length();
-    bool frameStatus = frameVerifier[ind].verifiy(packet, startIndex, endIndex);
+    bool frameStatus = frameVerifier[genID].verifiy(packet, startIndex, endIndex);
     pcktVerified &= frameStatus;
 
     //check for payload error
@@ -100,7 +100,7 @@ void PacketUnpacker::verifiyPacket()
     endIndex = startIndex+payloadLength-1;
 
 	if(configuration.getCheckContent()){
-		bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex, seqNum);
+		bool payloadStatus = payloadVerifier[genID].verifiy(packet, startIndex, endIndex, seqNum);
 		pcktVerified &=payloadStatus;
 	}
 	if(pcktVerified)

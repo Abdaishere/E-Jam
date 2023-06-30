@@ -59,7 +59,8 @@ void ConfigurationManager::initConfigurations()
     CONFIG_FOLDER = "";
     CONFIG_FOLDER+= CONFIG_DIR;
 
-    std::string lsStr = "ls ";
+    //ensure that the config files are listed in order of their creation time (birth time)
+    std::string lsStr = "ls -tr --time=birth";
     std::string dirStr(CONFIG_FOLDER);
     lsStr+=dirStr;
 
@@ -76,18 +77,19 @@ void ConfigurationManager::initConfigurations()
         if(dir.substr(dir.size()-3) == "txt")
             addConfiguration(dir.c_str());
     }
-    std::sort(streamIDs.begin(), streamIDs.end());
 }
 
 int ConfigurationManager::getNumberOfStreams() {
     return (int)streamIDs.size();
 }
-
+//verifier ID is the stream ID in the non-sorted list of streams
 int ConfigurationManager::getStreamIndex(ByteArray& StreamID)
 {
-    int index = std::lower_bound(streamIDs.begin(), streamIDs.end(), StreamID) - streamIDs.begin();
-    if(index >= (int)streamIDs.size() || streamIDs[index] != StreamID)
-        return -1;
-
-    return index;
+    int index = 0;
+    for(const auto& streamID: streamIDs){
+        if(streamID == StreamID)
+            return index;
+        ++index;
+    }
+    return -1;
 }

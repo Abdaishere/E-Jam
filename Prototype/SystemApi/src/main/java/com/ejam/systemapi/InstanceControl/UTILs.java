@@ -67,6 +67,13 @@ public class UTILs {
         return lines;
     }
 
+    public static int getStreamIndex(String streamID) {
+        //TODO: write a function to get index of config file with a certain stream id in the directory /etc/EJam
+        return 0;
+
+        return -1;
+    }
+
     public static String getMyMacAddress(String interfaceName) {
         Map<String, String> interfaceToAddress = new HashMap<>();
         byte[] mac;

@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import static com.ejam.systemapi.InstanceControl.UTILs.getStreamIndex;
+
 /**
  * This class initializes and manages the generator and verifier instances
  */
@@ -70,29 +72,35 @@ public class InstanceController implements Runnable {
     //Start generators
     private int startGenerators(Stream stream) {
         int genID = 0;
-
+        // ensure that the generators are in sorted order to assign genID correctly
+        // because verifiers rely on this fact
+        //note: this for loop should only enter the if condition once
+        Collections.sort(stream.generators);
         for (String sender : stream.generators) {
             System.out.println(sender);
             System.out.println(myMacAddress);
             if (sender.equals(myMacAddress)) {
                 String command = "../Executables/Generator";
                 String path = configDir + "/config_" + stream.streamID + ".txt";
-                String[] args = {Integer.toString(genID++), path};
+                String[] args = {Integer.toString(genID), path};
                 executeCommand(command, false, args);
             }
+            ++genID;
         }
         return genID;
     }
 
     //Start Verifiers
     private int startVerifiers(Stream stream) {
-        int verID = 0;
+        //verifier ID is the stream index in the list of streams on this node
+        int verID = getStreamIndex(stream.streamID);
 
+        //note: this for loop should only enter the if condition once
         for (String receiver : stream.verifiers) {
             if (receiver.equals(myMacAddress)) {
                 String command = "../Executables/verifier";
                 String path = configDir + "/config_" + stream.streamID + ".txt";
-                String[] args = {Integer.toString(verID++), path};
+                String[] args = {Integer.toString(verID), path};
                 executeCommand(command, false, args);
             }
         }
