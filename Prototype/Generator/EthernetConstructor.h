@@ -18,7 +18,7 @@ private:
     ByteArray streamID;
     ByteArray payload;
     ByteArray CRC;
-    static long long seqNum;
+
     //may need to insert 12-byte inter-packet gap, not sure
 
 public:
@@ -27,7 +27,7 @@ public:
 
     void setType(const ByteArray &type);
     void setPayload(const ByteArray &payload);
-    void constructFrame();
+    void constructFrame(uint64_t &seqNum);
 
     ByteArray calculateCRC(std::shared_ptr<ByteArray>);
 

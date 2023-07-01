@@ -1,9 +1,10 @@
 #include "PacketReceiver.h"
 
-PacketReceiver::PacketReceiver(int verNum)
+PacketReceiver::PacketReceiver(int verNum, const char* IF_NAME_P)
 {
     //initialize maximum number of verifiers and initialize the connection to pipes
     MAX_VERS = verNum;
+    ::memcpy(this->IF_NAME, IF_NAME_P, IF_NAMESIZE);
     fd = new int[verNum];
     recBuffer = new unsigned char[BUFFER_SIZE_VER];
     forwardingBuffer = new unsigned char[BUFFER_SIZE_VER];
@@ -28,14 +29,12 @@ void PacketReceiver::openPipes()
 bool PacketReceiver::initializeSwitchConnection()
 {
 
-    strcpy(ifName, DEFAULT_IF);
     struct ifreq ifopts;
 
     //open socket
     sock = socket(AF_PACKET, SOCK_RAW, htons(ETHER_TYPE));
-    if (sock == -1)
-    {
-        std::cerr << "unable to open socket\n";
+    if (sock == -1){
+        writeToFile("Receiving gateway is unable to open socket\n");
         return false;
     }
 
@@ -43,7 +42,7 @@ bool PacketReceiver::initializeSwitchConnection()
        i.e. read everything even if the destination
        mac address doesn't match your address
        we might not need to do this*/
-    strncpy(ifopts.ifr_name, ifName, IFNAMSIZ-1);
+    strncpy(ifopts.ifr_name, IF_NAME, IFNAMSIZ-1);
     //get interface flags
     ioctl(sock, SIOCGIFFLAGS, &ifopts);
     //turn on promiscuous mode mask
@@ -79,14 +78,21 @@ void PacketReceiver::swapBuffers()
 //send forward buffer to its corresponding verifier
 void PacketReceiver::checkBuffer()
 {
-    int verID = 0;
+    int verID;
     int totSizeFor = 0;
     for(int ptr=0; ptr < toForward; ptr++)
     {
-        sendToVerifier(verID++, forwardingBuffer+totSizeFor, forwardingSizes[ptr]);
-        totSizeFor += forwardingSizes[ptr];
-        if(verID == MAX_VERS) //reset verifier id 
+        //extract the streamID
+        ByteArray streamID;
+        streamID.assign(forwardingBuffer[totSizeFor + STREAM_ID_OFFSET], STREAMID_LEN);
+        verID = ConfigurationManager::getStreamIndex(streamID);
+        if(verID == -1)
+        {
+            std::cerr << "Couldn't find suitable stream\n";
             verID = 0;
+        }
+        sendToVerifier(verID, forwardingBuffer+totSizeFor, forwardingSizes[ptr]);
+        totSizeFor += forwardingSizes[ptr];
     }
 }
 
@@ -100,11 +106,9 @@ void PacketReceiver::receiveFromSwitch()
     while(sizeLeft >= MTU)
     {
         int bytesRead = recvfrom(sock, recBuffer+totSizeRec, MTU, 0, nullptr, nullptr);
-        std::cerr<<bytesRead << " ";
         cnt++;
-        if (bytesRead == -1)
-        {
-            std::cerr << "not received\n";
+        if (bytesRead == -1){
+            writeToFile("not received\n");
             return;
         }
 
@@ -113,7 +117,7 @@ void PacketReceiver::receiveFromSwitch()
         recSizes[received++] = bytesRead;
     }
 
-    std::cerr << cnt << " packets received\n";
+//    writeToFile(to_string(cnt) + " packets received\n");
 }
 
 //send payload to single verifier used in checkBuffer to send to all verifiers
@@ -128,4 +132,9 @@ void PacketReceiver::sendToVerifier(int verID, Payload payload, int len)
 PacketReceiver::~PacketReceiver()
 {
     closePipes();
+    delete[] recBuffer;
+    delete[] forwardingBuffer;
+    delete[] recSizes;
+    delete[] forwardingSizes;
+    delete[] fd;
 }

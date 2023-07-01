@@ -25,9 +25,14 @@ PacketUnpacker::PacketUnpacker(int verID, Configuration configuration)
     std::sort(srcMacAddresses.begin(), srcMacAddresses.end());
 
     int genNum = (int)senders.size();
-    frameVerifier = std::vector<FrameVerifier> (genNum, FrameVerifier(configuration));
-    payloadVerifier = std::vector<PayloadVerifier> (genNum, PayloadVerifier(configuration));
-    seqChecker = std::vector<SeqChecker> (genNum, SeqChecker());
+    frameVerifier = std::vector<FrameVerifier> ();
+    payloadVerifier = std::vector<PayloadVerifier> ();
+    seqChecker = std::vector<SeqChecker> ();
+    for(int i=0; i<genNum; i++){
+        frameVerifier.emplace_back(configuration);
+        payloadVerifier.emplace_back(configuration, i);
+        seqChecker.emplace_back();
+    }
 
 	statsManager = StatsManager::getInstance(configuration,verID, false);
 }
@@ -57,10 +62,10 @@ void PacketUnpacker::verifiyPacket()
     int sourceMac_startIndex = MAC_ADD_LEN;
     ByteArray currSrcMac = packet->substr(sourceMac_startIndex, MAC_ADD_LEN);
 //    print(&currSrcMac);
-    int ind = std::lower_bound(srcMacAddresses.begin(), srcMacAddresses.end(), currSrcMac) - srcMacAddresses.begin();
-    if(ind >= srcMacAddresses.size() || srcMacAddresses[ind] != currSrcMac)
+    int genID = std::lower_bound(srcMacAddresses.begin(), srcMacAddresses.end(), currSrcMac) - srcMacAddresses.begin();
+    if(genID >= srcMacAddresses.size() || srcMacAddresses[genID] != currSrcMac)
     {
-        std::cerr << "temp config null\n";
+        writeToFile("temp config null\n");
         std::shared_ptr<ErrorInfo> errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
         if(errorInfo == nullptr)
         {
@@ -76,14 +81,17 @@ void PacketUnpacker::verifiyPacket()
     int seqNumStartIndex = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN+STREAMID_LEN;
     for(int i=0; i<8; i++)
         seqNum |= ((unsigned long long )packet->at(seqNumStartIndex+i) << (i*8));
-    seqChecker[ind].receive(seqNum);
-    std::cerr << "SeqNum: " << seqNum << " Missing : " << seqChecker[ind].getMissing() << " Reordered:" << seqChecker[ind].getReordered() << "\n";
+    seqChecker[genID].receive(seqNum);
+//    writeToFile("SeqNum: " +  std::to_string(seqNum));
+//    writeToFile("Missing : " + std::to_string(seqChecker[genID].getMissing()));
+//    writeToFile("Reordered:" + std::to_string(seqChecker[genID].getReordered()) + "\n");
 
 
     //check for frame errors
     //by matching receiver and sender mac addresses and checking the CRCs
     int startIndex = 0, endIndex = packet->length();
-    bool frameStatus = frameVerifier[ind].verifiy(packet, startIndex, endIndex);
+    bool frameStatus = frameVerifier[genID].verifiy(packet, startIndex, endIndex);
+    pcktVerified &= frameStatus;
 
     //check for payload error
     //by matching payloads
@@ -91,28 +99,14 @@ void PacketUnpacker::verifiyPacket()
     startIndex = seqNumStartIndex+SeqNum_LEN;
     endIndex = startIndex+payloadLength-1;
 
-	if(configuration.getCheckContent())
-	{
-		bool payloadStatus = payloadVerifier[ind].verifiy(packet, startIndex, endIndex);
+	if(configuration.getCheckContent()){
+		bool payloadStatus = payloadVerifier[genID].verifiy(packet, startIndex, endIndex, seqNum);
 		pcktVerified &=payloadStatus;
-		//must delete pointer holding onto packet to avoid memory leak (no need with smart pointers)
-		if(!frameStatus)
-			std::cerr << "frame corrupted\n";
-		else
-			std::cerr << "frame correct\n";
-		if(!payloadStatus)
-			std::cerr << "payload corrupted\n";
-		else
-			std::cerr << "payload correct\n";
 	}
 	if(pcktVerified)
-	{
 		statsManager->increaseReceivedCorrectPckts(1);
-	}
 	else
-	{
 		statsManager->increaseReceivedWrongPckts(1);
-	}
 }
 
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <time.h>
 #include <chrono>
+#include <fstream>
 #include "StatsManager.h"
 #include "ConfigurationManager.h"
 
@@ -60,8 +61,7 @@ void sendTimeBasedBurst(std::shared_ptr<PacketCreator> pc, ull duration, ull del
     while (duration_cast<milliseconds>(endTime- beginTime).count() <= duration)
     {
         int remaining = burstSize;
-        while(remaining--)
-        {
+        while(remaining--){
             pc->sendHead();
             std::this_thread::sleep_for(milliseconds(IFG));
         }
@@ -86,15 +86,15 @@ void sendB2B(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull IFG = 0)
 
 
 /// \param delay in milliseconds
-/// \details send a specified number of packets in bursts of size burst
-void sendBurst(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull delay, int burst, ull IFG = 0)
+/// \details send a specified number of packets in bursts of size burstSize
+void sendBurst(std::shared_ptr<PacketCreator> pc, int packetsToSend, ull delay, int burstSize, ull IFG = 0)
 {
     using namespace std::chrono;
     if(packetsToSend <= 0) return;
 
     while(packetsToSend > 0)
     {
-        int rem = std::min(burst, packetsToSend);
+        int rem = std::min(burstSize, packetsToSend);
         packetsToSend -= rem;
         while(rem--)
         {
@@ -146,6 +146,7 @@ void createTimeBased (std::shared_ptr<PacketCreator> pc, ull duration, Configura
 //thread function to send the stats
 void sendStatsFunction(std::shared_ptr<StatsManager> sm)
 {
+    writeToFile("Start of the thread.");
     while (true)
         sm->sendStats();
 }
@@ -164,36 +165,44 @@ int main(int argc, char** argv)
         return 0;
     }
 
+
     Configuration currConfig = ConfigurationManager::getConfiguration(configPath);
+    ////setting up the initial state of the RNG
+    int global_id = currConfig.getID(currConfig.getMyMacAddress());
+
     std::shared_ptr<StatsManager> sm = StatsManager::getInstance(currConfig, genID, true);
     PacketSender::getInstance(genID, FIFO_FILE, 0777);
-    std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>(currConfig);
-    /// TODO configure main appropriately to run one of the above threads based on configuration parameters
+    std::shared_ptr<PacketCreator> pc = std::make_shared<PacketCreator>(currConfig, global_id);
     /// send according to one of the above threads using flowtype and sending mode
     /// sending mode is inferred from the numOfPackets and flowTime parameters in the stream configuration
 
 
+
     std::thread creator, sender;
+    writeToFile(std::to_string(sm == nullptr));
     std::thread statWriter(sendStatsFunction, sm);
     ull gap = currConfig.getInterFrameGap();
     FlowType flowType = currConfig.getFlowType();
-    int packetNumber = currConfig.getNumberOfPackets();
+    ull packetNumber = currConfig.getNumberOfPackets();
+    currConfig.print();
     if(packetNumber > 0)
     {
-        creator = std::thread(createNumBased, pc, packetNumber, currConfig,15);
-        //TODO add burst delay and burst size from stream configuration
+        creator = std::thread(createNumBased, pc, packetNumber, currConfig,gap);
+        ull burstDelay = currConfig.getBurstDelay();
+        ull burstSize = currConfig.getBurstLength();
         if(flowType == BURSTY)
-            sender = std::thread(sendBurst, pc, packetNumber, (ull)20, 30,gap);
+            sender = std::thread(sendBurst, pc, packetNumber, burstDelay, burstSize,gap);
         else
             sender = std::thread(sendB2B, pc, packetNumber, gap);
     }
     else
     {
         ull sendTime = currConfig.getLifeTime();
-        creator = std::thread(createTimeBased, pc, sendTime, currConfig,10);
-        //TODO add burst delay and burst size from stream configuration
+        ull burstDelay = currConfig.getBurstDelay();
+        ull burstLength = currConfig.getBurstLength();
+        creator = std::thread(createTimeBased, pc, sendTime, currConfig, gap);
         if(flowType == BURSTY)
-            sender = std::thread(sendTimeBasedBurst, pc, sendTime, (ull)20,30,gap);
+            sender = std::thread(sendTimeBasedBurst, pc, sendTime, burstDelay,burstLength,gap);
         else
             sender = std::thread(sendTimeBasedB2B, pc, sendTime, gap);
     }

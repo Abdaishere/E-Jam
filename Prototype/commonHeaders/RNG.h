@@ -1,44 +1,106 @@
 #ifndef GENERATOR_RNG_H
 #define GENERATOR_RNG_H
 #include <random>
+#include "xoshiro512+.cpp"
 //masks used to genetare a random number
-const unsigned long long masks[] = {255,
-                                    65280,
-                                    16711680,
-                                    4278190080,
-                                    1095216660480,
-                                    280375465082880,
-                                    71776119061217280,
+const unsigned long long masks[] = {255ull,
+                                    65280ull,
+                                    16711680ull,
+                                    4278190080ull,
+                                    1095216660480ull,
+                                    280375465082880ull,
+                                    71776119061217280ull,
                                     18374686479671623680ull};
+const int preComputeSize = 1e4;
+const int defaultShift = 5e3;
+
 class RNG {
 private:
     int index;
-    unsigned long long currRandomNumber;
-    int seed;
-    std::mt19937_64 rng; //random device
+    int startPacketNumber;
+    u_int64_t currRandomNumber;
+    u_int64_t seed[8];
+    //contains the starting seeds of the next preComputeSize packets
+    uint64_t seedTable[preComputeSize][8];
+    //random device
+    XOSHIRO_PRNG rng;
 public:
-    RNG(int seed = 0) //set the initial seed by defult to zero
+    RNG() //set the initial seed to zero
     {
         index = 8;
-        this->seed = seed;
-        rng.seed(seed);
+        memset(seed, 0, sizeof seed);
+        rng.setSeed(seed);
     }
 
-    unsigned long long getR()
-    {
+    uint64_t getR(){
         return currRandomNumber;
     }
 
-    void setSeed (int s)
-    {
-        rng.seed(s);
+    //return 0 if the packetNumber is in the range of the table, -1 is before, 1 if after range
+    int inTable(int packetNumber){
+        if(packetNumber < startPacketNumber) return -1;
+        if(startPacketNumber + preComputeSize - 1 < packetNumber) return 1;
+        return 0;
     }
 
-    unsigned char gen()
-    {
+    //set the start seed corresponding to this packet Number
+    bool goTo(int packetNumber){
+        if(inTable(packetNumber) < 0) return false;
+        while(inTable(packetNumber) != 0)
+            shiftTable();
+        setSeed(seedTable[packetNumber - startPacketNumber]);
+        return true;
+    }
+
+    void setSeed (u_int64_t* otherSeed){
+        index = 8;
+        memcpy(seed, otherSeed, sizeof seed);
+        rng.setSeed(seed);
+    }
+
+    void setSeed(uint64_t singleSeed){
+        index = 8;
+        uint64_t tempSeed[8];
+        memset(tempSeed, 0, sizeof tempSeed);
+        tempSeed[0] = singleSeed;
+        setSeed((uint64_t*)tempSeed);
+    }
+
+    void jump(){
+        index = 8;
+        rng.jump();
+    }
+
+    void long_jump(){
+        index = 8;
+        rng.long_jump();
+    }
+
+    void shiftTable(int shiftVal = defaultShift){
+        uint64_t* start = new uint64_t[8];
+        memcpy(start, seedTable[shiftVal],8 * sizeof(start[0]));
+        fillTable( startPacketNumber + shiftVal, start);
+        delete[] start;
+    }
+
+    void fillTable(int startNumber){
+        fillTable(startNumber, seed);
+    }
+
+    //fill sparse table starting from the start value
+    void fillTable(int startNumber, uint64_t* start){
+        index = 8;
+        startPacketNumber = startNumber;
+
+        memcpy(seedTable[0], start, 8 * sizeof start[0]);
+        for (int i = 1; i < preComputeSize; ++i)
+            rng.jump(seedTable[i], seedTable[i-1]);
+    }
+
+    unsigned char gen(){
         if(index == 8)
         {
-            currRandomNumber = rng();
+            currRandomNumber = rng.next();
             index = 0;
         }
 
