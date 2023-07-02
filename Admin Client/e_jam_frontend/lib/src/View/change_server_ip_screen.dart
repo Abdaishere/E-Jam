@@ -21,8 +21,8 @@ class _ChangeServerIPScreenState extends State<ChangeServerIPScreen> {
   void initState() {
     super.initState();
     _serverIpAddressController.text = NetworkController.serverIpAddress.host;
-    _serverPortController.text =
-        NetworkController.serverIpAddress.port.toString();
+    int port = NetworkController.serverIpAddress.port;
+    _serverPortController.text = port != 0 ? port.toString() : '8084';
   }
 
   @override

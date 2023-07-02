@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:e_jam/src/View/extensions/treemap_drilldown_devices_load.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DashBoardView extends StatefulWidget {
   const DashBoardView({super.key});
@@ -18,6 +19,8 @@ class DashBoardView extends StatefulWidget {
 }
 
 class _DashBoardViewState extends State<DashBoardView> {
+  final Uri _url = Uri.parse('https://youtu.be/oPZLR4RM150');
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +60,11 @@ class _DashBoardViewState extends State<DashBoardView> {
               FontAwesomeIcons.circleQuestion,
               size: 20,
             ),
-            onPressed: () {},
+            onPressed: () async {
+              if (!await launchUrl(_url)) {
+                throw Exception('Could not launch $_url');
+              }
+            },
           ),
         ],
       ),

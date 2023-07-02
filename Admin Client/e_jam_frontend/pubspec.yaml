@@ -41,6 +41,7 @@ dependencies:
   flutter_ripple: ^0.0.3 # small package to for ripple effect of radar view
   collection: ^1.17.1
   csv: ^5.0.2
+  url_launcher: ^6.1.11
   
 
 dev_dependencies:

@@ -16,6 +16,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DevicesListView extends StatefulWidget {
   const DevicesListView({super.key});
@@ -27,6 +28,7 @@ class DevicesListView extends StatefulWidget {
 class _DevicesListViewState extends State<DevicesListView> {
   bool _isPinging = false;
   bool? _isPinged;
+  final Uri _url = Uri.parse('https://youtu.be/oPZLR4RM150?t=57');
 
   void _pingAll() {
     _isPinging = true;
@@ -219,8 +221,10 @@ class _DevicesListViewState extends State<DevicesListView> {
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
           tooltip: 'Help',
-          onPressed: () {
-            // TODO: Add a link to a youtube video for explaining the Device card
+          onPressed: () async {
+            if (!await launchUrl(_url)) {
+              throw Exception('Could not launch $_url');
+            }
           },
         ),
       ],

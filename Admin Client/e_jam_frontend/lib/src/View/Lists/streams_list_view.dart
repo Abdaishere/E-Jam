@@ -19,6 +19,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StreamsListView extends StatefulWidget {
   const StreamsListView({super.key});
@@ -28,6 +29,8 @@ class StreamsListView extends StatefulWidget {
 }
 
 class _StreamsListViewState extends State<StreamsListView> {
+  final Uri _url = Uri.parse('https://youtu.be/oPZLR4RM150?t=255');
+
   @override
   void initState() {
     super.initState();
@@ -154,8 +157,10 @@ class _StreamsListViewState extends State<StreamsListView> {
         // Explanation icon for details about how the stream card works and what the icons mean and what the colors mean
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.circleQuestion, size: 20.0),
-          onPressed: () {
-            // TODO: Add a link to a youtube video for explaining the Device card
+          onPressed: () async {
+            if (!await launchUrl(_url)) {
+              throw Exception('Could not launch $_url');
+            }
           },
         ),
       ],

@@ -54,7 +54,7 @@ class DataExporter {
         builder: (context) => AlertDialog(
           title: const Text('Platform not supported'),
           content: const Text(
-              'Exporting data is only supported on Windows, Linux, and MacOS'),
+              'Exporting data is only supported on Windows, Linux, and MacOS. Please use one of these platforms to export data for now.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -282,7 +282,7 @@ class DataExporter {
   static saveAsCSV(List<List<dynamic>> data, String dataType) async {
     String csv = const ListToCsvConverter().convert(data);
     //Create date now string
-    String dateNow = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    String dateNow = DateFormat('yyyy_MM_dd_kk:mm').format(DateTime.now());
     String fileName = '${dataType}_$dateNow';
 
     // save file
@@ -303,7 +303,7 @@ class DataExporter {
         PdfPageTemplateElement(const Rect.fromLTWH(0, 0, 515, 50));
 
     //Create date now string
-    String dateNow = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    String dateNow = DateFormat('yyyy_MM_dd_kk:mm').format(DateTime.now());
     String fileName = '${dataType}_$dateNow';
 
     //Draw text in the header.
