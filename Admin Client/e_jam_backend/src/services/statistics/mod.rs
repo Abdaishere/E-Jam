@@ -40,7 +40,7 @@ pub fn run_generator_consumer(
             Err(e) => {
                 debug!("Kafka Error {:?}", e);
                 if counter == 0 {
-                    error!("Kafka Error {:?}", e);
+                    debug!("Kafka Error {:?}", e);
                     return Err(());
                 }
                 counter -= 1;
@@ -142,7 +142,7 @@ pub fn run_verifier_consumer(
             Err(e) => {
                 debug!("Kafka Error {:?}", e);
                 if counter == 0 {
-                    error!("Kafka Error {:?}", e);
+                    debug!("Kafka Error {:?}", e);
                     return Err(());
                 }
                 counter -= 1;

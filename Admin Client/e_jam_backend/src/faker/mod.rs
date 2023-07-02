@@ -114,7 +114,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
         {
             Ok(consumer) => break consumer,
             Err(_e) => {
-                error!("Kafka Connection for Generator faker{:?}", _e);
+                debug!("Kafka Connection for Generator faker{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
@@ -156,7 +156,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
                                 info!("Sent fake Generator data to Kafka Broker");
                             }
                             Err(e) => {
-                                error!(
+                                debug!(
                                     "Failed to send fake Generator data to Kafka Broker: {:?}",
                                     e
                                 );
@@ -164,7 +164,7 @@ pub fn run_generator_faker(devices_list: Vec<Device>, streams_entries: Vec<Strea
                         }
                     }
                     Err(e) => {
-                        error!("Failed to encode fake data: {:?}", e);
+                        debug!("Failed to encode fake data: {:?}", e);
                     }
                 }
             }
@@ -189,7 +189,7 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
         {
             Ok(consumer) => break consumer,
             Err(_e) => {
-                error!("Kafka Connection for Verifier faker{:?}", _e);
+                debug!("Kafka Connection for Verifier faker{:?}", _e);
                 sleep(Duration::from_secs(SLEEP_TIME));
             }
         }
@@ -232,7 +232,7 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
                                 info!("Sent fake Verifier stats to Kafka Broker");
                             }
                             Err(e) => {
-                                error!(
+                                debug!(
                                     "Failed to send fake Verifier data to Kafka Broker: {:?}",
                                     e
                                 );
@@ -240,7 +240,7 @@ pub fn run_verifier_faker(devices_list: Vec<Device>, streams_entries: Vec<Stream
                         }
                     }
                     Err(e) => {
-                        error!("Failed to encode fake data: {:?}", e);
+                        debug!("Failed to encode fake data: {:?}", e);
                     }
                 }
             }
