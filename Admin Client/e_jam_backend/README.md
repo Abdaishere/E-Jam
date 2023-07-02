@@ -38,15 +38,22 @@ cargo run
 To run the E-Jam API in a Docker container, run the following command:
 
 ```bash
-docker build -t center-point .
-sudo docker run -p 8084:8084 center-point
+docker pull aabdaa/center-point
+sudo docker run --network=host aabdaa/center-point
+```
+
+Or you can build the Docker image yourself by running the following command:
+
+```bash
+sudo docker build -t center-point .
+sudo docker run --network=host center-point
 ```
 
 the API will be available on port 8084 on your machine.
 Or you can run the following command to run the API in the background:
 
 ```bash
-sudo docker run -dp 8084:8084 center-point
+sudo docker run -d --network=host aabdaa/center-point
 ```
 
 ## How to test the E-Jam API
