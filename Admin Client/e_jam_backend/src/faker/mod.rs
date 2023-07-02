@@ -8,8 +8,7 @@ use crate::{
 use actix_web::web::Data;
 use fake::{Fake, Faker};
 use kafka::producer::{AsBytes, Producer, Record, RequiredAcks};
-use log::error;
-use log::info;
+use log::{debug, info};
 use schema_registry_converter::blocking::avro::AvroEncoder;
 use schema_registry_converter::blocking::schema_registry::SrSettings;
 use schema_registry_converter::schema_registry_common::SubjectNameStrategy;

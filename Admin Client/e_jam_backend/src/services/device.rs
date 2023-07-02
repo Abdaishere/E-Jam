@@ -314,7 +314,13 @@ async fn stream_finished(
     req: HttpRequest,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
-    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap().to_uppercase();
+    let mac_address = req
+        .headers()
+        .get("mac-address")
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_uppercase();
 
     let mut streams_entries = data.stream_entries.lock().await;
     let stream_entry = streams_entries.get_mut(&stream_id);
@@ -356,7 +362,13 @@ async fn stream_started(
     req: HttpRequest,
 ) -> impl Responder {
     let stream_id = stream_id.into_inner();
-    let mac_address = req.headers().get("mac-address").unwrap().to_str().unwrap().to_uppercase();
+    let mac_address = req
+        .headers()
+        .get("mac-address")
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_uppercase();
 
     let mut streams_entries = data.stream_entries.lock().await;
     let stream_entry = streams_entries.get_mut(&stream_id);

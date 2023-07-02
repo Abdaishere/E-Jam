@@ -540,7 +540,7 @@ async fn force_start_stream(
             stream_id
         ));
     }
-    
+
     let mut body = format!("stream {} ", stream_id);
     let mut streams_entries = data.stream_entries.lock().await;
     let stream_entry = streams_entries.get_mut(&stream_id).unwrap();

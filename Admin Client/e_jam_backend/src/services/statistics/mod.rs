@@ -1,7 +1,7 @@
 use crate::models::statistics::{Generator, Verifier};
 use apache_avro::from_value;
 use kafka::consumer::{Consumer, FetchOffset};
-use log::{debug, error};
+use log::debug;
 use schema_registry_converter::blocking::{avro::AvroDecoder, schema_registry::SrSettings};
 use std::{
     collections::LinkedList,
