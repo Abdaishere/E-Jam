@@ -20,11 +20,10 @@ import static java.lang.Thread.sleep;
  * aggregate them then sends the result to the admin client through Kafka
  */
 public class StatsManager implements Runnable {
-    private Inet4Address kafkaServerAddress;
     private static StatsManager instance = null;
     private float sendFrequency = 1000.0f;
-    private ArrayList<Generator> generatorStats = new ArrayList<>();
-    private ArrayList<Verifier> verifierStats = new ArrayList<>();
+    private final ArrayList<Generator> generatorStats = new ArrayList<>();
+    private final ArrayList<Verifier> verifierStats = new ArrayList<>();
 
     private Thread genStatsThread;
     private Thread verStatsThread;
@@ -59,7 +58,6 @@ public class StatsManager implements Runnable {
     }
 
     private StatsManager(Inet4Address ip) {
-        kafkaServerAddress = ip;
     }
 
     private void fillGenStats() {
@@ -78,23 +76,21 @@ public class StatsManager implements Runnable {
             }
         }
 
-        genStatsThread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    for (BufferedReader reader : readers) {
-                        String line = "";
-                        while ((line = reader.readLine()) != null) {
-                            data.add(line);
-                        }
-                        reader.close();
+        genStatsThread = new Thread(() -> {
+            try {
+                for (BufferedReader reader : readers) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        data.add(line);
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    reader.close();
                 }
-                for (String s : data) {
-                    System.out.println(s);
-                    generatorStats.add(GeneratorProducer.rebuildFromString(s));
-                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            for (String s : data) {
+                System.out.println(s);
+                generatorStats.add(GeneratorProducer.rebuildFromString(s));
             }
         });
         genStatsThread.start();
@@ -114,23 +110,21 @@ public class StatsManager implements Runnable {
                 throw new RuntimeException(e);
             }
         }
-        verStatsThread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    for (BufferedReader reader : readers) {
-                        String line = "";
-                        while ((line = reader.readLine()) != null) {
-                            data.add(line);
-                        }
-                        reader.close();
+        verStatsThread = new Thread(() -> {
+            try {
+                for (BufferedReader reader : readers) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        data.add(line);
                     }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    reader.close();
                 }
-
-                for (String s : data)
-                    verifierStats.add(VerifierProducer.rebuildFromString(s));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+
+            for (String s : data)
+                verifierStats.add(VerifierProducer.rebuildFromString(s));
         });
         verStatsThread.start();
     }
@@ -176,7 +170,7 @@ public class StatsManager implements Runnable {
         }
 
         System.out.println("should send now");
-        System.out.println("aggregatedGenStats.size() = "+ aggregatedGenStats.size());
+        System.out.println("aggregatedGenStats.size() = " + aggregatedGenStats.size());
         // send stats to kafka broker
         for (String key : aggregatedGenStats.keySet()) {
             long aggregatedPacketsSent = 0, aggregatedPacketsErrors = 0;
@@ -184,11 +178,13 @@ public class StatsManager implements Runnable {
                 aggregatedPacketsSent += generator.getPacketsSent();
                 aggregatedPacketsErrors += generator.getPacketsErrors();
             }
-            GeneratorProducer.produceDataToKafkaBroker(
-                    GeneratorProducer.rebuildFromParams((String) aggregatedGenStats.get(key).get(0).getMacAddress(),
-                    (String) aggregatedGenStats.get(key).get(0).getStreamId(),
-                    aggregatedPacketsSent,
-                    aggregatedPacketsErrors));
+
+            GeneratorProducer.produceDataToKafkaBroker(GeneratorProducer
+                    .rebuildFromParams((String) aggregatedGenStats.get(key).get(0).getMacAddress(),
+                            (String) aggregatedGenStats.get(key).get(0).getStreamId(),
+                            aggregatedPacketsSent,
+                            aggregatedPacketsErrors));
+
             System.out.println("Sending... IN GEN");
         }
         System.out.println("Sending.....");
@@ -201,14 +197,14 @@ public class StatsManager implements Runnable {
                 aggregatedPacketsDropped += verifier.getPacketsDropped();
                 aggregatedPacketsOutOfOrder += verifier.getPacketsOutOfOrder();
             }
+
             VerifierProducer.produceDataToKafkaBroker(Verifier.newBuilder()
                     .setMacAddress(aggregatedVerStats.get(key).get(0).getMacAddress())
                     .setStreamId(aggregatedVerStats.get(key).get(0).getStreamId())
-                    .setPacketsCorrect(aggregatedPacketsCorrect)
-                    .setPacketsErrors(aggregatedPacketsErrors)
-                    .setPacketsDropped(aggregatedPacketsDropped)
-                    .setPacketsOutOfOrder(aggregatedPacketsOutOfOrder)
+                    .setPacketsCorrect(aggregatedPacketsCorrect).setPacketsErrors(aggregatedPacketsErrors)
+                    .setPacketsDropped(aggregatedPacketsDropped).setPacketsOutOfOrder(aggregatedPacketsOutOfOrder)
                     .build());
+
         }
         generatorStats.clear();
         verifierStats.clear();
@@ -216,14 +212,18 @@ public class StatsManager implements Runnable {
     }
 
 
-
     /**
+     * This function is called when the thread is started.
+     * It runs in an infinite loop and calls the function ``sendStatistics()`` every ``sendFrequency`` seconds.
+     * ``sendFrequency`` can be set using the function ``setSendFrequency(float)``
      *
+     * @see #setSendFrequency(float)
+     * @see #sendStatistics()
      */
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
                 System.out.println("collecting stats");
                 fillGenStats();
                 fillVerStats();
@@ -233,19 +233,21 @@ public class StatsManager implements Runnable {
                     genStatsThread.join();
                     verStatsThread.join();
                 } catch (InterruptedException e) {
+                    System.out.println("Exception joining threads" + e.getMessage());
                     throw new RuntimeException(e);
                 }
 
                 System.out.println("sending size is " + generatorStats.size());
                 sendStatistics();
                 sleep((long) sendFrequency);
+            } catch (RuntimeException e) {
+                System.out.println("Exception in stats collector" + e.getMessage());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (RuntimeException e) {
-            run();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+
     }
 }

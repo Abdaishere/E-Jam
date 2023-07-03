@@ -2,9 +2,13 @@ package com.ejam.systemapi.InstanceControl;
 
 import com.ejam.systemapi.GlobalVariables;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static com.ejam.systemapi.InstanceControl.UTILs.getStreamIndex;
 
@@ -15,7 +19,7 @@ public class InstanceController implements Runnable {
     private final String configDir = ConfigurationManager.configDir;
     private final String myMacAddress;
     InputStream genStream, gatewayStream, verStream;
-    ArrayList<Long> pids = new ArrayList<>();
+    ArrayList<Long> pIds = new ArrayList<>();
     Stream stream;
     GlobalVariables globalVariables = GlobalVariables.getInstance();
 
@@ -33,7 +37,7 @@ public class InstanceController implements Runnable {
 
     public void killStreams() {
         //kill the current running executables
-        for (Long pid : pids) {
+        for (Long pid : pIds) {
             String[] args = {"-9", Long.toString(pid)};
             executeCommand("kill", true, args);
         }
@@ -44,7 +48,7 @@ public class InstanceController implements Runnable {
     private void debugStreams() {
 
         try {
-            String s = null;
+            String s;
             if (gatewayStream != null) {
                 BufferedReader gatewayInput = new BufferedReader(new InputStreamReader(gatewayStream));
                 while (gatewayInput.ready() && (s = gatewayInput.readLine()) != null) {
@@ -131,21 +135,11 @@ public class InstanceController implements Runnable {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             switch (args.length) {
-                case 0:
-                    processBuilder.command(command);
-                    break;
-                case 1:
-                    processBuilder.command(command, args[0]);
-                    break;
-                case 2:
-                    processBuilder.command(command, args[0], args[1]);
-                    break;
-                case 3:
-                    processBuilder.command(command, args[0], args[1], args[2]);
-                    break;
-                case 4:
-                    processBuilder.command(command, args[0], args[1], args[2], args[3]);
-                    break;
+                case 0 -> processBuilder.command(command);
+                case 1 -> processBuilder.command(command, args[0]);
+                case 2 -> processBuilder.command(command, args[0], args[1]);
+                case 3 -> processBuilder.command(command, args[0], args[1], args[2]);
+                case 4 -> processBuilder.command(command, args[0], args[1], args[2], args[3]);
             }
 
             Process process = processBuilder.start();
@@ -162,7 +156,7 @@ public class InstanceController implements Runnable {
                 System.out.println(command + " " + pid + " exited");
             } else {
                 System.out.println(command + " " + pid + " is executing without wait");
-                pids.add(pid);
+                pIds.add(pid);
                 if (command.contains("Generator"))
                     genStream = process.getErrorStream();
                 else if (command.contains("Gateway") || command.contains("sudo"))

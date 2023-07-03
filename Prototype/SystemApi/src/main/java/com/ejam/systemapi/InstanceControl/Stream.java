@@ -3,14 +3,15 @@ package com.ejam.systemapi.InstanceControl;
 import java.util.ArrayList;
 
 enum PayloadType {FIRST, SECOND, RANDOM}
+
 enum TransportProtocol {TCP, UDP}
+
 enum FlowType {BACK_TO_BACK, BURSTY}
 
 
 //steam information 
-public class Stream
-{
-    String streamID;                //A 3 alphanumeric charaters defining a stream
+public class Stream {
+    String streamID;                //A 3 alphanumeric characters defining a stream
     Long delay;                     //Delay in ms
     ArrayList<String> generators;      //senders mac addresses
     ArrayList<String> verifiers;    //receivers mac addresses
@@ -23,23 +24,11 @@ public class Stream
     TransportProtocol transportProtocol;  //The protocol used in the transport layer
     FlowType flowType;                  //The production pattern that the packets uses
 
-    long burstLen;				    //Number of packets in a burst
-    long burstDelay;				//Delay between bursts in milliseconds
+    long burstLen;                    //Number of packets in a burst
+    long burstDelay;                //Delay between bursts in milliseconds
     boolean checkContent;                  //Whether to check content or not
 
-
-
-
-    public Stream()
-    {
-        generators = new ArrayList<>();
-        verifiers = new ArrayList<>();
-    }
-
-    public Stream(String streamID, long delay, ArrayList<String> generators, ArrayList<String> verifiers,
-                  PayloadType payloadType, long numberOfPackets, int payloadLength, int seed, long bcFramesNum,
-                  long interFrameGap, long lifeTime, TransportProtocol transportProtocol,
-                  FlowType flowType, long burstLen, long burstDelay, boolean checkContent) {
+    public Stream(String streamID, long delay, ArrayList<String> generators, ArrayList<String> verifiers, PayloadType payloadType, long numberOfPackets, int payloadLength, int seed, long bcFramesNum, long interFrameGap, long lifeTime, TransportProtocol transportProtocol, FlowType flowType, long burstLen, long burstDelay, boolean checkContent) {
         this.streamID = streamID;
         this.delay = delay;
         this.generators = generators;

@@ -8,54 +8,74 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.UUID;
 
 
-public class GeneratorProducer {
-    static KafkaProducer<String, Generator> producer;
+public class GeneratorProducer implements Runnable {
+    static KafkaProducer<String, Object> producer;
 
     public static Generator rebuildFromParams(String macAdd, String streamID, Long pacSent, Long pacErr) {
-        LocalDate localDate = LocalDate.now();
-        // Get the default time zone
-        ZoneId zoneId = ZoneId.systemDefault();
-        // Convert the local date to an instant
-        Instant instant = localDate.atStartOfDay(zoneId).toInstant();
-//        System.out.println(UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE)).toUpperCase());
+
         return Generator.newBuilder()
                 .setMacAddress(macAdd)
                 .setStreamId(streamID)
                 .setPacketsSent(pacSent)
                 .setPacketsErrors(pacErr)
-                .setTimestamp(instant)
+                .setTimestamp(Instant.now())
                 .build();
     }
+
     public static Generator rebuildFromString(String string) {
         GlobalVariables globalVariables = GlobalVariables.getInstance();
         String[] values = string.split(String.valueOf(' '));
         String macAdd = UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE)).toUpperCase();
-       return rebuildFromParams(macAdd,values[1],Long.parseLong(values[2]),Long.parseLong(values[3]));
+
+        return rebuildFromParams(macAdd, values[1], Long.parseLong(values[2]), Long.parseLong(values[3]));
     }
 
     public static void produceDataToKafkaBroker(Generator generator) {
-        System.out.println(generator);
-        System.out.println(producer);
-        Faker faker = new Faker();
-        generator = Generator.newBuilder()
-                .setMacAddress(generator.getMacAddress())
-                .setStreamId(generator.getStreamId())
-                .setPacketsSent(faker.number().randomNumber())
-                .setPacketsErrors(faker.number().randomNumber())
-                .setTimestamp(faker.date().birthday().toInstant())
-                .build();
+        System.out.println("Sending data to Kafka broker ...");
         producer.send(new ProducerRecord<>(generator.getClass().getSimpleName(), generator), (metadata, exception) -> {
-            System.out.println("Trying to send...");
-            System.out.println(metadata.toString());
             if (exception != null) {
                 exception.printStackTrace();
+            } else {
+                System.out.println("Data sent successfully");
             }
         });
-        System.out.println("produceDataToKafkaBroker is executed!");
+    }
+
+    @Override
+    public void run() {
+        ProduceFakeData();
+    }
+
+    public static void ProduceFakeData() {
+        Faker faker = new Faker();
+        // send fake data with Kafka producer each 1 second to the topic is the same as the name of the class
+
+        while (true) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // create a fake Generator object
+            Generator generator = Generator.newBuilder()
+                    .setMacAddress(faker.internet().macAddress())
+                    .setStreamId(UUID.randomUUID().toString().substring(0, 3))
+                    .setPacketsSent(faker.number().randomNumber())
+                    .setPacketsErrors((faker.number().randomNumber() + 1) / 5)
+                    .setTimestamp(Instant.now()).build();
+
+            // send the fake data to the topic and print the exception if there is any
+            producer.send(new ProducerRecord<>(generator.getClass().getSimpleName(), generator), (metadata, exception) -> {
+                if (exception != null) {
+                    exception.printStackTrace();
+                } else {
+                    System.out.println("Sent successfully!");
+                }
+            });
+        }
     }
 }

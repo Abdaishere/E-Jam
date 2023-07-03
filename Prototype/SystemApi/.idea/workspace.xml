@@ -5,11 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="47b68451-4f1f-4e11-9f79-f274180f9ae5" name="Changes" comment="Edit mac address format">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/GlobalVariables.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/GlobalVariables.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Communicator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Communicator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/ConfigurationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/ConfigurationManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/InstanceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/ProcessController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/ProcessController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Stream.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/Stream.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/UTILs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/InstanceControl/UTILs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/NetworkUtilities/BroadcastUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/NetworkUtilities/BroadcastUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/NetworkUtilities/UdpUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/NetworkUtilities/UdpUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/SystemApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/SystemApiApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/GeneratorProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/GeneratorProducer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/KafkaInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/SchemaRegistry/Generator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/SchemaRegistry/Generator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/SchemaRegistry/Verifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/SchemaRegistry/Verifier.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/StatsManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/StatsManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/VerifierProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ejam/systemapi/stats/VerifierProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,33 +65,37 @@
     </option>
   </component>
   <component name="ProjectId" id="2LkPCgjetEtkGKTjgdDkwIra8zZ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/mostafa/Desktop/E-Jam/Prototype/SystemApi&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;64d965383f6b496d7a6ea9c14eeeefe8&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/abda/Development/Work/Others/E-Jam/Prototype/SystemApi",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "spring.configuration.checksum": "64d965383f6b496d7a6ea9c14eeeefe8",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java/com/example/systemapi/stats/avro" />
@@ -87,7 +107,14 @@
       <recent name="com.example.systemapi.stats" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.com.ejam.systemapi.stats.KafkaInitializer">
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.SystemApiApplication (1)">
     <configuration name="KafkaInitializer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.example.systemapi.stats.KafkaInitializer" />
       <module name="SystemApi" />
@@ -172,8 +199,8 @@
         <item itemvalue="Application.com.ejam.systemapi.stats.KafkaInitializer" />
         <item itemvalue="Application.com.ejam.systemapi.InstanceControl.Main" />
         <item itemvalue="Application.com.ejam.systemapi.InstanceControl.Communicator" />
-        <item itemvalue="Application.KafkaInitializer" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.KafkaInitializer" />
       </list>
     </recent_temporary>
   </component>
@@ -237,6 +264,7 @@
       <workItem from="1682371844043" duration="4956000" />
       <workItem from="1682454658247" duration="1305000" />
       <workItem from="1683202594024" duration="5116000" />
+      <workItem from="1688421000800" duration="6109000" />
     </task>
     <task id="LOCAL-00001" summary="create endpoints to communicate with admin-client">
       <created>1677019822321</created>
@@ -319,6 +347,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Create start endpoint" />
     <MESSAGE value="create endpoints to communicate with admin-client" />
     <MESSAGE value="make start endpoint receive string instead of json object" />
