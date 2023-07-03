@@ -1,5 +1,7 @@
 package com.ejam.systemapi.stats;
 
+import com.ejam.systemapi.GlobalVariables;
+import com.ejam.systemapi.InstanceControl.UTILs;
 import com.ejam.systemapi.stats.SchemaRegistry.Generator;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -14,6 +16,7 @@ public class VerifierProducer {
     static KafkaProducer<String, Verifier> producer;
 
     public static Verifier rebuildFromString(String string) {
+        GlobalVariables globalVariables = GlobalVariables.getInstance();
         String[] values = string.split(String.valueOf(' '));
 
         LocalDate localDate = LocalDate.now();
@@ -25,7 +28,7 @@ public class VerifierProducer {
         Instant instant = localDate.atStartOfDay(zoneId).toInstant();
 
         return Verifier.newBuilder()
-                .setMacAddress(values[0])
+                .setMacAddress(UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE)))
                 .setStreamId(values[1])
                 .setPacketsCorrect(Long.parseLong(values[2]))
                 .setPacketsErrors(Long.parseLong(values[3]))

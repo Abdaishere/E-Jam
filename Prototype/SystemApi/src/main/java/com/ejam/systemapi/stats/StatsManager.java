@@ -176,7 +176,7 @@ public class StatsManager implements Runnable {
         }
 
         System.out.println("should send now");
-
+        System.out.println("aggregatedGenStats.size() = "+ aggregatedGenStats.size());
         // send stats to kafka broker
         for (String key : aggregatedGenStats.keySet()) {
             long aggregatedPacketsSent = 0, aggregatedPacketsErrors = 0;
@@ -184,14 +184,14 @@ public class StatsManager implements Runnable {
                 aggregatedPacketsSent += generator.getPacketsSent();
                 aggregatedPacketsErrors += generator.getPacketsErrors();
             }
-            GeneratorProducer.produceDataToKafkaBroker(Generator.newBuilder()
-                    .setMacAddress(aggregatedGenStats.get(key).get(0).getMacAddress())
-                    .setStreamId(aggregatedGenStats.get(key).get(0).getStreamId())
-                    .setPacketsSent(aggregatedPacketsSent)
-                    .setPacketsErrors(aggregatedPacketsErrors)
-                    .build());
+            GeneratorProducer.produceDataToKafkaBroker(
+                    GeneratorProducer.rebuildFromParams((String) aggregatedGenStats.get(key).get(0).getMacAddress(),
+                    (String) aggregatedGenStats.get(key).get(0).getStreamId(),
+                    aggregatedPacketsSent,
+                    aggregatedPacketsErrors));
+            System.out.println("Sending... IN GEN");
         }
-
+        System.out.println("Sending.....");
         for (String key : aggregatedVerStats.keySet()) {
             long aggregatedPacketsCorrect = 0, aggregatedPacketsErrors = 0;
             long aggregatedPacketsDropped = 0, aggregatedPacketsOutOfOrder = 0;
@@ -212,6 +212,7 @@ public class StatsManager implements Runnable {
         }
         generatorStats.clear();
         verifierStats.clear();
+        System.out.println("Sent stats correctly");
     }
 
 

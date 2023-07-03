@@ -13,16 +13,19 @@ import java.util.Properties;
 
 public class KafkaInitializer {
     static GlobalVariables globalVariables = GlobalVariables.getInstance();
-    public static String BOOTSTRAP_SERVERS;
+//    public static String BOOTSTRAP_SERVERS;
+//    public final static String CLIENT_ID_CONFIG = "client1";
+//    public static String SCHEMA_REGISTRY_URL;
+
+    public final static String BOOTSTRAP_SERVERS = "http://192.168.1.6:9092/";
     public final static String CLIENT_ID_CONFIG = "client1";
-    public static String SCHEMA_REGISTRY_URL;
-
-
+    public final static String SCHEMA_REGISTRY_URL = "http://192.168.1.6:8081/";
     public static void Init() {
         globalVariables.readAdminConfig();
 
-        BOOTSTRAP_SERVERS = String.format("%s:9092", globalVariables.ADMIN_ADDRESS);
-        SCHEMA_REGISTRY_URL = String.format("%s:8081", globalVariables.ADMIN_ADDRESS);
+//        BOOTSTRAP_SERVERS = String.format("%s:9092", globalVariables.ADMIN_ADDRESS);
+//        SCHEMA_REGISTRY_URL = String.format("%s:8081", globalVariables.ADMIN_ADDRESS);
+
 
         System.out.println(BOOTSTRAP_SERVERS);
         System.out.println(SCHEMA_REGISTRY_URL);
@@ -40,7 +43,7 @@ public class KafkaInitializer {
         prop.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
 
         GeneratorProducer.producer = new KafkaProducer<>(prop);
-        VerifierProducer.producer = new KafkaProducer<>(prop);
+//        VerifierProducer.producer = new KafkaProducer<>(prop);
 
         Thread statsManagerThread = new Thread(StatsManager.getInstance());
         statsManagerThread.start();
