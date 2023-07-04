@@ -1,6 +1,6 @@
 # Makefile
 
-all: buildCpp buildSysApi createFiles
+all: buildCpp createFiles buildSysApi
 	echo done building	
 
 # Execute the CMakeLists file to build the other 3 targets

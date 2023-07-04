@@ -2,7 +2,6 @@ package com.ejam.systemapi;
 
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.PUT;
 import java.io.*;
 
 @Component

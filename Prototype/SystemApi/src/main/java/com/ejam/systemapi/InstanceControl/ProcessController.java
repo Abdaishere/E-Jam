@@ -32,7 +32,7 @@ class StreamProcess {
     public Thread thread;
 
     boolean killed = false;
-    
+
     public StreamProcess(InstanceController instanceController, Thread thread) {
         this.instanceController = instanceController;
         this.thread = thread;

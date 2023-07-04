@@ -11,7 +11,7 @@ public class UTILs {
 
     //get username from cmd
     public static String getUserString() {
-        String name = "";
+        String name;
         try {
             String command = "whoami";
             ProcessBuilder processBuilder = new ProcessBuilder();
@@ -44,17 +44,16 @@ public class UTILs {
 
     public static Set<String> listFiles(String dir) {
         System.out.println(dir);
-        return Stream.of(new File(dir).listFiles())
+        return Stream.of(Objects.requireNonNull(new File(dir).listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
                 .collect(Collectors.toSet());
     }
 
     public static ArrayList<String> getLines(String fileName) {
-        String WORD_FILE = fileName;
         ArrayList<String> lines = new ArrayList<>();
         try {
-            File file = new File(WORD_FILE);
+            File file = new File(fileName);
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -81,8 +80,8 @@ public class UTILs {
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
                 String fileName;
                 while ((fileName = bufferedReader.readLine()) != null) {
-                    if(fileName.startsWith("config")) {
-                        if(fileName.endsWith(streamID))
+                    if (fileName.startsWith("config")) {
+                        if (fileName.endsWith(streamID))
                             return index;
                         ++index;
                     }

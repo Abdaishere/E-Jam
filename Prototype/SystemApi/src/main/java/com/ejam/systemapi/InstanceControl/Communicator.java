@@ -1,8 +1,9 @@
 package com.ejam.systemapi.InstanceControl;
+
 import com.ejam.systemapi.GlobalVariables;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -10,13 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Receive the configuration from the admin gui and pass it to the configuration manager
@@ -25,7 +23,16 @@ import java.util.Map;
 @RequestMapping(path = "/")
 public class Communicator {
     /**
-     * Get configuration from Admin GUI
+     * Routes create for communication between the central server and the gateway
+     * ### Get / (index)
+     * will be called to Ping the system API and check if it is Online. (will be used in the devices Radar)
+     * ### Post /connect
+     * will be called to Connect to the system API and register the device in the system only if the mac address provided is accepted by the systemAPI.
+     * ### Post /start
+     * Generate or verify the Provided Stream.
+     * ### Post /stop
+     * Stop a currently running Stream.
+     * All endPoint headers will have mac-address = the mac address of the device that started the stream for verification.
      */
     static GlobalVariables globalVariables = GlobalVariables.getInstance();
 
@@ -34,26 +41,27 @@ public class Communicator {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/handshake")
-    public Map<String, String> handshake(@RequestHeader("admin-address") String adminAddress, @RequestHeader("admin-port") int adminPort) {
-        System.out.println("Received ip address: " + adminAddress);
-        System.out.println("Received port number: " + adminPort);
-
-        globalVariables.writeAdminConfig(adminAddress, adminPort);
-        globalVariables.readAdminConfig();
-
-        Map<String, String> response = new HashMap<>();
-        response.put("mac-address", UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE)));
-
-        return response;
-    }
+//    @PostMapping("/handshake")
+//    public Map<String, String> handshake(@RequestHeader("admin-address") String adminAddress, @RequestHeader("admin-port") int adminPort) {
+//
+//        System.out.println("Received ip address: " + adminAddress);
+//        System.out.println("Received port number: " + adminPort);
+//
+//        globalVariables.writeAdminConfig(adminAddress, adminPort);
+//        globalVariables.readAdminConfig();
+//
+//        Map<String, String> response = new HashMap<>();
+//        response.put("mac-address", UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.ADMIN_CLIENT_INTERFACE)));
+//
+//        return response;
+//    }
 
     @PostMapping("/connect")
     public ResponseEntity connect(@RequestHeader("mac-address") String macAddress) {
         System.out.println("Received mac address: " + macAddress);
 
         String serverMacAddress = UTILs.convertToWithoutColonFormat(macAddress);
-        System.out.println(macAddress);
+
         System.out.println(serverMacAddress);
         System.out.println(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE));
 
@@ -64,7 +72,13 @@ public class Communicator {
     }
 
     @PostMapping("/start")
-    public ResponseEntity startStream(@RequestBody String stringObj) throws JsonProcessingException {
+    public ResponseEntity startStream(@RequestBody String stringObj, @RequestHeader("mac-address") String macAddress) throws JsonProcessingException {
+        String serverMacAddress = UTILs.convertToWithoutColonFormat(macAddress);
+
+        if (!serverMacAddress.equals(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE))) {
+            return ResponseEntity.badRequest().build();
+        }
+
         System.out.println("Received configuration: " + stringObj);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonObj = mapper.readTree(stringObj);
@@ -100,11 +114,9 @@ public class Communicator {
         long burstDelay = jsonObj.get("burstDelay").asLong();
         boolean checkContent = jsonObj.get("checkContent").asBoolean();
 
-        Stream stream = new Stream(streamID, delay, generators, verifiers, payloadType,
-                numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap,
-                lifeTime, transportProtocol, flowType, burstLen, burstDelay, checkContent);
+        Stream stream = new Stream(streamID, delay, generators, verifiers, payloadType, numberOfPackets, payloadLength, seed, bcFramesNum, interFrameGap, lifeTime, transportProtocol, flowType, burstLen, burstDelay, checkContent);
 
-        ConfigurationManager configurationManager = new ConfigurationManager(stream);
+        new ConfigurationManager(stream);
         InstanceController instanceController = new InstanceController(stream);
         Thread thread = new Thread(instanceController);
         thread.start();
@@ -114,7 +126,13 @@ public class Communicator {
     }
 
     @PostMapping("/stop")
-    public ResponseEntity stopStream(@RequestHeader("stream-id") String streamId) {
+    public ResponseEntity stopStream(@RequestHeader("stream-id") String streamId, @RequestHeader("mac-address") String macAddress) {
+        String serverMacAddress = UTILs.convertToWithoutColonFormat(macAddress);
+
+        if (!serverMacAddress.equals(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE))) {
+            return ResponseEntity.badRequest().build();
+        }
+
         System.out.println("Received stream id: " + streamId);
         // stream is not running
         if (!ProcessController.containsProcess(streamId)) {
@@ -135,7 +153,7 @@ public class Communicator {
         try {
             process.instanceController.killStreams();
         } catch (Exception e) {
-
+            return ResponseEntity.badRequest().build();
         }
 
         // kill the thread made by that stream
