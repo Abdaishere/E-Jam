@@ -26,13 +26,13 @@ public class KafkaInitializer {
      */
     public static void GetBootstrapServers() {
         // TODO: uncomment this line when you want to use the admin config
-//        globalVariables.readAdminConfig();
+       globalVariables.readAdminConfig();
 
-//        BOOTSTRAP_SERVERS = String.format("http://%s:9092", globalVariables.ADMIN_ADDRESS);
-//        SCHEMA_REGISTRY_URL = String.format("http://%s:8081", globalVariables.ADMIN_ADDRESS);
+       BOOTSTRAP_SERVERS = String.format("http://%s:9092", globalVariables.ADMIN_ADDRESS);
+       SCHEMA_REGISTRY_URL = String.format("http://%s:8081", globalVariables.ADMIN_ADDRESS);
 
-        BOOTSTRAP_SERVERS = String.format("http://%s:9092", "localhost");
-        SCHEMA_REGISTRY_URL = String.format("http://%s:8081", "localhost");
+        // BOOTSTRAP_SERVERS = String.format("http://%s:9092", "localhost");
+        // SCHEMA_REGISTRY_URL = String.format("http://%s:8081", "localhost");
 
 
         System.out.println("Client ID: " + CLIENT_ID_CONFIG);
