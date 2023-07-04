@@ -4,6 +4,7 @@
 
 
 #include <string>
+#include <cstdint>
 #include "Byte.h"
 
 class FrameConstructor

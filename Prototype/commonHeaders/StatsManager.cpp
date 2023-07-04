@@ -177,7 +177,7 @@ void StatsManager::writeStatFile()
             printf("File already exists sgen_id, skipping creation...\n");
         }
     }
-
+	msg += "\n";
 	//Write on pipe
     std::cerr << "message is: " + msg << "\n";
 	write(fd, msg.c_str(), sizeof(char)*msg.size());
