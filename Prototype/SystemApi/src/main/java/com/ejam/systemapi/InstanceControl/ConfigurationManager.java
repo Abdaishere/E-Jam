@@ -47,7 +47,9 @@ public class ConfigurationManager {
             fileWriter.write(Long.toString(stream.burstLen) + '\n');
             fileWriter.write(Long.toString(stream.burstDelay) + '\n');
             int checkContent = stream.checkContent ? 1 : 0;
-            fileWriter.write(checkContent + '\n');
+
+            fileWriter.write(Integer.toString(checkContent) + '\n');
+
 
             fileWriter.close();
         } catch (IOException e) {
