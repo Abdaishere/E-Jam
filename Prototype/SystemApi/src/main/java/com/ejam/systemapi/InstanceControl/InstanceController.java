@@ -135,11 +135,21 @@ public class InstanceController implements Runnable {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder();
             switch (args.length) {
-                case 0 -> processBuilder.command(command);
-                case 1 -> processBuilder.command(command, args[0]);
-                case 2 -> processBuilder.command(command, args[0], args[1]);
-                case 3 -> processBuilder.command(command, args[0], args[1], args[2]);
-                case 4 -> processBuilder.command(command, args[0], args[1], args[2], args[3]);
+                case 0:
+                    processBuilder.command(command);
+                    break;
+                case 1:
+                    processBuilder.command(command, args[0]);
+                    break;
+                case 2:
+                    processBuilder.command(command, args[0], args[1]);
+                    break;
+                case 3:
+                    processBuilder.command(command, args[0], args[1], args[2]);
+                    break;
+                case 4:
+                    processBuilder.command(command, args[0], args[1], args[2], args[3]);
+                    break;
             }
 
             Process process = processBuilder.start();
@@ -157,12 +167,10 @@ public class InstanceController implements Runnable {
             } else {
                 System.out.println(command + " " + pid + " is executing without wait");
                 pIds.add(pid);
-                if (command.contains("Generator"))
-                    genStream = process.getErrorStream();
+                if (command.contains("Generator")) genStream = process.getErrorStream();
                 else if (command.contains("Gateway") || command.contains("sudo"))
                     gatewayStream = process.getErrorStream();
-                else if (command.contains("verifier"))
-                    verStream = process.getErrorStream();
+                else if (command.contains("verifier")) verStream = process.getErrorStream();
             }
 
         } catch (Exception e) {
