@@ -1,3 +1,11 @@
+#![doc(html_favicon_url = "https://i.imgur.com/6nhDut9.png")]
+#![doc(html_logo_url = "https://i.imgur.com/6nhDut9.png")]
+//! # E-Jam API
+//! This is the API for the E-Jam project.
+//! It is a REST API that allows the user to create, read, update and delete devices and streams.
+//! It also allows the user to send data with the streams and to read the data with the streams.
+//! The API is written in Rust and uses the Actix-Web framework.
+
 use actix_web::{web, App, HttpServer};
 use log::info;
 

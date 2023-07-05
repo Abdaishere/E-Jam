@@ -4,7 +4,7 @@
 
 ![Rust](https://img.shields.io/badge/rust-Latest-blue)
 ![Actix](https://img.shields.io/badge/actix-Latest-blue)
-![Version](https://img.shields.io/badge/version-1.0.1-Green)
+![Version](https://img.shields.io/badge/version-0.2.1-Green)
 ![Status](https://img.shields.io/badge/status-Testing-orange)
 
 ## INTRODUCTION
