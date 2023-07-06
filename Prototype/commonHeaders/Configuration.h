@@ -351,7 +351,7 @@ public:
         return streamID;
     }
 
-    ByteArray getStreamIDVal()
+    ByteArray getStreamIDVal()const
     {
         return *streamID;
     }

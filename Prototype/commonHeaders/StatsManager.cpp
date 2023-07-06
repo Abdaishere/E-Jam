@@ -26,6 +26,10 @@ std::shared_ptr<StatsManager> StatsManager::getInstance()
 StatsManager::StatsManager(const Configuration& config, int id, bool is_gen1)
 {
     is_gen = is_gen1;
+    ByteArray streamIDV = config.getStreamIDVal();
+    streamID = "";
+    for(char c:streamIDV)
+        streamID.push_back(c);
     instanceID = id;
 	configuration = config;
     resetStats();
@@ -157,11 +161,11 @@ void StatsManager::writeStatFile()
 	std::string dir = STAT_DIR;
 	if(is_gen)
 	{
-		dir += "/genStats/sgen_";
+		dir += "/genStats/" + streamID + "_sgen_";
 	}
 	else
 	{
-		dir += "/verStats/sver_";
+		dir += "/verStats/" + streamID + "_sver_";
 	}
 
  	mkfifo((dir + std::to_string(instanceID)).c_str(), S_IFIFO | 0640);
