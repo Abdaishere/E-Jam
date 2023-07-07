@@ -64,3 +64,6 @@ Prototype/verifier/cmake-build-debug/**
 
 # OS files
 .directory
+
+# Debug files
+Admin Client/e_jam_backend/valgrind-out.log

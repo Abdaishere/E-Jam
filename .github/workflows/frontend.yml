@@ -1,0 +1,154 @@
+on:
+    pull_request:
+        branches:
+            - Admin-Client
+            - master
+    push:
+        branches:
+            - Admin-Client
+            - master
+    
+name: "Admin-Client CI/CD"
+jobs:
+    build-Linux-Web-APK:
+        name : "Build Flutter For Linux, Web and APK"
+        runs-on: ubuntu-latest
+        defaults:
+          run:
+            working-directory: "./Admin Client/e_jam_frontend/"
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+
+            - name: "Setup Java"
+              uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+
+            - run: sudo apt-get update
+
+            - name: "Install Tools"
+              run: sudo apt-get install build-essential cmake clang ninja-build pkg-config libgtk-3-dev liblzma5
+
+            - name: "Setup Flutter"
+              uses: subosito/flutter-action@v1
+              with:
+                    flutter-version: "3.10.5"
+
+            - name: "Get Packages"
+              run: flutter pub get
+
+            - name: "Build APK"
+              run: flutter build apk --release
+
+            - name: "Build Linux"
+              run: flutter build linux --release
+
+            - name: "Build Web"
+              run: flutter build web --release --no-tree-shake-icons
+
+            # - name: "Upload Linux"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #     name: E-Jam Linux
+            #     path: "build/linux/release/*"
+            #     tag: v1.0.${{ github.run_number }}
+
+            # - name: "Upload Web"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #       name: E-Jam Web
+            #       path: "build/web/*"
+            #       tag: v1.0.${{ github.run_number }}
+
+            # - name: "Upload APK"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #       name: E-Jam.apk
+            #       path: "build/app/outputs/apk/release/*"
+            #       tag: v1.0.${{ github.run_number }}
+
+    # Needs Certificate as Secret Key To build IOS and MacOS 
+    # build-MacOS-IOS:
+    #     name: "Deploy to MacOS and IOS"
+    #     runs-on: macos-latest
+    #     defaults:
+    #       run:
+    #         working-directory: "./Admin Client/e_jam_frontend/"
+    #     steps:
+    #         - name: "Checkout"
+    #           uses: actions/checkout@v2
+            
+    #         - name: "Setup IOS"
+    #           uses: actions/setup-java@v1
+    #           with:
+    #             java-version: "12.x"
+
+    #         - name: "Setup Flutter"
+    #           uses: subosito/flutter-action@v1
+    #           with:
+    #                 flutter-version: "3.10.5"
+
+    #         - name: "Get Packages"
+    #           run: flutter pub get
+
+    #         - name: "Build IOS"
+    #           run: flutter build ios --release
+
+    #         - name: "Build MacOS"
+    #           run: flutter build macos --release
+
+    #         - name: "Upload IOS"
+    #           uses: ncipollo/release-action@v1
+    #           with:
+    #             name: E-Jam IOS
+    #             artifacts: "build/ios/iphoneos/*"
+    #             tag: v1.0.${{ github.run_number }}
+    #             token: ${{ secrets.GITHUB_TOKEN }}
+            
+    #         - name: "Upload MacOS"
+    #           uses: ncipollo/release-action@v1
+    #           with:
+    #             name: E-Jam MacOS
+    #             artifacts: "build/macos/Build/Products/Release/*"
+    #             tag: v1.0.${{ github.run_number }}
+    #             token: ${{ secrets.GITHUB_TOKEN }}
+
+    build-Windows:
+        name: "Build Flutter For Windows"
+        runs-on: windows-latest
+        defaults:
+          run:
+            working-directory: "./Admin Client/e_jam_frontend/"
+        steps:
+            - name: "Checkout"
+              uses: actions/checkout@v2
+            
+            - name: "Setup Java"
+              uses: actions/setup-java@v1
+              with:
+                java-version: "12.x"
+
+            - name: "Setup Flutter"
+              uses: subosito/flutter-action@v1
+              with:
+                    flutter-version: "3.10.5"
+
+            - name: "Get Packages"
+              run: flutter pub get
+
+            - name: "Build Windows"
+              run: flutter build windows --release
+
+            # - name: "Upload Windows"
+            #   uses: actions/upload-artifact@v2
+            #   with:
+            #     name: E-Jam Windows
+            #     path: "build/windows/runner/Release/*"
+            #     tag: v1.0.${{ github.run_number }}
+      
+
+
+
+    # push to Admin-Client Branch
+    # 

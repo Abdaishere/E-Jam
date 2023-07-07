@@ -1,0 +1,35 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "Add streams",
+    "dateExported": "2023-05-18T05:29:42.128Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "c51c1825-b2ae-4672-9966-2589c38e1fa2",
+            "colId": "cd8a3088-9fce-49e3-86f0-db215ee6052a",
+            "containerId": "",
+            "name": "add stream Copy",
+            "url": "http://localhost:8084/streams",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-05-08T08:32:24.289Z",
+            "modified": "2023-05-10T12:50:55.523Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"first stream\",\n  \"description\": \"this is stream 000\",\n  \"lastUpdated\": 0,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"delay\": 0,\n  \"generatorsIds\": [\n    \"1.1.1.1\"\n  ],\n  \"verifiersIds\": [\n    \"8.8.8.8\"\n  ],\n  \"payloadType\": 0,\n  \"burstLength\": 0,\n  \"burstDelay\": 0,\n  \"numberOfPackets\": 100,\n  \"payloadLength\": 1499,\n  \"seed\": 540024,\n  \"broadcastFrames\": 12,\n  \"interFrameGap\": 123,\n  \"timeToLive\": 1000,\n  \"transportLayerProtocol\": \"TCP\",\n  \"flowType\": \"BackToBack\",\n  \"checkContent\": false\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ],
+    "settings": {
+        "runOptions": {
+            "delay": 0,
+            "iterations": 500,
+            "dataFilePath": ""
+        }
+    }
+}
