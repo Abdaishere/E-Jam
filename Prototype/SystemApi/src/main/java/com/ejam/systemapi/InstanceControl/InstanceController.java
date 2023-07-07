@@ -170,12 +170,10 @@ public class InstanceController implements Runnable {
             } else {
                 System.out.println(command + " " + pid + " is executing without wait");
                 pIds.add(pid);
-                if (command.contains("Generator"))
-                    genStream = process.getErrorStream();
+                if (command.contains("Generator")) genStream = process.getErrorStream();
                 else if (command.contains("Gateway") || command.contains("sudo"))
                     gatewayStream = process.getErrorStream();
-                else if (command.contains("verifier"))
-                    verStream = process.getErrorStream();
+                else if (command.contains("verifier")) verStream = process.getErrorStream();
             }
 
         } catch (Exception e) {
