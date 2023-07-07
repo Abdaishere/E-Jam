@@ -69,7 +69,6 @@ public class StatsManager implements Runnable {
         Set<String> dirs = UTILs.listFiles(parentFolder);
         ArrayList<String> data = new ArrayList<>();
         for (String dir : dirs) {
-            System.out.println("Dir = " + (parentFolder + dir));
             try {
                 readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(parentFolder + dir))));
             } catch (FileNotFoundException e) {
@@ -106,9 +105,7 @@ public class StatsManager implements Runnable {
         ArrayList<String> data = new ArrayList<>();
         for (String dir : dirs) {
             try {
-//                System.out.println("here1");
                 readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(parentFolder + dir))));
-//                System.out.println("here2");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -172,7 +169,6 @@ public class StatsManager implements Runnable {
             }
         }
 
-        System.out.println("Sending.....");
         // send stats to kafka broker
         if(!aggregatedGenStats.isEmpty()) {
             for (String key : aggregatedGenStats.keySet()) {
@@ -229,11 +225,10 @@ public class StatsManager implements Runnable {
     public void run() {
         while (true) {
             try {
-                System.out.println("collecting stats");
+//                System.out.println("collecting stats");
                 fillGenStats();
                 fillVerStats();
 
-                System.out.println("After filling");
                 try {
                     sleep((long) sendFrequency);
                     genStatsThread.interrupt();
@@ -243,7 +238,6 @@ public class StatsManager implements Runnable {
                     throw new RuntimeException(e);
                 }
 
-                System.out.println("sending size is " + generatorStats.size());
                 sendStatistics();
                 sleep((long) sendFrequency);
             } catch (RuntimeException e) {

@@ -43,7 +43,6 @@ public class UTILs {
     }
 
     public static Set<String> listFiles(String dir) {
-        System.out.println(dir);
         return Stream.of(Objects.requireNonNull(new File(dir).listFiles()))
                 .filter(file -> !file.isDirectory())
                 .map(File::getName)
