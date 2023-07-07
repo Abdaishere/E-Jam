@@ -21,6 +21,7 @@ import static java.lang.Thread.sleep;
  */
 public class StatsManager implements Runnable {
     private static StatsManager instance = null;
+//      make sure the sendFrequency is enough so that the collection of stats can happen correctly if not blocked
     private float sendFrequency = 1000.0f;
     private final ArrayList<Generator> generatorStats = new ArrayList<>();
     private final ArrayList<Verifier> verifierStats = new ArrayList<>();
@@ -234,8 +235,9 @@ public class StatsManager implements Runnable {
 
                 System.out.println("After filling");
                 try {
-                    genStatsThread.join();
-                    verStatsThread.join();
+                    sleep((long) sendFrequency);
+                    genStatsThread.interrupt();
+                    verStatsThread.interrupt();
                 } catch (InterruptedException e) {
                     System.out.println("Exception joining threads" + e.getMessage());
                     throw new RuntimeException(e);
