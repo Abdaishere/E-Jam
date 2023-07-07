@@ -2,13 +2,13 @@ package com.ejam.systemapi.InstanceControl;
 
 import com.ejam.systemapi.GlobalVariables;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.ejam.systemapi.InstanceControl.UTILs.getStreamIndex;
 
@@ -18,6 +18,9 @@ import static com.ejam.systemapi.InstanceControl.UTILs.getStreamIndex;
 public class InstanceController implements Runnable {
     private final String configDir = ConfigurationManager.configDir;
     private final String myMacAddress;
+
+    private final String genStatsDir = "/etc/EJam/stats/genStats";
+    private final String verStatsDir = "/etc/EJam/stats/verStats";
     InputStream genStream, gatewayStream, verStream;
     ArrayList<Long> pIds = new ArrayList<>();
     Stream stream;
@@ -185,6 +188,15 @@ public class InstanceController implements Runnable {
         executeCommand("../Executables/GetExecutables.sh", true, args);
     }
 
+    //delete all files in a given directory which have a prefix pref
+    void deleteFiles(String directory, String pref) {
+        File dir = new File(directory);
+        File[] files = dir.listFiles();
+        for(File file:files) {
+            if(file.getName().startsWith(pref))
+                file.delete();
+        }
+    }
 
     @Override
     public void run() {
@@ -219,6 +231,9 @@ public class InstanceController implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //clear up the stats files associated with this stream
+        deleteFiles(genStatsDir, stream.streamID);
+        deleteFiles(verStatsDir, stream.streamID);
 
         // notify Admin-client that the stream is finished
         try {

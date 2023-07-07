@@ -21,6 +21,7 @@ import static java.lang.Thread.sleep;
  */
 public class StatsManager implements Runnable {
     private static StatsManager instance = null;
+//      make sure the sendFrequency is enough so that the collection of stats can happen correctly if not blocked
     private float sendFrequency = 1000.0f;
     private final ArrayList<Generator> generatorStats = new ArrayList<>();
     private final ArrayList<Verifier> verifierStats = new ArrayList<>();
@@ -105,7 +106,9 @@ public class StatsManager implements Runnable {
         ArrayList<String> data = new ArrayList<>();
         for (String dir : dirs) {
             try {
+//                System.out.println("here1");
                 readers.add(new BufferedReader(new InputStreamReader(new FileInputStream(parentFolder + dir))));
+//                System.out.println("here2");
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -169,46 +172,48 @@ public class StatsManager implements Runnable {
             }
         }
 
-        System.out.println("should send now");
-        System.out.println("aggregatedGenStats.size() = " + aggregatedGenStats.size());
-        // send stats to kafka broker
-        for (String key : aggregatedGenStats.keySet()) {
-            long aggregatedPacketsSent = 0, aggregatedPacketsErrors = 0;
-            for (Generator generator : aggregatedGenStats.get(key)) {
-                aggregatedPacketsSent += generator.getPacketsSent();
-                aggregatedPacketsErrors += generator.getPacketsErrors();
-            }
-
-            GeneratorProducer.produceDataToKafkaBroker(GeneratorProducer
-                    .rebuildFromParams((String) aggregatedGenStats.get(key).get(0).getMacAddress(),
-                            (String) aggregatedGenStats.get(key).get(0).getStreamId(),
-                            aggregatedPacketsSent,
-                            aggregatedPacketsErrors));
-
-            System.out.println("Sending... IN GEN");
-        }
         System.out.println("Sending.....");
-        for (String key : aggregatedVerStats.keySet()) {
-            long aggregatedPacketsCorrect = 0, aggregatedPacketsErrors = 0;
-            long aggregatedPacketsDropped = 0, aggregatedPacketsOutOfOrder = 0;
-            for (Verifier verifier : aggregatedVerStats.get(key)) {
-                aggregatedPacketsCorrect += verifier.getPacketsCorrect();
-                aggregatedPacketsErrors += verifier.getPacketsErrors();
-                aggregatedPacketsDropped += verifier.getPacketsDropped();
-                aggregatedPacketsOutOfOrder += verifier.getPacketsOutOfOrder();
+        // send stats to kafka broker
+        if(!aggregatedGenStats.isEmpty()) {
+            for (String key : aggregatedGenStats.keySet()) {
+                long aggregatedPacketsSent = 0, aggregatedPacketsErrors = 0;
+                for (Generator generator : aggregatedGenStats.get(key)) {
+                    aggregatedPacketsSent += generator.getPacketsSent();
+                    aggregatedPacketsErrors += generator.getPacketsErrors();
+                }
+
+                GeneratorProducer.produceDataToKafkaBroker(GeneratorProducer
+                        .rebuildFromParams((String) aggregatedGenStats.get(key).get(0).getMacAddress(),
+                                (String) aggregatedGenStats.get(key).get(0).getStreamId(),
+                                aggregatedPacketsSent,
+                                aggregatedPacketsErrors));
+
             }
+            System.out.println("Sent all data correctly in generator");
+        }
+        if(!aggregatedVerStats.isEmpty()) {
+            for (String key : aggregatedVerStats.keySet()) {
+                long aggregatedPacketsCorrect = 0, aggregatedPacketsErrors = 0;
+                long aggregatedPacketsDropped = 0, aggregatedPacketsOutOfOrder = 0;
+                for (Verifier verifier : aggregatedVerStats.get(key)) {
+                    aggregatedPacketsCorrect += verifier.getPacketsCorrect();
+                    aggregatedPacketsErrors += verifier.getPacketsErrors();
+                    aggregatedPacketsDropped += verifier.getPacketsDropped();
+                    aggregatedPacketsOutOfOrder += verifier.getPacketsOutOfOrder();
+                }
 
-            VerifierProducer.produceDataToKafkaBroker(Verifier.newBuilder()
-                    .setMacAddress(aggregatedVerStats.get(key).get(0).getMacAddress())
-                    .setStreamId(aggregatedVerStats.get(key).get(0).getStreamId())
-                    .setPacketsCorrect(aggregatedPacketsCorrect).setPacketsErrors(aggregatedPacketsErrors)
-                    .setPacketsDropped(aggregatedPacketsDropped).setPacketsOutOfOrder(aggregatedPacketsOutOfOrder)
-                    .build());
-
+                VerifierProducer.produceDataToKafkaBroker(VerifierProducer.rebuildFromParams(
+                        (String) aggregatedVerStats.get(key).get(0).getMacAddress(),
+                        (String) aggregatedVerStats.get(key).get(0).getStreamId(),
+                        aggregatedPacketsCorrect,
+                        aggregatedPacketsErrors,
+                        aggregatedPacketsDropped,
+                        aggregatedPacketsOutOfOrder));
+            }
+            System.out.println("Sent all data correctly in verifier");
         }
         generatorStats.clear();
         verifierStats.clear();
-        System.out.println("Sent stats correctly");
     }
 
 
@@ -230,8 +235,9 @@ public class StatsManager implements Runnable {
 
                 System.out.println("After filling");
                 try {
-                    genStatsThread.join();
-                    verStatsThread.join();
+                    sleep((long) sendFrequency);
+                    genStatsThread.interrupt();
+                    verStatsThread.interrupt();
                 } catch (InterruptedException e) {
                     System.out.println("Exception joining threads" + e.getMessage());
                     throw new RuntimeException(e);

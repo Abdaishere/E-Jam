@@ -2,6 +2,7 @@ package com.ejam.systemapi.stats;
 
 import com.ejam.systemapi.GlobalVariables;
 import com.ejam.systemapi.InstanceControl.UTILs;
+import com.ejam.systemapi.stats.SchemaRegistry.Generator;
 import com.ejam.systemapi.stats.SchemaRegistry.Verifier;
 import com.github.javafaker.Faker;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -14,19 +15,30 @@ import java.util.UUID;
 public class VerifierProducer implements Runnable {
     static KafkaProducer<String, Object> producer;
 
+    public static Verifier rebuildFromParams(String macAdd, String streamID, Long pacCorrect, Long pacErr,
+                                             Long pacDropped, Long packOutOfOrder) {
+
+        return Verifier.newBuilder()
+                .setMacAddress(macAdd)
+                .setStreamId(streamID)
+                .setPacketsCorrect(pacCorrect)
+                .setPacketsErrors(pacErr)
+                .setPacketsDropped(pacDropped)
+                .setPacketsOutOfOrder(packOutOfOrder)
+                .setTimestamp(Instant.now())
+                .build();
+    }
     public static Verifier rebuildFromString(String string) {
         GlobalVariables globalVariables = GlobalVariables.getInstance();
         String[] values = string.split(String.valueOf(' '));
 
-        return Verifier.newBuilder()
-                .setMacAddress(UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE)))
-                .setStreamId(values[1])
-                .setPacketsCorrect(Long.parseLong(values[2]))
-                .setPacketsErrors(Long.parseLong(values[3]))
-                .setPacketsDropped(Long.parseLong(values[4]))
-                .setPacketsOutOfOrder(Long.parseLong(values[5]))
-                .setTimestamp(Instant.now())
-                .build();
+        return rebuildFromParams(
+                UTILs.convertToColonFormat(UTILs.getMyMacAddress(globalVariables.GATEWAY_INTERFACE))
+                ,values[1]
+                ,Long.parseLong(values[2])
+                ,Long.parseLong(values[3])
+                ,Long.parseLong(values[4])
+                ,Long.parseLong(values[5]));
     }
 
     public static void produceDataToKafkaBroker(Verifier verifier) {

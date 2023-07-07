@@ -35,6 +35,7 @@ private:
     void writeStatFile();
 	bool is_gen;
     int instanceID;
+    std::string streamID;
 	Configuration configuration;
 	int fd; //file descriptor to write sgen_id files
 
