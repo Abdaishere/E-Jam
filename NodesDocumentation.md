@@ -1,4 +1,3 @@
-This documentation is meant to explain how the generators and verifiers work on executing streams and ensuring proper sequencing. It is not meant to explain the structure of the stream.
 
 # **Packet Structure**
 
@@ -9,8 +8,6 @@ The packets will consist of normal ethernet packets with the addition of some fi
 -Source address
 
 -Stream ID (2-byte field)
-
--GeneratorID (2-byte field)
 
 -Sequence Number (8-byte field)
 
@@ -27,6 +24,58 @@ Before the test, the configuration of all streams in the system is sent by the a
 # **Packet Sequencing**
 Each generator sequences packets incrementally according to the the generator-streamID pair it belongs to.
 
-All the verifier instance on the pc are identical. This is because the verifier has the task of parsing which stream the received packet belongs to, and the rest of the parsing process depends on the configuration of the stream. 
-So it would not make sense to have multiple verifiers.
-The verifier will use an *in-memory database* which holds the configurations of all streams this node is involved in. This is to speed up the verification process and save memory as not all verifiers have to load the configuration table locally to them.
+The gateway has the task of parsing each packet to decide which stream it belongs to and forwarding it to the correct verifier.
+
+
+# **Program Arguments Passed to the different Executables**
+
+Genertor: generator ID, stream config folder directory
+
+Verifier: verifier ID, stream config folder directory
+
+Gateway: mode gateway for sending or verifiying, # of generators of verifiers, interface on which to send and receive from the switch
+
+
+Note: each verifier instance is only responsible for verifier the packets belonging to a single stream
+
+# **Configuration file structure**
+
+The configuration file for the stream is stored in the directory /etc/EJam/ under the name config_xxx where xxx represents the streamID
+It contains the following fields each on a single line sequentially:
+
+- Stream ID
+- Generator Number (follwed by a list of generators)
+- Verifier Number (followed by a list of verifiers)
+- Payload Type
+- Number of Packets
+- Payload Length
+- PRNG Seed
+- number of broadcast frames to send (per 100 frames of normal frames) (might be changed later)
+- interframe gap (in milliseconds)
+- lifetime
+- type of transport protocol to use
+- flow type (back to back, bursty)
+- burst length
+- burst delay
+- check content
+
+Example Configuration:
+```
+abc
+1
+8CB87EB05FEA
+1
+00D861A86FDA
+0
+0
+13
+17
+1
+2
+60000
+0
+1
+600
+20
+0
+```

@@ -18,12 +18,11 @@ void PacketCreator::createPacket(int rcvInd)
 {
     //Signal a packet created
     std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
-    statsManager->increaseSentPckts(1);
 
     //TODO move ByteArray creating inside each constructor class
     ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
 
-    payloadGenerator.regeneratePayload();
+    payloadGenerator.regeneratePayload(seqNum);
     ByteArray payload = payloadGenerator.getPayload();
 
     ByteArray innerProtocol = ByteArray(2, '0');
@@ -32,32 +31,30 @@ void PacketCreator::createPacket(int rcvInd)
     ethernetConstructor.setType(innerProtocol);
     ethernetConstructor.setDestinationAddress(destinationAddress);
     ethernetConstructor.setPayload(payload);
-    ethernetConstructor.constructFrame();
-    //TODO delete the values inside created ByteArray*
+    ethernetConstructor.constructFrame(seqNum);
     //lock the mutex and push to queue then unlock it
     mtx.lock();
     productQueue.push(ethernetConstructor.getFrame());
     mtx.unlock();
 }
 
-PacketCreator::PacketCreator(Configuration configuration): payloadGenerator(configuration), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
+PacketCreator::PacketCreator(Configuration configuration, int id): payloadGenerator(configuration, id), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
     sender = PacketSender::getInstance();
+    global_id = id;
+    seqNum = 1;
     this->configuration = configuration;
 }
 
 void PacketCreator::sendHead()
 {
-    if(productQueue.empty())
-    {
-        return;
-    }
+    //busy waiting to ensure that a packet is sent
+    while(productQueue.empty());
     mtx.lock();
     ByteArray packet = productQueue.front();
     productQueue.pop();
     mtx.unlock();
-
+//    writeToFile("transmitting packets \n");
     sender->transmitPackets(packet);
 	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
 	statsManager->increaseSentPckts(1);
-	std::cerr << ("Packet transmitted\n");
 }

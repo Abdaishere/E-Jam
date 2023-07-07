@@ -4,6 +4,7 @@
 
 
 #include <string>
+#include <cstdint>
 #include "Byte.h"
 
 class FrameConstructor
@@ -17,7 +18,7 @@ public:
     FrameConstructor(ByteArray);
     FrameConstructor(ByteArray, ByteArray);
     void setDestinationAddress(const ByteArray &destinationAddress);
-    virtual void constructFrame() = 0;
+    virtual void constructFrame(uint64_t&) = 0;
      ByteArray getFrame();
 };
 

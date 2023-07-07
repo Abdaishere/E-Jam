@@ -10,7 +10,7 @@
 #include <iostream>
 std::shared_ptr<PacketReceiver> PacketReceiver::instance = nullptr;
 PacketReceiver::PacketReceiver() {}
-
+#include "../../commonHeaders/Utils.h"
 std::shared_ptr<PacketReceiver> PacketReceiver::getInstance(int genID, std::string pipeDir, int pipePerm)
 {
     if(instance  == nullptr)
@@ -35,14 +35,15 @@ int PacketReceiver::openFifo()
     if(status == -1) {
         if (errno != EEXIST) //if the error was more than the file already existing
         {
-            printf("Error in creating the FIFO file\n");
+            writeToFile("Error in creating the FIFO file\n");
         } else {
-            printf("File already exists, skipping creation...\n");
+            writeToFile("File already exists, skipping creation...\n");
         }
     }
-
+    writeToFile("opening file as pipe\n");
     //open pipe as file
     fd = open((instance->pipeDir).c_str(), O_RDONLY);
+    writeToFile("returning  from open fifo function\n");
     std::cerr << "File descriptor "<< fd << "\n";
     return fd;
 }

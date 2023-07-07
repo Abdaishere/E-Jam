@@ -1,7 +1,7 @@
 #ifndef DATAGRAMVERIFIER_H
 #define DATAGRAMVERIFIER_H
 
-#include "Byte.h"
+#include "../../commonHeaders/Byte.h"
 class DatagramVerifier
 {
     public:

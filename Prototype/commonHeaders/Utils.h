@@ -14,6 +14,7 @@ ByteArray convertLLToStr(unsigned long long number);
 std::vector<std::string> splitString(const std::string& s, char delim);
 int convertStreamID(char* strmID);
 std::string exec(const char * command);
+void writeToFile(std::string line);
 
 
 #endif //GENERATOR_UTILS_H

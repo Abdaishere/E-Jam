@@ -10,8 +10,10 @@
 Prototype/Gateway/cmake-build-debug/**
 Prototype/Generator/cmake-build-debug/**
 Prototype/verifier/cmake-build-debug/**
+**/cmake-build-debug/**
 **/clion-environment.txt
 **/clion-log.txt
+**/cmake-build-debug/**
 *clion*
 *CMake*
 **/*.txt
@@ -49,6 +51,7 @@ Prototype/verifier/cmake-build-debug/**
 
 #Java class files
 */out/production/*
+**/out/production/**
 *.class
 *.idea/*
 

@@ -28,13 +28,14 @@ private:
 	ull sentPckts;
 	ull sentErrorPckts;
 
-    clock_t timer;
+    std::chrono::time_point<std::chrono::steady_clock> timer;
     StatsManager(const Configuration& config, int, bool);
     void resetStats();
 	void buildMsg(std::string&);
     void writeStatFile();
 	bool is_gen;
     int instanceID;
+    std::string streamID;
 	Configuration configuration;
 	int fd; //file descriptor to write sgen_id files
 

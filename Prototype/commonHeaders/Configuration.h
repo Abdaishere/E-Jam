@@ -11,7 +11,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <memory>
-
+#include <fstream>
 //constants of configuration
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
@@ -52,8 +52,7 @@ private:
     char* filePath;
 
     //convert int to corresponding hexa character
-    unsigned char hexSwitcher(int x)
-    {
+    unsigned char hexSwitcher(int x){
         if(x<10 && x>=0)
             return x+'0';
         else if(x>9 && x<16)
@@ -61,6 +60,34 @@ private:
         else
             return 'F';
     }
+
+
+public:
+    Configuration()
+    {
+        filePath = nullptr;
+    }
+
+    bool isSet()
+    {
+        return filePath != nullptr;
+    }
+
+
+
+	//DEBUG FUNCTIONS
+	//#######################################
+	void setMacAddress(ByteArray newAdd)
+	{
+		myMacAddress = newAdd;
+	}
+	void setFilePath(char* path)
+	{
+		filePath = path;
+	}
+	//##############################################
+
+
 
     //Discover the mac address of this machine
     ByteArray discoverMyMac()
@@ -96,49 +123,42 @@ private:
         if (success) memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
         return ByteArray(mac_address, MAC_ADD_LEN);
     }
-public:
-    Configuration()
-    {
-        filePath = nullptr;
-    }
-
-    bool isSet()
-    {
-        return filePath != nullptr;
-    }
 
     //Read configuration from a file of the correct format
     void loadFromFile(char* path)
     {
         //copying pointers, not actual contents of the char array
         filePath = path;
-        freopen(path,"r",stdin);
+        std::ifstream inFile(path, std::ifstream::in);
 
         //Set stream ID, must be of leangth 3 (STREAMID_LEN)
         unsigned char* sID =  new unsigned char[STREAMID_LEN];
-        for(int i=0;i<STREAMID_LEN;i++) std::cin>>sID[i];
-
+        for(int i=0;i<STREAMID_LEN;i++) {
+            inFile>>sID[i];
+            std::cout << (int)sID[i] << " ";
+        }
+        std::cout << "\n";
         setStreamID(sID);
 
         //Set senders and recievers
         int sndSize, rcvSize;
-        std::cin>> sndSize;
+        inFile >> sndSize;
         while(sndSize--)    //Read n senders
         {
             std::string s;
-            std::cin>>s;
+            inFile >> s;
             senders.push_back(ByteArray(s.begin(), s.end()));
         }
-        std::cin>> rcvSize;
+        inFile >> rcvSize;
         while(rcvSize--)    //Read n reciever
         {
             std::string s;
-            std::cin>>s;
+            inFile >> s;
             receivers.push_back(ByteArray(s.begin(), s.end()));
         }
         //Read payload type
         int input;
-        std::cin>>input;
+        inFile >> input;
         switch (input)
         {
             case 0:
@@ -151,15 +171,15 @@ public:
                 payloadType = RANDOM;
         }
 
-        std::cin>>numberOfPackets;
-        std::cin>>payloadLength;
-        std::cin>>seed;
-        std::cin>>bcFramesNum;
-        std::cin>>interFrameGap;
-        std::cin>>lifeTime;
+        inFile >> numberOfPackets;
+        inFile >> payloadLength;
+        inFile >> seed;
+        inFile >> bcFramesNum;
+        inFile >> interFrameGap;
+        inFile >> lifeTime;
 
         //Read transport protocol
-        std::cin>>input;
+        inFile >> input;
         switch (input)
         {
             case 0:
@@ -170,7 +190,7 @@ public:
         }
 
         //Read Flow type
-        std::cin>>input;
+        inFile >> input;
         switch (input)
         {
             case 0:
@@ -181,16 +201,15 @@ public:
         }
 
 		//Read burst length
-		std::cin>>burstLen;
+        inFile >> burstLen;
 
 		//Read burstDelay
-		std::cin>>burstDelay;
+        inFile >> burstDelay;
 
 		//Read check content
 		char cInput;
-		std::cin>>cInput;
-		cInput-='0'; //convert to int
-		checkContent = cInput;
+        inFile >> cInput;
+		checkContent = (cInput == '0');
 
         //handle macaddres
         myMacAddress = discoverMyMac();
@@ -245,8 +264,18 @@ public:
         }
     }
 
+    //get my global id for generator (amongst all generators in the stream)
+    int getID(ByteArray mac){
+        int sendersSize = senders.size();
+        for(int i=0; i<sendersSize; i++){
+            if(senders[i] == mac)
+                return i;
+        }
+        return -1;
+    }
+
     //getters and setters
-    
+
     std::vector<ByteArray>& getSenders()
     {
         return senders;
@@ -257,7 +286,7 @@ public:
         Configuration::senders = inSenders;
     }
 
-    std::vector<ByteArray>& getReceivers() 
+    std::vector<ByteArray>& getReceivers()
     {
         return receivers;
     }
@@ -322,6 +351,11 @@ public:
         return streamID;
     }
 
+    ByteArray getStreamIDVal()const
+    {
+        return *streamID;
+    }
+
     void setStreamID(const unsigned char* id)
     {
         streamID = std::make_shared<ByteArray>(id, STREAMID_LEN);
@@ -355,6 +389,14 @@ public:
     }
 
 
+    ull getBurstLength()
+    {
+        return burstLen;
+    }
+    ull getBurstDelay()
+    {
+        return burstDelay;
+    }
     //Printing for debugging only
     void print()
     {
@@ -390,6 +432,8 @@ public:
         printf("bcFramesNum: %llu\n", bcFramesNum);
         printf("interFrameGap: %llu\n", interFrameGap);
         printf("lifeTime: %llu\n", lifeTime);
+        printf("BurstDelay: %llu\n", burstDelay);
+        printf("BurstLength: %llu\n", burstLen);
 
         switch (transportProtocol)
         {
