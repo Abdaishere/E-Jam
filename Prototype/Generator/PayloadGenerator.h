@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #ifndef GENERATOR_PAYLOADGENERATOR_H
 #define GENERATOR_PAYLOADGENERATOR_H
@@ -15,21 +12,19 @@
 class PayloadGenerator
 {
 private:
-    static PayloadGenerator* instance;
     ByteArray payload;
     void generateFirstAlphabet(); // a -- m
     void generateSecondAlphabet(); // n -- z
-    void generateRandomCharacters();
-    void addStreamId();
-
+    void generateRandomCharacters(int);
     RNG rng;
-    void generateAlphabet();
-    explicit PayloadGenerator();
+    PayloadType payloadType;
+    int global_id;
 public:
     //must specify the length of the payload and its type
+    PayloadGenerator(Configuration);
+    PayloadGenerator(Configuration, int);
     ByteArray getPayload();
-    static PayloadGenerator* getInstance();
-    void regeneratePayload();
+    void regeneratePayload(uint64_t);
 };
 
 

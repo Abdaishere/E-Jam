@@ -8,14 +8,14 @@
 #include <csignal>
 #include <error.h>
 #include <iostream>
-PacketReceiver* PacketReceiver::instance = nullptr;
+std::shared_ptr<PacketReceiver> PacketReceiver::instance = nullptr;
 PacketReceiver::PacketReceiver() {}
-
-PacketReceiver* PacketReceiver::getInstance(int genID, std::string pipeDir, int pipePerm)
+#include "../../commonHeaders/Utils.h"
+std::shared_ptr<PacketReceiver> PacketReceiver::getInstance(int genID, std::string pipeDir, int pipePerm)
 {
     if(instance  == nullptr)
     {
-        instance = new PacketReceiver();
+        instance.reset(new PacketReceiver());
         instance->pipeDir = pipeDir;
         instance->permissions = pipePerm;
         instance->verID = genID;
@@ -35,14 +35,15 @@ int PacketReceiver::openFifo()
     if(status == -1) {
         if (errno != EEXIST) //if the error was more than the file already existing
         {
-            printf("Error in creating the FIFO file\n");
+            writeToFile("Error in creating the FIFO file\n");
         } else {
-            printf("File already exists, skipping creation...\n");
+            writeToFile("File already exists, skipping creation...\n");
         }
     }
-
+    writeToFile("opening file as pipe\n");
     //open pipe as file
     fd = open((instance->pipeDir).c_str(), O_RDONLY);
+    writeToFile("returning  from open fifo function\n");
     std::cerr << "File descriptor "<< fd << "\n";
     return fd;
 }
@@ -51,15 +52,18 @@ void PacketReceiver::closePipe() {
     close(fd);
 }
 
-void PacketReceiver::receivePackets(ByteArray* packet)
+//fix:must make the smart pointer passed by reference as it is lost when only copied
+void PacketReceiver::receivePackets(std::shared_ptr<ByteArray>& packet)
 {
     int packetSize; read(fd, &packetSize,4);
-    int received = read(fd, packet->bytes, packetSize);
-    std::cerr << "packet reached receiver " << received << " \n";
-    packet->length = received;
-//    for(int i=0; i<packet->length; i++)
-//        std::cerr<<(int)packet->at(i) << " ";
-//    std::cerr << "\n";
+    unsigned char* cstr = new unsigned char[packetSize]; //why we do not delete it ??
+    read(fd, cstr, packetSize);
+    packet = std::make_shared<ByteArray>(packetSize, 'a');
+    for(int i=0;i<packetSize;i++)
+        packet->at(i) = cstr[i];
+
+//    memcpy(packet, cstr, sizeof(cstr));
+    delete[] cstr;
 }
 
 PacketReceiver::~PacketReceiver() {

@@ -1,7 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
-
 #include "PacketCreator.h"
 #include "ConfigurationManager.h"
 #include <iostream>
@@ -16,52 +12,49 @@
 #include <StatsManager.h>
 
 std::queue<ByteArray> PacketCreator::productQueue;
-std::mutex PacketCreator::mtx; //to avoid data race on product queue
+std::mutex PacketCreator::mtx;
 
 void PacketCreator::createPacket(int rcvInd)
 {
     //Signal a packet created
-    StatsManager* statsManager = StatsManager::getInstance();
-    statsManager->increaseNumPackets();
+    std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
 
     //TODO move ByteArray creating inside each constructor class
-    ByteArray sourceAddress = ConfigurationManager::getConfiguration()->getMyMacAddress();
-    ByteArray destinationAddress = ConfigurationManager::getConfiguration()->getReceivers()[rcvInd];
+    ByteArray destinationAddress = configuration.getReceivers()[rcvInd];
 
-    PayloadGenerator* payloadGenerator = PayloadGenerator::getInstance();
-    payloadGenerator->regeneratePayload();
-    ByteArray payload = payloadGenerator->getPayload();
-    ByteArray innerProtocol = ByteArray("00",2);
-    innerProtocol[0] = (char)0x88;innerProtocol[1] = (char) 0xb5;
-    ByteArray streamID = *ConfigurationManager::getConfiguration()->getStreamID();
-    FrameConstructor* frameConstructor = new EthernetConstructor(sourceAddress, destinationAddress,
-                                                                 payload,
-                                                                 innerProtocol,streamID);
-    frameConstructor->constructFrame();
-    //TODO delete the values inside created ByteArray*
+    payloadGenerator.regeneratePayload(seqNum);
+    ByteArray payload = payloadGenerator.getPayload();
+
+    ByteArray innerProtocol = ByteArray(2, '0');
+    innerProtocol[0] = (unsigned char) 0x88;
+    innerProtocol[1] = (unsigned char) 0xb5;
+    ethernetConstructor.setType(innerProtocol);
+    ethernetConstructor.setDestinationAddress(destinationAddress);
+    ethernetConstructor.setPayload(payload);
+    ethernetConstructor.constructFrame(seqNum);
     //lock the mutex and push to queue then unlock it
     mtx.lock();
-    productQueue.push(frameConstructor->getFrame());
+    productQueue.push(ethernetConstructor.getFrame());
     mtx.unlock();
 }
 
-PacketCreator::PacketCreator() {
+PacketCreator::PacketCreator(Configuration configuration, int id): payloadGenerator(configuration, id), ethernetConstructor(configuration.getMyMacAddress(), *configuration.getStreamID()){
     sender = PacketSender::getInstance();
+    global_id = id;
+    seqNum = 1;
+    this->configuration = configuration;
 }
-#include <iostream>
+
 void PacketCreator::sendHead()
 {
-    if(productQueue.size()<1)
-    {
-        return;
-    }
-    //lock the mutex and consume then unloack it
+    //busy waiting to ensure that a packet is sent
+    while(productQueue.empty());
     mtx.lock();
     ByteArray packet = productQueue.front();
     productQueue.pop();
     mtx.unlock();
-
-    packet.print();
+//    writeToFile("transmitting packets \n");
     sender->transmitPackets(packet);
-    std::cerr << ("Packet transmitted\n");
+	std::shared_ptr<StatsManager> statsManager = StatsManager::getInstance(configuration);
+	statsManager->increaseSentPckts(1);
 }

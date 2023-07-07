@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
@@ -13,39 +10,49 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <string.h>
-
+#include <memory>
+#include <fstream>
 //constants of configuration
 typedef unsigned long long ull;
 #define MAC_ADD_LEN 6
 #define STREAMID_LEN 3
+#define SeqNum_Len 8
 #define FRAME_TYPE_LEN 2
 #define CRC_LENGTH 4
 #define PREMBLE_LENGTH 8
 #define LENGTH_LENGTH 2
+#define SeqNum_LEN 8
 #define CONFIG_DIR "/etc/EJam"
 
 
 
 enum PayloadType {FIRST, SECOND, RANDOM};
+enum TransportProtocol {TCP, UDP};
+enum FlowType {BACK_TO_BACK, BURSTY};
 
 class Configuration
 {
 private:
     //stream attributes
-    std::vector<ByteArray> senders; //list of senders mac addresses
-    std::vector<ByteArray> receivers; //list of receivers mac addressess
-    ByteArray myMacAddress;
-    PayloadType payloadType;
-    ull numberOfPackets = 100;
-    ull lifeTime = 100;
-    int payloadLength, seed;
-    int flowType;
-    ull SendingRate;
-    ByteArray* streamID;
+    std::shared_ptr<ByteArray> streamID;                //A 3 alphanumeric charaters defining a stream
+    std::vector<ByteArray> senders;     //list of senders mac addresses
+    std::vector<ByteArray> receivers;   //list of receivers mac addressess
+    ByteArray myMacAddress;             //The mac address of this machine (Inferred)
+    PayloadType payloadType;            //The type of the payload
+    ull numberOfPackets = 100;          //Number of packets flowing in the stream before it ends
+    ull bcFramesNum;                    //after x regular frame, send a broadcast frame
+    int payloadLength, seed;            //Payload length, and seed to use in RNGs
+    ull interFrameGap;                  //Time to wait between each packet generation in the stream in ms
+    ull lifeTime = 1000;                //Time to live before ending execution in ms
+    TransportProtocol transportProtocol;  //The protocol used in the transport layer
+    FlowType flowType;                  //The production pattern that the packets uses
+	ull burstLen;						//Number of packets in a burst
+	ull burstDelay;						//Delay between bursts in milliseconds
+    bool checkContent;                  //Whether to check content or not
+    char* filePath;
 
     //convert int to corresponding hexa character
-    unsigned char hexSwitcher(int x)
-    {
+    unsigned char hexSwitcher(int x){
         if(x<10 && x>=0)
             return x+'0';
         else if(x>9 && x<16)
@@ -54,6 +61,35 @@ private:
             return 'F';
     }
 
+
+public:
+    Configuration()
+    {
+        filePath = nullptr;
+    }
+
+    bool isSet()
+    {
+        return filePath != nullptr;
+    }
+
+
+
+	//DEBUG FUNCTIONS
+	//#######################################
+	void setMacAddress(ByteArray newAdd)
+	{
+		myMacAddress = newAdd;
+	}
+	void setFilePath(char* path)
+	{
+		filePath = path;
+	}
+	//##############################################
+
+
+
+    //Discover the mac address of this machine
     ByteArray discoverMyMac()
     {
         struct ifreq ifr;
@@ -84,40 +120,46 @@ private:
         }
 
         unsigned char mac_address[MAC_ADD_LEN];
-
         if (success) memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
-        return ByteArray((char*) mac_address, MAC_ADD_LEN,0);
+        return ByteArray(mac_address, MAC_ADD_LEN);
     }
-public:
+
+    //Read configuration from a file of the correct format
     void loadFromFile(char* path)
     {
-        freopen(path,"r",stdin);
+        //copying pointers, not actual contents of the char array
+        filePath = path;
+        std::ifstream inFile(path, std::ifstream::in);
 
         //Set stream ID, must be of leangth 3 (STREAMID_LEN)
-        char* sID = new char[STREAMID_LEN];
-        std::cin>>sID;
+        unsigned char* sID =  new unsigned char[STREAMID_LEN];
+        for(int i=0;i<STREAMID_LEN;i++) {
+            inFile>>sID[i];
+            std::cout << (int)sID[i] << " ";
+        }
+        std::cout << "\n";
         setStreamID(sID);
 
         //Set senders and recievers
         int sndSize, rcvSize;
-        std::cin>> sndSize;
+        inFile >> sndSize;
         while(sndSize--)    //Read n senders
         {
             std::string s;
-            std::cin>>s;
-            senders.push_back(ByteArray(s.c_str(),s.size(),0));
+            inFile >> s;
+            senders.push_back(ByteArray(s.begin(), s.end()));
         }
-        std::cin>> rcvSize;
+        inFile >> rcvSize;
         while(rcvSize--)    //Read n reciever
         {
             std::string s;
-            std::cin>>s;
-            receivers.push_back(ByteArray(s.c_str(),s.size(),0));
+            inFile >> s;
+            receivers.push_back(ByteArray(s.begin(), s.end()));
         }
         //Read payload type
-        int pt;
-        std::cin>>pt;
-        switch (pt)
+        int input;
+        inFile >> input;
+        switch (input)
         {
             case 0:
                 payloadType = FIRST;
@@ -129,9 +171,45 @@ public:
                 payloadType = RANDOM;
         }
 
-        std::cin>>numberOfPackets;
-        std::cin>>payloadLength;
-        std::cin>>seed;
+        inFile >> numberOfPackets;
+        inFile >> payloadLength;
+        inFile >> seed;
+        inFile >> bcFramesNum;
+        inFile >> interFrameGap;
+        inFile >> lifeTime;
+
+        //Read transport protocol
+        inFile >> input;
+        switch (input)
+        {
+            case 0:
+                transportProtocol = TCP;
+                break;
+            default:
+                transportProtocol = UDP;
+        }
+
+        //Read Flow type
+        inFile >> input;
+        switch (input)
+        {
+            case 0:
+                flowType = BACK_TO_BACK;
+                break;
+            default:
+                flowType = BURSTY;
+        }
+
+		//Read burst length
+        inFile >> burstLen;
+
+		//Read burstDelay
+        inFile >> burstDelay;
+
+		//Read check content
+		char cInput;
+        inFile >> cInput;
+		checkContent = (cInput == '0');
 
         //handle macaddres
         myMacAddress = discoverMyMac();
@@ -172,38 +250,50 @@ public:
         {
             std::string temp(12, 'x');
             for(int i=0; i<12; i++) temp[i] = e.at(i);
-            ByteArray mac6 = ByteArray(convertToMac6(temp).c_str(), 6);
+            std::string ma6 = convertToMac6(temp);
+            ByteArray mac6 = ByteArray(ma6.begin(), ma6.end());
             e = mac6;
         }
         for(auto& e:senders)
         {
             std::string temp(12, 'x');
             for(int i=0; i<12; i++) temp[i] = e.at(i);
-            ByteArray mac6 = ByteArray(convertToMac6(temp).c_str(), 6);
+            std::string ma6 = convertToMac6(temp);
+            ByteArray mac6 = ByteArray(ma6.begin(), ma6.end());
             e = mac6;
         }
     }
 
+    //get my global id for generator (amongst all generators in the stream)
+    int getID(ByteArray mac){
+        int sendersSize = senders.size();
+        for(int i=0; i<sendersSize; i++){
+            if(senders[i] == mac)
+                return i;
+        }
+        return -1;
+    }
+
     //getters and setters
-    
-    std::vector<ByteArray> &getSenders()
+
+    std::vector<ByteArray>& getSenders()
     {
         return senders;
     }
 
-    void setSenders(const std::vector<ByteArray> &senders)
+    void setSenders(const std::vector<ByteArray> &inSenders)
     {
-        Configuration::senders = senders;
+        Configuration::senders = inSenders;
     }
 
-    const std::vector<ByteArray> &getReceivers() const
+    std::vector<ByteArray>& getReceivers()
     {
         return receivers;
     }
 
-    void setReceivers(const std::vector<ByteArray> &receivers)
+    void setReceivers(const std::vector<ByteArray> &inReceivers)
     {
-        Configuration::receivers = receivers;
+        Configuration::receivers = inReceivers;
     }
 
     PayloadType getPayloadType() const
@@ -211,9 +301,9 @@ public:
         return payloadType;
     }
 
-    void setPayloadType(PayloadType payloadType)
+    void setPayloadType(PayloadType pt)
     {
-        Configuration::payloadType = payloadType;
+        Configuration::payloadType = pt;
     }
 
     long long int getNumberOfPackets() const
@@ -221,9 +311,9 @@ public:
         return numberOfPackets;
     }
 
-    void setNumberOfPackets(long long int numberOfPackets)
+    void setNumberOfPackets(long long int nop)
     {
-        Configuration::numberOfPackets = numberOfPackets;
+        Configuration::numberOfPackets = nop;
     }
 
     long long int getLifeTime() const
@@ -231,29 +321,9 @@ public:
         return lifeTime;
     }
 
-    void setLifeTime(long long int lifeTime)
+    void setLifeTime(long long int lt)
     {
-        Configuration::lifeTime = lifeTime;
-    }
-
-    int getFlowType() const
-    {
-        return flowType;
-    }
-
-    void setFlowType(int flowType)
-    {
-        Configuration::flowType = flowType;
-    }
-
-    long long int getSendingRate() const
-    {
-        return SendingRate;
-    }
-
-    void setSendingRate(long long int sendingRate)
-    {
-        SendingRate = sendingRate;
+        Configuration::lifeTime = lt;
     }
 
     ByteArray getMyMacAddress()
@@ -271,37 +341,78 @@ public:
         return payloadLength;
     }
 
-    void setMyMacAddress(char* mac)
+    void setMyMacAddress(const unsigned char* mac)
     {
-        myMacAddress = ByteArray(mac,6,0);
+        myMacAddress = ByteArray(mac,6);
     }
 
-    ByteArray* getStreamID()
+    std::shared_ptr<ByteArray> getStreamID()
     {
         return streamID;
     }
 
-    void setStreamID(char* id)
+    ByteArray getStreamIDVal()const
     {
-        streamID = new ByteArray(id,STREAMID_LEN,0);
+        return *streamID;
     }
 
-    //For debugging only
+    void setStreamID(const unsigned char* id)
+    {
+        streamID = std::make_shared<ByteArray>(id, STREAMID_LEN);
+    }
+
+    ull getBcFramesNum()
+    {
+        return bcFramesNum;
+    }
+
+    ull getInterFrameGap()
+    {
+        return interFrameGap;
+    }
+
+    ull getLifeTime()
+    {
+        return lifeTime;
+    }
+    TransportProtocol getTransportProtocol()
+    {
+        return transportProtocol;
+    }
+    FlowType getFlowType()
+    {
+        return flowType;
+    }
+    bool getCheckContent()
+    {
+        return checkContent;
+    }
+
+
+    ull getBurstLength()
+    {
+        return burstLen;
+    }
+    ull getBurstDelay()
+    {
+        return burstDelay;
+    }
+    //Printing for debugging only
     void print()
     {
-        printf("Stream ID: %s\n", streamID->bytes);
+        printf("Stream ID: %s\n", streamID->c_str());
         printf("Senders(%d):\n", (int)senders.size());
         for(auto sender: senders)
         {
             printf("%c", 9);
-            sender.printChars();
+            printChars(&sender);
         }
 
         printf("Receivers(%d):\n", (int)receivers.size());
         for(auto rec: receivers)
         {
             printf("%c",9);
-            rec.printChars();
+            printChars(&rec);
         }
 
         switch (payloadType)
@@ -317,7 +428,31 @@ public:
         }
         printf("Number of packets: %d\n", (int)numberOfPackets);
         printf("Payload length: %d\n", payloadLength);
-        printf("Seed: %d\n\n\n", seed);
+        printf("Seed: %d\n", seed);
+        printf("bcFramesNum: %llu\n", bcFramesNum);
+        printf("interFrameGap: %llu\n", interFrameGap);
+        printf("lifeTime: %llu\n", lifeTime);
+        printf("BurstDelay: %llu\n", burstDelay);
+        printf("BurstLength: %llu\n", burstLen);
+
+        switch (transportProtocol)
+        {
+            case TCP:
+                printf("Transprt Protocol Type: TCP\n");
+                break;
+            default:
+                printf("Transprt Protocol Type: UDP\n");
+        }
+        switch (flowType)
+        {
+            case BACK_TO_BACK:
+                printf("Flow Type: Back to back\n");
+                break;
+            default:
+                printf("Flow Type: Bursty\n");
+        }
+
+        printf("checkContent: %d\n", checkContent);
         printf("###########################\n");
     }
 };

@@ -1,23 +1,33 @@
-//
-// Created by mohamedelhagry on 12/2/22.
-//
-
 #include "Byte.h"
-#include <iostream>
-//unit testing for ByteArray struct
 
 
-/*
-int main()
+std::string byteArray_to_string(const ByteArray& byteArray)
 {
-    ByteArray arr2("mkdfg4", 6);
-    ByteArray arr3("ioasdf", 6);
-
-    ByteArray arr(15);
-    arr.write(arr2);
-    arr.write(arr3);
-    for(int i=0; i<15; i++)
-        printf("%c", arr.bytes[i]);
-
+	std::string result = "";
+	for(unsigned char uc: byteArray)
+	{
+		char c = (char) uc;
+		result+=c;
+	}
+	return result;
 }
-*/
+
+void print(ByteArray* ptr)
+{
+    int sz = ptr->size();
+    for(int i=0;i<sz;i++)
+    {
+        std::cout<<(int)ptr->at(i);
+    }
+    std::cout<<std::endl;
+}
+
+void printChars(ByteArray* ptr)
+{
+    int sz = ptr->size();
+    for(int i=0;i<sz;i++)
+    {
+        std::cout<<ptr->at(i);
+    }
+    std::cout<<std::endl;
+}

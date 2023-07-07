@@ -1,49 +1,32 @@
 #include "FramVerifier.h"
 
-//initialize the static instance
-FrameVerifier* FrameVerifier::instance = nullptr;
-
-FrameVerifier::FrameVerifier()
+FrameVerifier::FrameVerifier(Configuration configuration)
 {
-
+    this->configuration = configuration;
 }
 
-//handle singleton instance
-FrameVerifier* FrameVerifier::getInstance()
-{
-    if(instance == nullptr)
-    {
-        instance = new FrameVerifier();
-    }
-    return instance;
-}
-
-bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
+bool FrameVerifier::verifiy(std::shared_ptr<ByteArray> packet, int startIndex, int endIndex)
 {
     updateAcceptedSenders();
     std::vector<ByteArray>acceptedSenders = *(this->acceptedSenders);
 
-    ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+    std::shared_ptr<ErrorInfo> errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
 
     bool status = true;
 
-//    startIndex+=PREMBLE_LENGTH;
     //check for receiver
     bool correctReceiver = true;
-    for(int i=0;i<MAC_ADD_LEN;i++)
-    {
-        if(acceptedRecv[i] != packet->at(i + startIndex))
+    for(int i=0;i<MAC_ADD_LEN;i++){
+        if(configuration.getMyMacAddress()[i] != packet->at(i + startIndex))
         {
             correctReceiver = false;
             break;
         }
     }
 
-    if(!correctReceiver)
-    {
-        if(errorInfo == nullptr)
-        {
-           errorInfo = new ErrorInfo(packet);
+    if(!correctReceiver){
+        if(errorInfo == nullptr){
+           errorInfo = std::make_shared<ErrorInfo>(packet);
         }
         errorInfo->addError(DESTINATION_MAC);
         status = false;
@@ -52,16 +35,13 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     //check first 6 entries with a sender
     startIndex+=MAC_ADD_LEN;
     bool correctSender = false;
-    for(int i=0;i<acceptedSenders.size();i++)
-    {
+    for(int i=0;i<acceptedSenders.size();i++){
         //ith index is current sender compare it with first 6 entries in packet
         bool fullMatch = true;
-        for(int j=0;j<MAC_ADD_LEN;j++)
-        {
+        for(int j=0;j<MAC_ADD_LEN;j++){
             if(acceptedSenders[i][j]!= packet->at(j+startIndex)){ fullMatch = false; break; }
         }
-        if(fullMatch)
-        {
+        if(fullMatch){
             correctSender = true;
             break;
         }
@@ -71,7 +51,7 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
     {
         if(errorInfo == nullptr)
         {
-            errorInfo = new ErrorInfo(packet);
+            errorInfo = std::make_shared<ErrorInfo>(packet);
         }
         errorInfo->addError(SOURCE_MAC);
         status = false;
@@ -79,46 +59,37 @@ bool FrameVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
 
 
     //Extract payload
-    int payloadStart = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN + STREAMID_LEN ;
-    int payloadEnd = payloadStart + ConfigurationManager::getConfiguration()->getPayloadLength();
+    int payloadStart = MAC_ADD_LEN+MAC_ADD_LEN+FRAME_TYPE_LEN + STREAMID_LEN;
+    int payloadEnd = payloadStart + configuration.getPayloadLength();
 
     //Extract CRC
     //Calculate the correct CRC
     //CRC includes stream len ID
-    ByteArray* correctCRC = calculateCRC(packet, payloadStart, payloadEnd);
+    std::shared_ptr<ByteArray> correctCRC = calculateCRC(packet, payloadStart, payloadEnd);
     startIndex = endIndex-CRC_LENGTH;
     //Try to Match CRCs
     bool crcCorrect = true;
-    for(int i=0;i<CRC_LENGTH;i++)
-    {
-        if(correctCRC->bytes[i] != packet->at(i+startIndex)){ crcCorrect = false; break; }
+    for(int i=0;i<CRC_LENGTH;i++){
+        if(correctCRC->at(i) != packet->at(i+startIndex)){ crcCorrect = false; break; }
     }
-    if(!crcCorrect)
-    {
-        if(errorInfo == nullptr)
-        {
-            errorInfo = new ErrorInfo(packet);
+    if(!crcCorrect){
+        if(errorInfo == nullptr){
+            errorInfo = std::make_shared<ErrorInfo>(packet);
         }
         errorInfo->addError(CRC);
         status = false;
     }
-    delete correctCRC;
-
-
     return status;
 }
 
 void FrameVerifier::updateAcceptedSenders()
 {
-    acceptedSenders = &ConfigurationManager::getConfiguration()->getSenders();
+    std::vector<ByteArray>& senders = configuration.getSenders();
+    acceptedSenders = std::make_shared<std::vector<ByteArray>>(senders);
 }
 
-ByteArray *FrameVerifier::calculateCRC(ByteArray * packet, int startIdx, int endIdx)
+std::shared_ptr<ByteArray> FrameVerifier::calculateCRC(std::shared_ptr<ByteArray> packet, int startIdx, int endIdx)
 {
-    char* crc = new char[4];
-    for(int i=0; i<4;i++)
-        crc[i] = '4';
-    return new ByteArray(crc,4,0);
-    //TODO calculate CRC
-    return nullptr;
+    return std::make_shared<ByteArray>(4, '4');
+    ///TODO calculate CRC carefulllllllll ya hagryyyyyy
 }

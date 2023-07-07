@@ -1,26 +1,21 @@
 #include "PayloadVerifier.h"
 
-PayloadVerifier* PayloadVerifier::instance = nullptr;
-
-PayloadVerifier::PayloadVerifier()
+PayloadVerifier::PayloadVerifier(Configuration configuration, int genID)
 {
-
-}
-
-//handle singleton instance
-PayloadVerifier* PayloadVerifier::getInstance()
-{
-    if(instance == nullptr)
-    {
-        instance = new PayloadVerifier;
+    gen_global_ID = genID;
+    if(configuration.getPayloadType() == RANDOM){
+        rng.setSeed(configuration.getSeed());
+        for(int i=0; i<gen_global_ID; i++)
+            rng.long_jump();
+        rng.fillTable(1);
     }
-    return instance;
+    this->configuration = configuration;
 }
 
-bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
+bool PayloadVerifier::verifiy(std::shared_ptr<ByteArray>& packet, int startIndex, int endIndex, int packetNumber)
 {
     bool status = true;
-    switch(ConfigurationManager::getConfiguration()->getPayloadType())
+    switch(configuration.getPayloadType())
     {
         case FIRST: //verify first half of alphabet a--m
         {
@@ -50,17 +45,22 @@ bool PayloadVerifier::verifiy(ByteArray* packet, int startIndex, int endIndex)
             }
             break;
         }
-        case RANDOM:
-            //TODO check random payload type
+        case RANDOM: {
+            rng.goTo(packetNumber);
             status = true;
+            for (int i = startIndex; i <= endIndex; i++) {
+                if (packet->at(i) != rng.gen())
+                    status = false;
+            }
             break;
+        }
     }
     if(!status)
     {
-        ErrorInfo* errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
+        std::shared_ptr<ErrorInfo> errorInfo = ErrorHandler::getInstance()->packetErrorInfo;
         if(errorInfo == nullptr)
         {
-            errorInfo = new ErrorInfo(packet);
+            errorInfo = std::make_shared<ErrorInfo>(packet);
         }
         errorInfo->addError(PAYLOAD);
         ErrorHandler::getInstance()->logError();

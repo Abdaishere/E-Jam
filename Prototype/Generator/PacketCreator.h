@@ -1,6 +1,3 @@
-//
-// Created by khaled on 11/27/22.
-//
 
 #ifndef GENERATOR_PACKETCREATOR_H
 #define GENERATOR_PACKETCREATOR_H
@@ -14,22 +11,20 @@
 #include "FrameConstructor.h"
 #include "EthernetConstructor.h"
 #include "PacketSender.h"
+#include "xoshiro512+.cpp"
 
-struct segmentConstructorInfo{
-    //some relevant values regarding the headers of the protocol
-    //payload
-    //time to live
-    //destination ip address
-    //source ip address
-    //
-};
 
 class PacketCreator
 {
 private:
-    PacketSender* sender;
+    std::shared_ptr<PacketSender> sender;
+    PayloadGenerator payloadGenerator;
+    Configuration configuration;
+    EthernetConstructor ethernetConstructor;
+    int global_id;
+    uint64_t seqNum;
 public:
-    PacketCreator();
+    PacketCreator(Configuration, int id = 0);
     static std::mutex mtx;
     static std::queue<ByteArray> productQueue;
     void createPacket(int);
