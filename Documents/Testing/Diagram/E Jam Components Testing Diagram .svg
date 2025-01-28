@@ -1,0 +1,1619 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   width="704.1499999999999px"
+   height="850.1500000000001px"
+   viewBox="-0.5 -0.5 704.1499999999999 850.1500000000001"
+   animation="{&quot;scriptArr&quot;:[],&quot;cellIdArr&quot;:[]}"
+   id="svg1295"
+   sodipodi:docname="E Jam Components Testing Diagram .svg"
+   inkscape:export-filename="E Jam Components Testing Diagram .png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <sodipodi:namedview
+     id="namedview1297"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="1.0186437"
+     inkscape:cx="352.4294"
+     inkscape:cy="268.00341"
+     inkscape:window-width="1499"
+     inkscape:window-height="749"
+     inkscape:window-x="1130"
+     inkscape:window-y="743"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg1295" />
+  <defs
+     id="defs876">
+    <style
+       type="text/css"
+       id="style872">ul { margin-top: 0px; margin-bottom: 10px; }
+ol { margin-top: 0px; margin-bottom: 10px; }
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 { margin-bottom: .5rem; font-weight: 500; line-height: 1.2; }
+h1, h2, h3, h4, h5, h6 { margin-top: 0; margin-bottom: .5rem; }
+.h1, h1 { font-size: 2.5rem; }
+h2 { font-size: 1.5em; font-weight: bold; }
+h3 { font-size: 1.17em; font-weight: bold; }
+.h4, h4 { font-size: 1.5rem; }
+.h5, h5 { font-size: 1.25rem; }
+.h6, h6 { font-size: 1rem; }
+p { margin-top: 0; margin-bottom: 1rem; }
+a { color: #007bff; }
+</style>
+    <style
+       type="text/css"
+       id="style874">@import url(https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap);
+@import url(https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap);
+</style>
+    <xhtml:style
+       type="text/css">div.MathJax_SVG_Display { position: static; }
+span.MathJax_SVG { position: static !important; }</xhtml:style>
+    <xhtml:style
+       type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</xhtml:style>
+    <xhtml:style
+       type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 1px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: .7em}
+.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: #606872; color: white}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</xhtml:style>
+    <xhtml:style
+       type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</xhtml:style>
+    <xhtml:style
+       type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</xhtml:style>
+    <xhtml:style
+       type="text/css">.MathJax_Preview {color: #888; display: contents}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</xhtml:style>
+    <xhtml:style
+       type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: &quot; &quot;}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom &gt; * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd &gt; * {display: block!important}
+.MJXp-script-box &gt; *  {display: table!important; height: 50%}
+.MJXp-script-box &gt; * &gt; * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box &gt; *:last-child &gt; * {vertical-align: bottom}
+.MJXp-script-box &gt; * &gt; * &gt; * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover, .MJXp-munder {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over &gt; * {display: block!important}
+.MJXp-munderover &gt; *, .MJXp-munder &gt; * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable &gt; * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr &gt; .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child &gt; .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr &gt; .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child &gt; .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</xhtml:style>
+    <xhtml:style
+       type="text/css">.MathJax_SVG_Display {text-align: center; margin: 1em 0em; position: relative; display: block!important; text-indent: 0; max-width: none; max-height: none; min-width: 0; min-height: 0; width: 100%}
+.MathJax_SVG .MJX-monospace {font-family: monospace}
+.MathJax_SVG .MJX-sans-serif {font-family: sans-serif}
+#MathJax_SVG_Tooltip {background-color: InfoBackground; color: InfoText; border: 1px solid black; box-shadow: 2px 2px 5px #AAAAAA; -webkit-box-shadow: 2px 2px 5px #AAAAAA; -moz-box-shadow: 2px 2px 5px #AAAAAA; -khtml-box-shadow: 2px 2px 5px #AAAAAA; padding: 3px 4px; z-index: 401; position: absolute; left: 0; top: 0; width: auto; height: auto; display: none}
+.MathJax_SVG {display: inline; font-style: normal; font-weight: normal; line-height: normal; font-size: 100%; font-size-adjust: none; text-indent: 0; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0; min-height: 0; border: 0; padding: 0; margin: 0}
+.MathJax_SVG * {transition: none; -webkit-transition: none; -moz-transition: none; -ms-transition: none; -o-transition: none}
+.MathJax_SVG &gt; div {display: inline-block}
+.mjx-svg-href {fill: blue; stroke: blue}
+.MathJax_SVG_Processing {visibility: hidden; position: absolute; top: 0; left: 0; width: 0; height: 0; overflow: hidden; display: block!important}
+.MathJax_SVG_Processed {display: none!important}
+.MathJax_SVG_test {font-style: normal; font-weight: normal; font-size: 100%; font-size-adjust: none; text-indent: 0; text-transform: none; letter-spacing: normal; word-spacing: normal; overflow: hidden; height: 1px}
+.MathJax_SVG_test.mjx-test-display {display: table!important}
+.MathJax_SVG_test.mjx-test-inline {display: inline!important; margin-right: -1px}
+.MathJax_SVG_test.mjx-test-default {display: block!important; clear: both}
+.MathJax_SVG_ex_box {display: inline-block!important; position: absolute; overflow: hidden; min-height: 0; max-height: none; padding: 0; border: 0; margin: 0; width: 1px; height: 60ex}
+.mjx-test-inline .MathJax_SVG_left_box {display: inline-block; width: 0; float: left}
+.mjx-test-inline .MathJax_SVG_right_box {display: inline-block; width: 0; float: right}
+.mjx-test-display .MathJax_SVG_right_box {display: table-cell!important; width: 10000em!important; min-width: 0; max-width: none; padding: 0; border: 0; margin: 0}
+.MathJax_SVG .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</xhtml:style>
+  </defs>
+  <g
+     id="g1283">
+    <g
+       shape-node=""
+       id="g884">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-25"
+         d="M 7 0 L 696.42 0 L 703.42 7 L 703.42 842.98 L 696.42 849.98 L 7 849.98 L 0 842.98 L 0 7 Z"
+         fill="#7882ff"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path878" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-25"
+         cx="691.92"
+         cy="7"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,691.92,11.5)"
+         pointer-events="all"
+         id="ellipse880" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-25"
+         d="M 691.92 11 L 691.92 16.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,691.92,11.5)"
+         pointer-events="all"
+         id="path882" />
+    </g>
+    <g
+       shape-node=""
+       id="g890">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-25"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g888">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-25"
+           x="351.21"
+           y="17.5"
+           id="text886">Acceptance Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g898">
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-1"
+         d="M 30.16 22 L 672.99 22 L 679.99 29 L 679.99 833.06 L 672.99 840.06 L 30.16 840.06 L 23.16 833.06 L 23.16 29 Z"
+         fill="#64c8be"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path892" />
+      <ellipse
+         cell-id="EADGmijDcdawtbk75WXz-1"
+         cx="668.49"
+         cy="29"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,668.49,33.5)"
+         pointer-events="all"
+         id="ellipse894" />
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-1"
+         d="M 668.49 33 L 668.49 38.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,668.49,33.5)"
+         pointer-events="all"
+         id="path896" />
+    </g>
+    <g
+       shape-node=""
+       id="g904">
+      <g
+         cell-id="EADGmijDcdawtbk75WXz-1"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g902">
+        <text
+           cell-id="EADGmijDcdawtbk75WXz-1"
+           x="351.08"
+           y="39.5"
+           id="text900">End-to-End Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g912">
+      <path
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-3"
+         d="M 48.49 44.53 L 656.59 44.53 L 663.59 51.53 L 663.59 501.97 L 656.59 508.97 L 48.49 508.97 L 41.49 501.97 L 41.49 51.53 Z"
+         fill="#f0c832"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path906" />
+      <ellipse
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-3"
+         cx="652.09"
+         cy="51.53"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,652.09,56.03)"
+         pointer-events="all"
+         id="ellipse908" />
+      <path
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-3"
+         d="M 652.09 55.53 L 652.09 61.23"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,652.09,56.03)"
+         pointer-events="all"
+         id="path910" />
+    </g>
+    <g
+       shape-node=""
+       id="g918">
+      <g
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-3"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g916">
+        <text
+           cell-id="TQYFg1MJ6GxDoMH6MYwa-3"
+           x="352.04"
+           y="62.03"
+           id="text914">Functional Testing &amp; Load Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g926">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-1"
+         d="M 69.99 68.28 L 637.1 68.28 L 644.1 75.28 L 644.1 486.45 L 637.1 493.45 L 69.99 493.45 L 62.99 486.45 L 62.99 75.28 Z"
+         fill="#fff1aa"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path920" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-1"
+         cx="632.6"
+         cy="75.28"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,632.6,79.78)"
+         pointer-events="all"
+         id="ellipse922" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-1"
+         d="M 632.6 79.28 L 632.6 84.98"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,632.6,79.78)"
+         pointer-events="all"
+         id="path924" />
+    </g>
+    <g
+       shape-node=""
+       id="g932">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-1"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g930">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-1"
+           x="353.05"
+           y="85.78"
+           id="text928">Integration Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g940">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-24"
+         d="M 208 96 L 494.27 96 L 501.27 103 L 501.27 227.01 L 494.27 234.01 L 208 234.01 L 201 227.01 L 201 103 Z"
+         fill="#a0c8f0"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path934" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-24"
+         cx="489.77"
+         cy="103"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,489.77,107.5)"
+         pointer-events="all"
+         id="ellipse936" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-24"
+         d="M 489.77 107 L 489.77 112.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,489.77,107.5)"
+         pointer-events="all"
+         id="path938" />
+    </g>
+    <g
+       shape-node=""
+       id="g946">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-24"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g944">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-24"
+           x="350.64"
+           y="113.5"
+           id="text942">Exploratory Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g954">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-16"
+         d="M 227.25 119 L 480.25 119 L 487.25 126 L 487.25 217.32 L 480.25 224.32 L 227.25 224.32 L 220.25 217.32 L 220.25 126 Z"
+         fill="#8cc86e"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path948" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-16"
+         cx="475.75"
+         cy="126"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,475.75,130.5)"
+         pointer-events="all"
+         id="ellipse950" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-16"
+         d="M 475.75 130 L 475.75 135.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,475.75,130.5)"
+         pointer-events="all"
+         id="path952" />
+    </g>
+    <g
+       shape-node=""
+       id="g960">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-16"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g958">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-16"
+           x="353.25"
+           y="136.5"
+           id="text956">Usability Testing &amp; Compatibility Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g968">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-7"
+         d="M 288.51 144 L 421.5 144 L 428.5 151 L 428.5 209.38 L 421.5 216.38 L 288.51 216.38 L 281.51 209.38 L 281.51 151 Z"
+         fill="#64d2fa"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path962" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-7"
+         cx="417"
+         cy="151"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,417,155.5)"
+         pointer-events="all"
+         id="ellipse964" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-7"
+         d="M 417 155 L 417 160.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,417,155.5)"
+         pointer-events="all"
+         id="path966" />
+    </g>
+    <g
+       shape-node=""
+       id="g974">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-7"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g972">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-7"
+           x="354.51"
+           y="161.5"
+           id="text970">Performance Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g980">
+      <path
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-4"
+         d="M 332.88 167 L 385.66 167 C 413.11 167 413.11 207.49 385.66 207.49 L 332.88 207.49 C 305.43 207.49 305.43 167 332.88 167"
+         fill="#64c8be"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path976" />
+      <path
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-4"
+         d="M 332.88 167 L 385.66 167 C 413.11 167 413.11 207.49 385.66 207.49 L 332.88 207.49 C 305.43 207.49 305.43 167 332.88 167"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path978" />
+    </g>
+    <g
+       shape-node=""
+       id="g997">
+      <g
+         cell-id="TQYFg1MJ6GxDoMH6MYwa-4"
+         transform="translate(-0.5 -0.5)"
+         id="g995">
+        <switch
+           cell-id="TQYFg1MJ6GxDoMH6MYwa-4"
+           id="switch993">
+          <foreignObject
+             cell-id="TQYFg1MJ6GxDoMH6MYwa-4"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 93px; height: 1px; padding-top: 187px; margin-left: 313px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Front End</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg991">
+            <defs
+               id="defs983">
+              <path
+                 id="3y4BxxGCkkSuGADy"
+                 d="M333.140625,192.4125 h52.703125" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text989"><textPath
+                 xlink:href="#3y4BxxGCkkSuGADy"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath987"><tspan
+                   xml:space="preserve"
+                   id="tspan985">Front End</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1005">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-5"
+         d="M 205.47 264 L 493.91 264 L 500.91 271 L 500.91 465.01 L 493.91 472.01 L 205.47 472.01 L 198.47 465.01 L 198.47 271 Z"
+         fill="#e66478"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path999" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-5"
+         cx="489.41"
+         cy="271"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,489.41,275.5)"
+         pointer-events="all"
+         id="ellipse1001" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-5"
+         d="M 489.41 275 L 489.41 280.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,489.41,275.5)"
+         pointer-events="all"
+         id="path1003" />
+    </g>
+    <g
+       shape-node=""
+       id="g1011">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-5"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1009">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-5"
+           x="349.19"
+           y="281.5"
+           id="text1007">Fault-Tolerance Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1019">
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-4"
+         d="M 224 289 L 474.82 289 L 481.82 296 L 481.82 452.29 L 474.82 459.29 L 224 459.29 L 217 452.29 L 217 296 Z"
+         fill="#adb0ff"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1013" />
+      <ellipse
+         cell-id="EADGmijDcdawtbk75WXz-4"
+         cx="470.32"
+         cy="296"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,470.32,300.5)"
+         pointer-events="all"
+         id="ellipse1015" />
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-4"
+         d="M 470.32 300 L 470.32 305.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,470.32,300.5)"
+         pointer-events="all"
+         id="path1017" />
+    </g>
+    <g
+       shape-node=""
+       id="g1025">
+      <g
+         cell-id="EADGmijDcdawtbk75WXz-4"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1023">
+        <text
+           cell-id="EADGmijDcdawtbk75WXz-4"
+           x="348.91"
+           y="306.5"
+           id="text1021">Center Point</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1033">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-8"
+         d="M 290 314 L 413.85 314 L 420.85 321 L 420.85 375.66 L 413.85 382.66 L 290 382.66 L 283 375.66 L 283 321 Z"
+         fill="#fa9646"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1027" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-8"
+         cx="409.35"
+         cy="321"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,409.35,325.5)"
+         pointer-events="all"
+         id="ellipse1029" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-8"
+         d="M 409.35 325 L 409.35 330.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,409.35,325.5)"
+         pointer-events="all"
+         id="path1031" />
+    </g>
+    <g
+       shape-node=""
+       id="g1039">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-8"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1037">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-8"
+           x="351.43"
+           y="331.5"
+           id="text1035">Logic Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1045">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-3"
+         d="M 330.55 340 L 378.35 340 C 403.21 340 403.21 376.05 378.35 376.05 L 330.55 376.05 C 305.7 376.05 305.7 340 330.55 340"
+         fill="#64c8be"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1041" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-3"
+         d="M 330.55 340 L 378.35 340 C 403.21 340 403.21 376.05 378.35 376.05 L 330.55 376.05 C 305.7 376.05 305.7 340 330.55 340"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1043" />
+    </g>
+    <g
+       shape-node=""
+       id="g1062">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-3"
+         transform="translate(-0.5 -0.5)"
+         id="g1060">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-3"
+           id="switch1058">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-3"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 84px; height: 1px; padding-top: 358px; margin-left: 312px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Admin API</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1056">
+            <defs
+               id="defs1048">
+              <path
+                 id="vy4BxxGCkkSuGADz"
+                 d="M325.984375,363.4125 h56.03125" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1054"><textPath
+                 xlink:href="#vy4BxxGCkkSuGADz"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1052"><tspan
+                   xml:space="preserve"
+                   id="tspan1050">Admin API</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1068">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-2"
+         d="M 386.19 399.96 L 441.64 399.96 C 470.48 399.96 470.48 437.32 441.64 437.32 L 386.19 437.32 C 357.36 437.32 357.36 399.96 386.19 399.96"
+         fill="#64c8be"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1064" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-2"
+         d="M 386.19 399.96 L 441.64 399.96 C 470.48 399.96 470.48 437.32 441.64 437.32 L 386.19 437.32 C 357.36 437.32 357.36 399.96 386.19 399.96"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1066" />
+    </g>
+    <g
+       shape-node=""
+       id="g1085">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-2"
+         transform="translate(-0.5 -0.5)"
+         id="g1083">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-2"
+           id="switch1081">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-2"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 98px; height: 1px; padding-top: 419px; margin-left: 365px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Kafka Cluster</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1079">
+            <defs
+               id="defs1071">
+              <path
+                 id="fy4BxxGCkkSuGAD0"
+                 d="M377.984375,424.4125 h72.03125" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1077"><textPath
+                 xlink:href="#fy4BxxGCkkSuGAD0"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1075"><tspan
+                   xml:space="preserve"
+                   id="tspan1073">Kafka Cluster</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1091">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-4"
+         d="M 256.72 399.96 L 309.59 399.96 C 337.08 399.96 337.08 437.32 309.59 437.32 L 256.72 437.32 C 229.23 437.32 229.23 399.96 256.72 399.96"
+         fill="#64c8be"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1087" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-4"
+         d="M 256.72 399.96 L 309.59 399.96 C 337.08 399.96 337.08 437.32 309.59 437.32 L 256.72 437.32 C 229.23 437.32 229.23 399.96 256.72 399.96"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1089" />
+    </g>
+    <g
+       shape-node=""
+       id="g1108">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-4"
+         transform="translate(-0.5 -0.5)"
+         id="g1106">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-4"
+           id="switch1104">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-4"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 93px; height: 1px; padding-top: 419px; margin-left: 237px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Logger</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1102">
+            <defs
+               id="defs1094">
+              <path
+                 id="_y4BxxGCkkSuGAD1"
+                 d="M264.8125,424.4125 h37.375" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1100"><textPath
+                 xlink:href="#_y4BxxGCkkSuGAD1"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1098"><tspan
+                   xml:space="preserve"
+                   id="tspan1096">Logger</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1116">
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-6"
+         d="M 46.82 514.61 L 655.23 514.61 L 662.23 521.61 L 662.23 821.53 L 655.23 828.53 L 46.82 828.53 L 39.82 821.53 L 39.82 521.61 Z"
+         fill="#f0c832"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1110" />
+      <ellipse
+         cell-id="EADGmijDcdawtbk75WXz-6"
+         cx="650.73"
+         cy="521.61"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,650.73,526.11)"
+         pointer-events="all"
+         id="ellipse1112" />
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-6"
+         d="M 650.73 525.61 L 650.73 531.31"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,650.73,526.11)"
+         pointer-events="all"
+         id="path1114" />
+    </g>
+    <g
+       shape-node=""
+       id="g1122">
+      <g
+         cell-id="EADGmijDcdawtbk75WXz-6"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1120">
+        <text
+           cell-id="EADGmijDcdawtbk75WXz-6"
+           x="350.53"
+           y="532.11"
+           id="text1118">Load Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1130">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-26"
+         d="M 67.98 539.67 L 635.09 539.67 L 642.09 546.67 L 642.09 803.79 L 635.09 810.79 L 67.98 810.79 L 60.98 803.79 L 60.98 546.67 Z"
+         fill="#fff1aa"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1124" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-26"
+         cx="630.59"
+         cy="546.67"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,630.59,551.17)"
+         pointer-events="all"
+         id="ellipse1126" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-26"
+         d="M 630.59 550.67 L 630.59 556.37"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,630.59,551.17)"
+         pointer-events="all"
+         id="path1128" />
+    </g>
+    <g
+       shape-node=""
+       id="g1147">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-26"
+         transform="translate(-0.5 -0.5)"
+         id="g1145">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-26"
+           id="switch1143">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-26"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe flex-start; justify-content: unsafe center; width: 579px; height: 1px; padding-top: 547px; margin-left: 62px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Integration Testing</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1141">
+            <defs
+               id="defs1133">
+              <path
+                 id="AK4BxxGCkkSuGAD2"
+                 d="M302.5625,559.6 h97.859375" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1139"><textPath
+                 xlink:href="#AK4BxxGCkkSuGAD2"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1137"><tspan
+                   xml:space="preserve"
+                   id="tspan1135">Integration Testing</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1155">
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-5"
+         d="M 242.28 662 L 456.53 662 L 463.53 669 L 463.53 795.12 L 456.53 802.12 L 242.28 802.12 L 235.28 795.12 L 235.28 669 Z"
+         fill="#c8f08c"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1149" />
+      <ellipse
+         cell-id="EADGmijDcdawtbk75WXz-5"
+         cx="452.03"
+         cy="669"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,452.03,673.5)"
+         pointer-events="all"
+         id="ellipse1151" />
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-5"
+         d="M 452.03 673 L 452.03 678.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,452.03,673.5)"
+         pointer-events="all"
+         id="path1153" />
+    </g>
+    <g
+       shape-node=""
+       id="g1161">
+      <g
+         cell-id="EADGmijDcdawtbk75WXz-5"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1159">
+        <text
+           cell-id="EADGmijDcdawtbk75WXz-5"
+           x="348.91"
+           y="679.5"
+           id="text1157">Integration Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1169">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-28"
+         d="M 269.87 685 L 428.94 685 L 435.94 692 L 435.94 786.4 L 428.94 793.4 L 269.87 793.4 L 262.87 786.4 L 262.87 692 Z"
+         fill="#adb0ff"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1163" />
+      <ellipse
+         cell-id="jNosl13H0RXkluZ5hi8h-28"
+         cx="424.44"
+         cy="692"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,424.44,696.5)"
+         pointer-events="all"
+         id="ellipse1165" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-28"
+         d="M 424.44 696 L 424.44 701.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,424.44,696.5)"
+         pointer-events="all"
+         id="path1167" />
+    </g>
+    <g
+       shape-node=""
+       id="g1175">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-28"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1173">
+        <text
+           cell-id="jNosl13H0RXkluZ5hi8h-28"
+           x="348.91"
+           y="702.5"
+           id="text1171"> Network Access Layer</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1181">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-29"
+         d="M 334.15 751 L 367.83 751 C 385.33 751 385.33 783.07 367.83 783.07 L 334.15 783.07 C 316.64 783.07 316.64 751 334.15 751"
+         fill="#e6e6e6"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1177" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-29"
+         d="M 334.15 751 L 367.83 751 C 385.33 751 385.33 783.07 367.83 783.07 L 334.15 783.07 C 316.64 783.07 316.64 751 334.15 751"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1179" />
+    </g>
+    <g
+       shape-node=""
+       id="g1198">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-29"
+         transform="translate(-0.5 -0.5)"
+         id="g1196">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-29"
+           id="switch1194">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-29"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 59px; height: 1px; padding-top: 767px; margin-left: 322px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Gateway</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1192">
+            <defs
+               id="defs1184">
+              <path
+                 id="gK4BxxGCkkSuGAD3"
+                 d="M327.8125,772.4125 h47.359375" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1190"><textPath
+                 xlink:href="#gK4BxxGCkkSuGAD3"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1188"><tspan
+                   xml:space="preserve"
+                   id="tspan1186">Gateway</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1204">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-30"
+         d="M 377.37 709 L 413.99 709 C 433.03 709 433.03 741.07 413.99 741.07 L 377.37 741.07 C 358.33 741.07 358.33 709 377.37 709"
+         fill="#e6e6e6"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1200" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-30"
+         d="M 377.37 709 L 413.99 709 C 433.03 709 433.03 741.07 413.99 741.07 L 377.37 741.07 C 358.33 741.07 358.33 709 377.37 709"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1202" />
+    </g>
+    <g
+       shape-node=""
+       id="g1221">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-30"
+         transform="translate(-0.5 -0.5)"
+         id="g1219">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-30"
+           id="switch1217">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-30"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 64px; height: 1px; padding-top: 725px; margin-left: 364px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Verifier</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1215">
+            <defs
+               id="defs1207">
+              <path
+                 id="QK4BxxGCkkSuGAD4"
+                 d="M377.3125,730.4125 h37.359375" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1213"><textPath
+                 xlink:href="#QK4BxxGCkkSuGAD4"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1211"><tspan
+                   xml:space="preserve"
+                   id="tspan1209">Verifier</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1227">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-31"
+         d="M 289.32 709 L 325.94 709 C 344.98 709 344.98 741.07 325.94 741.07 L 289.32 741.07 C 270.28 741.07 270.28 709 289.32 709"
+         fill="#e6e6e6"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1223" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-31"
+         d="M 289.32 709 L 325.94 709 C 344.98 709 344.98 741.07 325.94 741.07 L 289.32 741.07 C 270.28 741.07 270.28 709 289.32 709"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1225" />
+    </g>
+    <g
+       shape-node=""
+       id="g1244">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-31"
+         transform="translate(-0.5 -0.5)"
+         id="g1242">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-31"
+           id="switch1240">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-31"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 64px; height: 1px; padding-top: 725px; margin-left: 276px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">Generator</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1238">
+            <defs
+               id="defs1230">
+              <path
+                 id="wK4BxxGCkkSuGAD5"
+                 d="M280.984375,730.4125 h54.03125" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1236"><textPath
+                 xlink:href="#wK4BxxGCkkSuGAD5"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1234"><tspan
+                   xml:space="preserve"
+                   id="tspan1232">Generator</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1252">
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-15"
+         d="M 272.38 564 L 427.01 564 L 434.01 571 L 434.01 643.93 L 427.01 650.93 L 272.38 650.93 L 265.38 643.93 L 265.38 571 Z"
+         fill="#e66478"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1246" />
+      <ellipse
+         cell-id="EADGmijDcdawtbk75WXz-15"
+         cx="422.51"
+         cy="571"
+         rx="4"
+         ry="4"
+         fill="none"
+         stroke="#000000"
+         transform="rotate(45,422.51,575.5)"
+         pointer-events="all"
+         id="ellipse1248" />
+      <path
+         cell-id="EADGmijDcdawtbk75WXz-15"
+         d="M 422.51 575 L 422.51 580.7"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         transform="rotate(45,422.51,575.5)"
+         pointer-events="all"
+         id="path1250" />
+    </g>
+    <g
+       shape-node=""
+       id="g1258">
+      <g
+         cell-id="EADGmijDcdawtbk75WXz-15"
+         fill="#000000"
+         font-family="Helvetica"
+         text-anchor="middle"
+         font-size="12px"
+         id="g1256">
+        <text
+           cell-id="EADGmijDcdawtbk75WXz-15"
+           x="349.2"
+           y="581.5"
+           id="text1254">Security Testing</text>
+      </g>
+    </g>
+    <g
+       shape-node=""
+       id="g1264">
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-15"
+         d="M 326.49 590 L 377.72 590 C 404.36 590 404.36 641.17 377.72 641.17 L 326.49 641.17 C 299.85 641.17 299.85 590 326.49 590"
+         fill="#64c8be"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1260" />
+      <path
+         cell-id="jNosl13H0RXkluZ5hi8h-15"
+         d="M 326.49 590 L 377.72 590 C 404.36 590 404.36 641.17 377.72 641.17 L 326.49 641.17 C 299.85 641.17 299.85 590 326.49 590"
+         fill="none"
+         stroke="#000000"
+         stroke-miterlimit="10"
+         pointer-events="all"
+         id="path1262" />
+    </g>
+    <g
+       shape-node=""
+       id="g1281">
+      <g
+         cell-id="jNosl13H0RXkluZ5hi8h-15"
+         transform="translate(-0.5 -0.5)"
+         id="g1279">
+        <switch
+           cell-id="jNosl13H0RXkluZ5hi8h-15"
+           id="switch1277">
+          <foreignObject
+             cell-id="jNosl13H0RXkluZ5hi8h-15"
+             style="overflow: visible; text-align: left;"
+             pointer-events="none"
+             width="100%"
+             height="100%"
+             requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility">
+            <xhtml:div
+               style="display: flex; align-items: unsafe center; justify-content: unsafe center; width: 90px; height: 1px; padding-top: 616px; margin-left: 307px;">
+              <xhtml:div
+                 style="box-sizing: border-box; font-size: 0; text-align: center; ">
+                <xhtml:div
+                   style="display: inline-block; font-size: 12px; font-family: &quot;Helvetica&quot;, &quot;VP Default&quot;; color: #000000; line-height: 1.2; pointer-events: all; word-break: break-word; white-space: normal; word-wrap: normal; ">
+                  <xhtml:div
+                     ani="">
+                    <xhtml:div
+                       ani="">System's API</xhtml:div>
+                  </xhtml:div>
+                </xhtml:div>
+              </xhtml:div>
+            </xhtml:div>
+          </foreignObject>
+          <svg
+             width="100%"
+             height="100%"
+             version="1.1"
+             id="svg1275">
+            <defs
+               id="defs1267">
+              <path
+                 id="oK4BxxGCkkSuGAD6"
+                 d="M316.84375,621.4125 h70.3125" />
+            </defs>
+            <text
+               fill="rgb(0, 0, 0)"
+               font-size="12px"
+               font-family="Helvetica, &quot;VP Default&quot;"
+               font-weight="400"
+               id="text1273"><textPath
+                 xlink:href="#oK4BxxGCkkSuGAD6"
+                 startOffset="50%"
+                 text-anchor="middle"
+                 id="textPath1271"><tspan
+                   xml:space="preserve"
+                   id="tspan1269">System's API</tspan></textPath></text>
+          </svg>
+        </switch>
+      </g>
+    </g>
+  </g>
+  <switch
+     id="switch1291">
+    <g
+       requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
+       id="g1285" />
+    <a
+       transform="translate(0,-5)"
+       id="a1289">
+      <text
+         text-anchor="middle"
+         font-size="10px"
+         x="50%"
+         y="100%"
+         id="text1287" />
+    </a>
+  </switch>
+</svg>
