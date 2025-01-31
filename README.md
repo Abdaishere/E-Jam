@@ -111,8 +111,8 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 
 ## 🏗 Architecture
 
-### System Diagram
-![Architecture Diagram](Documentation/FSMs/device_state_machine.png)
+### Stream State Machine
+![Stream State Machine](Documentation/FSMs/stream_state_machine.png)
 
 ### Key Components
 - **Admin Client**: Cross-platform with UI for test configuration and monitoring.
