@@ -112,7 +112,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 ## 🏗 Architecture
 
 ### Stream State Machine
-![Stream State Machine](Documentation/FSMs/stream_state_machine.png)
+<img src="Documentation/FSMs/stream_state_machine.png" width="250px" alt="Stream State Machine"/>
 
 ### Key Components
 - **Admin Client**: Cross-platform with UI for test configuration and monitoring.
@@ -122,19 +122,21 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 
 ### Directory Structure
 ```bash
- .
-├──  Admin Client          # Flutter UI + Rust backend
-├──  Documentation         # PDF specs and presentation
-├──  Prototype             # Core components (Old Version)
-└──  Screen Shots          # UI previews
+📁 .
+├── 📁 Admin Client          # Flutter UI + Rust backend
+├── 📁 Documentation         # PDF specs and presentation
+├── 📁 Prototype             # Core components (Old Version)
+└── 📁 Screen Shots          # UI previews
 ```
 
 ---
 
 ## 📚 Documentation
-- [Full Project Documentation](Documentation/The%20E-Jam%20Project%20Documentation.pdf)
-- [RFC Compliance Guide](Documentation/Test%20Design.pdf)
-- [API Reference](Admin%20Client/e_jam_backend/README.md)
+- [Full Project Description](Documentation/The%20E-Jam%20Project%20Documentation.pdf)
+- [Front end Reference](Admin%20Client/e_jam_frontend/README.md)
+- [Center Point Reference](Admin%20Client/e_jam_backend/README.md)
+- [Kafka Reference](Admin%20Client/kafka_stack_docker_compose/README.md)
+- [Admint Client Reference](Admin%20Client/README.md)
 
 ---
 
