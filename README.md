@@ -18,6 +18,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 - [Walkthrough](#-walkthrough)
 - [Architecture](#-architecture)
 - [Documentation](#-documentation)
+- [Contributing](#-contributing)
 - [License](#-license)
 - [Acknowledgments](#-acknowledgments)
 
@@ -133,10 +134,19 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 
 ## 📚 Documentation
 - [Full Project Description](Documentation/The%20E-Jam%20Project%20Documentation.pdf)
+- [Nodes Documentation](Documentation/NodesDocumentation.md)
 - [Front end Reference](Admin%20Client/e_jam_frontend/README.md)
 - [Center Point Reference](Admin%20Client/e_jam_backend/README.md)
 - [Kafka Reference](Admin%20Client/kafka_stack_docker_compose/README.md)
 - [Admint Client Reference](Admin%20Client/README.md)
+
+---
+
+## 🤝 Contributing
+1. Fork the repository.
+2. Create a feature branch: `git checkout -b feat/amazing-feature`
+3. Submit a PR with detailed documentation.  
+   See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
