@@ -38,7 +38,7 @@
 <dependency>
   <groupId>org.apache.kafka</groupId>
   <artifactId>kafka-clients</artifactId>
-  <version>3.4.0</version>
+  <version>5.3.0-ccs</version>
   <!-- https://mvnrepository.com/artifact/io.confluent/kafka-avro-serializer -->
 
 </dependency>
@@ -53,7 +53,7 @@
 <dependency>
     <groupId>org.apache.kafka</groupId>
     <artifactId>kafka-clients</artifactId>
-    <version>3.4.0</version>
+    <version>5.3.0-ccs</version>
 </dependency>
 
 <dependency>
