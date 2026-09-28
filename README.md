@@ -31,7 +31,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 - **Real-Time Monitoring**: Live dashboards with interactive charts for packet statistics.
 - **Multi-Protocol Support**: Test TCP, UDP, and custom protocols.
 - **Distributed Architecture**: Scale tests across multiple nodes via Docker and Kafka.
-- **Automated RFC Compliance**: Pre-configured tests for RFC2544, RFC2889, and RFC2899.
+- **Automated RFC Compliance**: Pre-configured tests for RFC2544 and RFC2889.
 
 ### Unique Advantages Over Competitors
 | Feature               | E-Jam          |
