@@ -63,7 +63,7 @@ It was our 2022 to 2023 graduation project at Cairo University, Faculty of Compu
 - Java 11, Rust 1.68+, Flutter 3.7+
 
 ### Steps
-> For More Details, each folder has its own README file for other functionalities. This is just  straight-forward,  instructions to run the app.
+> Each folder has its own README with more detail. These are the short steps to run the app. Run each step from the repository root.
 
 1. **Clone the Repository**:
    ```bash
@@ -95,7 +95,7 @@ It was our 2022 to 2023 graduation project at Cairo University, Faculty of Compu
    ```bash
    cd Prototype/SystemApi
    mvn clean install
-   java -jar target/systemapi-1.0.0.jar
+   java -jar target/SystemApi-1.0-SNAPSHOT.jar
    ```
 ---
 
