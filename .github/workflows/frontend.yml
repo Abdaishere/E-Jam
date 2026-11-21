@@ -116,7 +116,9 @@ jobs:
 
     build-Windows:
         name: "Build Flutter For Windows"
-        runs-on: windows-latest
+        # Flutter 3.10.5 only knows Visual Studio 2019/2022. windows-latest now ships
+        # Visual Studio 2026, so CMake fell back to "Visual Studio 16 2019" and failed.
+        runs-on: windows-2022
         defaults:
           run:
             working-directory: "./Admin Client/e_jam_frontend/"
