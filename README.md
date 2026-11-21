@@ -3,11 +3,13 @@
 <p align="center" ><img height="350" src="Admin Client/e_jam_frontend/assets/images/icon.png" alt="E-Jam Logo"/> </p>
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Linux%20%7C%20Windows%20%7C%20MacOS-greenlight)
+![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Linux%20%7C%20Windows%20%7C%20MacOS-brightgreen)
 ![Version](https://img.shields.io/badge/version-1.1.2+1-Green)
-![Status](https://img.shields.io/badge/status-Testing-orange)
+![Status](https://img.shields.io/badge/status-Completed%202023-blue)
 
-A high-performance platform for stress-testing, monitoring, and debugging network switches with customizable scenarios.
+E-Jam is a distributed test bench for network switches. It runs RFC 2544 and RFC 2889 benchmarks from a group of nodes and shows the results live in a Flutter admin client.
+
+It was our 2022 to 2023 graduation project at Cairo University, Faculty of Computers and Artificial Intelligence, built in collaboration with Siemens EDA. Engineers from Siemens EDA were our mentors, our sponsor and the product owner. It was a university project, not a Siemens product.
 
 ---
 
@@ -20,6 +22,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 - [Documentation](#-documentation)
 - [Contributing](#-contributing)
 - [License](#-license)
+- [Team](#team)
 - [Acknowledgments](#-acknowledgments)
 
 ---
@@ -29,17 +32,9 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 ### Core Capabilities
 - **Stress Testing**: Measure throughput, latency, and packet loss under custom loads.
 - **Real-Time Monitoring**: Live dashboards with interactive charts for packet statistics.
-- **Multi-Protocol Support**: Test TCP, UDP, and custom protocols.
+- **TCP and UDP Streams**: Choose the transport protocol for each stream.
 - **Distributed Architecture**: Scale tests across multiple nodes via Docker and Kafka.
 - **Automated RFC Compliance**: Pre-configured tests for RFC2544 and RFC2889.
-
-### Unique Advantages Over Competitors
-| Feature               | E-Jam          |
-|-----------------------|----------------|
-| Custom Test Scenarios | ✅             | 
-| Cross-Platform UI     | ✅ (Flutter)   |
-| Real-Time Analytics   | ✅             |
-| Open Source           | ✅             | 
 
 ---
 
@@ -72,7 +67,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/E-Jam.git
+   git clone https://github.com/Abdaishere/E-Jam.git
    cd E-Jam
    ```
 
@@ -119,7 +114,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 - **Admin Client**: Cross-platform with UI for test configuration and monitoring.
 - **Generators/Verifiers**: C++ modules for packet generation/validation.
 - **Kafka Cluster**: Real-time data streaming for distributed analytics.
-- **System API**: Java/Spring Boot backend for orchestration.
+- **System API**: Java/Spring Boot agent on each node. It takes the start and stop calls from Center Point, launches the generators and verifiers and publishes their statistics to Kafka (code in `Prototype/SystemApi`).
 
 ### Directory Structure
 ```bash
@@ -138,7 +133,7 @@ A high-performance platform for stress-testing, monitoring, and debugging networ
 - [Front end Reference](Admin%20Client/e_jam_frontend/README.md)
 - [Center Point Reference](Admin%20Client/e_jam_backend/README.md)
 - [Kafka Reference](Admin%20Client/kafka_stack_docker_compose/README.md)
-- [Admint Client Reference](Admin%20Client/README.md)
+- [Admin Client Reference](Admin%20Client/README.md)
 
 ---
 
@@ -155,8 +150,21 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
+## Team
+
+Five of us built E-Jam: Khaled Waleed, Mohamed Amr, Abdallah El Belkasy, Islam Wagih and Mostafa Abdullah.
+
+What I (Abdallah) built:
+- Center Point, the control plane. It is written in Rust on Actix Web. Its REST API drives every stream, device and process through explicit state machines and reads the test statistics from Apache Kafka, decoding them with Avro schemas from a schema registry. Code: `Admin Client/e_jam_backend`.
+- The Flutter admin client that configures tests and charts the results live. Code: `Admin Client/e_jam_frontend`.
+
+My teammates wrote the C++ packet generators and verifiers and the Java System API, which runs on each node and publishes the statistics to Kafka.
+
+---
+
 ## 🙏 Acknowledgments
-- **Developers**: Khaled Waleed, Mohamed Amr, Abdallah Mohamed, Islam Wagin, Mostafa Abdullah
+
+Thank you to our supervisor, Dr. Mohammad El-Ramly, and to our mentors at Siemens EDA, who sponsored the project and acted as its product owner.
 
 
 ### Screenshots
